@@ -908,11 +908,30 @@ router.get('/places', adminTokenAuth, adminAuth, async (req, res) => {
       Place.find().lean(),
       BusinessAccount.find().select('name').lean()
     ]);
-    const bizMap = new Map(businesses.map(b => [b._id.toString(), b.name]));
-    const data = places.map(p => ({
-      ...p,
-      ownerName: bizMap.get(p.ownerId) || 'System'
-    }));
+    const bizMap = new Map();
+    businesses.forEach(b => {
+      const bId = b._id.toString();
+      bizMap.set(bId, b.name);
+      if (b.customId) {
+        bizMap.set(b.customId, b.name);
+        // Fallback for suffix matches (e.g. 52623887 matches business52623887)
+        const suffix = b.customId.replace('business', '');
+        if (suffix && suffix !== b.customId) {
+           bizMap.set(suffix, b.name);
+        }
+      }
+    });
+
+    const data = places.map(p => {
+      let ownerName = 'Hệ thống (WanderViet)';
+      if (p.ownerId) {
+        ownerName = bizMap.get(p.ownerId) || bizMap.get(p.ownerId.toString()) || ownerName;
+      }
+      return {
+        ...p,
+        ownerName
+      };
+    });
     res.json({ success: true, data });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

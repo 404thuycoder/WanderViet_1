@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
 const Transaction = require('../models/Transaction');
 const Place = require('../models/Place');
@@ -16,11 +17,14 @@ router.post('/', auth, async (req, res) => {
       specialRequests, paymentMethod, bookingType
     } = req.body;
 
-    const place = await Place.findOne({ id: placeId });
+    const placeQuery = [{ id: placeId }];
+    if (mongoose.Types.ObjectId.isValid(placeId)) placeQuery.push({ _id: placeId });
+    const place = await Place.findOne({ $or: placeQuery });
+
     if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
     if (!place.ownerId) return res.status(400).json({ success: false, message: 'Địa điểm này chưa được quản lý bởi doanh nghiệp' });
 
-    const totalPrice = (place.priceFrom || 0) * (peopleCount || 1);
+    const totalPrice = (place.price || place.priceFrom || 0) * (peopleCount || 1);
     const type = bookingType || (place.isTour ? 'tour' : 'service');
 
     const newBooking = new Booking({
@@ -46,7 +50,8 @@ router.post('/', auth, async (req, res) => {
     await newBooking.save();
 
     // Nếu không phải "liên hệ" → tạo transaction pending
-    if (paymentMethod && paymentMethod !== 'contact' && totalPrice > 0) {
+    const isOnlinePay = ['transfer', 'qr', 'momo', 'zalopay', 'e-wallet', 'card'].includes(paymentMethod);
+    if (isOnlinePay && totalPrice > 0) {
       const txn = new Transaction({
         transactionId: 'TXN-' + Math.random().toString(36).substr(2, 8).toUpperCase(),
         userId:        req.user.id,
@@ -116,6 +121,7 @@ router.put('/:id/cancel', auth, async (req, res) => {
 
 // New unified PUT /:id route for status updates
 router.put('/:id', sharedAuth, async (req, res) => {
+  require('fs').appendFileSync('debug_route.log', `[${new Date().toISOString()}] PUT /api/bookings/${req.params.id} Role: ${req.user.role}\n`);
   try {
     const { status, notes } = req.body;
     let query = { _id: req.params.id };
@@ -139,25 +145,39 @@ router.put('/:id', sharedAuth, async (req, res) => {
     if (!booking) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng hoặc bạn không có quyền thao tác.' });
     
     // Notify User on status change (if business/admin updated it)
-    if (req.user.role === 'business' || req.user.role === 'admin') {
-      const statusLabels = { 'confirmed': 'đã xác nhận', 'completed': 'đã hoàn thành', 'cancelled': 'đã bị hủy' };
-      const label = statusLabels[status] || status;
-      const bIdStr = (booking.bookingId || booking._id).toString();
-      const pName = booking.placeName || 'Dịch vụ';
-      
-      const newNotif = new Notification({
-        userId: booking.userId,
-        title: 'Cập nhật đơn hàng',
-        message: `Đơn hàng #${bIdStr.slice(-6).toUpperCase()} (${pName}) của bạn ${label}.`,
-        type: 'system',
-        link: '/history.html#bookings'
-      });
-      await newNotif.save();
+    if (booking && (req.user.role === 'business' || req.user.role === 'admin')) {
+      const recipientId = booking.userId;
+      const isValidRecipient = recipientId && 
+                               typeof recipientId === 'string' && 
+                               recipientId.length > 5 && 
+                               recipientId !== 'undefined' && 
+                               recipientId !== 'null';
+
+      if (isValidRecipient) {
+        try {
+          const statusLabels = { 'confirmed': 'đã xác nhận', 'completed': 'đã hoàn thành', 'cancelled': 'đã bị hủy' };
+          const label = statusLabels[status] || status;
+          const bIdShort = (booking.bookingId || booking._id).toString().slice(-6).toUpperCase();
+          const pName = booking.placeName || 'Dịch vụ';
+          
+          const newNotif = new Notification({
+            recipientId: recipientId,
+            title: 'Cập nhật đơn hàng',
+            message: `Đơn hàng #${bIdShort} (${pName}) của bạn ${label}.`,
+            type: 'system',
+            link: '/history.html#bookings'
+          });
+          await newNotif.save();
+        } catch (notifErr) {
+          console.error('[BookingNotif] Failed to create notification:', notifErr.message);
+        }
+      }
     }
 
     res.json({ success: true, data: booking });
   } catch (err) {
-    res.status(500).json({ success: false, message: 'Lỗi cập nhật đơn hàng: ' + err.message });
+    console.error('[BookingUpdate] 500 Error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi hệ thống khi cập nhật đơn hàng: ' + err.message });
   }
 });
 
@@ -190,19 +210,25 @@ router.put('/:id/status', businessAuth, async (req, res) => {
     if (!booking) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hoặc sai quyền' });
 
     // Notify User
-    const statusLabels = { 'confirmed': 'đã xác nhận', 'completed': 'đã hoàn thành', 'cancelled': 'đã bị hủy' };
-    const label = statusLabels[status] || status;
-    const bIdStr = (booking.bookingId || booking._id).toString();
-    const pName = booking.placeName || 'Dịch vụ';
+    if (booking.userId && booking.userId.length > 3 && booking.userId !== 'undefined') {
+      try {
+        const statusLabels = { 'confirmed': 'đã xác nhận', 'completed': 'đã hoàn thành', 'cancelled': 'đã bị hủy' };
+        const label = statusLabels[status] || status;
+        const bIdStr = (booking.bookingId || booking._id).toString();
+        const pName = booking.placeName || 'Dịch vụ';
 
-    const newNotif = new Notification({
-      userId: booking.userId,
-      title: 'Cập nhật dịch vụ',
-      message: `Dịch vụ #${bIdStr.slice(-6).toUpperCase()} (${pName}) đã được doanh nghiệp ${label}.`,
-      type: 'system',
-      link: '/history.html#bookings'
-    });
-    await newNotif.save();
+        const newNotif = new Notification({
+          recipientId: booking.userId,
+          title: 'Cập nhật dịch vụ',
+          message: `Dịch vụ #${bIdStr.slice(-6).toUpperCase()} (${pName}) đã được doanh nghiệp ${label}.`,
+          type: 'system',
+          link: '/history.html#bookings'
+        });
+        await newNotif.save();
+      } catch (notifErr) {
+        console.error('[BookingStatusNotif] Failed:', notifErr.message);
+      }
+    }
 
     res.json({ success: true, data: booking });
   } catch (err) {

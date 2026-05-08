@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Render business list from businessData.js into HTML
  * Requirements: 
  * - A div with id="business-list" must exist in the HTML
@@ -59,3 +59,4 @@ function renderBusinesses() {
 
 // Auto-run when DOM is ready
 document.addEventListener('DOMContentLoaded', renderBusinesses);
+

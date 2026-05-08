@@ -8,6 +8,7 @@
     content="Lên kế hoạch du lịch tự túc: gợi ý điểm đến, tìm theo ngân sách & sở thích, lịch trình và bản đồ — WanderViệt." />
   <title>WanderViệt — Du lịch tự túc, thông minh</title>
   <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="shortcut icon" href="/assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -16,6 +17,8 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=1776819067180"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link rel="shortcut icon" href="/assets/favicon.svg">
   <link rel="stylesheet" href="global-tokens.css?v=4" />
   <link rel="stylesheet" href="styles.css?v=4" />
   <link rel="stylesheet" href="voice-guide.css?v=4" />
@@ -61,10 +64,10 @@
           </form>
 
           <div class="hero-v2__tags">
-            <span>Phổ biến:</span>
-            <button type="button" class="glass-chip" data-filter-tag="biển">Biển đảo</button>
-            <button type="button" class="glass-chip" data-filter-tag="văn hóa">Văn hóa</button>
-            <button type="button" class="glass-chip" data-filter-tag="ẩm thực">Ẩm thực</button>
+            <span style="font-weight: 700; color: #fff; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Phổ biến:</span>
+            <button type="button" class="glass-chip" data-filter-tag="biển">🏝️ Biển đảo</button>
+            <button type="button" class="glass-chip" data-filter-tag="văn hóa">🏛️ Văn hóa</button>
+            <button type="button" class="glass-chip" data-filter-tag="ẩm thực">🍜 Ẩm thực</button>
           </div>
         </div>
         
@@ -100,22 +103,38 @@
           <p class="section-desc">Chọn theo chủ đề — chúng tôi gợi ý những nơi được du khách yêu thích nhất.</p>
         </header>
 
-        <div class="filter-bar" role="group" aria-label="Lọc theo chủ đề">
-          <button type="button" class="filter-btn is-active" data-dest-filter="all">Tất cả</button>
-          <button type="button" class="filter-btn" data-dest-filter="biển">Biển đảo</button>
-          <button type="button" class="filter-btn" data-dest-filter="văn hóa">Văn hóa</button>
-          <button type="button" class="filter-btn" data-dest-filter="tour">Tours du lịch</button>
-          <button type="button" class="filter-btn" data-dest-filter="utility">Tiện ích</button>
-          <button type="button" class="filter-btn" data-dest-filter="leo núi">Leo núi</button>
-          <button type="button" class="filter-btn" data-dest-filter="ẩm thực">Ẩm thực</button>
+        <div class="filter-bar" role="group" aria-label="Lọc theo chủ đề" style="justify-content: center; gap: 0.5rem; margin-bottom: 3rem;">
+          <button type="button" class="filter-btn is-active" data-dest-filter="all">🌐 Tất cả</button>
+          <button type="button" class="filter-btn" data-dest-filter="biển">🏖️ Biển đảo</button>
+          <button type="button" class="filter-btn" data-dest-filter="văn hóa">🏰 Văn hóa</button>
+          <button type="button" class="filter-btn" data-dest-filter="tour">🗺️ Tours</button>
+          <button type="button" class="filter-btn" data-dest-filter="utility">🏨 Dịch vụ</button>
+          <button type="button" class="filter-btn" data-dest-filter="leo núi">⛰️ Leo núi</button>
+          <button type="button" class="filter-btn" data-dest-filter="ẩm thực">🍲 Ẩm thực</button>
         </div>
 
         <noscript>
           <p class="section-desc">Bật JavaScript để xem đầy đủ điểm đến, đăng nhập và lập lịch trình.</p>
         </noscript>
         <div class="dest-grid" data-dest-grid></div>
-        <p class="search-empty visually-hidden" data-search-empty role="status">Không tìm thấy điểm đến phù hợp. Thử từ
-          khóa khác.</p>
+      </div>
+    </section>
+
+    <!-- ===== TOP PARTNERS ===== -->
+    <section class="section top-partners" id="top-partners" aria-labelledby="partners-title">
+      <div class="container">
+        <header class="section-head">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+              <h2 id="partners-title" class="section-title">Đối tác nổi bật</h2>
+              <p class="section-desc">Khám phá các doanh nghiệp du lịch uy tín hàng đầu trên WanderViệt.</p>
+            </div>
+            <a href="business-directory.html" class="btn btn--text" style="color: var(--accent-warm); font-weight: 700;">Xem tất cả đối tác →</a>
+          </div>
+        </header>
+        <div class="partners-scroll" id="partnersContainer">
+          <div class="loading-state">Đang tìm kiếm đối tác...</div>
+        </div>
       </div>
     </section>
 

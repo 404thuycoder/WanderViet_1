@@ -1,4 +1,4 @@
-/**
+﻿/**
  * searchServices.js
  * Thanh tìm kiếm realtime kết hợp với filter tab
  *
@@ -335,3 +335,4 @@ function initSearchServices(wrapId = 'search-wrap', tabBarId = 'tab-bar', gridId
   // Render lần đầu
   _applyFilters(gridId, countEl);
 }
+

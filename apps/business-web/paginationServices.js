@@ -1,4 +1,4 @@
-/**
+﻿/**
  * paginationServices.js
  * Chức năng phân trang cho danh sách dịch vụ
  *
@@ -183,3 +183,4 @@ function applyPaginationToData(data, gridId, keyword = '') {
   // Mặc định luôn reset về trang 1 khi filter/search mới
   paginateServices(1);
 }
+

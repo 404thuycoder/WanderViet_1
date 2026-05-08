@@ -261,21 +261,9 @@
       }
     },
     async loadModeration() {
-      const tbody = document.getElementById('moderation-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem;"><span class="spinner-small"></span> Đang tải yêu cầu duyệt...</td></tr>';
-      
-      // Simulating a small delay or actual fetch
-      setTimeout(() => {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="5" style="text-align:center; padding:3rem;">
-              <div style="font-size:3rem; margin-bottom:1rem;">✅</div>
-              <p>Tất cả nội dung đã được xử lý xong!</p>
-            </td>
-          </tr>
-        `;
-      }, 500);
+      if (typeof window.loadModeration === 'function') {
+        return window.loadModeration();
+      }
     },
     setButtonLoading: (btn, isLoading) => {
       if (!btn) return;
@@ -2944,33 +2932,58 @@
   }
 
   // --- Moderation ---
-  let moderationData = [];
+  let allPlacesData = [];
   async function loadModeration(silent = false) {
     const tbody = document.getElementById('moderation-tbody');
     if (!tbody) return;
     if (!silent) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">Đang tải hàng chờ...</td></tr>';
     
     try {
-      const json = await apiFetch('/api/admin/places'); // Admin sees all, filter for partner/pending
+      const json = await apiFetch('/api/admin/places');
       if (json.success) {
-        const allData = json.data;
-        // Only show pending items in the table
-        moderationData = allData.filter(p => p.status === 'pending');
-        renderModeration(moderationData);
-        updateModerationDashboard(allData);
+        allPlacesData = json.data;
         
-        // Update badge count
-        const pendingCount = moderationData.length;
-        const badge = document.getElementById('badge-pending-count');
-        if (badge) {
-          badge.textContent = pendingCount;
-          badge.hidden = pendingCount === 0;
+        // Default to pending filter
+        const activeTab = document.querySelector('#moderation-tabs .btn--primary');
+        const filter = activeTab ? activeTab.getAttribute('data-mod-filter') : 'pending';
+        
+        const filtered = allPlacesData.filter(p => p.status === filter);
+        renderModeration(filtered);
+        updateModerationDashboard(allPlacesData);
+        
+        const pendingCount = allPlacesData.filter(p => p.status === 'pending').length;
+        const tabBtn = document.getElementById('tab-pending-count');
+        if (tabBtn) {
+          tabBtn.textContent = `Đang chờ (${pendingCount})`;
         }
       }
     } catch (err) {
       tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#f87171">Lỗi tải dữ liệu</td></tr>';
     }
   }
+
+  // Add event listeners for moderation tabs
+  document.addEventListener('DOMContentLoaded', () => {
+    const modTabs = document.getElementById('moderation-tabs');
+    if (modTabs) {
+      modTabs.querySelectorAll('[data-mod-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const filter = btn.getAttribute('data-mod-filter');
+          // Update UI state
+          modTabs.querySelectorAll('.btn').forEach(b => {
+            b.classList.remove('btn--primary');
+            b.classList.add('btn--ghost');
+          });
+          btn.classList.add('btn--primary');
+          btn.classList.remove('btn--ghost');
+          
+          // Filter data
+          const filtered = allPlacesData.filter(p => p.status === filter);
+          renderModeration(filtered);
+        });
+      });
+    }
+  });
 
   let moderationManagerChart = null;
   function updateModerationDashboard(allData, chartType = 'doughnut') {
@@ -3032,7 +3045,7 @@
         </td>
         <td>
           <div style="font-weight: 500;">${p.ownerName || 'Đối tác doanh nghiệp'}</div>
-          <small style="color:var(--text-muted)">ID: ${p.ownerId ? p.ownerId.slice(-6) : 'N/A'}</small>
+          <small style="color:var(--text-muted)">ID: ${p.ownerId || 'N/A'}</small>
         </td>
         <td>
            <div style="font-weight: 600; color: var(--admin-primary);">${typeLabel}</div>

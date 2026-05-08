@@ -1,10 +1,8 @@
-/**
- * serviceManagement.js — localStorage version (no backend required)
+﻿/**
+ * serviceManagement.js — API Integrated version
  */
 (function() {
     'use strict';
-
-    const LS_KEY = 'biz_services';
 
     const state = {
         services: [],
@@ -16,101 +14,92 @@
     // ── Styles ──────────────────────────────────────────────────
     const style = document.createElement('style');
     style.textContent = `
-        .sm-container { max-width:1400px; margin:0 auto; font-family:'Inter',sans-serif; }
+        .sm-container { max-width:1400px; margin:0 auto; font-family:'Plus Jakarta Sans',sans-serif; color: #fff; }
         .sm-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; }
-        .sm-title { font-size:28px; font-weight:900; color:#0f172a; }
-        .sm-btn-primary { background:linear-gradient(135deg,#6366f1,#4f46e5); color:white; border:none; padding:14px 28px; border-radius:14px; font-weight:700; cursor:pointer; transition:all .3s; box-shadow:0 10px 20px rgba(99,102,241,.25); font-size:15px; }
+        .sm-title { font-size:28px; font-weight:900; color:#fff; }
+        .sm-btn-primary { background:linear-gradient(135deg,#6366f1,#a855f7); color:white; border:none; padding:14px 28px; border-radius:14px; font-weight:700; cursor:pointer; transition:all .3s; box-shadow:0 10px 20px rgba(99,102,241,.25); font-size:15px; }
         .sm-btn-primary:hover { transform:translateY(-3px); box-shadow:0 15px 30px rgba(99,102,241,.35); }
+        .sm-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        .sm-filters { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:16px; background:#fff; padding:16px; border-radius:20px; border:1px solid #f1f5f9; }
-        .sm-tabs { display:flex; gap:8px; background:#f1f5f9; padding:6px; border-radius:14px; }
-        .sm-tab { padding:10px 20px; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; color:#64748b; transition:all .2s; user-select:none; }
-        .sm-tab.active { background:#fff; color:#6366f1; box-shadow:0 4px 12px rgba(0,0,0,.05); }
-        .sm-search { padding:12px 20px; border-radius:14px; border:2px solid #e2e8f0; width:280px; font-size:14px; outline:none; transition:all .2s; background:#f8fafc; }
-        .sm-search:focus { border-color:#6366f1; background:#fff; }
+        .sm-filters { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:16px; background:rgba(255,255,255,0.03); backdrop-filter:blur(20px); padding:16px; border-radius:20px; border:1px solid rgba(255,255,255,0.08); }
+        .sm-tabs { display:flex; gap:8px; background:rgba(255,255,255,0.05); padding:6px; border-radius:14px; }
+        .sm-tab { padding:10px 20px; border-radius:10px; cursor:pointer; font-size:14px; font-weight:700; color:#94a3b8; transition:all .2s; user-select:none; }
+        .sm-tab.active { background:rgba(255,255,255,0.1); color:#fff; box-shadow:0 4px 12px rgba(0,0,0,.1); }
+        .sm-search { padding:12px 20px; border-radius:14px; border:1px solid rgba(255,255,255,0.1); width:280px; font-size:14px; outline:none; transition:all .2s; background:rgba(255,255,255,0.03); color:#fff; }
+        .sm-search:focus { border-color:#6366f1; background:rgba(255,255,255,0.06); }
 
         .sm-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:24px; padding-bottom:40px; }
-        .sm-card { background:#fff; border-radius:16px; border:1px solid #f1f5f9; box-shadow:0 4px 15px rgba(0,0,0,.04); overflow:hidden; transition:all .3s; display:flex; flex-direction:column; }
-        .sm-card:hover { transform:translateY(-6px); box-shadow:0 20px 40px rgba(0,0,0,.08); }
-        .sm-card-img { width:100%; height:180px; object-fit:cover; background:#e2e8f0; }
+        .sm-card { background:rgba(255,255,255,0.03); backdrop-filter:blur(20px); border-radius:16px; border:1px solid rgba(255,255,255,0.08); box-shadow:0 4px 15px rgba(0,0,0,.2); overflow:hidden; transition:all 0.3s; display:flex; flex-direction:column; position: relative; }
+        .sm-card:hover { transform:translateY(-6px); box-shadow:0 20px 40px rgba(0,0,0,.4); border-color: rgba(99,102,241,0.3); }
+        .sm-card-img { width:100%; height:180px; object-fit:cover; background:#1e293b; }
         .sm-card-body { padding:20px; flex:1; display:flex; flex-direction:column; }
-        .sm-card-title { font-size:17px; font-weight:800; margin-bottom:8px; color:#0f172a; }
-        .sm-card-loc { font-size:13px; color:#64748b; margin-bottom:12px; font-weight:500; }
-        .sm-card-price { font-size:19px; font-weight:900; color:#10b981; margin-bottom:4px; }
-        .sm-card-unit { font-size:13px; color:#64748b; font-weight:600; }
-        .sm-card-stats { display:flex; justify-content:space-between; font-size:13px; color:#64748b; margin:12px 0; }
-        .sm-card-actions { display:flex; gap:8px; margin-top:auto; padding-top:16px; border-top:1px solid #f1f5f9; }
-        .sm-btn-action { flex:1; padding:10px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; border:none; background:#f1f5f9; color:#334155; transition:all .2s; }
-        .sm-btn-action:hover { background:#e2e8f0; }
-        .sm-btn-action.delete { color:#ef4444; }
-        .sm-btn-action.delete:hover { background:#fef2f2; }
+        .sm-card-title { font-size:17px; font-weight:800; margin-bottom:8px; color:#fff; }
+        .sm-card-loc { font-size:13px; color:#94a3b8; margin-bottom:12px; font-weight:500; }
+        .sm-card-price { font-size:19px; font-weight:900; color:#4ade80; margin-bottom:4px; }
+        .sm-card-unit { font-size:13px; color:#94a3b8; font-weight:600; }
+        .sm-card-stats { display:flex; justify-content:space-between; font-size:13px; color:#94a3b8; margin:12px 0; }
+        .sm-card-actions { display:flex; gap:8px; margin-top:auto; padding-top:16px; border-top:1px solid rgba(255,255,255,0.05); }
+        .sm-btn-action { flex:1; padding:10px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#cbd5e1; transition:all .2s; }
+        .sm-btn-action:hover { background:rgba(255,255,255,0.1); color:#fff; }
+        .sm-btn-action.delete { color:#f87171; }
+        .sm-btn-action.delete:hover { background:rgba(239,68,68,0.1); }
 
         .sm-badge { padding:5px 12px; border-radius:20px; font-size:11px; font-weight:800; display:inline-block; text-transform:uppercase; }
-        .sm-badge.active { background:#ecfdf5; color:#059669; }
-        .sm-badge.pending { background:#fffbeb; color:#d97706; }
-        .sm-badge.paused { background:#f1f5f9; color:#475569; }
+        .sm-badge.approved { background:rgba(16,185,129,0.1); color:#34d399; }
+        .sm-badge.pending { background:rgba(245,158,11,0.1); color:#fbbf24; }
+        .sm-badge.rejected { background:rgba(239,68,68,0.1); color:#f87171; }
+        .sm-badge.paused { background:rgba(148,163,184,0.1); color:#94a3b8; }
 
-        .sm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); backdrop-filter:blur(6px); z-index:9999; align-items:center; justify-content:center; }
+        .sm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(10px); z-index:9999; align-items:center; justify-content:center; }
         .sm-modal-overlay.active { display:flex; }
-        .sm-modal { background:#fff; border-radius:24px; padding:36px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; }
+        .sm-modal { background:#111827; border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:36px; width:100%; max-width:700px; max-height:95vh; overflow-y:auto; box-shadow: 0 40px 100px rgba(0,0,0,0.5); color:#fff; }
         .sm-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px; }
         .sm-form-group { display:flex; flex-direction:column; gap:8px; }
         .sm-form-group.full { grid-column:1/-1; }
-        .sm-form-label { font-size:13px; font-weight:700; color:#374151; }
-        .sm-form-control { padding:12px 16px; border-radius:12px; border:2px solid #e5e7eb; font-size:14px; transition:all .2s; outline:none; }
-        .sm-form-control:focus { border-color:#6366f1; box-shadow:0 0 0 4px rgba(99,102,241,.1); }
+        .sm-form-label { font-size:13px; font-weight:700; color:#94a3b8; }
+        .sm-form-control { padding:12px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:14px; transition:all .2s; outline:none; }
+        .sm-form-control:focus { border-color:#6366f1; background:rgba(255,255,255,0.06); box-shadow:0 0 0 4px rgba(99,102,241,.1); }
         .sm-modal-actions { display:flex; gap:12px; justify-content:flex-end; }
-        .sm-btn-cancel { padding:12px 24px; border-radius:12px; border:2px solid #e5e7eb; background:#fff; font-weight:700; cursor:pointer; color:#374151; }
+        .sm-btn-cancel { padding:12px 24px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); font-weight:700; cursor:pointer; color:#cbd5e1; }
+        .sm-btn-cancel:hover { background:rgba(255,255,255,0.1); color:#fff; }
 
-        .sm-empty { grid-column:1/-1; text-align:center; padding:80px; background:#fff; border-radius:24px; border:2px dashed #e2e8f0; }
+        .sm-empty { grid-column:1/-1; text-align:center; padding:80px; background:rgba(255,255,255,0.02); border-radius:24px; border:2px dashed rgba(255,255,255,0.1); color:#94a3b8; }
 
-        #sm-toast { position:fixed; top:24px; right:24px; z-index:99999; padding:14px 24px; border-radius:12px; font-weight:700; font-size:14px; box-shadow:0 10px 30px rgba(0,0,0,.15); transition:all .3s; }
+        .spinner-small { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     `;
     document.head.appendChild(style);
 
-    // ── localStorage helpers ────────────────────────────────────
-    function load() {
-        try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch { return []; }
-    }
-
-    function save(list) {
-        localStorage.setItem(LS_KEY, JSON.stringify(list));
-    }
-
-    function seed() {
-        const existing = load();
-        if (existing.length > 0) return;
-        const samples = [
-            { id: 's1', name: 'Tour Hạ Long VIP 2N1Đ', category: 'tour', location: 'Quảng Ninh', price: 2500000, unit: 'người', status: 'active', rating: 4.8, bookings: 124, image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80', desc: 'Khám phá vẻ đẹp kỳ vĩ của vịnh Hạ Long trên du thuyền 5 sao đẳng cấp.', createdAt: new Date().toISOString() },
-            { id: 's2', name: 'Khách sạn Mường Thanh Grand', category: 'hotel', location: 'Đà Nẵng', price: 1800000, unit: 'đêm', status: 'active', rating: 4.5, bookings: 87, image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80', desc: 'Vị trí đắc địa gần bãi biển Mỹ Khê, phòng ốc hiện đại và dịch vụ tận tâm.', createdAt: new Date().toISOString() },
-            { id: 's3', name: 'Nhà hàng Bếp Việt Hội An', category: 'restaurant', location: 'Hội An', price: 350000, unit: 'người', status: 'active', rating: 4.7, bookings: 203, image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80', desc: 'Thưởng thức tinh hoa ẩm thực phố cổ trong không gian hoài niệm.', createdAt: new Date().toISOString() },
-            { id: 's4', name: 'Tour Sapa Trekking 3N2Đ', category: 'tour', location: 'Lào Cai', price: 3200000, unit: 'người', status: 'pending', rating: 0, bookings: 0, image: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&q=80', desc: 'Trải nghiệm văn hóa bản địa và chinh phục đỉnh Fansipan hùng vĩ.', createdAt: new Date().toISOString() },
-            { id: 's5', name: 'Nghỉ dưỡng Phú Quốc 5 Sao', category: 'hotel', location: 'Phú Quốc', price: 4500000, unit: 'đêm', status: 'paused', rating: 4.9, bookings: 56, image: 'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=600&q=80', desc: 'Thiên đường nghỉ dưỡng riêng tư với bãi biển riêng và hồ bơi vô cực.', createdAt: new Date().toISOString() },
-        ];
-        save(samples);
+    // ── Data Handling ───────────────────────────────────────────
+    async function loadServices() {
+        const grid = document.getElementById('sm-grid');
+        if (grid) grid.innerHTML = '<div class="sm-empty"><div class="spinner"></div><p>Đang tải dịch vụ từ máy chủ...</p></div>';
+        
+        try {
+            const json = await apiFetch('/api/business/places');
+            if (json.success) {
+                state.services = json.data;
+                renderGrid();
+            } else {
+                if (grid) grid.innerHTML = `<div class="sm-empty"><p style="color:#ef4444">Lỗi: ${json.message}</p></div>`;
+            }
+        } catch (err) {
+            if (grid) grid.innerHTML = '<div class="sm-empty"><p style="color:#ef4444">Lỗi kết nối máy chủ</p></div>';
+        }
     }
 
     // ── Utils ───────────────────────────────────────────────────
-    function genId() { return 's' + Date.now(); }
-
     function formatMoney(n) {
         if (!n && n !== 0) return 'Liên hệ';
         return new Intl.NumberFormat('vi-VN').format(n) + ' VND';
     }
 
     function toast(msg, type = 'success') {
-        let el = document.getElementById('sm-toast');
-        if (el) el.remove();
-        el = document.createElement('div');
-        el.id = 'sm-toast';
-        el.style.background = type === 'error' ? '#ef4444' : '#10b981';
-        el.style.color = '#fff';
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(-10px)';
-        el.textContent = msg;
-        document.body.appendChild(el);
-        requestAnimationFrame(() => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
-        setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3000);
+        if (window.WanderUI && window.WanderUI.showToast) {
+            window.WanderUI.showToast(msg, type);
+        } else {
+            alert(msg);
+        }
     }
 
     function debounce(fn, ms) {
@@ -120,12 +109,15 @@
     // ── Compute filtered list ───────────────────────────────────
     function getFiltered() {
         let list = state.services.slice();
-        if (state.filter !== 'all') list = list.filter(s => s.status === state.filter);
+        if (state.filter !== 'all') {
+            const statusMap = { active: 'approved', pending: 'pending', paused: 'rejected' };
+            list = list.filter(s => s.status === (statusMap[state.filter] || state.filter));
+        }
         if (state.search) {
             const q = state.search.toLowerCase();
             list = list.filter(s =>
                 (s.name || '').toLowerCase().includes(q) ||
-                (s.location || '').toLowerCase().includes(q)
+                (s.region || '').toLowerCase().includes(q)
             );
         }
         return list;
@@ -133,13 +125,15 @@
 
     // ── Render ──────────────────────────────────────────────────
     function badge(status) {
-        const map = { active: ['active','Đang hoạt động'], pending: ['pending','Chờ duyệt'], paused: ['paused','Tạm dừng'] };
-        const [cls, label] = map[status] || ['paused', status];
+        const map = { approved: ['approved','Hoạt động'], pending: ['pending','Chờ duyệt'], rejected: ['rejected','Bị từ chối'] };
+        const [cls, label] = map[status] || ['paused', status || 'N/A'];
         return `<span class="sm-badge ${cls}">${label}</span>`;
     }
 
-    function typeLabel(cat) {
-        return { tour: '🗺️ Tour', hotel: '🏨 Khách sạn', restaurant: '🍽️ Nhà hàng' }[cat] || '📦 Khác';
+    function typeLabel(kind, isTour) {
+        if (isTour) return '🗺️ Tour';
+        const map = { 'khach-san': '🏨 Khách sạn', 'nha-hang': '🍽️ Nhà hàng', 'giai-tri': '🎡 Giải trí' };
+        return map[kind] || '📍 Địa điểm';
     }
 
     function renderGrid() {
@@ -147,7 +141,12 @@
         if (!grid) return;
         const list = getFiltered();
         if (!list.length) {
-            grid.innerHTML = `<div class="sm-empty"><div style="font-size:40px;margin-bottom:16px">📭</div><h3 style="color:#475569">Không có dịch vụ nào</h3><p style="color:#94a3b8;margin-top:8px">Nhấn "+ Thêm dịch vụ mới" để bắt đầu</p></div>`;
+            grid.innerHTML = `
+                <div class="sm-empty">
+                    <div style="font-size:40px;margin-bottom:16px">📭</div>
+                    <h3 style="color:#475569">Không có dịch vụ nào</h3>
+                    <p style="color:#94a3b8;margin-top:8px">Nhấn "+ Thêm dịch vụ mới" để bắt đầu</p>
+                </div>`;
             return;
         }
         grid.innerHTML = list.map(s => {
@@ -158,72 +157,70 @@
                 <div class="sm-card-body">
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
                         ${badge(s.status)}
-                        <span style="font-size:12px;color:#64748b;font-weight:800;background:#f1f5f9;padding:4px 10px;border-radius:12px">${typeLabel(s.category)}</span>
+                        <span style="font-size:12px;color:#64748b;font-weight:800;background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:12px">${typeLabel(s.kind, s.isTour)}</span>
                     </div>
                     <h3 class="sm-card-title">${s.name}</h3>
-                    <div class="sm-card-loc">📍 ${s.location || 'Chưa cập nhật'}</div>
-                    <div class="sm-card-price">${formatMoney(s.price)}<span class="sm-card-unit">${s.unit ? ' / ' + s.unit : ''}</span></div>
+                    <div class="sm-card-loc">📍 ${s.region || 'Chưa cập nhật'}</div>
+                    <div class="sm-card-price">${formatMoney(s.priceFrom)}<span class="sm-card-unit">${s.priceTo ? ' - ' + formatMoney(s.priceTo) : ''}</span></div>
                     <div class="sm-card-stats">
-                        <span>⭐ ${s.rating || 'Chưa có đánh giá'}</span>
-                        <span>🔥 <b>${s.bookings || 0}</b> lượt đặt</span>
+                        <span>⭐ ${s.ratingAvg || '0'} (${s.reviewCount || 0})</span>
+                        <span>🔥 <b>${s.bookingsCount || 0}</b> lượt đặt</span>
                     </div>
                     <div class="sm-card-actions">
-                        <button class="sm-btn-action" onclick="window.smActions.toggle('${s.id}')">Trạng thái</button>
-                        <button class="sm-btn-action" onclick="window.smActions.edit('${s.id}')">✏️ Sửa</button>
-                        <button class="sm-btn-action" style="color:#6366f1;font-weight:800" onclick="window.ChatBox&&window.ChatBox.open('${s.id}','${(s.name||'').replace(/'/g,'')}')">💬 Hỗ trợ</button>
-                        <button class="sm-btn-action delete" onclick="window.smActions.delete('${s.id}')">🗑️</button>
+                        <button class="sm-btn-action" onclick="window.smActions.edit('${s._id}')">✏️ Sửa</button>
+                        <button class="sm-btn-action" style="color:#6366f1;font-weight:800" onclick="window.smActions.support('${s._id}')">💬 Hỗ trợ</button>
+                        <button class="sm-btn-action delete" onclick="window.smActions.delete('${s._id}')">🗑️</button>
                     </div>
                 </div>
+                ${s.rejectionReason ? `<div style="padding:10px; background:rgba(239,68,68,0.1); color:#f87171; font-size:11px; border-top:1px solid rgba(239,68,68,0.2)">Lý do từ chối: ${s.rejectionReason}</div>` : ''}
             </div>`;
         }).join('');
     }
 
     // ── Actions ─────────────────────────────────────────────────
     window.smActions = {
-        toggle(id) {
-            const list = load();
-            const idx = list.findIndex(s => s.id === id);
-            if (idx < 0) return;
-            const cycle = { active: 'paused', paused: 'pending', pending: 'active' };
-            list[idx].status = cycle[list[idx].status] || 'active';
-            save(list);
-            state.services = list;
-            renderGrid();
-            toast('Cập nhật trạng thái thành công');
-        },
-
-        delete(id) {
-            if (!confirm('🚨 Bạn có chắc muốn xóa dịch vụ này?')) return;
-            const list = load().filter(s => s.id !== id);
-            save(list);
-            state.services = list;
-            renderGrid();
-            toast('Đã xóa dịch vụ');
+        async delete(id) {
+            if (!confirm('🚨 Bạn có chắc muốn xóa dịch vụ này khỏi hệ thống?')) return;
+            try {
+                const res = await apiFetch(`/api/business/places/${id}`, { method: 'DELETE' });
+                if (res.success) {
+                    toast('Đã xóa dịch vụ');
+                    loadServices();
+                } else {
+                    toast(res.message, 'error');
+                }
+            } catch (err) {
+                toast('Lỗi kết nối', 'error');
+            }
         },
 
         edit(id) {
             state.editingId = id;
-            const svc = load().find(s => s.id === id);
+            const svc = state.services.find(s => s._id === id);
             if (!svc) return;
+            
             document.getElementById('sm-modal-title').textContent = '✏️ Chỉnh sửa dịch vụ';
             document.getElementById('sm-form-name').value = svc.name || '';
-            document.getElementById('sm-form-category').value = svc.category || 'tour';
-            document.getElementById('sm-form-location').value = svc.location || '';
-            document.getElementById('sm-form-price').value = svc.price || '';
-            document.getElementById('sm-form-unit').value = svc.unit || 'người';
+            document.getElementById('sm-form-kind').value = svc.kind || 'diem-du-lich';
+            document.getElementById('sm-form-region').value = svc.region || '';
+            document.getElementById('sm-form-address').value = svc.address || '';
+            document.getElementById('sm-form-priceFrom').value = svc.priceFrom || '';
             document.getElementById('sm-form-image').value = svc.image || '';
-            document.getElementById('sm-form-desc').value = svc.desc || '';
+            document.getElementById('sm-form-description').value = svc.description || '';
+            document.getElementById('sm-form-highlights').value = svc.highlights || '';
+            document.getElementById('sm-form-policy').value = svc.policy || '';
+            document.getElementById('sm-form-isTour').checked = !!svc.isTour;
+            
             document.getElementById('sm-modal-wrapper').classList.add('active');
         },
 
         add() {
             state.editingId = null;
             document.getElementById('sm-modal-title').textContent = '✨ Thêm dịch vụ mới';
-            ['sm-form-name','sm-form-location','sm-form-price','sm-form-image','sm-form-desc'].forEach(id => {
-                const el = document.getElementById(id); if (el) el.value = '';
-            });
-            document.getElementById('sm-form-category').value = 'tour';
-            document.getElementById('sm-form-unit').value = 'người';
+            const formIds = ['sm-form-name','sm-form-region','sm-form-address','sm-form-priceFrom','sm-form-image','sm-form-description', 'sm-form-highlights', 'sm-form-policy'];
+            formIds.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            document.getElementById('sm-form-kind').value = 'diem-du-lich';
+            document.getElementById('sm-form-isTour').checked = false;
             document.getElementById('sm-modal-wrapper').classList.add('active');
         },
 
@@ -231,33 +228,61 @@
             document.getElementById('sm-modal-wrapper').classList.remove('active');
         },
 
-        save() {
-            const name = document.getElementById('sm-form-name').value.trim();
-            const category = document.getElementById('sm-form-category').value;
-            const location = document.getElementById('sm-form-location').value.trim();
-            const priceRaw = document.getElementById('sm-form-price').value;
-            const price = priceRaw === '' ? null : Number(priceRaw);
-            const unit = document.getElementById('sm-form-unit').value;
-            const image = document.getElementById('sm-form-image').value.trim();
-            const desc = document.getElementById('sm-form-desc').value.trim();
+        async save() {
+            const btn = document.querySelector('.sm-modal-actions .sm-btn-primary');
+            const originalHtml = btn.innerHTML;
+            
+            const payload = {
+                name: document.getElementById('sm-form-name').value.trim(),
+                kind: document.getElementById('sm-form-kind').value,
+                region: document.getElementById('sm-form-region').value.trim(),
+                address: document.getElementById('sm-form-address').value.trim(),
+                priceFrom: Number(document.getElementById('sm-form-priceFrom').value) || 0,
+                image: document.getElementById('sm-form-image').value.trim(),
+                description: document.getElementById('sm-form-description').value.trim(),
+                isTour: document.getElementById('sm-form-isTour').checked,
+                highlights: document.getElementById('sm-form-highlights').value.trim(),
+                policy: document.getElementById('sm-form-policy').value.trim()
+            };
 
-            if (!name || !location) {
-                toast('⚠️ Vui lòng điền Tên và Địa điểm!', 'error'); return;
+            if (!payload.name || !payload.region) {
+                toast('⚠️ Vui lòng điền Tên và Khu vực!', 'error'); return;
             }
 
-            const list = load();
-            if (state.editingId) {
-                const idx = list.findIndex(s => s.id === state.editingId);
-                if (idx >= 0) Object.assign(list[idx], { name, category, location, price, unit, image, desc });
-                toast('Cập nhật thành công');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-small"></span> Đang lưu...';
+
+            try {
+                const method = state.editingId ? 'PUT' : 'POST';
+                const url = state.editingId ? `/api/business/places/${state.editingId}` : '/api/business/places';
+                
+                const res = await apiFetch(url, {
+                    method: method,
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.success) {
+                    toast(state.editingId ? 'Cập nhật thành công' : 'Đã gửi yêu cầu phê duyệt', 'success');
+                    this.closeModal();
+                    loadServices();
+                } else {
+                    toast(res.message || 'Lỗi lưu dữ liệu', 'error');
+                }
+            } catch (err) {
+                toast('Lỗi kết nối máy chủ', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        },
+        
+        support(id) {
+            if (window.ChatBox) {
+                const svc = state.services.find(s => s._id === id);
+                window.ChatBox.open(id, svc ? svc.name : 'Dịch vụ');
             } else {
-                list.unshift({ id: genId(), name, category, location, price, unit, image, desc, status: 'pending', rating: 0, bookings: 0, createdAt: new Date().toISOString() });
-                toast('Tạo dịch vụ thành công');
+                toast('Chức năng hỗ trợ đang khởi tạo...', 'info');
             }
-            save(list);
-            state.services = list;
-            this.closeModal();
-            renderGrid();
         }
     };
 
@@ -269,7 +294,10 @@
         wrapper.innerHTML = `
         <div class="sm-container">
             <div class="sm-header">
-                <h2 class="sm-title">Quản lý dịch vụ</h2>
+                <div>
+                    <h2 class="sm-title">Quản lý dịch vụ</h2>
+                    <p style="color:#94a3b8; font-size:14px; margin-top:4px">Đăng tải và quản lý các sản phẩm du lịch của bạn trên WanderViệt.</p>
+                </div>
                 <button class="sm-btn-primary" onclick="window.smActions.add()">+ Thêm dịch vụ mới</button>
             </div>
             <div class="sm-filters">
@@ -277,7 +305,7 @@
                     <div class="sm-tab active" data-filter="all">Tất cả</div>
                     <div class="sm-tab" data-filter="active">Đang hoạt động</div>
                     <div class="sm-tab" data-filter="pending">Chờ duyệt</div>
-                    <div class="sm-tab" data-filter="paused">Tạm dừng</div>
+                    <div class="sm-tab" data-filter="paused">Bị từ chối</div>
                 </div>
                 <input type="text" class="sm-search" id="sm-search-input" placeholder="🔍 Tìm kiếm tên, địa điểm...">
             </div>
@@ -285,7 +313,7 @@
 
             <div class="sm-modal-overlay" id="sm-modal-wrapper">
                 <div class="sm-modal">
-                    <h3 id="sm-modal-title" style="font-size:22px;font-weight:900;margin-bottom:28px;color:#0f172a"></h3>
+                    <h3 id="sm-modal-title" style="font-size:22px;font-weight:900;margin-bottom:28px;color:#fff"></h3>
                     <div class="sm-form-grid">
                         <div class="sm-form-group full">
                             <label class="sm-form-label">Tên dịch vụ *</label>
@@ -293,41 +321,50 @@
                         </div>
                         <div class="sm-form-group">
                             <label class="sm-form-label">Phân loại</label>
-                            <select id="sm-form-category" class="sm-form-control">
-                                <option value="tour">🗺️ Tour</option>
-                                <option value="hotel">🏨 Khách sạn</option>
-                                <option value="restaurant">🍽️ Nhà hàng</option>
+                            <select id="sm-form-kind" class="sm-form-control">
+                                <option value="diem-du-lich">🏝️ Điểm du lịch</option>
+                                <option value="khach-san">🏨 Khách sạn</option>
+                                <option value="nha-hang">🍽️ Nhà hàng</option>
+                                <option value="giai-tri">🎡 Giải trí</option>
+                                <option value="tien-ich">🛠️ Tiện ích</option>
                             </select>
                         </div>
-                        <div class="sm-form-group">
-                            <label class="sm-form-label">Địa điểm *</label>
-                            <input type="text" id="sm-form-location" class="sm-form-control" placeholder="Ví dụ: Quảng Ninh">
+                        <div class="sm-form-group" style="flex-direction:row; align-items:center; gap:10px; margin-top:25px">
+                            <input type="checkbox" id="sm-form-isTour" style="width:18px;height:18px">
+                            <label class="sm-form-label" for="sm-form-isTour" style="margin:0">Đây là một Tour du lịch</label>
                         </div>
                         <div class="sm-form-group">
-                            <label class="sm-form-label">Giá niêm yết (VNĐ)</label>
-                            <input type="number" id="sm-form-price" class="sm-form-control" placeholder="Để trống nếu 'Liên hệ'">
+                            <label class="sm-form-label">Khu vực (Tỉnh/Thành phố) *</label>
+                            <input type="text" id="sm-form-region" class="sm-form-control" placeholder="Ví dụ: Quảng Ninh">
                         </div>
                         <div class="sm-form-group">
-                            <label class="sm-form-label">Đơn vị tính</label>
-                            <select id="sm-form-unit" class="sm-form-control">
-                                <option value="người">người</option>
-                                <option value="đêm">đêm</option>
-                                <option value="vé">vé</option>
-                                <option value="bàn">bàn</option>
-                            </select>
+                            <label class="sm-form-label">Địa chỉ chi tiết</label>
+                            <input type="text" id="sm-form-address" class="sm-form-control" placeholder="Số nhà, tên đường...">
+                        </div>
+                        <div class="sm-form-group">
+                            <label class="sm-form-label">Giá khởi điểm (VNĐ)</label>
+                            <input type="number" id="sm-form-priceFrom" class="sm-form-control" placeholder="Ví dụ: 2500000">
                         </div>
                         <div class="sm-form-group full">
-                            <label class="sm-form-label">Link ảnh đại diện (Tùy chọn)</label>
-                            <input type="text" id="sm-form-image" class="sm-form-control" placeholder="https://...">
+                            <label class="sm-form-label">Link ảnh đại diện</label>
+                            <input type="text" id="sm-form-image" class="sm-form-control" placeholder="Dán link ảnh tại đây (unsplash, google...)">
                         </div>
                         <div class="sm-form-group full">
-                            <label class="sm-form-label">Mô tả ngắn</label>
-                            <textarea id="sm-form-desc" class="sm-form-control" style="height:100px;resize:none" placeholder="Nhập mô tả hấp dẫn để thu hút khách hàng..."></textarea>
+                            <label class="sm-form-label">Mô tả dịch vụ</label>
+                            <textarea id="sm-form-description" class="sm-form-control" style="height:120px;resize:none" placeholder="Nhập mô tả chi tiết để thu hút khách hàng..."></textarea>
+                        </div>
+                        <div class="sm-form-group full">
+                            <label class="sm-form-label">Điểm nổi bật (Highlights) - Mỗi dòng một ý</label>
+                            <textarea id="sm-form-highlights" class="sm-form-control" style="height:80px;resize:none" placeholder="Ví dụ: &#10;Miễn phí nước suối&#10;Xe Limousine đời mới..."></textarea>
+                        </div>
+                        <div class="sm-form-group full">
+                            <label class="sm-form-label">Chính sách hoàn hủy & Quy định</label>
+                            <textarea id="sm-form-policy" class="sm-form-control" style="height:80px;resize:none" placeholder="Nhập các quy định về việc hủy đơn, trả phòng..."></textarea>
                         </div>
                     </div>
                     <div class="sm-modal-actions">
                         <button class="sm-btn-cancel" onclick="window.smActions.closeModal()">Hủy bỏ</button>
-                        <button class="sm-btn-primary" onclick="window.smActions.save()">Lưu dịch vụ</button>
+                        <button class="sm-btn-primary" onclick="window.smActions.save()">Lưu & Gửi phê duyệt</button>
                     </div>
                 </div>
             </div>
@@ -347,10 +384,51 @@
             });
         });
 
-        // Seed + load
-        seed();
-        state.services = load();
-        renderGrid();
+        loadServices();
+        checkAndSyncLegacyData();
     };
 
+    async function checkAndSyncLegacyData() {
+        const LS_KEY = 'biz_services';
+        const legacyData = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+        if (legacyData.length === 0) return;
+
+        console.log('Detected legacy local data, syncing to server...', legacyData);
+        // Removed intrusive alert/toast
+
+        let successCount = 0;
+        for (const item of legacyData) {
+            try {
+                // Map legacy fields to new fields
+                const payload = {
+                    name: item.name,
+                    kind: item.category === 'tour' ? 'diem-du-lich' : (item.category === 'hotel' ? 'khach-san' : 'nha-hang'),
+                    region: item.location || 'Chưa rõ',
+                    address: item.location || '',
+                    priceFrom: item.price || 0,
+                    image: item.image || '',
+                    description: item.desc || '',
+                    isTour: item.category === 'tour',
+                    status: 'pending',
+                    source: 'partner'
+                };
+
+                const res = await apiFetch('/api/business/places', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                if (res.success) successCount++;
+            } catch (e) {
+                console.error('Failed to sync item:', item, e);
+            }
+        }
+
+        if (successCount > 0) {
+            console.log(`Successfully synced ${successCount} legacy services.`);
+            localStorage.removeItem(LS_KEY); // Clean up
+            loadServices();
+        }
+    }
+
 })();
+

@@ -87,30 +87,35 @@ const verifyPortalToken = (expectedPortal) => async (req, res, next) => {
     const accountId = account.id || account._id || account.customId;
     if (!account || !accountId) return res.status(401).json({ success: false, message: 'Auth: Token missing account ID' });
     
-    // Standardize portal
+    // Standardize portal and prevent cross-portal token usage early
     if (!account.portal) {
       if (decoded.role === 'admin' || decoded.role === 'superadmin') account.portal = 'admin';
       else if (decoded.portal) account.portal = decoded.portal;
-      else account.portal = expectedPortal || 'user';
+      else account.portal = 'user'; // Default for old tokens
     }
-    
-    account.id = accountId; 
     
     const isPortalCheckRequired = expectedPortal && expectedPortal !== null && expectedPortal !== 'null';
     if (isPortalCheckRequired && account.portal !== expectedPortal) {
-      return res.status(403).json({ success: false, message: `Auth: Portal mismatch (Expected ${expectedPortal}, got ${account.portal})` });
+      console.warn(`[Auth] Portal mismatch: Expected ${expectedPortal}, but token is for ${account.portal}`);
+      return res.status(403).json({ 
+        success: false, 
+        message: `Quyền truy cập bị từ chối: Token này thuộc cổng ${account.portal}, không phải ${expectedPortal}.`,
+        code: 'PORTAL_MISMATCH'
+      });
     }
 
-    // Try cache first (skip if cache-buster 't' is present)
+    account.id = accountId; 
+    
+    // Try cache first
     const skipCache = req.query.t || req.headers['x-skip-cache'];
-    const cachedUser = skipCache ? null : getFromCache(accountId, account.portal || expectedPortal || 'user');
+    const cachedUser = skipCache ? null : getFromCache(accountId, account.portal);
     if (cachedUser) {
       req.user = cachedUser;
       return next();
     }
 
     const modelMap = { 'user': User, 'business': BusinessAccount, 'admin': AdminAccount };
-    const Model = modelMap[account.portal || expectedPortal || 'user'];
+    const Model = modelMap[account.portal];
     
     if (Model) {
       const query = {
@@ -123,10 +128,10 @@ const verifyPortalToken = (expectedPortal) => async (req, res, next) => {
         query.$or.push({ _id: accountId });
       }
 
-      const accountData = await Model.findOne(query).lean(); // Use lean for speed
+      const accountData = await Model.findOne(query).lean();
       if (!accountData) {
-        console.warn(`Auth: Account ${accountId} not found in ${account.portal || expectedPortal}`);
-        return res.status(401).json({ success: false, message: 'Auth: Account not found in DB' });
+        console.warn(`Auth: Account ${accountId} not found in ${account.portal} collection`);
+        return res.status(401).json({ success: false, message: 'Tài khoản không tồn tại hoặc phiên làm việc đã hết hạn.' });
       }
       
       // Update lastActive less frequently (every 15 mins instead of 5)

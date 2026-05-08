@@ -1,4 +1,4 @@
-/**
+﻿/**
  * mockData.js
  * Centralized mock data for WanderViệt Business Dashboard.
  */
@@ -96,3 +96,4 @@ function getMessages(convId) {
 if (typeof module !== 'undefined') {
     module.exports = { services, bookings, conversations, messages, getAllServices, getBookings, getConversations, getMessages };
 }
+

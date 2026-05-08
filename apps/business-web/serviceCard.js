@@ -1,4 +1,4 @@
-/**
+﻿/**
  * serviceCard.js
  * Component hiển thị danh sách dịch vụ dạng card
  * Yêu cầu: mockData.js phải được load trước
@@ -310,3 +310,4 @@ function renderServices(services, containerId = 'service-grid') {
     });
   });
 }
+

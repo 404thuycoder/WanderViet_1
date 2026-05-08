@@ -1,9 +1,7 @@
-/**
- * messageManagement.js
- * Advanced Chat / Messenger interface for WanderViệt Business.
- * Tích hợp Trợ lý AI v5.0 (Learning & Advanced Flow).
+﻿/**
+ * messageManagement.js — Zenith Dark Messenger
+ * Advanced Chat interface for WanderViệt Business Partner Hub.
  */
-
 (function() {
     'use strict';
 
@@ -11,14 +9,13 @@
     let localMessages = [];
     let localConversations = [];
     
-    // Hệ thống Trí nhớ & Phiên
     let aiMemory = JSON.parse(localStorage.getItem('chatbot_memory_v5') || '{}');
     let aiSession = { step: 'idle', data: {} };
 
     const HISTORY_KEY = 'chatbot_history_messages_v5';
     const AI_BOT_ID = 'ai-assistant';
 
-    // ── Logic AI Thông minh ──────────────────────────────────────
+    // ── Logic AI ────────────────────────────────────────────────
     function normalize(text) {
         if (!text) return '';
         return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w\s]/gi, '').trim();
@@ -28,7 +25,6 @@
         const raw = userMessage;
         const clean = normalize(raw);
 
-        // 1. Cú pháp Dạy học (Learning)
         if (raw.toLowerCase().startsWith('day:')) {
             const parts = raw.substring(4).split('=');
             if (parts.length === 2) {
@@ -40,12 +36,10 @@
             }
         }
 
-        // 2. Ưu tiên Trí nhớ đã học
         for (let k in aiMemory) {
             if (clean.includes(k)) return aiMemory[k];
         }
 
-        // 3. Luồng Hội thoại (Flow)
         if (aiSession.step === 'asking_people') {
             const num = raw.match(/\d+/);
             if (num) {
@@ -71,7 +65,6 @@
             return "Dạ cho em xin số điện thoại để liên hệ xác nhận ạ.";
         }
 
-        // 4. Intent Detection
         const intents = {
             services: ["dich vu", "co gi", "lam gi", "san pham", "tien ich"],
             booking: ["dat phong", "thue phong", "book", "dat cho", "nghi"],
@@ -80,7 +73,7 @@
         };
 
         if (intents.services.some(k => clean.includes(k))) {
-            return "Dạ bên em cung cấp 2 dịch vụ chính: \n1. **Đặt phòng khách sạn/Resort** cao cấp view biển. \n2. **Tour du lịch trọn gói** (Hạ Long, Đà Nẵng, Hội An). \nBạn muốn tìm hiểu kỹ hơn về dịch vụ nào ạ?";
+            return "Dạ bên em cung cấp 2 dịch vụ chính: \n1. **Khách sạn & Resort** cao cấp. \n2. **Tour du lịch trọn gói**. \nBạn muốn tìm hiểu kỹ hơn về dịch vụ nào ạ?";
         }
 
         if (intents.booking.some(k => clean.includes(k)) || clean.includes("phong")) {
@@ -94,65 +87,66 @@
         }
 
         if (intents.price.some(k => clean.includes(k))) {
-            return "Dạ giá bên em rất linh hoạt: Tour từ 1.8tr/người và Phòng từ 1.2tr/đêm. Bạn muốn em gửi bảng giá chi tiết của dịch vụ nào ạ?";
+            return "Dạ giá bên em rất linh hoạt tùy theo thời điểm và hạng dịch vụ. Bạn đang quan tâm đến tour hay phòng khách sạn để em gửi bảng giá mới nhất ạ?";
         }
 
-        return "Dạ em chưa hiểu rõ ý mình lắm. Bạn muốn xem danh sách **dịch vụ**, **đặt phòng** hay hỏi về **giá cả** ạ?";
+        return "Dạ em đã nhận được tin nhắn của bạn. Em là trợ lý ảo WanderViệt, bạn có thể hỏi em về đặt tour, đặt phòng hoặc báo giá ạ!";
     }
 
-    // ── Styles (Premium & Smooth Scroll) ─────────────────────────
+    // ── Styles ──────────────────────────────────────────────────
     const style = document.createElement('style');
     style.textContent = `
-        .msg-mgmt-container { width: 100%; height: 550px; display: flex; flex-direction: column; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; background: #fff; margin-bottom: 30px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-        .messenger-layout { display: grid; grid-template-columns: 300px 1fr; background: #fff; height: 100%; overflow: hidden; }
+        .msg-mgmt-container { width: 100%; height: 650px; display: flex; flex-direction: column; font-family: 'Plus Jakarta Sans', sans-serif; overflow: hidden; background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border-radius: 28px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 40px 100px rgba(0,0,0,0.4); color:#fff; }
+        .messenger-layout { display: grid; grid-template-columns: 320px 1fr; height: 100%; overflow: hidden; }
         
-        .msg-sidebar { border-right: 1px solid #f1f5f9; display: flex; flex-direction: column; background: #f8fafc; height: 100%; }
-        .sidebar-head { padding: 15px 20px; border-bottom: 1px solid #f1f5f9; background: #fff; flex-shrink: 0; }
-        .conv-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .msg-sidebar { border-right: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; background: rgba(255,255,255,0.02); height: 100%; }
+        .sidebar-head { padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .conv-list { flex: 1; overflow-y: auto; padding: 12px; }
         
-        .conv-item { display: flex; align-items: center; gap: 18px; padding: 18px; border-radius: 22px; cursor: pointer; transition: all 0.3s; margin-bottom: 10px; }
-        .conv-item.active { background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%); color: #fff; }
+        .conv-item { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 20px; cursor: pointer; transition: all 0.3s; margin-bottom: 4px; border: 1px solid transparent; }
+        .conv-item:hover { background: rgba(255,255,255,0.05); }
+        .conv-item.active { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; box-shadow: 0 10px 25px rgba(99,102,241,0.3); border-color: rgba(255,255,255,0.1); }
         
-        .chat-main { display: flex; flex-direction: column; height: 100%; background: #fff; overflow: hidden; }
-        .chat-header { padding: 12px 20px; border-bottom: 1px solid #f1f5f9; background: #fff; flex-shrink: 0; }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; background: #fff; scroll-behavior: smooth; }
-        .chat-messages::after { content: ""; display: block; height: 60px; width: 100%; flex-shrink: 0; }
+        .chat-main { display: flex; flex-direction: column; height: 100%; background: transparent; overflow: hidden; }
+        .chat-header { padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.01); display:flex; justify-content:space-between; align-items:center; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
         
-        .bubble { max-width: 75%; padding: 16px 24px; font-size: 15px; line-height: 1.6; border-radius: 24px; position: relative; animation: slideIn 0.4s ease-out; }
-        .bubble-in { align-self: flex-start; background: #fff; color: #1e293b; border-bottom-left-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; }
-        .bubble-out { align-self: flex-end; background: #4338ca; color: #fff; border-bottom-right-radius: 4px; }
-        .bubble-ai { background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%); color: #fff; border: none; }
+        .bubble { max-width: 80%; padding: 14px 20px; font-size: 15px; line-height: 1.6; border-radius: 20px; position: relative; animation: slideUp 0.4s ease-out; }
+        .bubble-in { align-self: flex-start; background: rgba(255,255,255,0.05); color: #fff; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.1); }
+        .bubble-out { align-self: flex-end; background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(99,102,241,0.2); }
+        .bubble-ai { background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%); color: #fff; }
         
-        .chat-input-area { padding: 18px 25px; border-top: 2px solid #f1f5f9; display: flex; align-items: center; gap: 15px; background: #f8fafc; flex-shrink: 0; }
-        .chat-input { flex: 1; padding: 14px 22px; border-radius: 12px; border: 2px solid #cbd5e1; outline: none; background: #fff; font-size: 15px; }
-        .btn-send { width: 48px; height: 48px; border-radius: 12px; background: #4338ca; color: #fff; border: none; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .chat-input-area { padding: 20px 24px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 14px; background: rgba(255,255,255,0.02); }
+        .chat-input { flex: 1; padding: 14px 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); outline: none; background: rgba(255,255,255,0.03); font-size: 15px; color:#fff; transition:all 0.2s; }
+        .chat-input:focus { border-color:#6366f1; background:rgba(255,255,255,0.06); box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
+        .btn-send { width: 50px; height: 50px; border-radius: 16px; background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 15px rgba(99,102,241,0.3); transition: all 0.2s; }
+        .btn-send:hover { transform: scale(1.05); opacity: 0.9; }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     `;
     document.head.appendChild(style);
 
-    // ── Scroll Logic (Final Fix) ─────────────────────────────────
+    // ── Utils ───────────────────────────────────────────────────
     function forceScrollToBottom() {
         const container = document.getElementById('chat-messages-container');
         if (!container) return;
-        
-        const doScroll = () => {
-            container.scrollTop = container.scrollHeight + 1000;
+        setTimeout(() => {
+            container.scrollTop = container.scrollHeight;
             const lastMsg = container.lastElementChild;
             if (lastMsg) lastMsg.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        };
-
-        doScroll();
-        setTimeout(doScroll, 50);
-        setTimeout(doScroll, 150);
-        setTimeout(doScroll, 400);
+        }, 50);
     }
 
-    // ── Initialization ──────────────────────────────────────────
+    function nowStr() {
+        const now = new Date();
+        return now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
+    }
+
+    // ── Main Logic ──────────────────────────────────────────────
     window.initMessageManagement = function() {
         localMessages = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
         localConversations = [
-            { id: AI_BOT_ID, customerName: 'Trợ lý Tư vấn Chuyên nghiệp', avatar: '👩‍💼', status: 'online', lastMessage: 'Em có thể giúp gì cho mình ạ?', time: 'Online', isAI: true },
+            { id: AI_BOT_ID, customerName: 'Trợ lý AI WanderViệt', avatar: '👩‍💼', status: 'online', lastMessage: 'Em có thể giúp gì cho mình ạ?', time: 'Online', isAI: true },
             { id: 'c-1', customerName: 'Nguyễn Văn A', avatar: 'https://i.pravatar.cc/150?u=1', status: 'online', lastMessage: 'Báo giá cho mình nhé', time: '10:30' }
         ];
 
@@ -163,14 +157,14 @@
             <div class="msg-mgmt-container">
                 <div class="messenger-layout">
                     <div class="msg-sidebar">
-                        <div class="sidebar-head"><h2 style="font-weight:900; color:#1e1b4b;">Hỗ trợ khách hàng</h2></div>
+                        <div class="sidebar-head"><h3 style="font-weight:900; color:#fff; font-size:18px">Tin nhắn</h3></div>
                         <div class="conv-list" id="conv-list"></div>
                     </div>
                     <div class="msg-main" id="chat-main-view">
-                        <div style="flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:25px; text-align:center; height:100%; background:#fcfcfd;">
-                            <div style="font-size:80px; background:#eef2ff; width:150px; height:150px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#4338ca;">👩‍💼</div>
-                            <h2 style="font-weight:900; color:#1e1b4b;">Trung tâm Tư vấn Thông minh</h2>
-                            <p style="color:#64748b; max-width:380px; font-size:16px;">Sẵn sàng hỗ trợ giải đáp mọi thắc mắc về tour và khách sạn.</p>
+                        <div style="flex:1; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:24px; text-align:center; height:100%;">
+                            <div style="font-size:70px; background:rgba(99,102,241,0.1); width:140px; height:140px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#6366f1; border: 1px solid rgba(99,102,241,0.2)">💬</div>
+                            <h2 style="font-weight:900; color:#fff; font-size:22px">Trung tâm Chăm sóc Khách hàng</h2>
+                            <p style="color:#94a3b8; max-width:350px; font-size:15px; line-height:1.6">Chọn một cuộc hội thoại để bắt đầu hỗ trợ khách hàng của bạn.</p>
                         </div>
                     </div>
                 </div>
@@ -184,15 +178,15 @@
         if (!container) return;
         container.innerHTML = localConversations.map(c => `
             <div class="conv-item ${activeConvId === c.id ? 'active' : ''}" onclick="window.selectConversation('${c.id}')">
-                <div style="width:56px; height:56px; border-radius:18px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:28px;">
-                    ${c.avatar.length > 2 ? `<img src="${c.avatar}" style="width:100%; height:100%; border-radius:18px; object-fit:cover;">` : c.avatar}
+                <div style="width:54px; height:54px; border-radius:16px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0">
+                    ${c.avatar.length > 2 ? `<img src="${c.avatar}" style="width:100%; height:100%; border-radius:16px; object-fit:cover;">` : c.avatar}
                 </div>
-                <div class="conv-info">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                        <span style="font-weight:800; font-size:16px;">${c.customerName}</span>
-                        <span style="font-size:10px; opacity:0.7;">${c.time}</span>
+                <div class="conv-info" style="flex:1; min-width:0">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span style="font-weight:800; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${c.customerName}</span>
+                        <span style="font-size:10px; color:#94a3b8; font-weight:700">${c.time}</span>
                     </div>
-                    <div style="font-size:13px; opacity:0.85;">${c.lastMessage}</div>
+                    <div style="font-size:12px; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${c.lastMessage}</div>
                 </div>
             </div>
         `).join('');
@@ -207,24 +201,24 @@
         mainView.innerHTML = `
             <div class="chat-main">
                 <div class="chat-header">
-                    <div style="display:flex; align-items:center; gap:18px;">
-                        <div style="font-size:24px;">${conv.avatar.length > 2 ? `<img src="${conv.avatar}" style="width:52px; height:52px; border-radius:16px; object-fit:cover;">` : conv.avatar}</div>
+                    <div style="display:flex; align-items:center; gap:16px;">
+                        <div style="font-size:24px;">${conv.avatar.length > 2 ? `<img src="${conv.avatar}" style="width:50px; height:50px; border-radius:14px; object-fit:cover;">` : conv.avatar}</div>
                         <div>
-                            <div style="font-weight:900; color:#1e1b4b; font-size:17px;">${conv.customerName}</div>
-                            <div style="font-size:12px; color:#10b981; font-weight:700;">Đang trực tuyến ⚡</div>
+                            <div style="font-weight:900; color:#fff; font-size:17px;">${conv.customerName}</div>
+                            <div style="font-size:12px; color:#4ade80; font-weight:700;">Đang hoạt động ✨</div>
                         </div>
                     </div>
-                    <button onclick="localStorage.removeItem('${HISTORY_KEY}'); aiSession={step:'idle',data:{}}; window.initMessageManagement(); setTimeout(()=>window.selectConversation('${AI_BOT_ID}'), 50);" style="font-size:12px; font-weight:700; color:#ef4444; background:#fef2f2; border:none; padding:10px 20px; border-radius:12px; cursor:pointer;">Làm mới Chat</button>
+                    <button onclick="localStorage.removeItem('${HISTORY_KEY}'); window.initMessageManagement();" style="font-size:11px; font-weight:800; color:#f87171; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); padding:8px 16px; border-radius:12px; cursor:pointer;">Xóa lịch sử</button>
                 </div>
                 <div class="chat-messages" id="chat-messages-container"></div>
                 <div class="chat-input-area">
-                    <input type="text" placeholder="Nhập câu hỏi tại đây..." id="chat-input-field" class="chat-input">
+                    <input type="text" placeholder="Nhập tin nhắn..." id="chat-input-field" class="chat-input">
                     <button onclick="window.handleSendMessage()" class="btn-send">➤</button>
                 </div>
             </div>
         `;
 
-        renderMessages(id, true);
+        renderMessages(id);
         const input = document.getElementById('chat-input-field');
         if (input) {
             input.focus();
@@ -232,28 +226,23 @@
         }
     };
 
-    function renderMessages(convId, instantScroll = false) {
-        const msgs = localMessages.filter(m => m.conversationId === convId);
+    function renderMessages(convId) {
+        let msgs = localMessages.filter(m => m.conversationId === convId);
         const container = document.getElementById('chat-messages-container');
         if (!container) return;
 
         if (msgs.length === 0 && convId === AI_BOT_ID) {
-            msgs.push({ conversationId: AI_BOT_ID, sender: 'customer', content: 'Chào bạn! Em là trợ lý ảo hỗ trợ tư vấn dịch vụ. Bạn muốn tìm hiểu về **Tour du lịch** hay **Đặt phòng khách sạn** ạ?', time: 'Hệ thống' });
+            msgs = [{ conversationId: AI_BOT_ID, sender: 'customer', content: 'Chào bạn! Em là trợ lý ảo hỗ trợ tư vấn dịch vụ. Bạn muốn tìm hiểu về **Tour du lịch** hay **Đặt phòng khách sạn** ạ?', time: 'Hệ thống' }];
         }
 
         container.innerHTML = msgs.map(m => `
             <div class="bubble ${m.sender === 'customer' ? 'bubble-in' : 'bubble-out'} ${convId === AI_BOT_ID && m.sender === 'customer' ? 'bubble-ai' : ''}">
                 ${m.content}
-                <div style="font-size:9.5px; opacity:0.6; margin-top:8px; text-align:right; font-weight:600;">${m.time}</div>
+                <div style="font-size:9px; color:#94a3b8; margin-top:6px; text-align:right; font-weight:700;">${m.time}</div>
             </div>
         `).join('');
 
         forceScrollToBottom();
-    }
-
-    function nowStr() {
-        const now = new Date();
-        return now.getHours() + ':' + (now.getMinutes() < 10 ? '0' : '') + now.getMinutes();
     }
 
     window.handleSendMessage = function() {
@@ -263,98 +252,20 @@
         const content = input.value.trim();
         if (!content) return;
 
-        // 1. Thêm tin nhắn của User ngay lập tức
         localMessages.push({ id: Date.now(), conversationId: activeConvId, sender: 'business', content, time: nowStr() });
-        
-        // 2. Clear input ngay lập tức để gửi tin tiếp theo được luôn
         input.value = '';
-        renderMessages(activeConvId, false);
+        renderMessages(activeConvId);
         localStorage.setItem(HISTORY_KEY, JSON.stringify(localMessages));
 
-        // 3. Phản hồi AI sau 1 giây
         if (activeConvId === AI_BOT_ID) {
             setTimeout(() => {
                 const reply = getBotReply(content);
                 localMessages.push({ id: 'ai-' + Date.now(), conversationId: AI_BOT_ID, sender: 'customer', content: reply, time: nowStr() });
-                renderMessages(AI_BOT_ID, false);
+                renderMessages(AI_BOT_ID);
                 localStorage.setItem(HISTORY_KEY, JSON.stringify(localMessages));
-            }, 1000);
-        }
-    };
-
-    // ── Dedicated AI View ────────────────────────────────────────
-    window.initAIChat = function() {
-        const container = document.getElementById('ai-chat-container');
-        if (!container) return;
-        
-        container.innerHTML = `
-            <div class="msg-mgmt-container" style="height:600px">
-                <div class="chat-main" style="border:none">
-                    <div class="chat-header">
-                        <div style="display:flex; align-items:center; gap:18px;">
-                            <div style="font-size:32px; background:#eef2ff; padding:10px; border-radius:15px">👩‍💼</div>
-                            <div>
-                                <div style="font-weight:900; color:#1e1b4b; font-size:18px;">Trợ lý Tư vấn Chuyên nghiệp</div>
-                                <div style="font-size:12px; color:#10b981; font-weight:700;">Hỗ trợ 24/7 bằng Trí tuệ nhân tạo ⚡</div>
-                            </div>
-                        </div>
-                        <button onclick="localStorage.removeItem('${HISTORY_KEY}'); aiSession={step:'idle',data:{}}; window.initAIChat();" style="font-size:12px; font-weight:700; color:#ef4444; background:#fef2f2; border:none; padding:10px 20px; border-radius:12px; cursor:pointer;">Làm mới cuộc hội thoại</button>
-                    </div>
-                    <div class="chat-messages" id="ai-chat-messages-container" style="padding:30px"></div>
-                    <div class="chat-input-area" style="background:#fff; border-top:1px solid #f1f5f9">
-                        <input type="text" placeholder="Hỏi em về tour, phòng hoặc giá cả..." id="ai-chat-input-field" class="chat-input" style="border-radius:15px; background:#f8fafc">
-                        <button onclick="window.handleSendAIMessage()" class="btn-send" style="border-radius:15px">➤</button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        window.handleSendAIMessage = function() {
-            const input = document.getElementById('ai-chat-input-field');
-            if (!input) return;
-            const content = input.value.trim();
-            if (!content) return;
-
-            const msgs = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-            msgs.push({ id: Date.now(), conversationId: AI_BOT_ID, sender: 'business', content, time: nowStr() });
-            localStorage.setItem(HISTORY_KEY, JSON.stringify(msgs));
-            input.value = '';
-            renderAIMessages();
-
-            setTimeout(() => {
-                const reply = getBotReply(content);
-                const msgs2 = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
-                msgs2.push({ id: 'ai-' + Date.now(), conversationId: AI_BOT_ID, sender: 'customer', content: reply, time: nowStr() });
-                localStorage.setItem(HISTORY_KEY, JSON.stringify(msgs2));
-                renderAIMessages();
-            }, 1000);
-        };
-
-        function renderAIMessages() {
-            const msgs = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]').filter(m => m.conversationId === AI_BOT_ID);
-            const containerMsgs = document.getElementById('ai-chat-messages-container');
-            if (!containerMsgs) return;
-
-            if (msgs.length === 0) {
-                msgs.push({ conversationId: AI_BOT_ID, sender: 'customer', content: 'Chào bạn! Em là trợ lý ảo WanderViệt. Em có thể giúp bạn tìm hiểu về các dịch vụ du lịch, báo giá hoặc hỗ trợ đặt phòng. Bạn cần em giúp gì ạ?', time: 'Hệ thống' });
-            }
-
-            containerMsgs.innerHTML = msgs.map(m => `
-                <div class="bubble ${m.sender === 'customer' ? 'bubble-in bubble-ai' : 'bubble-out'}" style="margin-bottom:15px">
-                    ${m.content}
-                    <div style="font-size:9.5px; opacity:0.6; margin-top:8px; text-align:right; font-weight:600;">${m.time}</div>
-                </div>
-            `).join('');
-            
-            containerMsgs.scrollTop = containerMsgs.scrollHeight;
-        }
-
-        renderAIMessages();
-        const inp = document.getElementById('ai-chat-input-field');
-        if (inp) {
-            inp.focus();
-            inp.addEventListener('keypress', (e) => { if (e.key === 'Enter') window.handleSendAIMessage(); });
+            }, 800);
         }
     };
 
 })();
+

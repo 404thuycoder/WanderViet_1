@@ -1,4 +1,4 @@
-/**
+﻿/**
  * updateServiceStatus.js
  * Chức năng đổi trạng thái dịch vụ (active | pending | paused)
  *
@@ -45,3 +45,4 @@ function updateServiceStatus(id, newStatus) {
     console.warn(`[updateServiceStatus] Không tìm thấy dịch vụ ID: ${id}`);
   }
 }
+

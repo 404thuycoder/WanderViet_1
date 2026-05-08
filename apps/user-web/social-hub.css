@@ -630,7 +630,7 @@
     .convo-time { font-size: 0.75rem; color: var(--text-muted); flex-shrink: 0; }
 
     /* ===== CHAT DRAWER ===== */
-    .chat-drawer { position: fixed; bottom: 0; right: 90px; width: 380px; height: 520px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-radius: 20px 20px 0 0; box-shadow: 0 -10px 50px rgba(0,0,0,0.5); z-index: 9990; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); border: 1px solid rgba(255,255,255,0.1); border-bottom: none; }
+    .chat-drawer { position: fixed; bottom: 0; right: 90px; width: 380px; height: 520px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border-radius: 20px 20px 0 0; box-shadow: 0 -10px 50px rgba(0,0,0,0.5); z-index: 20005; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); border: 1px solid rgba(255,255,255,0.1); border-bottom: none; }
     .chat-drawer.open { transform: translateY(0); }
     .chat-drawer-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); border-radius: 20px 20px 0 0; }
     .chat-target-info { display: flex; align-items: center; gap: 12px; }
@@ -745,7 +745,7 @@
     .editor-tools .tool-btn span { font-size: 0.7rem; font-weight: 600; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
 
     /* Image Viewer */
-    .image-viewer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10002; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .image-viewer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 21002; display: flex; align-items: center; justify-content: center; cursor: pointer; }
     .image-viewer-overlay img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 8px; }
     .close-viewer { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; }
 
@@ -783,7 +783,7 @@
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.95);
-        z-index: 10000;
+        z-index: 21000;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -1031,7 +1031,7 @@
         inset: 0;
         background: rgba(0,0,0,0.8);
         backdrop-filter: blur(10px);
-        z-index: 10001;
+        z-index: 21001;
         display: flex;
         align-items: center;
         justify-content: center;

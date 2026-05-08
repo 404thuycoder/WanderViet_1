@@ -1,417 +1,313 @@
-/**
- * addServiceForm.js
- * Form thêm dịch vụ mới dạng Modal
- *
- * Load order:
- *   mockData.js → serviceCard.js → filterServices.js → searchServices.js → addServiceForm.js
- *
- * Cách dùng:
- *   <div id="modal-root"></div>
- *   <button class="btn-add" id="btn-open-add">Thêm dịch vụ</button>
- *   initAddServiceForm('modal-root', '#btn-open-add');
+﻿/**
+ * addServiceForm.js - Elite Zenith Edition
+ * Form thêm dịch vụ mới dạng Modal chuyên sâu cho đối tác Elite
  */
 
-// ─────────────────────────────────────────
-//  Inject CSS cho Modal & Form
-// ─────────────────────────────────────────
 (function injectModalStyles() {
   if (document.getElementById('add-svc-styles')) return;
   const style = document.createElement('style');
   style.id = 'add-svc-styles';
-  style.textContent = `
-    /* Modal Overlay */
-    .svc-modal-overlay {
+  style.te    .svc-modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(10, 17, 30, 0.4);
-      backdrop-filter: blur(4px);
+      background: rgba(4, 9, 20, 0.7);
+      backdrop-filter: blur(15px);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 9999;
       opacity: 0;
       visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s;
+      transition: all 0.3s;
     }
-    .svc-modal-overlay.is-open {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    /* Modal Content */
+    .svc-modal-overlay.is-open { opacity: 1; visibility: visible; }
+ 
     .svc-modal {
-      background: #ffffff;
-      width: 100%;
-      max-width: 500px;
-      border-radius: 20px;
-      box-shadow: 0 24px 48px rgba(118, 75, 162, 0.15);
-      transform: translateY(20px);
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: #111827;
+      width: 95%;
+      max-width: 700px;
+      max-height: 90vh;
+      border-radius: 32px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.5);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      animation: modalSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      color: #fff;
     }
-    .svc-modal-overlay.is-open .svc-modal {
-      transform: translateY(0);
-    }
-
-    /* Header */
+    @keyframes modalSlideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+ 
     .svc-modal-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid #f0ecff;
+      padding: 24px 32px;
+      background: linear-gradient(to right, #6366f1, #a855f7);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: #f8f5ff;
-    }
-    .svc-modal-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: #1a1a2e;
-      margin: 0;
-    }
-    .svc-modal-close {
-      background: #ede8ff;
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      font-size: 16px;
-      color: #764ba2;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s, transform 0.2s;
-    }
-    .svc-modal-close:hover {
-      background: #c4b5fd;
-      transform: scale(1.1);
-    }
-
-    /* Form Body */
-    .svc-form {
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    
-    .svc-form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .svc-form-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: #444;
-    }
-    
-    .svc-form-input {
-      border: 1.5px solid #ede8ff;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 14px;
-      color: #1a1a2e;
-      font-family: inherit;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      background: #fcfbff;
-    }
-    .svc-form-input:focus {
-      outline: none;
-      border-color: #764ba2;
-      box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
-      background: #fff;
-    }
-    
-    .svc-form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    /* Footer */
-    .svc-modal-footer {
-      padding: 16px 24px;
-      border-top: 1px solid #f0ecff;
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      background: #faf8ff;
-    }
-    
-    .svc-btn {
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      transition: transform 0.1s, opacity 0.2s;
-      border: none;
-    }
-    .svc-btn:active { transform: scale(0.96); }
-    
-    .svc-btn-cancel {
-      background: #fff;
-      color: #666;
-      border: 1px solid #ddd;
-    }
-    .svc-btn-cancel:hover { background: #f5f5f5; }
-    
-    .svc-btn-submit {
-      background: linear-gradient(135deg, #667eea, #764ba2);
       color: #fff;
-      box-shadow: 0 4px 12px rgba(118, 75, 162, 0.3);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
-    .svc-btn-submit:hover {
-      opacity: 0.9;
-    }
+    .svc-modal-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .svc-modal-close { background: rgba(255,255,255,0.2); border: none; width: 36px; height: 36px; border-radius: 12px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .svc-modal-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+ 
+    .svc-modal-body { padding: 0; overflow-y: auto; flex: 1; background: transparent; }
+    .svc-form { padding: 32px; display: flex; flex-direction: column; gap: 24px; }
+    
+    .svc-section-title { font-size: 13px; font-weight: 800; color: #a5b4fc; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+    
+    .svc-form-group { display: flex; flex-direction: column; gap: 8px; }
+    .svc-form-label { font-size: 13px; font-weight: 700; color: #94a3b8; }
+    .svc-form-input { border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 12px 16px; font-size: 14px; transition: all 0.2s; background: rgba(255,255,255,0.03); color: #fff; font-family: inherit; }
+    .svc-form-input:focus { outline: none; border-color: #6366f1; background: rgba(255,255,255,0.06); box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
+    .svc-form-input::placeholder { color: #4b5563; }
+    
+    .svc-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+ 
+    /* List Builder UI */
+    .builder-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+    .builder-item { display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); animation: fadeIn 0.3s ease; }
+    .builder-item input { flex: 1; border: none; background: transparent; font-size: 13px; outline: none; color: #fff; }
+    .builder-btn-remove { color: #f87171; cursor: pointer; padding: 4px; border-radius: 6px; }
+    .builder-btn-remove:hover { background: rgba(239,68,68,0.1); }
+    .btn-add-item { width: fit-content; padding: 8px 16px; border-radius: 10px; border: 1px dashed rgba(99,102,241,0.3); color: #a5b4fc; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 8px; }
+    .btn-add-item:hover { background: rgba(99,102,241,0.05); border-color: #6366f1; }
+ 
+    .svc-modal-footer { padding: 24px 32px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: flex-end; gap: 16px; background: rgba(0,0,0,0.1); }
+    .btn-svc { padding: 14px 28px; border-radius: 16px; font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.3s; border: none; font-family: inherit; }
+    .btn-svc-cancel { background: rgba(255,255,255,0.05); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); }
+    .btn-svc-cancel:hover { background: rgba(255,255,255,0.08); }
+    .btn-svc-submit { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; box-shadow: 0 10px 20px rgba(99,102,241,0.2); }
+    .btn-svc-submit:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(99,102,241,0.3); }
+ 
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    teY(0); } }
   `;
   document.head.appendChild(style);
 })();
 
-// ─────────────────────────────────────────
-//  addService(service) - Core Function
-// ─────────────────────────────────────────
-/**
- * Thêm dịch vụ mới vào danh sách và cập nhật giao diện
- * @param {Object} service - Dữ liệu dịch vụ mới
- */
-function addService(service) {
-  const allServices = getAllServices();
-  
-  // 1. Tạo ID mới
-  const newIdNum = allServices.length + 1;
-  const newId = 'SVC' + String(newIdNum).padStart(3, '0');
-  
-  // 2. Format object dịch vụ
-  const newService = {
-    id: newId,
-    name: service.name.trim(),
-    type: service.type,
-    location: service.location.trim(),
-    price: Number(service.price),
-    unit: service.type === 'khách sạn' || service.type === 'villa' ? 'đêm' : 'người',
-    rating: 0,
-    bookings: 0,
-    status: 'pending', // Mặc định chờ duyệt khi mới thêm
-    image: service.image.trim() || 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=600'
-  };
-  
-  // 3. Thêm vào đầu danh sách mockData
-  allServices.unshift(newService);
-  
-  console.log('[addService] Đã thêm thành công:', newService);
-  
-  // 4. Update UI
-  // Nếu có hệ thống search + filter thì trigger nó để vẽ lại
-  if (typeof _applyFilters === 'function') {
-      const gridId = 'service-grid'; 
-      const countEl = document.getElementById('_svc_result_count');
-      _applyFilters(gridId, countEl);
-      
-      // Update badge đếm ở các tab nếu tab đang tồn tại
-      const tabBar = document.getElementById('tab-bar');
-      if (tabBar && typeof _renderTabBar === 'function') {
-         // Lấy tab đang active hiện tại
-         const activeTab = tabBar.querySelector('.filter-tab.is-active');
-         const currentStatus = activeTab ? activeTab.dataset.status : 'all';
-         _renderTabBar(tabBar, gridId, currentStatus);
-      }
-  } else if (typeof filterServices === 'function') {
-      const activeTab = document.querySelector('.filter-tab.is-active');
-      const status = activeTab ? activeTab.dataset.status : 'all';
-      filterServices(status);
-  } else if (typeof renderServices === 'function') {
-      renderServices(allServices, 'service-grid');
-  }
-
-  // Update Dashboard Stats realtime
-  if (typeof renderStats === 'function') {
-      renderStats('dashboard-stats');
-  }
-}
-
-// ─────────────────────────────────────────
-//  Khởi tạo Modal Form
-// ─────────────────────────────────────────
-/**
- * @param {string} rootId - ID của thẻ div sẽ chứa Modal
- * @param {string} triggerSelector - CSS selector của nút để mở Modal (VD: '#btn-add' hoặc '.add-btn')
- */
 function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add') {
   const root = document.getElementById(rootId);
-  if (!root) {
-    console.warn(`[addServiceForm] Không tìm thấy #${rootId}`);
-    return;
-  }
-  
-  // Build HTML cho Modal
+  if (!root) return;
+
   root.innerHTML = `
     <div class="svc-modal-overlay" id="add-svc-overlay">
       <div class="svc-modal">
         <div class="svc-modal-header">
-          <h3 class="svc-modal-title">Thêm dịch vụ mới</h3>
-          <button class="svc-modal-close" id="add-svc-close" title="Đóng">✕</button>
+          <h3 class="svc-modal-title">Dịch vụ Elite & Trải nghiệm</h3>
+          <button class="svc-modal-close" id="add-svc-close">✕</button>
         </div>
-        
-        <form id="add-svc-form">
-          <div class="svc-form">
-            <div class="svc-form-group">
-              <label class="svc-form-label">Tên dịch vụ *</label>
-              <input type="text" id="svc-input-name" class="svc-form-input" placeholder="VD: Khách sạn 5 sao..." required>
+        <div class="svc-modal-body">
+          <form id="add-svc-form" class="svc-form">
+            <!-- SECTION 1: CƠ BẢN -->
+            <div class="svc-section">
+              <div class="svc-section-title">Thông tin cơ bản</div>
+              <div class="svc-form-group" style="margin-bottom: 20px;">
+                <label class="svc-form-label">Tên dịch vụ/Tour *</label>
+                <input type="text" id="svc-name" class="svc-form-input" placeholder="Tên hiển thị thu hút khách hàng" required>
+              </div>
+              <div class="svc-form-row">
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Phân loại *</label>
+                  <select id="svc-kind" class="svc-form-input">
+                    <option value="trai-nghiem">Trải nghiệm / Tour</option>
+                    <option value="khach-san">Khách sạn / Villa</option>
+                    <option value="nha-hang">Nhà hàng / Ẩm thực</option>
+                    <option value="giai-tri">Giải trí / Sự kiện</option>
+                  </select>
+                </div>
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Giá khởi điểm (VND) *</label>
+                  <input type="number" id="svc-price" class="svc-form-input" placeholder="3200000" required>
+                </div>
+              </div>
             </div>
-            
-            <div class="svc-form-row">
+
+            <!-- SECTION 2: CHI TIẾT ĐỊA ĐIỂM -->
+            <div class="svc-section">
+              <div class="svc-section-title">Địa điểm & Liên hệ</div>
+              <div class="svc-form-row">
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Vùng/Miền *</label>
+                  <input type="text" id="svc-region" class="svc-form-input" placeholder="VD: Sapa, Lào Cai" required>
+                </div>
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Số điện thoại hỗ trợ</label>
+                  <input type="text" id="svc-phone" class="svc-form-input" placeholder="090...">
+                </div>
+              </div>
+              <div class="svc-form-group" style="margin-top: 15px;">
+                <label class="svc-form-label">Địa chỉ chính xác</label>
+                <input type="text" id="svc-address" class="svc-form-input" placeholder="Số nhà, Tên đường...">
+              </div>
+            </div>
+
+            <!-- SECTION 3: TOUR SPECIFIC (Conditional) -->
+            <div class="svc-section" id="tour-extras" style="background: rgba(99,102,241,0.03); padding: 20px; border-radius: 20px; border: 1px dashed rgba(99,102,241,0.2);">
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                <input type="checkbox" id="svc-is-tour" style="width:20px; height:20px; cursor:pointer;">
+                <label for="svc-is-tour" class="svc-form-label" style="cursor:pointer; margin:0;">Đây là Tour du lịch (Có lịch trình & ngày đi)</label>
+              </div>
+              <div id="tour-fields" style="display:none; gap:20px; flex-direction:column;">
+                <div class="svc-form-row">
+                   <div class="svc-form-group">
+                     <label class="svc-form-label">Thời lượng</label>
+                     <input type="text" id="svc-duration" class="svc-form-input" placeholder="VD: 3 Ngày 2 Đêm">
+                   </div>
+                   <div class="svc-form-group">
+                     <label class="svc-form-label">Độ khó</label>
+                     <select id="svc-diff" class="svc-form-input">
+                       <option value="easy">Dễ dàng (Easy)</option>
+                       <option value="medium">Vừa sức (Medium)</option>
+                       <option value="hard">Thử thách (Hard)</option>
+                     </select>
+                   </div>
+                </div>
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Lịch trình chi tiết (Day-by-Day)</label>
+                  <div id="itinerary-list" class="builder-list"></div>
+                  <div class="btn-add-item" id="btn-add-day">+ Thêm ngày hành trình</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 4: NỘI DUNG ELITE -->
+            <div class="svc-section">
+              <div class="svc-section-title">Nội dung Elite</div>
               <div class="svc-form-group">
-                <label class="svc-form-label">Loại dịch vụ *</label>
-                <select id="svc-input-type" class="svc-form-input" required>
-                  <option value="trai-nghiem">Trải nghiệm / Tour</option>
-                  <option value="khach-san">Khách sạn / Nghỉ dưỡng</option>
-                  <option value="nha-hang">Nhà hàng / Ẩm thực</option>
-                  <option value="giai-tri">Giải trí / Vui chơi</option>
-                  <option value="diem-du-lich">Điểm tham quan</option>
-                </select>
+                <label class="svc-form-label">Mô tả tổng quan</label>
+                <textarea id="svc-desc" class="svc-form-input" style="height:100px; resize:none;" placeholder="Viết những lời chào mời hấp dẫn nhất..."></textarea>
               </div>
               <div class="svc-form-group">
-                <label class="svc-form-label">Giá thấp nhất (VND) *</label>
-                <input type="number" id="svc-input-price" class="svc-form-input" placeholder="VD: 1500000" min="0" required>
+                <label class="svc-form-label">Dấu ấn đặc biệt (Highlights)</label>
+                <div id="highlight-list" class="builder-list"></div>
+                <div class="btn-add-item" id="btn-add-hl">+ Thêm điểm nổi bật</div>
+              </div>
+              <div class="svc-form-group">
+                <label class="svc-form-label">Ảnh trưng bày (Dán link cách nhau bằng dấu phẩy)</label>
+                <textarea id="svc-imgs" class="svc-form-input" style="height:60px; resize:none;" placeholder="https://..."></textarea>
+              </div>
+              <div class="svc-form-group">
+                <label class="svc-form-label">Video (Youtube/TikTok URL)</label>
+                <input type="text" id="svc-video" class="svc-form-input" placeholder="https://youtube.com/...">
               </div>
             </div>
-
-            <div class="svc-form-group" style="flex-direction: row; align-items: center; gap: 10px; background: #f0f7ff; padding: 10px; border-radius: 10px;">
-              <input type="checkbox" id="svc-input-istour" style="width: 18px; height: 18px; cursor: pointer;">
-              <label for="svc-input-istour" class="svc-form-label" style="cursor: pointer; margin: 0;">Dịch vụ này là Tour du lịch (Trọn gói / Lịch trình sẵn)</label>
-            </div>
-            
-            <div class="svc-form-group">
-              <label class="svc-form-label">Địa điểm / Khu vực *</label>
-              <input type="text" id="svc-input-loc" class="svc-form-input" placeholder="VD: Hạ Long, Quảng Ninh" required>
-            </div>
-
-            <div class="svc-form-group">
-              <label class="svc-form-label">Mô tả tổng quan</label>
-              <textarea id="svc-input-desc" class="svc-form-input" style="height:80px;" placeholder="Giới thiệu ngắn về dịch vụ của bạn..."></textarea>
-            </div>
-            
-            <div class="svc-form-group">
-              <label class="svc-form-label">Danh sách Ảnh (URLs, ngăn cách bằng dấu phẩy)</label>
-              <textarea id="svc-input-imgs" class="svc-form-input" placeholder="https://image1.jpg, https://image2.jpg..."></textarea>
-            </div>
-
-            <div class="svc-form-group">
-              <label class="svc-form-label">Link Video giới thiệu (Youtube/TikTok)</label>
-              <input type="url" id="svc-input-video" class="svc-form-input" placeholder="https://www.youtube.com/watch?v=...">
-            </div>
-          </div>
-          
-          <div class="svc-modal-footer">
-            <button type="button" class="svc-btn svc-btn-cancel" id="add-svc-cancel">Hủy</button>
-            <button type="submit" class="svc-btn svc-btn-submit" id="add-svc-submit-btn">Đăng dịch vụ</button>
-          </div>
-        </form>
+          </form>
+        </div>
+        <div class="svc-modal-footer">
+          <button class="btn-svc btn-svc-cancel" id="add-svc-cancel-btn">Hủy bỏ</button>
+          <button class="btn-svc btn-svc-submit" id="add-svc-submit-btn">Đăng dịch vụ Elite</button>
+        </div>
       </div>
     </div>
   `;
-  
-  // -- REPLACEMENT FOR addService FUNCTION --
-  window.addService = async function(service) {
-    const btn = document.getElementById('add-svc-submit-btn');
-    if (btn) { btn.disabled = true; btn.textContent = 'Đang đăng...'; }
+
+  // --- LOGIC: HIỆN/ẨN TOUR FIELDS ---
+  const chkTour = document.getElementById('svc-is-tour');
+  const tourFields = document.getElementById('tour-fields');
+  chkTour.addEventListener('change', () => {
+    tourFields.style.display = chkTour.checked ? 'flex' : 'none';
+  });
+
+  // --- LOGIC: BUILDER HÀNH TRÌNH ---
+  const itineraryList = document.getElementById('itinerary-list');
+  const btnAddDay = document.getElementById('btn-add-day');
+  btnAddDay.addEventListener('click', () => {
+    const dayNum = itineraryList.children.length + 1;
+    const div = document.createElement('div');
+    div.className = 'builder-item';
+    div.innerHTML = `
+      <b style="font-size:12px; color:#6366f1; width:50px;">Ngày ${dayNum}</b>
+      <input type="text" placeholder="Tiêu đề ngày (VD: Trekking Fansipan)" class="it-title">
+      <input type="text" placeholder="Chi tiết ngắn" class="it-desc">
+      <span class="builder-btn-remove">✕</span>
+    `;
+    div.querySelector('.builder-btn-remove').onclick = () => div.remove();
+    itineraryList.appendChild(div);
+  });
+
+  // --- LOGIC: BUILDER HIGHLIGHTS ---
+  const hlList = document.getElementById('highlight-list');
+  const btnAddHl = document.getElementById('btn-add-hl');
+  btnAddHl.addEventListener('click', () => {
+    const div = document.createElement('div');
+    div.className = 'builder-item';
+    div.innerHTML = `
+      <input type="text" placeholder="VD: Khách sạn 5 sao cao cấp nhất Sapa" class="hl-input">
+      <span class="builder-btn-remove">✕</span>
+    `;
+    div.querySelector('.builder-btn-remove').onclick = () => div.remove();
+    hlList.appendChild(div);
+  });
+
+  // --- OVERLAY LOGIC ---
+  const overlay = document.getElementById('add-svc-overlay');
+  const btnClose = document.getElementById('add-svc-close');
+  const btnCancel = document.getElementById('add-svc-cancel-btn');
+  const btnSubmit = document.getElementById('add-svc-submit-btn');
+  const form = document.getElementById('add-svc-form');
+
+  const triggers = document.querySelectorAll(triggerSelector);
+  triggers.forEach(btn => btn.onclick = () => overlay.classList.add('is-open'));
+
+  const close = () => { overlay.classList.remove('is-open'); form.reset(); itineraryList.innerHTML = ''; hlList.innerHTML = ''; };
+  btnClose.onclick = close;
+  btnCancel.onclick = close;
+  overlay.onclick = (e) => e.target === overlay && close();
+
+  // --- SUBMIT LOGIC ---
+  btnSubmit.onclick = async () => {
+    const name = document.getElementById('svc-name').value;
+    if (!name) return alert('Vui lòng nhập tên dịch vụ');
+    
+    btnSubmit.disabled = true;
+    btnSubmit.textContent = 'Đang xử lý...';
+
+    const highlights = Array.from(hlList.querySelectorAll('.hl-input')).map(i => i.value).filter(Boolean);
+    const itinerary = Array.from(itineraryList.children).map((div, idx) => ({
+      day: idx + 1,
+      title: div.querySelector('.it-title').value,
+      detail: div.querySelector('.it-desc').value
+    })).filter(it => it.title);
+
+    const payload = {
+      name,
+      kind: document.getElementById('svc-kind').value,
+      priceFrom: document.getElementById('svc-price').value,
+      region: document.getElementById('svc-region').value,
+      address: document.getElementById('svc-address').value,
+      contactPhone: document.getElementById('svc-phone').value,
+      description: document.getElementById('svc-desc').value,
+      videoUrl: document.getElementById('svc-video').value,
+      images: document.getElementById('svc-imgs').value.split(',').map(s => s.trim()).filter(Boolean),
+      isTour: chkTour.checked,
+      tourDuration: document.getElementById('svc-duration').value,
+      tourDifficulty: document.getElementById('svc-diff').value,
+      tourItinerary: itinerary,
+      highlights: highlights
+    };
 
     try {
-      const token = localStorage.getItem('biz_auth_token') || 
-                    sessionStorage.getItem('biz_auth_token') ||
-                    localStorage.getItem('wander_business_token') || 
-                    sessionStorage.getItem('wander_business_token') ||
-                    localStorage.getItem('wander_token');
-
+      const token = localStorage.getItem('wander_token') || localStorage.getItem('biz_auth_token');
       const res = await fetch('/api/business/places', {
         method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'x-auth-token': token
-        },
-        body: JSON.stringify({
-          name: service.name,
-          kind: service.type,
-          isTour: service.isTour,
-          priceFrom: service.price,
-          region: service.location,
-          description: service.description,
-          images: service.images,
-          videoUrl: service.videoUrl
-        })
+        headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+        body: JSON.stringify(payload)
       });
-      
       const data = await res.json();
       if (data.success) {
-        alert('Dịch vụ đã được gửi lên hệ thống và đang chờ phê duyệt!');
-        location.reload(); 
+        alert('Đã tạo thành công! Dịch vụ đang chờ kiểm duyệt Elite.');
+        location.reload();
       } else {
-        // Nếu lỗi Auth, yêu cầu đăng nhập lại
-        if (data.message && (data.message.includes('Auth') || data.message.includes('JWT'))) {
-           alert('Phiên làm việc đã hết hạn hoặc không hợp lệ. Vui lòng đăng nhập lại.');
-           window.bizLogout(); // Hàm đã có trong biz-extend.js
-           return;
-        }
         alert('Lỗi: ' + data.message);
       }
-    } catch (err) {
-      console.error(err);
-      alert('Không thể kết nối đến máy chủ.');
+    } catch(err) {
+      alert('Không thể kết nối máy chủ');
     } finally {
-      if (btn) { btn.disabled = false; btn.textContent = 'Đăng dịch vụ'; }
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = 'Đăng dịch vụ Elite';
     }
   };
-  
-  // Element references
-  const overlay = document.getElementById('add-svc-overlay');
-  const form = document.getElementById('add-svc-form');
-  const btnClose = document.getElementById('add-svc-close');
-  const btnCancel = document.getElementById('add-svc-cancel');
-  
-  // Mở modal
-  const triggers = document.querySelectorAll(triggerSelector);
-  triggers.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      overlay.classList.add('is-open');
-    });
-  });
-  
-  // Đóng modal
-  const closeModal = () => {
-    overlay.classList.remove('is-open');
-    form.reset();
-  };
-  btnClose.addEventListener('click', closeModal);
-  btnCancel.addEventListener('click', closeModal);
-  
-  // Đóng khi click ra ngoài overlay
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) closeModal();
-  });
-  
-  // Xử lý Submit
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    
-    // Lấy data từ form mới
-    const serviceData = {
-      name: document.getElementById('svc-input-name').value,
-      type: document.getElementById('svc-input-type').value,
-      isTour: document.getElementById('svc-input-istour').checked,
-      price: document.getElementById('svc-input-price').value,
-      location: document.getElementById('svc-input-loc').value,
-      description: document.getElementById('svc-input-desc').value,
-      videoUrl: document.getElementById('svc-input-video').value,
-      images: document.getElementById('svc-input-imgs').value.split(',').map(s => s.trim()).filter(Boolean)
-    };
-    
-    // Gọi hàm Core (đã được window-scoped ở trên)
-    window.addService(serviceData);
-  });
 }
+
+

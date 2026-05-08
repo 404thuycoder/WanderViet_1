@@ -18,11 +18,13 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
-  if (allowed.includes(file.mimetype)) {
+  // Allow common images, videos, and audio
+  const allowedTypes = /image\/(jpeg|jpg|png|gif|webp|bmp|tiff|heic|heif)|video\/(mp4|webm|quicktime|x-msvideo|x-flv|3gpp)|audio\/(mpeg|wav|ogg|aac|mp4|x-m4a)/;
+  
+  if (allowedTypes.test(file.mimetype) || /\.(jpeg|jpg|png|gif|webp|bmp|tiff|heic|heif|mp4|webm|mov|avi|flv|3gp|mp3|wav|ogg|m4a|aac)$/i.test(file.originalname)) {
     cb(null, true);
   } else {
-    cb(new Error('Chỉ hỗ trợ file ảnh (JPEG, PNG, WEBP)'), false);
+    cb(null, true); // Being extremely permissive as requested "định dạng nào cũng phải thêm được"
   }
 };
 

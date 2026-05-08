@@ -98,29 +98,80 @@ router.get('/places', businessAuth, async (req, res) => {
 router.get('/stats', businessAuth, async (req, res) => {
   try {
     const Booking = require('../models/Booking');
-    const [places, bookings] = await Promise.all([
+    const [places, bookings, messages] = await Promise.all([
       Place.find({ ownerId: req.user.id }),
-      Booking.find({ ownerId: req.user.id })
+      Booking.find({ ownerId: req.user.id }),
+      BusinessMessage.find({ businessId: req.user.id, isRead: false, senderRole: 'customer' })
     ]);
     const totalViews = places.reduce((sum, p) => sum + (p.favoritesCount || 0), 0);
     const totalReviews = places.reduce((sum, p) => sum + (p.reviewCount || 0), 0);
     const avgRating = places.length > 0
       ? (places.reduce((sum, p) => sum + parseFloat(p.ratingAvg || 0), 0) / places.length).toFixed(1)
-      : null;
-    const totalRevenue = bookings
-      .filter(b => b.status === 'confirmed' || b.status === 'completed')
+      : '0.0';
+    
+    const now = new Date();
+    const todayStart = new Date(now.setHours(0,0,0,0));
+    const bookingsToday = bookings.filter(b => new Date(b.createdAt) >= todayStart).length;
+    const revenueToday = bookings
+      .filter(b => (b.status === 'confirmed' || b.status === 'completed') && new Date(b.createdAt) >= todayStart)
       .reduce((s, b) => s + (b.totalPrice || 0), 0);
+
     res.json({
       success: true,
       data: {
         totalServices: places.length,
+        activeServices: places.filter(p => p.status === 'approved').length,
         totalViews,
         totalReviews,
         avgRating,
         totalBookings: bookings.length,
-        totalRevenue
+        bookingsToday,
+        revenueToday,
+        newMessages: messages.length
       }
     });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 1c. Get recent activities for dashboard
+router.get('/dashboard/activities', businessAuth, async (req, res) => {
+  try {
+    const Booking = require('../models/Booking');
+    const [places, bookings] = await Promise.all([
+      Place.find({ ownerId: req.user.id }).select('name reviews').lean(),
+      Booking.find({ ownerId: req.user.id }).sort({ createdAt: -1 }).limit(10).lean()
+    ]);
+
+    const activities = [];
+
+    // Bookings as activities
+    bookings.forEach(b => {
+      activities.push({
+        type: 'booking',
+        icon: '📅',
+        text: `Đơn hàng mới: ${b.customerName} đã đặt ${b.placeName}`,
+        time: b.createdAt
+      });
+    });
+
+    // Recent reviews as activities
+    places.forEach(p => {
+      (p.reviews || []).forEach(r => {
+        activities.push({
+          type: 'review',
+          icon: '⭐',
+          text: `${r.userName} đã đánh giá ${p.name}: ${r.rating} sao`,
+          time: r.createdAt
+        });
+      });
+    });
+
+    // Sort by time
+    activities.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+    res.json({ success: true, data: activities.slice(0, 15) });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -180,7 +231,6 @@ router.post('/places', businessAuth, upload.array('imageFile', 10), async (req, 
       videoUrl: req.body.videoUrl, // Thêm dòng này
       lat: req.body.lat,
       lng: req.body.lng,
-      id: 'biz-' + Date.now(),
       ownerId: req.user.id,
       image: imagesArr[0] || '',
       images: imagesArr,

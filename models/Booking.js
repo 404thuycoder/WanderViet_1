@@ -14,7 +14,7 @@ const bookingSchema = new mongoose.Schema({
   peopleCount:    { type: Number, default: 1 },
   totalPrice:     { type: Number, default: 0 },
   specialRequests:{ type: String, default: '' },  // Yêu cầu đặc biệt
-  paymentMethod:  { type: String, enum: ['contact', 'transfer', 'momo', 'zalopay', 'card'], default: 'contact' },
+  paymentMethod:  { type: String, enum: ['contact', 'transfer', 'qr', 'momo', 'zalopay', 'e-wallet', 'card'], default: 'contact' },
   paymentStatus:  { type: String, enum: ['unpaid', 'pending', 'paid', 'refunded'], default: 'unpaid' },
   status:         { type: String, enum: ['pending', 'confirmed', 'cancelled', 'completed'], default: 'pending' },
   ownerId:        { type: String, required: true, index: true }, // Business ID

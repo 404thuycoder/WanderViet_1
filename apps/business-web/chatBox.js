@@ -85,7 +85,7 @@
         let foundService = null;
         if (clean.includes("tour") || clean.includes("khach san") || clean.includes("phong") || clean.includes("xe") || clean.includes("ve")) {
             try {
-                const res = await window.api.get('/services');
+                const res = await window.api.get('/business/places');
                 const list = res.data || res || [];
                 foundService = list.find(s => normalize(s.name).includes(clean) || clean.includes(normalize(s.name)));
                 if (foundService) aiSession.lastService = foundService;
@@ -302,7 +302,10 @@
         }
     };
 
+    window.ChatBox = window.SmartChat;
+
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', buildUI);
     else buildUI();
 
 })();
+

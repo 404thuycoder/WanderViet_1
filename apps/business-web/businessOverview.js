@@ -1,4 +1,4 @@
-/**
+﻿/**
  * businessOverview.js — Trang chủ Dashboard (Premium Edition)
  * Layout: Quick Actions | KPI Cards | Revenue Chart | [Activities & Messages] | [Featured Services & Reviews]
  */
@@ -39,97 +39,109 @@
 
     // ── CSS ──────────────────────────────────────────────────────
     const css = `
-    .hp-wrap { padding: 24px; background: #f8fafc; font-family: 'Be Vietnam Pro', sans-serif; }
+    .hp-wrap { padding: 40px; background: transparent; font-family: 'Plus Jakarta Sans', sans-serif; color: #fff; }
     
     /* Quick Actions */
-    .hp-quick { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-    .hp-qbtn { padding: 10px 18px; border-radius: 12px; background: #fff; border: 1.5px solid #e2e8f0; font-size: 13px; font-weight: 700; color: #475569; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all .2s; }
-    .hp-qbtn:hover { border-color: #6366f1; color: #6366f1; background: #f5f3ff; transform: translateY(-1px); }
-    .hp-qbtn.primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; border: none; }
-    .hp-qbtn.primary:hover { box-shadow: 0 4px 12px rgba(99,102,241,.3); opacity: 0.9; }
+    .hp-quick { display: flex; gap: 16px; margin-bottom: 40px; flex-wrap: wrap; }
+    .hp-qbtn { 
+      padding: 14px 24px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); 
+      font-size: 14px; font-weight: 700; color: #fff; cursor: pointer; display: flex; align-items: center; gap: 10px; 
+      transition: all .3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(20px);
+    }
+    .hp-qbtn:hover { border-color: #6366f1; background: rgba(255,255,255,0.06); transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+    .hp-qbtn.primary { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; border: none; box-shadow: 0 8px 25px rgba(99,102,241,0.3); }
+    .hp-qbtn.primary:hover { opacity: 0.9; box-shadow: 0 12px 30px rgba(99,102,241,0.4); }
 
     /* KPI Cards */
-    .hp-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-    .hp-kpi { background: #fff; padding: 20px; border-radius: 16px; border: 1px solid #f1f5f9; display: flex; align-items: center; gap: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.02); }
-    .hp-kpi-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
-    .hp-kpi-val { font-size: 24px; font-weight: 900; color: #0f172a; line-height: 1.1; }
-    .hp-kpi-lbl { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; margin-top: 4px; }
+    .hp-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 40px; }
+    .hp-kpi { 
+      background: rgba(255,255,255,0.03); padding: 28px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); 
+      display: flex; flex-direction: column; gap: 16px; backdrop-filter: blur(20px); transition: all .4s;
+    }
+    .hp-kpi:hover { transform: translateY(-5px); border-color: rgba(99,102,241,0.3); background: rgba(255,255,255,0.05); }
+    .hp-kpi-icon { 
+      width: 54px; height: 54px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; 
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+    }
+    .hp-kpi-val { font-size: 32px; font-weight: 900; color: #fff; line-height: 1; letter-spacing: -1px; }
+    .hp-kpi-lbl { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
 
     /* Chart Section */
-    .hp-chart-card { background: #fff; border-radius: 20px; padding: 24px; border: 1px solid #f1f5f9; margin-bottom: 24px; }
-    .hp-chart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .hp-chart-title { font-size: 16px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px; }
-    .hp-chart-container { height: 260px; position: relative; }
+    .hp-chart-card { background: rgba(255,255,255,0.03); border-radius: 28px; padding: 32px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 40px; backdrop-filter: blur(20px); }
+    .hp-chart-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .hp-chart-title { font-size: 18px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 12px; }
+    .hp-chart-container { height: 320px; position: relative; }
 
     /* Layout */
-    .hp-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-bottom: 24px; }
-    .hp-card { background: #fff; border-radius: 20px; border: 1px solid #f1f5f9; overflow: hidden; display: flex; flex-direction: column; }
-    .hp-card-head { padding: 20px 20px 0; display: flex; justify-content: space-between; align-items: center; }
-    .hp-card-title { font-size: 15px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px; }
-    .hp-card-body { padding: 16px 20px 20px; }
+    .hp-row { display: grid; grid-template-columns: 1.6fr 1fr; gap: 32px; margin-bottom: 40px; }
+    .hp-card { background: rgba(255,255,255,0.03); border-radius: 28px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; display: flex; flex-direction: column; backdrop-filter: blur(20px); }
+    .hp-card-head { padding: 28px 28px 10px; display: flex; justify-content: space-between; align-items: center; }
+    .hp-card-title { font-size: 17px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 12px; }
+    .hp-card-link { font-size: 13px; font-weight: 700; color: #6366f1; cursor: pointer; transition: opacity .2s; }
+    .hp-card-link:hover { opacity: 0.8; text-decoration: underline; }
+    .hp-card-body { padding: 20px 28px 28px; }
     
     /* Lists */
-    .hp-list-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f8fafc; }
+    .hp-list-item { display: flex; align-items: center; gap: 16px; padding: 18px 0; border-bottom: 1px solid rgba(255,255,255,0.05); transition: transform .2s; }
+    .hp-list-item:hover { transform: translateX(5px); }
     .hp-list-item:last-child { border-bottom: none; }
-    .hp-list-av { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 14px; flex-shrink: 0; }
-    .hp-list-text { font-size: 14px; font-weight: 600; color: #334155; line-height: 1.4; }
-    .hp-list-sub  { font-size: 12px; color: #94a3b8; font-weight: 500; margin-top: 2px; }
+    .hp-list-av { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 16px; flex-shrink: 0; }
+    .hp-list-text { font-size: 15px; font-weight: 600; color: #fff; line-height: 1.4; }
+    .hp-list-sub  { font-size: 12px; color: #94a3b8; font-weight: 500; margin-top: 4px; }
 
     /* Service Grid (Horizontal) */
-    .hp-svcs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .hp-svc { background: #f8fafc; padding: 12px; border-radius: 14px; border: 1px solid #f1f5f9; display: flex; gap: 12px; transition: all .2s; }
-    .hp-svc:hover { border-color: #6366f1; background: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.05); }
-    .hp-svc-img { width: 64px; height: 56px; border-radius: 10px; object-fit: cover; }
+    .hp-svcs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    .hp-svc { background: rgba(255,255,255,0.02); padding: 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); display: flex; gap: 16px; transition: all .3s; cursor: pointer; }
+    .hp-svc:hover { border-color: #6366f1; background: rgba(255,255,255,0.05); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+    .hp-svc-img { width: 80px; height: 70px; border-radius: 14px; object-fit: cover; border: 1px solid rgba(255,255,255,0.05); }
     .hp-svc-info { flex: 1; min-width: 0; }
-    .hp-svc-name { font-size: 13px; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .hp-svc-meta { font-size: 11px; color: #94a3b8; font-weight: 600; margin-top: 4px; }
+    .hp-svc-name { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hp-svc-meta { font-size: 12px; color: #94a3b8; font-weight: 600; margin-top: 6px; }
     `;
 
     // ── Main Content HTML ────────────────────────────────────────
     function render() {
         const biz = getCurrentBiz();
         const svcs = getServices();
-        const activeSvcs = svcs.filter(s => s.status === 'active').length;
-        const totalBookings = svcs.reduce((s, x) => s + (x.bookings || 0), 0);
 
         return `
         <div class="hp-wrap">
             <!-- Header -->
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:40px">
                 <div>
-                    <h1 style="font-size:24px;font-weight:900;color:#0f172a">Trang chủ</h1>
-                    <p style="font-size:14px;color:#64748b;margin-top:4px">Chào mừng trở lại, ${biz ? biz.name : 'Đối tác'}! Đây là tổng quan hôm nay.</p>
+                    <h1 style="font-size:32px;font-weight:900;color:#fff;letter-spacing:-1px">Tổng quan</h1>
+                    <p style="font-size:15px;color:var(--text-muted);margin-top:6px">Chào mừng trở lại, <span style="color:#fff;font-weight:700">${biz ? biz.name : 'Đối tác'}</span>! Hệ thống của bạn đang hoạt động ổn định.</p>
                 </div>
-                <div style="background:#fff;padding:8px 16px;border-radius:12px;border:1px solid #e2e8f0;font-size:13px;font-weight:700;color:#475569">
+                <div class="date-chip">
                     📅 ${new Date().toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'numeric', year: 'numeric' })}
                 </div>
             </div>
 
             <!-- Quick Actions -->
             <div class="hp-quick">
-                <button class="hp-qbtn primary" onclick="window.navigateToView('services')">➕ Đăng tour mới</button>
-                <button class="hp-qbtn" onclick="window.navigateToView('bookings')">📑 Danh sách đơn</button>
-                <button class="hp-qbtn" onclick="location.reload()">🔄 Làm mới dữ liệu</button>
-                <button class="hp-qbtn" onclick="window.navigateToView('profile')">🏢 Xem hồ sơ DN</button>
+                <button class="hp-qbtn primary" onclick="window.navigateToView('services')"><span>➕</span> Đăng tour mới</button>
+                <button class="hp-qbtn" onclick="window.navigateToView('bookings')"><span>📑</span> Quản lý đơn hàng</button>
+                <button class="hp-qbtn" onclick="location.reload()"><span>🔄</span> Làm mới</button>
+                <button class="hp-qbtn" onclick="window.navigateToView('profile')"><span>🏢</span> Hồ sơ doanh nghiệp</button>
             </div>
 
             <!-- KPI Cards -->
             <div class="hp-kpis" id="dashboard-kpis">
                 <div class="hp-kpi">
-                    <div class="hp-kpi-icon" style="background:#fef3c7">💰</div>
-                    <div><div class="hp-kpi-val" id="stat-revenue" style="color:#d97706">...</div><div class="hp-kpi-lbl">Doanh thu hôm nay</div></div>
+                    <div class="hp-kpi-icon">💰</div>
+                    <div><div class="hp-kpi-lbl">Doanh thu hôm nay</div><div class="hp-kpi-val" id="stat-revenue" style="color:#10b981">...</div></div>
                 </div>
                 <div class="hp-kpi">
-                    <div class="hp-kpi-icon" style="background:#dcfce7">📈</div>
-                    <div><div class="hp-kpi-val" id="stat-bookings" style="color:#059669">...</div><div class="hp-kpi-lbl">Đơn hàng hôm nay</div></div>
+                    <div class="hp-kpi-icon">📈</div>
+                    <div><div class="hp-kpi-lbl">Đơn hàng hôm nay</div><div class="hp-kpi-val" id="stat-bookings" style="color:#6366f1">...</div></div>
                 </div>
                 <div class="hp-kpi">
-                    <div class="hp-kpi-icon" style="background:#e0e7ff">💬</div>
-                    <div><div class="hp-kpi-val" id="stat-messages" style="color:#4f46e5">...</div><div class="hp-kpi-lbl">Tin nhắn mới</div></div>
+                    <div class="hp-kpi-icon">💬</div>
+                    <div><div class="hp-kpi-lbl">Tin nhắn mới</div><div class="hp-kpi-val" id="stat-messages" style="color:#f59e0b">...</div></div>
                 </div>
                 <div class="hp-kpi">
-                    <div class="hp-kpi-icon" style="background:#f1f5f9">🏨</div>
-                    <div><div class="hp-kpi-val" id="stat-services" style="color:#475569">...</div><div class="hp-kpi-lbl">Dịch vụ đang chạy</div></div>
+                    <div class="hp-kpi-icon">🏨</div>
+                    <div><div class="hp-kpi-lbl">Dịch vụ hoạt động</div><div class="hp-kpi-val" id="stat-services" style="color:#a855f7">...</div></div>
                 </div>
             </div>
 
@@ -137,7 +149,7 @@
             <div class="hp-chart-card">
                 <div class="hp-chart-head">
                     <div class="hp-chart-title">📊 Xu hướng doanh thu (7 ngày qua)</div>
-                    <div style="font-size:12px;font-weight:700;color:#10b981">▲ +12.5% so với tuần trước</div>
+                    <div style="font-size:14px;font-weight:700;color:#10b981;background:rgba(16,185,129,0.1);padding:6px 12px;border-radius:10px">▲ +12.5%</div>
                 </div>
                 <div class="hp-chart-container">
                     <canvas id="revenueChart"></canvas>
@@ -147,14 +159,14 @@
             <!-- Main Row -->
             <div class="hp-row">
                 <!-- Left: Activities & Featured Services -->
-                <div style="display:flex;flex-direction:column;gap:20px">
+                <div style="display:flex;flex-direction:column;gap:32px">
                     <div class="hp-card">
                         <div class="hp-card-head">
                             <div class="hp-card-title">🕒 Hoạt động gần đây</div>
                             <span class="hp-card-link" onclick="window.navigateToView('bookings')">Xem tất cả →</span>
                         </div>
                         <div class="hp-card-body" id="activities-container">
-                            <div style="text-align:center;padding:2rem;color:#94a3b8">Đang tải hoạt động...</div>
+                            <div style="text-align:center;padding:3rem;color:var(--text-muted)">Đang tải hoạt động...</div>
                         </div>
                     </div>
 
@@ -171,7 +183,7 @@
                                         <div class="hp-svc-info">
                                             <div class="hp-svc-name">${s.name}</div>
                                             <div class="hp-svc-meta">⭐ ${s.rating} • ${s.bookings} lượt đặt</div>
-                                            <div style="font-size:12px;font-weight:800;color:#10b981;margin-top:4px">${formatMoney(s.price)}</div>
+                                            <div style="font-size:14px;font-weight:800;color:#10b981;margin-top:6px">${formatMoney(s.price)}</div>
                                         </div>
                                     </div>
                                 `).join('')}
@@ -181,14 +193,14 @@
                 </div>
 
                 <!-- Right: Messages & Reviews -->
-                <div style="display:flex;flex-direction:column;gap:20px">
+                <div style="display:flex;flex-direction:column;gap:32px">
                     <div class="hp-card">
                         <div class="hp-card-head">
-                            <div class="hp-card-title">💬 Chăm sóc khách hàng</div>
+                            <div class="hp-card-title">💬 Khách hàng nhắn tin</div>
                             <span class="hp-card-link" onclick="window.navigateToView('messages')">Phòng chat →</span>
                         </div>
                         <div class="hp-card-body" id="dashboard-messages">
-                            <div style="text-align:center;padding:1rem;color:#94a3b8">Đang tải tin nhắn...</div>
+                            <div style="text-align:center;padding:2rem;color:var(--text-muted)">Đang tải tin nhắn...</div>
                         </div>
                     </div>
 
@@ -198,7 +210,7 @@
                             <span class="hp-card-link" onclick="window.navigateToView('reviews')">Tất cả →</span>
                         </div>
                         <div class="hp-card-body" id="hp-reviews-list">
-                            <div style="text-align:center;padding:1rem;color:#94a3b8">Đang tải đánh giá...</div>
+                            <div style="text-align:center;padding:2rem;color:var(--text-muted)">Đang tải đánh giá...</div>
                         </div>
                     </div>
                 </div>
@@ -241,8 +253,8 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
-                    x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } }
                 }
             }
         });
@@ -290,10 +302,7 @@
     };
 
     function loadDashboardStats() {
-        fetch('/api/dashboard/summary', {
-            headers: { 'x-auth-token': localStorage.getItem('biz_auth_token') || localStorage.getItem('wander_token') }
-        })
-        .then(r => r.json())
+        window.apiFetch('/api/business/stats')
         .then(json => {
             if (json.success && json.data) {
                 const d = json.data;
@@ -329,10 +338,7 @@
         const container = document.getElementById('activities-container');
         if (!container) return;
 
-        fetch('/api/dashboard/activities', {
-            headers: { 'x-auth-token': localStorage.getItem('biz_auth_token') || localStorage.getItem('wander_token') }
-        })
-        .then(r => r.json())
+        window.apiFetch('/api/business/dashboard/activities')
         .then(json => {
             const list = json.success && json.data ? json.data : [];
             if (list.length === 0) {
@@ -342,7 +348,7 @@
 
             container.innerHTML = list.map(a => `
                 <div class="hp-list-item">
-                    <div style="font-size:20px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:#f8fafc;border-radius:10px">${a.icon}</div>
+                    <div style="font-size:20px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border-radius:10px">${a.icon}</div>
                     <div style="flex:1">
                         <div class="hp-list-text">${a.text}</div>
                         <div class="hp-list-sub">${timeSince(a.time)}</div>
@@ -356,10 +362,7 @@
         const container = document.getElementById('dashboard-messages');
         if (!container) return;
 
-        fetch('/api/messages', {
-            headers: { 'x-auth-token': localStorage.getItem('biz_auth_token') || localStorage.getItem('wander_token') }
-        })
-        .then(r => r.json())
+        window.apiFetch('/api/business/messages')
         .then(json => {
             const list = json.success && json.data ? json.data : [];
             if (list.length === 0) {
@@ -368,16 +371,16 @@
             }
 
             container.innerHTML = list.slice(0, 3).map(m => {
-                const av = (m.sender && m.sender.name ? m.sender.name.charAt(0) : 'K').toUpperCase();
+                const av = (m.customerName ? m.customerName.charAt(0) : 'K').toUpperCase();
                 return `
                 <div class="hp-list-item" onclick="window.navigateToView('messages')" style="cursor:pointer">
                     <div class="hp-list-av" style="background:#6366f1">${av}</div>
                     <div style="flex:1">
                         <div style="display:flex;justify-content:space-between">
-                            <div class="hp-list-text">${m.sender ? m.sender.name : 'Khách hàng'}</div>
-                            <div style="font-size:10px;color:#94a3b8">${timeSince(m.createdAt)}</div>
+                            <div class="hp-list-text">${m.customerName || 'Khách hàng'}</div>
+                            <div style="font-size:10px;color:#94a3b8">${timeSince(m.time)}</div>
                         </div>
-                        <div class="hp-list-sub" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;">${m.content || ''}</div>
+                        <div class="hp-list-sub" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;">${m.lastMessage || ''}</div>
                     </div>
                 </div>
                 `;
@@ -389,11 +392,7 @@
         const container = document.getElementById('hp-reviews-list');
         if (!container) return;
 
-        // Use the same API endpoint as biz-extend.js
-        fetch('/api/business/reviews', {
-            headers: { 'x-auth-token': localStorage.getItem('biz_auth_token') || localStorage.getItem('wander_business_token') }
-        })
-        .then(r => r.json())
+        window.apiFetch('/api/business/reviews')
         .then(json => {
             const list = json.success && json.data ? json.data : [];
             if (list.length === 0) {
@@ -406,12 +405,12 @@
                 return `
                     <div class="hp-list-item" style="flex-direction:column;align-items:flex-start;gap:4px">
                         <div style="display:flex;justify-content:space-between;width:100%">
-                            <div style="font-size:13px;font-weight:700;color:#334155">${r.userName || 'Khách hàng'}</div>
+                            <div style="font-size:13px;font-weight:700;color:#fff">${r.userName || 'Khách hàng'}</div>
                             <div style="font-size:11px;color:#94a3b8">${timeStr}</div>
                         </div>
                         <div>${stars(r.rating)}</div>
-                        <div style="font-size:13px;color:#64748b;line-height:1.4;font-style:italic">"${r.text || r.comment || ''}"</div>
-                        <div style="font-size:11px;font-weight:700;color:#6366f1;background:#f5f3ff;padding:2px 8px;border-radius:4px;margin-top:4px">${r.placeName || 'Dịch vụ'}</div>
+                        <div style="font-size:13px;color:#cbd5e1;line-height:1.4;font-style:italic">"${r.text || r.comment || ''}"</div>
+                        <div style="font-size:11px;font-weight:700;color:#a5b4fc;background:rgba(99,102,241,0.1);padding:2px 8px;border-radius:4px;margin-top:4px">${r.placeName || 'Dịch vụ'}</div>
                     </div>
                 `;
             }).join('');
@@ -422,3 +421,4 @@
     }
 
 })();
+

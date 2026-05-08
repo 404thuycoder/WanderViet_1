@@ -1,4 +1,4 @@
-// Dịch vụ xác thực gọi API thật tới Node.js Backend
+﻿// Dịch vụ xác thực gọi API thật tới Node.js Backend
 
 const API_URL = '/api/auth';
 
@@ -74,3 +74,4 @@ export const authService = {
     }
   }
 };
+

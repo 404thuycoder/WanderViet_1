@@ -409,37 +409,34 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     syncInProgress = true;
     lastSyncTime = now;
 
-    const token = localStorage.getItem('wander_token');
-    console.log("🔑 Token exists:", !!token);
-    
-    const authBtns = document.querySelectorAll("[data-auth-open]");
-    const profileTrays = document.querySelectorAll("[data-auth-show]");
-    console.log("🔘 Login buttons found:", authBtns.length);
-    console.log("👤 Profile trays found:", profileTrays.length);
-    
-    const userNameEl = document.querySelector("[data-user-name]");
-    const userAvatarImg = document.querySelector("[data-user-avatar]");
-    const userInitial = document.querySelector("[data-user-initial]");
-    const headerRankEl = document.getElementById('header-user-rank');
-
-    if (!token) {
-      console.log("❌ No token - showing login button");
-      authBtns.forEach(el => el.style.display = "flex");
-      profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
-      if (headerRankEl) headerRankEl.style.display = "none";
-      syncInProgress = false;
-      return;
-    }
-
     try {
+      const token = localStorage.getItem('wander_token');
+      console.log("🔑 Token exists:", !!token);
+      
+      const authBtns = document.querySelectorAll("[data-auth-open]");
+      const profileTrays = document.querySelectorAll("[data-auth-show]");
+      console.log("🔘 Login buttons found:", authBtns.length);
+      console.log("👤 Profile trays found:", profileTrays.length);
+      
+      const userNameEl = document.querySelector("[data-user-name]");
+      const userAvatarImg = document.querySelector("[data-user-avatar]");
+      const userInitial = document.querySelector("[data-user-initial]");
+      const headerRankEl = document.getElementById('header-user-rank');
+
+      if (!token) {
+        console.log("❌ No token - showing login button");
+        authBtns.forEach(el => el.style.display = "flex");
+        profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
+        if (headerRankEl) headerRankEl.style.display = "none";
+        return;
+      }
+
       const parts = token.split('.');
       if (parts.length !== 3) {
-        // Token không hợp lệ, xử lý như chưa đăng nhập
         console.log("❌ Token invalid format (not 3 parts)");
         authBtns.forEach(el => el.style.display = "flex");
         profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
         if (headerRankEl) headerRankEl.style.display = "none";
-        syncInProgress = false;
         return;
       }
       const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
@@ -492,7 +489,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           authBtns.forEach(el => el.style.display = "flex");
           profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
           if (headerRankEl) headerRankEl.style.display = "none";
-          syncInProgress = false;
           return;
         }
         const data = await r.json();
@@ -525,10 +521,11 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     } catch (e) {
       console.error("Auth sync error", e);
-      // Khi có lỗi parsing token, coi như chưa đăng nhập
+      // Khi có lỗi, mặc định hiện nút đăng nhập
+      const authBtns = document.querySelectorAll("[data-auth-open]");
+      const profileTrays = document.querySelectorAll("[data-auth-show]");
       authBtns.forEach(el => el.style.display = "flex");
       profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
-      if (headerRankEl) headerRankEl.style.display = "none";
     } finally {
       syncInProgress = false;
     }
@@ -596,7 +593,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
              <li><a href="quests.html" class="nav-link" data-link="quests">🎯 Nhiệm vụ</a></li>
              <li><a href="history.html" class="nav-link" data-link="history">⏳ Lịch sử</a></li>
              <li><a href="leaderboard.html" class="nav-link" data-link="leaderboard">🏆 BXH</a></li>
-             <li><a href="business-services.html" class="nav-link" data-link="business">🏨 Doanh nghiệp</a></li>
+             <li><a href="business-directory.html" class="nav-link" data-link="business">🏨 Doanh nghiệp</a></li>
           </ul>
           
           <div class="site-nav__mobile-footer">

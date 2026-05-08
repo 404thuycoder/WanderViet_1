@@ -16,15 +16,69 @@ const Message = require('../models/Message');
 const Group = require('../models/Group');
 const Story = require('../models/Story');
 const { emitToUser, emitToUsers, sendNotification } = require('../utils/socketManager');
+const Follow = require('../models/Follow');
 
+// ==========================================
+// BUSINESS FOLLOWING ROUTES
+// ==========================================
+
+router.post('/business/follow', auth, async (req, res) => {
+  try {
+    const { businessId } = req.body;
+    const realUserId = req.user.id; // Follower
+    
+    const existing = await Follow.findOne({ followerId: realUserId, businessId });
+    if (existing) {
+      // Unfollow
+      await Follow.deleteOne({ _id: existing._id });
+      await BusinessAccount.findOneAndUpdate({ $or: [{ _id: businessId }, { customId: businessId }] }, { $inc: { followersCount: -1 } });
+      return res.json({ success: true, message: 'Đã bỏ theo dõi', following: false });
+    } else {
+      // Follow
+      const newFollow = new Follow({ followerId: realUserId, businessId });
+      await newFollow.save();
+      await BusinessAccount.findOneAndUpdate({ $or: [{ _id: businessId }, { customId: businessId }] }, { $inc: { followersCount: 1 } });
+      
+      return res.json({ success: true, message: 'Đã theo dõi', following: true });
+    }
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.get('/business/following', auth, async (req, res) => {
+  try {
+    const following = await Follow.find({ followerId: req.user.id });
+    const bizIds = following.map(f => f.businessId);
+    
+    const businesses = await BusinessAccount.find({ 
+      $or: [{ _id: { $in: bizIds } }, { customId: { $in: bizIds } }] 
+    }).select('name displayName avatar category followersCount isVerified');
+    
+    res.json({ success: true, data: businesses });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+router.get('/business/check-follow/:id', auth, async (req, res) => {
+  try {
+    const following = await Follow.findOne({ followerId: req.user.id, businessId: req.params.id });
+    res.json({ success: true, following: !!following });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 // Multer config for media uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
   filename: (req, file, cb) => cb(null, `social_${Date.now()}_${Math.random().toString(36).slice(2)}${path.extname(file.originalname)}`)
 });
-const upload = multer({ storage, limits: { fileSize: 20 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
-  const allowed = /jpeg|jpg|png|gif|webp|mp4|webm|mp3|wav|ogg|m4a|aac/;
-  cb(null, allowed.test(path.extname(file.originalname).toLowerCase()));
+const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
+  // Broadly allow images, videos, and audio
+  const allowed = /jpeg|jpg|png|gif|webp|bmp|tiff|heic|heif|mp4|webm|mov|avi|flv|3gp|mp3|wav|ogg|m4a|aac|m4p|flac/;
+  const isMatch = allowed.test(path.extname(file.originalname).toLowerCase()) || allowed.test(file.mimetype.toLowerCase());
+  cb(null, true); // Allow all as requested
 }});
 
 // Helper: resolve customId/string to MongoDB ObjectId with caching

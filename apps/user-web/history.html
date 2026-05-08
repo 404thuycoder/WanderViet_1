@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" data-theme="dark">
+<html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,35 +8,46 @@
   <link rel="stylesheet" href="styles.css">
   <style>
     :root {
+      --bg-gradient: radial-gradient(circle at 50% -20%, #f1f5f9 0%, #e2e8f0 100%);
+    }
+    [data-theme="dark"] {
       --bg-gradient: radial-gradient(circle at 50% -20%, #1e293b 0%, #0f172a 100%);
     }
     body {
-      background: var(--bg-gradient);
+      background: var(--bg);
+      background-image: var(--bg-gradient);
+      color: var(--text);
       min-height: 100vh;
+      transition: background 0.4s ease, color 0.4s ease;
+      margin: 0;
     }
     .history-hero {
-      padding: 6rem 0 3rem;
+      padding: 6rem 0 4rem;
       text-align: center;
-      background: linear-gradient(to bottom, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.8) 100%);
+      position: relative;
     }
     .history-hero h1 {
-      font-size: 3rem;
+      font-size: 3.5rem;
       font-family: var(--font-display);
       margin-bottom: 1rem;
-      background: linear-gradient(to right, #fff, var(--primary));
+      background: linear-gradient(to right, var(--text), var(--primary));
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
+      font-weight: 800;
+      letter-spacing: -1px;
     }
     
     .history-tabs-container {
       position: sticky;
       top: 72px;
       z-index: 10;
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      margin-bottom: 2rem;
+      background: var(--surface-overlay);
+      backdrop-filter: var(--glass-blur);
+      -webkit-backdrop-filter: var(--glass-blur);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2.5rem;
+      transition: all 0.3s ease;
     }
     
     .history-tabs {
@@ -52,25 +63,27 @@
     .history-tabs::-webkit-scrollbar { display: none; }
 
     .history-tab {
-      padding: 0.75rem 1.5rem;
-      border-radius: 12px;
-      background: rgba(255, 255, 255, 0.03);
+      padding: 0.85rem 1.75rem;
+      border-radius: 14px;
+      background: var(--glass-bg);
       color: var(--text-muted);
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.3s var(--ease);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      font-size: 0.95rem;
     }
     .history-tab.is-active {
-      background: var(--gradient-primary);
+      background: var(--primary);
       color: #fff;
-      box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
       border-color: transparent;
+      transform: translateY(-2px);
     }
 
     .history-container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 0 2rem 5rem;
     }
@@ -82,75 +95,91 @@
     }
 
     .history-card {
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 20px;
-      padding: 1.5rem;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: var(--bg-elevated);
+      border-radius: 24px;
+      padding: 1.75rem;
+      border: 1px solid var(--border);
       display: flex;
-      gap: 1.5rem;
-      transition: transform 0.3s ease;
+      gap: 1.75rem;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: var(--shadow-sm);
     }
     .history-card:hover {
-      transform: translateY(-4px);
-      background: rgba(255, 255, 255, 0.05);
+      transform: translateY(-6px) scale(1.01);
+      background: var(--glass-bg);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-lg);
     }
     .history-card__media {
-      width: 120px;
-      height: 120px;
-      border-radius: 16px;
+      width: 140px;
+      height: 140px;
+      border-radius: 20px;
       background-size: cover;
       background-position: center;
       flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
     }
     .history-card__content {
       flex: 1;
     }
     .history-card__type {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--accent);
-      margin-bottom: 0.5rem;
-      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+      font-weight: 800;
     }
     .history-card__title {
-      font-size: 1.25rem;
+      font-size: 1.5rem;
+      font-weight: 800;
       margin-bottom: 0.5rem;
+      font-family: var(--font-display);
+      color: var(--text);
     }
     .history-card__meta {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: var(--text-muted);
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
     .history-card__text {
       font-style: italic;
       line-height: 1.6;
       color: var(--text);
-      background: rgba(0, 0, 0, 0.2);
-      padding: 1rem;
-      border-radius: 12px;
+      background: var(--bg);
+      padding: 1.25rem;
+      border-radius: 16px;
+      border-left: 4px solid var(--primary);
     }
 
     .trip-card {
-      background: var(--gradient-dark);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
     }
     .trip-status {
-      padding: 0.25rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 700;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-    .status-completed { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-    .status-planning { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+    .status-completed { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+    .status-planning { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+    .status-cancelled { background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); }
 
     .empty-state {
       text-align: center;
-      padding: 5rem 2rem;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 24px;
-      border: 1px dashed rgba(255, 255, 255, 0.1);
+      padding: 6rem 2rem;
+      background: var(--bg-elevated);
+      border-radius: 32px;
+      border: 2px dashed var(--border);
+      animation: fadeIn 0.5s ease;
     }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Grid for Wishlist tab */
     .wishlist-grid {
@@ -195,6 +224,15 @@
   <script src="places-data.js"></script>
   <script>
     (function() {
+      // Sync theme from documentElement to body for local overrides
+      const syncTheme = () => {
+        const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+        document.body.setAttribute('data-theme', theme);
+      };
+      const themeObserver = new MutationObserver(syncTheme);
+      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      syncTheme();
+
       const content = document.getElementById('history-content');
       const tabs = document.querySelectorAll('.history-tab');
       let currentTab = 'wishlist';

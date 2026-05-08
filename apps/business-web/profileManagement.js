@@ -1,6 +1,5 @@
-/**
- * profileManagement.js — Trang hồ sơ doanh nghiệp
- * Route: profile (data-view="profile")
+﻿/**
+ * profileManagement.js — Trang hồ sơ doanh nghiệp (Zenith Dark Edition)
  */
 (function () {
     'use strict';
@@ -19,12 +18,10 @@
         var stored = [];
         try { stored = JSON.parse(localStorage.getItem('biz_services') || '[]'); } catch (e) { }
         if (stored.length > 0) return stored;
-        // Seed mẫu nếu chưa có
         return [
             { id: 's1', name: 'Tour Hạ Long VIP 2N1Đ',    price: 2500000, unit: 'người', category: 'tour',       status: 'active',  rating: 4.8, bookings: 124, location: 'Quảng Ninh', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&q=80' },
             { id: 's2', name: 'Khách sạn Mường Thanh',     price: 1800000, unit: 'đêm',   category: 'hotel',      status: 'active',  rating: 4.5, bookings: 87,  location: 'Đà Nẵng',   image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80' },
-            { id: 's3', name: 'Nhà hàng Bếp Việt Hội An',  price: 350000,  unit: 'người', category: 'restaurant', status: 'active',  rating: 4.7, bookings: 203, location: 'Hội An',    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80' },
-            { id: 's4', name: 'Tour Sapa Trekking 3N2Đ',   price: 3200000, unit: 'người', category: 'tour',       status: 'pending', rating: 0,   bookings: 0,   location: 'Lào Cai',   image: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&q=80' },
+            { id: 's3', name: 'Nhà hàng Bếp Việt Hội An',  price: 350000,  unit: 'người', category: 'restaurant', status: 'active',  rating: 4.7, bookings: 203, location: 'Hội An',    image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80' }
         ];
     }
 
@@ -51,69 +48,71 @@
 
     function statusCfg(s) {
         var map = {
-            active:  { label: 'Đang hoạt động', bg: '#ecfdf5', color: '#059669' },
-            pending: { label: 'Chờ duyệt',       bg: '#fffbeb', color: '#d97706' },
-            paused:  { label: 'Tạm dừng',        bg: '#f1f5f9', color: '#475569' },
+            active:  { label: 'Đang hoạt động', bg: 'rgba(5, 150, 105, 0.2)', color: '#34d399' },
+            pending: { label: 'Chờ duyệt',       bg: 'rgba(217, 119, 6, 0.2)', color: '#fbbf24' },
+            paused:  { label: 'Tạm dừng',        bg: 'rgba(148, 163, 184, 0.2)', color: '#94a3b8' },
         };
-        return map[s] || { label: s || 'Không rõ', bg: '#f1f5f9', color: '#64748b' };
+        return map[s] || { label: s || 'Không rõ', bg: 'rgba(71, 85, 105, 0.2)', color: '#94a3b8' };
     }
 
     function typeLabel(cat) {
-        var map = { tour: '🗺️ Tour', hotel: '🏨 Khách sạn', restaurant: '🍽️ Nhà hàng' };
-        return map[cat] || '📦 Dịch vụ';
+        var map = { tour: '🗺️ Tour', hotel: '🏨 Hotel', restaurant: '🍽️ Restaurant' };
+        return map[cat] || '📍 Service';
     }
 
-    function safeName(name) {
-        return (name || '').replace(/"/g, '').replace(/'/g, '').replace(/`/g, '');
+    function safeName(str) {
+        return str.replace(/'/g, "\\'");
     }
 
-    // ── CSS ──────────────────────────────────────────────────────
-    var css = [
-        '.pf-wrap{padding:24px;background:#f1f5f9;min-height:100vh;font-family:"Be Vietnam Pro","Inter",sans-serif}',
-        '.pf-cover{height:180px;border-radius:20px;background:linear-gradient(135deg,#667eea,#764ba2,#f093fb);position:relative;margin-bottom:60px}',
-        '.pf-avatar{position:absolute;bottom:-44px;left:28px;width:90px;height:90px;border-radius:22px;background:linear-gradient(135deg,#6366f1,#a855f7);border:4px solid #fff;display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 8px 24px rgba(99,102,241,.3)}',
-        '.pf-cover-btns{position:absolute;bottom:14px;right:16px;display:flex;gap:10px}',
-        '.pf-btn{padding:9px 18px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s}',
-        '.pf-btn-primary{background:#6366f1;color:#fff}',
-        '.pf-btn-primary:hover{background:#4f46e5;transform:translateY(-1px)}',
-        '.pf-btn-ghost{background:rgba(255,255,255,.9);color:#374151}',
-        '.pf-card{background:#fff;border-radius:20px;box-shadow:0 1px 4px rgba(0,0,0,.06);border:1px solid #f1f5f9;margin-bottom:20px}',
-        '.pf-card-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px 0}',
-        '.pf-card-title{font-size:15px;font-weight:800;color:#0f172a}',
-        '.pf-card-body{padding:16px 24px 24px}',
-        '.pf-biz-name{font-size:24px;font-weight:900;color:#0f172a;margin:0 0 4px}',
-        '.pf-biz-desc{font-size:14px;color:#475569;line-height:1.7;margin:8px 0 14px}',
-        '.pf-info-chip{display:inline-flex;align-items:center;gap:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:7px 12px;font-size:13px;color:#374151;font-weight:600;margin:4px}',
-        '.pf-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}',
-        '.pf-stat{background:#fff;border-radius:16px;padding:18px;text-align:center;border:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.05)}',
-        '.pf-stat-val{font-size:26px;font-weight:900;line-height:1}',
-        '.pf-stat-lbl{font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}',
-        '.pf-layout{display:grid;grid-template-columns:1fr 2fr;gap:18px}',
-        '.pf-col{display:flex;flex-direction:column;gap:18px}',
-        '.pf-fac-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;margin-bottom:8px;font-size:13px;font-weight:600;color:#374151}',
-        '.pf-svc-item{display:flex;gap:12px;padding:14px;border-radius:14px;border:1.5px solid #f1f5f9;margin-bottom:10px;transition:all .2s;cursor:pointer}',
-        '.pf-svc-item:hover{border-color:#6366f1;box-shadow:0 4px 14px rgba(99,102,241,.1)}',
-        '.pf-svc-img{width:76px;height:64px;object-fit:cover;border-radius:11px;flex-shrink:0}',
-        '.pf-svc-name{font-size:14px;font-weight:800;color:#0f172a;margin:0 0 4px}',
-        '.pf-svc-price{font-size:15px;font-weight:900;color:#10b981}',
-        '.pf-svc-unit{font-size:12px;color:#94a3b8;font-weight:500}',
-        '.pf-svc-meta{display:flex;gap:10px;font-size:12px;color:#64748b;margin-top:5px;font-weight:600}',
-        '.pf-svc-actions{display:flex;gap:8px;margin-top:8px}',
-        '.pf-svc-btn{padding:6px 14px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .2s}',
-        '.pf-svc-btn-chat{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}',
-        '.pf-svc-btn-chat:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(99,102,241,.35)}',
-        '.pf-svc-btn-edit{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0}',
-        '.pf-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center}',
-        '.pf-modal-overlay.active{display:flex}',
-        '.pf-modal{background:#fff;border-radius:24px;padding:32px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}',
-        '.pf-form-label{display:block;font-size:13px;font-weight:700;color:#374151;margin-bottom:7px}',
-        '.pf-form-ctrl{width:100%;padding:11px 15px;border-radius:11px;border:2px solid #e5e7eb;font-size:14px;outline:none;box-sizing:border-box;transition:all .2s;font-family:inherit}',
-        '.pf-form-ctrl:focus{border-color:#6366f1}',
-        'textarea.pf-form-ctrl{resize:vertical;min-height:90px}',
-        '@media(max-width:900px){.pf-layout{grid-template-columns:1fr}.pf-stats{grid-template-columns:repeat(2,1fr)}}'
-    ].join('');
+    var css = `
+        .pf-wrap { padding: 40px; font-family: 'Plus Jakarta Sans', sans-serif; color: #fff; }
+        .pf-cover { height: 220px; border-radius: 28px; background: linear-gradient(135deg, #6366f1, #a855f7, #4f46e5); position: relative; margin-bottom: 70px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); overflow: visible; }
+        .pf-avatar { position: absolute; bottom: -45px; left: 40px; width: 110px; height: 110px; border-radius: 28px; background: linear-gradient(135deg, #1e293b, #0f172a); border: 4px solid #111827; display: flex; align-items: center; justify-content: center; font-size: 48px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
+        .pf-cover-btns { position: absolute; bottom: 20px; right: 24px; display: flex; gap: 12px; }
+        .pf-btn { padding: 12px 24px; border-radius: 14px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all .3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .pf-btn-primary { background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; box-shadow: 0 8px 20px rgba(99,102,241,0.3); }
+        .pf-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(99,102,241,0.4); }
+        .pf-btn-ghost { background: rgba(255,255,255,0.1); color: #fff; backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+        .pf-btn-ghost:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2); }
 
-    // ── Build info chips ─────────────────────────────────────────
+        .pf-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(25px); border-radius: 28px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 24px; box-shadow: 0 15px 40px rgba(0,0,0,0.2); overflow: hidden; }
+        .pf-card-head { display: flex; justify-content: space-between; align-items: center; padding: 28px 32px 12px; }
+        .pf-card-title { font-size: 17px; font-weight: 800; color: #fff; }
+        .pf-card-body { padding: 20px 32px 32px; }
+
+        .pf-biz-name { font-size: 32px; font-weight: 900; color: #fff; margin-bottom: 6px; letter-spacing: -0.5px; }
+        .pf-biz-desc { font-size: 15px; color: #94a3b8; line-height: 1.7; margin-bottom: 20px; max-width: 800px; }
+        .pf-info-chip { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 10px 18px; font-size: 13px; color: #cbd5e1; font-weight: 600; margin: 4px; }
+        
+        .pf-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 24px; }
+        .pf-stat { background: rgba(255,255,255,0.03); border-radius: 24px; padding: 24px; text-align: center; border: 1px solid rgba(255,255,255,0.05); transition: transform .3s; }
+        .pf-stat:hover { transform: translateY(-5px); border-color: rgba(99,102,241,0.2); }
+        .pf-stat-val { font-size: 32px; font-weight: 900; color: #fff; line-height: 1; }
+        .pf-stat-lbl { font-size: 11px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; }
+
+        .pf-layout { display: grid; grid-template-columns: 350px 1fr; gap: 24px; }
+        .pf-col { display: flex; flex-direction: column; gap: 24px; }
+        
+        .pf-fac-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 12px; font-size: 14px; font-weight: 600; color: #cbd5e1; }
+        
+        .pf-svc-item { display: flex; gap: 20px; padding: 20px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 16px; transition: all .3s; cursor: pointer; background: rgba(255,255,255,0.02); }
+        .pf-svc-item:hover { border-color: #6366f1; background: rgba(255,255,255,0.05); transform: translateX(8px); }
+        .pf-svc-img { width: 100px; height: 85px; object-fit: cover; border-radius: 16px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); }
+        .pf-svc-name { font-size: 16px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+        .pf-svc-price { font-size: 18px; font-weight: 900; color: #4ade80; }
+        .pf-svc-meta { display: flex; gap: 14px; font-size: 13px; color: #94a3b8; margin-top: 8px; font-weight: 600; }
+        
+        .pf-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(15px); z-index: 9999; align-items: center; justify-content: center; }
+        .pf-modal-overlay.active { display: flex; }
+        .pf-modal { background: #111827; border-radius: 32px; padding: 40px; width: 100%; max-width: 550px; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); color: #fff; box-shadow: 0 50px 100px rgba(0,0,0,0.5); }
+        .pf-form-label { display: block; font-size: 14px; font-weight: 700; color: #94a3b8; margin-bottom: 10px; }
+        .pf-form-ctrl { width: 100%; padding: 14px 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); font-size: 15px; outline: none; box-sizing: border-box; transition: all .2s; font-family: inherit; color: #fff; }
+        .pf-form-ctrl:focus { border-color: #6366f1; background: rgba(255,255,255,0.06); box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
+        
+        @media (max-width: 1000px) { .pf-layout { grid-template-columns: 1fr; } .pf-stats { grid-template-columns: repeat(2, 1fr); } }
+    `;
+
+    // ── Build functions ──────────────────────────────────────────
     function buildInfoChips(biz) {
         var chips = [
             { icon: '📍', text: biz.address },
@@ -127,58 +126,33 @@
         }).join('');
     }
 
-    // ── Build facilities list ────────────────────────────────────
-    function buildFacilities() {
-        var items = [
-            ['📍', biz.address],
-            ['📞', biz.phone],
-            ['📧', biz.email || 'Chưa cập nhật'],
-            ['🌐', biz.website || 'Chưa cập nhật'],
-            ['🏷️', biz.category],
-            ['📅', 'Thành lập: ' + biz.founded],
-        ];
-        return items.map(function (x) {
-            return '<div class="pf-fac-item"><span style="font-size:18px">' + x[0] + '</span>' + x[1] + '</div>';
-        }).join('');
-    }
-
-    // ── Current biz reference ────────────────────────────────────
-    var biz = {};
-
-    // ── Build service cards ──────────────────────────────────────
     function buildServiceCards(svcs) {
         if (!svcs.length) {
-            return '<div style="text-align:center;padding:50px 20px;color:#94a3b8">' +
-                '<div style="font-size:48px;margin-bottom:14px">📭</div>' +
-                '<h3 style="color:#475569;margin:0 0 8px">Chưa có dịch vụ</h3>' +
-                '<p style="font-size:13px;margin:0 0 18px">Thêm dịch vụ đầu tiên để bắt đầu!</p>' +
-                '<button class="pf-btn pf-btn-primary" onclick="window.navigateToView(\'services\')">+ Thêm dịch vụ</button>' +
+            return '<div style="text-align:center;padding:60px 20px;color:#94a3b8">' +
+                '<div style="font-size:56px;margin-bottom:20px;opacity:0.3">📭</div>' +
+                '<h3 style="color:#fff;margin:0 0 10px;font-size:18px">Chưa có dịch vụ</h3>' +
+                '<p style="font-size:14px;margin:0 0 24px">Thêm dịch vụ đầu tiên để khách hàng tìm thấy bạn!</p>' +
+                '<button class="pf-btn pf-btn-primary" onclick="window.navigateToView(\'services\')">+ Thêm dịch vụ ngay</button>' +
                 '</div>';
         }
 
         return svcs.map(function (s) {
             var sc    = statusCfg(s.status);
             var img   = s.image || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=400&q=80';
-            var sid   = s.id || s._id || '';
             var sname = safeName(s.name || 'Dịch vụ');
 
-            return '<div class="pf-svc-item">' +
+            return '<div class="pf-svc-item" onclick="window.navigateToView(\'services\')">' +
                 '<img class="pf-svc-img" src="' + img + '" alt="' + sname + '" onerror="this.src=\'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=400&q=80\'">' +
                 '<div style="flex:1;min-width:0">' +
-                    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px">' +
+                    '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px">' +
                         '<p class="pf-svc-name">' + (s.name || 'Dịch vụ') + '</p>' +
-                        '<span style="padding:3px 9px;border-radius:20px;font-size:11px;font-weight:800;background:' + sc.bg + ';color:' + sc.color + ';flex-shrink:0">' + sc.label + '</span>' +
+                        '<span style="padding:4px 10px;border-radius:12px;font-size:11px;font-weight:800;background:' + sc.bg + ';color:' + sc.color + ';flex-shrink:0">' + sc.label + '</span>' +
                     '</div>' +
-                    '<div style="font-size:12px;color:#6366f1;font-weight:700;margin-bottom:4px">' + typeLabel(s.category || s.type) + '</div>' +
-                    '<div class="pf-svc-price">' + formatPrice(s.price) + '<span class="pf-svc-unit">' + (s.unit ? ' / ' + s.unit : '') + '</span></div>' +
+                    '<div class="pf-svc-price">' + formatPrice(s.price) + '<span style="font-size:13px;color:#94a3b8;font-weight:600"> / ' + (s.unit || 'người') + '</span></div>' +
                     '<div class="pf-svc-meta">' +
                         '<span>📍 ' + (s.location || 'Chưa cập nhật') + '</span>' +
-                        '<span>' + (s.rating > 0 ? '⭐ ' + s.rating : '⭐ Chưa có') + '</span>' +
+                        '<span>⭐ ' + (s.rating > 0 ? s.rating : 'N/A') + '</span>' +
                         '<span>🔥 ' + (s.bookings || 0) + ' đặt</span>' +
-                    '</div>' +
-                    '<div class="pf-svc-actions">' +
-                        '<button class="pf-svc-btn pf-svc-btn-chat" data-sid="' + sid + '" data-sname="' + sname + '">💬 Chăm sóc</button>' +
-                        '<button class="pf-svc-btn pf-svc-btn-edit" onclick="window.navigateToView(\'services\')">✏️ Sửa</button>' +
                     '</div>' +
                 '</div>' +
                 '</div>';
@@ -188,7 +162,7 @@
     // ── Main render ──────────────────────────────────────────────
     function render() {
         var user  = getCurrentBiz();
-        biz       = getDefaultBiz(user);
+        var biz   = getDefaultBiz(user);
         var svcs  = getMyServices();
 
         var totalBookings = svcs.reduce(function (s, x) { return s + (x.bookings || 0); }, 0);
@@ -200,102 +174,86 @@
 
         var handle = '@' + biz.name.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
 
-        var html = '' +
-        '<div class="pf-wrap">' +
+        return `
+        <div class="pf-wrap">
+            <div class="pf-cover">
+                <div class="pf-avatar">🏨</div>
+                <div class="pf-cover-btns">
+                    <button class="pf-btn pf-btn-ghost" onclick="window.pfActions.edit()">✏️ Sửa hồ sơ</button>
+                    <button class="pf-btn pf-btn-primary" onclick="window.navigateToView('services')">+ Thêm dịch vụ</button>
+                </div>
+            </div>
 
-            // Cover
-            '<div class="pf-cover">' +
-                '<div class="pf-avatar">🏨</div>' +
-                '<div class="pf-cover-btns">' +
-                    '<button class="pf-btn pf-btn-ghost" onclick="window.pfActions.edit()">✏️ Chỉnh sửa</button>' +
-                    '<button class="pf-btn pf-btn-primary" onclick="window.navigateToView(\'services\')">+ Thêm dịch vụ</button>' +
-                '</div>' +
-            '</div>' +
+            <div class="pf-card">
+                <div class="pf-card-body">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:20px">
+                        <div style="flex:1">
+                            <h1 class="pf-biz-name">${biz.name}</h1>
+                            <div style="font-size:14px;color:#6366f1;font-weight:800;margin-bottom:12px;letter-spacing:1px">${handle.toUpperCase()}</div>
+                            <p class="pf-biz-desc">${biz.description}</p>
+                            <div id="pf-chips">${buildInfoChips(biz)}</div>
+                        </div>
+                        <span style="background:rgba(99,102,241,0.1);color:#a5b4fc;padding:8px 20px;border-radius:14px;font-size:13px;font-weight:800;border:1px solid rgba(99,102,241,0.2)">${biz.tier}</span>
+                    </div>
+                </div>
+            </div>
 
-            // Info card
-            '<div class="pf-card">' +
-                '<div class="pf-card-body">' +
-                    '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">' +
-                        '<div style="flex:1">' +
-                            '<h1 class="pf-biz-name" id="pf-display-name">' + biz.name + '</h1>' +
-                            '<div style="font-size:13px;color:#6366f1;font-weight:700;margin-bottom:8px">' + handle + '</div>' +
-                            '<p class="pf-biz-desc" id="pf-display-desc">' + biz.description + '</p>' +
-                            '<div id="pf-chips">' + buildInfoChips(biz) + '</div>' +
-                        '</div>' +
-                        '<span style="background:#ede9fe;color:#6d28d9;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:800;flex-shrink:0">' + biz.tier + '</span>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
+            <div class="pf-stats">
+                <div class="pf-stat"><div class="pf-stat-val" style="color:#6366f1">${svcs.length}</div><div class="pf-stat-lbl">Sản phẩm</div></div>
+                <div class="pf-stat"><div class="pf-stat-val" style="color:#10b981">${activeCount}</div><div class="pf-stat-lbl">Hoạt động</div></div>
+                <div class="pf-stat"><div class="pf-stat-val" style="color:#f59e0b">${totalBookings}</div><div class="pf-stat-lbl">Lượt đặt</div></div>
+                <div class="pf-stat"><div class="pf-stat-val" style="color:#f87171">${avgRating}</div><div class="pf-stat-lbl">Đánh giá TB</div></div>
+            </div>
 
-            // Stats
-            '<div class="pf-stats">' +
-                '<div class="pf-stat"><div class="pf-stat-val" style="color:#6366f1">' + svcs.length + '</div><div class="pf-stat-lbl">Dịch vụ</div></div>' +
-                '<div class="pf-stat"><div class="pf-stat-val" style="color:#10b981">' + activeCount + '</div><div class="pf-stat-lbl">Đang hoạt động</div></div>' +
-                '<div class="pf-stat"><div class="pf-stat-val" style="color:#f59e0b">' + totalBookings + '</div><div class="pf-stat-lbl">Lượt đặt</div></div>' +
-                '<div class="pf-stat"><div class="pf-stat-val" style="color:#ef4444">' + avgRating + '</div><div class="pf-stat-lbl">Rating TB</div></div>' +
-            '</div>' +
+            <div class="pf-layout">
+                <div class="pf-col">
+                    <div class="pf-card">
+                        <div class="pf-card-head"><div class="pf-card-title">🛎️ Liên hệ & Thông tin</div></div>
+                        <div class="pf-card-body">
+                            <div class="pf-fac-item">📍 ${biz.address}</div>
+                            <div class="pf-fac-item">📞 ${biz.phone}</div>
+                            <div class="pf-fac-item">📧 ${biz.email || 'N/A'}</div>
+                            <div class="pf-fac-item">🌐 ${biz.website || 'N/A'}</div>
+                            <div class="pf-fac-item">📅 Từ ${biz.founded}</div>
+                        </div>
+                    </div>
+                    <div class="pf-card">
+                        <div class="pf-card-head"><div class="pf-card-title">✨ Tiện ích đặc quyền</div></div>
+                        <div class="pf-card-body" style="display:flex;flex-wrap:wrap;gap:8px">
+                            ${['🚗 Đưa đón','🍽️ Bữa ăn','🛡️ Bảo hiểm','📸 Chụp ảnh','🎧 HDV','🏊 Hồ bơi','📶 Wifi','🅿️ Đỗ xe','♻️ Eco','💳 Online'].map(f => 
+                                '<span style="padding:8px 14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:12px;font-size:12px;font-weight:700;color:#cbd5e1">' + f + '</span>'
+                            ).join('')}
+                        </div>
+                    </div>
+                </div>
 
-            // 2-column layout
-            '<div class="pf-layout">' +
+                <div class="pf-col">
+                    <div class="pf-card">
+                        <div class="pf-card-head">
+                            <div class="pf-card-title">🧳 Danh sách dịch vụ</div>
+                            <a style="font-size:13px;color:#6366f1;font-weight:800;cursor:pointer;text-decoration:none" onclick="window.navigateToView('services')">Quản lý →</a>
+                        </div>
+                        <div class="pf-card-body">${buildServiceCards(svcs)}</div>
+                    </div>
+                </div>
+            </div>
 
-                // Cột trái: thông tin & tiện ích
-                '<div class="pf-col">' +
-                    '<div class="pf-card">' +
-                        '<div class="pf-card-head"><div class="pf-card-title">🛎️ Thông tin liên hệ</div></div>' +
-                        '<div class="pf-card-body">' + buildFacilities() + '</div>' +
-                    '</div>' +
-                    '<div class="pf-card">' +
-                        '<div class="pf-card-head"><div class="pf-card-title">✨ Tiện ích nổi bật</div></div>' +
-                        '<div class="pf-card-body" style="display:flex;flex-wrap:wrap;gap:8px">' +
-                            ['🚗 Đưa đón','🍽️ Bữa ăn','🛡️ Bảo hiểm','📸 Chụp ảnh','🎧 HDV','🏊 Hồ bơi','📶 Wifi','🅿️ Đỗ xe','♻️ Eco','💳 Online'].map(function (f) {
-                                return '<span style="padding:7px 13px;background:#eff6ff;border:1px solid #c7d2fe;border-radius:10px;font-size:12px;font-weight:700;color:#3730a3">' + f + '</span>';
-                            }).join('') +
-                        '</div>' +
-                    '</div>' +
-                '</div>' +
-
-                // Cột phải: dịch vụ
-                '<div class="pf-col">' +
-                    '<div class="pf-card">' +
-                        '<div class="pf-card-head">' +
-                            '<div class="pf-card-title">🧳 Dịch vụ của tôi</div>' +
-                            '<a style="font-size:13px;color:#6366f1;font-weight:700;cursor:pointer" onclick="window.navigateToView(\'services\')">Quản lý →</a>' +
-                        '</div>' +
-                        '<div class="pf-card-body" id="pf-svc-list">' + buildServiceCards(svcs) + '</div>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
-
-            // Edit modal
-            '<div class="pf-modal-overlay" id="pf-modal">' +
-                '<div class="pf-modal">' +
-                    '<h3 style="font-size:20px;font-weight:900;margin:0 0 22px;color:#0f172a">✏️ Chỉnh sửa hồ sơ</h3>' +
-                    '<div style="margin-bottom:16px"><label class="pf-form-label">Tên doanh nghiệp</label><input type="text" id="pf-edit-name" class="pf-form-ctrl" value="' + biz.name + '"></div>' +
-                    '<div style="margin-bottom:16px"><label class="pf-form-label">Mô tả</label><textarea id="pf-edit-desc" class="pf-form-ctrl">' + biz.description + '</textarea></div>' +
-                    '<div style="margin-bottom:16px"><label class="pf-form-label">Địa chỉ</label><input type="text" id="pf-edit-addr" class="pf-form-ctrl" value="' + biz.address + '"></div>' +
-                    '<div style="margin-bottom:16px"><label class="pf-form-label">Số điện thoại</label><input type="text" id="pf-edit-phone" class="pf-form-ctrl" value="' + biz.phone + '"></div>' +
-                    '<div style="margin-bottom:16px"><label class="pf-form-label">Email</label><input type="email" id="pf-edit-email" class="pf-form-ctrl" value="' + biz.email + '"></div>' +
-                    '<div style="margin-bottom:20px"><label class="pf-form-label">Website</label><input type="text" id="pf-edit-web" class="pf-form-ctrl" value="' + biz.website + '" placeholder="https://..."></div>' +
-                    '<div style="display:flex;gap:10px;justify-content:flex-end">' +
-                        '<button class="pf-btn pf-btn-ghost" onclick="window.pfActions.closeModal()">Hủy</button>' +
-                        '<button class="pf-btn pf-btn-primary" onclick="window.pfActions.save()">💾 Lưu hồ sơ</button>' +
-                    '</div>' +
-                '</div>' +
-            '</div>' +
-        '</div>';
-
-        return html;
-    }
-
-    // ── Wire chat buttons after render ───────────────────────────
-    function wireChatButtons() {
-        document.querySelectorAll('.pf-svc-btn-chat').forEach(function (btn) {
-            btn.addEventListener('click', function () {
-                var sid   = btn.getAttribute('data-sid');
-                var sname = btn.getAttribute('data-sname');
-                if (window.ChatBox) window.ChatBox.open(sid, sname);
-            });
-        });
+            <div class="pf-modal-overlay" id="pf-modal">
+                <div class="pf-modal">
+                    <h3 style="font-size:24px;font-weight:900;margin:0 0 28px;color:#fff">✏️ Chỉnh sửa hồ sơ</h3>
+                    <div style="margin-bottom:20px"><label class="pf-form-label">Tên doanh nghiệp</label><input type="text" id="pf-edit-name" class="pf-form-ctrl" value="${biz.name}"></div>
+                    <div style="margin-bottom:20px"><label class="pf-form-label">Mô tả ngắn</label><textarea id="pf-edit-desc" class="pf-form-ctrl">${biz.description}</textarea></div>
+                    <div style="margin-bottom:20px"><label class="pf-form-label">Địa chỉ trụ sở</label><input type="text" id="pf-edit-addr" class="pf-form-ctrl" value="${biz.address}"></div>
+                    <div style="margin-bottom:20px"><label class="pf-form-label">Số điện thoại</label><input type="text" id="pf-edit-phone" class="pf-form-ctrl" value="${biz.phone}"></div>
+                    <div style="margin-bottom:20px"><label class="pf-form-label">Email công việc</label><input type="email" id="pf-edit-email" class="pf-form-ctrl" value="${biz.email}"></div>
+                    <div style="margin-bottom:28px"><label class="pf-form-label">Website</label><input type="text" id="pf-edit-web" class="pf-form-ctrl" value="${biz.website}" placeholder="https://..."></div>
+                    <div style="display:flex;gap:12px;justify-content:flex-end">
+                        <button class="pf-btn pf-btn-ghost" onclick="window.pfActions.closeModal()">Hủy bỏ</button>
+                        <button class="pf-btn pf-btn-primary" onclick="window.pfActions.save()">💾 Lưu thay đổi</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
     }
 
     // ── Global actions ───────────────────────────────────────────
@@ -303,46 +261,36 @@
         edit: function () { document.getElementById('pf-modal').classList.add('active'); },
         closeModal: function () { document.getElementById('pf-modal').classList.remove('active'); },
         save: function () {
-            biz.name        = document.getElementById('pf-edit-name').value.trim()  || biz.name;
-            biz.description = document.getElementById('pf-edit-desc').value.trim()  || biz.description;
-            biz.address     = document.getElementById('pf-edit-addr').value.trim()  || biz.address;
-            biz.phone       = document.getElementById('pf-edit-phone').value.trim() || biz.phone;
-            biz.email       = document.getElementById('pf-edit-email').value.trim();
-            biz.website     = document.getElementById('pf-edit-web').value.trim();
+            var name = document.getElementById('pf-edit-name').value.trim();
+            var desc = document.getElementById('pf-edit-desc').value.trim();
+            if (!name) return alert('Tên không được để trống');
 
-            // Persist
             var user = getCurrentBiz() || {};
-            Object.assign(user, biz);
+            user.name = name;
+            user.description = desc;
+            user.address = document.getElementById('pf-edit-addr').value.trim();
+            user.phone = document.getElementById('pf-edit-phone').value.trim();
+            user.email = document.getElementById('pf-edit-email').value.trim();
+            user.website = document.getElementById('pf-edit-web').value.trim();
+
             localStorage.setItem('biz_auth_user', JSON.stringify(user));
-
-            updateIdentity(biz); // Cập nhật sidebar
-
             this.closeModal();
             window.initProfile();
-
+            
             // Toast
-            var t = document.createElement('div');
-            t.style.cssText = 'position:fixed;top:24px;right:24px;z-index:99999;padding:14px 24px;border-radius:12px;background:#10b981;color:#fff;font-weight:700;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.15)';
-            t.textContent = '✅ Đã lưu hồ sơ thành công!';
-            document.body.appendChild(t);
-            setTimeout(function () { t.style.opacity = '0'; setTimeout(function () { t.remove(); }, 300); }, 2500);
+            if (window.WanderUI && window.WanderUI.showToast) {
+                window.WanderUI.showToast('Đã cập nhật hồ sơ doanh nghiệp', 'success');
+            } else {
+                alert('Đã cập nhật hồ sơ!');
+            }
         }
     };
-
-    function updateIdentity(biz) {
-        if (!biz) return;
-        var nameElems = [document.getElementById('sidebar-name'), document.getElementById('topbar-username')];
-        nameElems.forEach(function (el) { if(el) el.textContent = biz.name; });
-        var tierEl = document.getElementById('sidebar-tier');
-        if (tierEl) tierEl.textContent = biz.tier || 'PARTNER';
-    }
 
     // ── Main init ────────────────────────────────────────────────
     window.initProfile = function () {
         var wrapper = document.getElementById('profile-mgmt-container');
         if (!wrapper) return;
 
-        // Inject CSS once
         if (!document.getElementById('pf-style')) {
             var st = document.createElement('style');
             st.id = 'pf-style';
@@ -351,8 +299,7 @@
         }
 
         wrapper.innerHTML = render();
-        updateIdentity(biz);
-        wireChatButtons();
     };
 
 }());
+

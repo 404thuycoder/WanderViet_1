@@ -1,4 +1,5 @@
 require('dotenv').config();
+console.log('🚀 [SERVER] Starting at', new Date().toISOString());
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -52,7 +53,14 @@ app.use((req, res, next) => {
     next();
 });
 
+// Force UTF-8 for all JSON API responses to fix Vietnamese encoding issues
+app.use('/api', (req, res, next) => {
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  next();
+});
+
 // API Routes
+app.use('/api/public', require('./routes/public'));
 app.use('/api/chat', require('./routes/chat'));
 app.use('/api/places', require('./routes/places'));
 app.use('/api/auth', require('./routes/auth').router);

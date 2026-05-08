@@ -1,4 +1,4 @@
-const businessData = [
+﻿const businessData = [
   {
     id: 1,
     name: 'InterContinental Đà Nẵng Sun Peninsula Resort',
@@ -124,3 +124,4 @@ const businessData = [
 if (typeof module !== 'undefined') {
   module.exports = businessData;
 }
+

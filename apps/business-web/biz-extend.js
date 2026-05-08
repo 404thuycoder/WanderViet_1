@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    biz-extend.js — Extended Business Dashboard Functionality
    Xử lý: navigation views, analytics, messages, promo form, CSV export
    ============================================================ */
@@ -16,30 +16,8 @@
 
   var API = window.location.origin;
 
-  async function apiFetch(url, options) {
-    var token = getToken();
-    options = options || {};
-    options.headers = options.headers || {};
-    if (token) {
-      options.headers['x-auth-token'] = token;
-      options.headers['Authorization'] = 'Bearer ' + token;
-    }
-    
-    if (options.body && !(options.body instanceof FormData)) {
-      options.headers['Content-Type'] = 'application/json';
-    }
-    
-    return fetch(url, options).then(function (r) {
-      if (r.status === 401) {
-        console.warn('[apiFetch] 401 Unauthorized - Yêu cầu đăng nhập lại.');
-        // Redirect if we are on index.html or root (/)
-        if (token || window.location.pathname.includes('index.html') || window.location.pathname === '/') {
-           setTimeout(function() { window.location.href = 'dashboard.html'; }, 2000);
-        }
-      }
-      return r.json();
-    });
-  }
+  // (Removed local apiFetch, now using global window.apiFetch from api.js)
+
 
   // Global logout function
   window.bizLogout = function() {
@@ -687,3 +665,4 @@
   window.navigateToView = showView;
 
 })();
+

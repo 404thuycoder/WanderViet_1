@@ -1,4 +1,4 @@
-/**
+﻿/**
  * paymentManagement.js
  * Payment management module for WanderViệt Business.
  */
@@ -8,10 +8,10 @@
 
     // Premium Styles for Payments
     const style = document.createElement('style');
-    style.textContent = `
-        .pay-mgmt-container {
+    style.textContent = `        .pay-mgmt-container {
             max-width: 1300px;
             margin: 0 auto;
+            color: #fff;
         }
         
         @keyframes spin {
@@ -38,16 +38,18 @@
 
         .pay-success-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
             display: flex; align-items: center; justify-content: center;
             z-index: 3000; animation: fadeIn 0.3s;
         }
 
         .pay-success-modal {
-            background: #fff; padding: 40px; border-radius: 24px;
+            background: #111827; padding: 40px; border-radius: 28px;
             text-align: center; width: 100%; max-width: 420px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
             animation: slideUp 0.3s ease-out;
+            color: #fff;
         }
 
         .pay-success-icon { 
@@ -67,20 +69,21 @@
         .pay-mgmt-title h2 {
             font-size: 24px;
             font-weight: 800;
-            color: #1a1a2e;
+            color: #fff;
         }
 
         .pay-mgmt-title p {
             font-size: 14px;
-            color: #64748b;
+            color: #94a3b8;
             margin-top: 4px;
         }
 
         .pay-mgmt-body {
-            background: #fff;
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(20px);
             border-radius: 28px;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 15px 50px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
             min-height: 500px;
             display: flex;
             align-items: center;
@@ -92,35 +95,35 @@
 
         .pay-icon-wrapper {
             font-size: 72px;
-            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            background: rgba(255,255,255,0.05);
             width: 140px;
             height: 140px;
             border-radius: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(255,255,255,0.1);
             margin-bottom: 8px;
         }
 
         .pay-card {
-            background: #fff;
-            border-radius: 24px;
-            border: 1px solid #f1f5f9;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
             width: 100%;
             max-width: 600px;
             overflow: hidden;
         }
 
         .pay-card-header {
-            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
             padding: 30px 40px;
             color: #fff;
             text-align: center;
         }
-
-        .pay-card-header h3 {
+          .pay-card-header h3 {
             font-size: 20px;
             font-weight: 800;
             margin-bottom: 8px;
@@ -141,7 +144,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 16px 0;
-            border-bottom: 1px dashed #e2e8f0;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
         }
 
         .pay-detail-row:last-child {
@@ -149,20 +152,19 @@
         }
 
         .pay-detail-label {
-            color: #64748b;
+            color: #94a3b8;
             font-size: 14px;
             font-weight: 600;
         }
 
         .pay-detail-value {
-            color: #1a1a2e;
+            color: #fff;
             font-size: 16px;
             font-weight: 800;
             text-align: right;
             max-width: 60%;
         }
-
-        .pay-actions {
+          .pay-actions {
             padding: 0 40px 40px 40px;
             display: flex;
             gap: 16px;
@@ -205,18 +207,17 @@
             color: #1a1a2e;
         }
 
-        /* Payment Methods */
-        .pay-methods {
+        /* Payment Methods */        .pay-methods {
             padding: 20px 40px;
-            background: #f8fafc;
-            border-top: 1px solid #f1f5f9;
-            border-bottom: 1px solid #f1f5f9;
+            background: rgba(255,255,255,0.02);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .pay-method-title {
             font-size: 14px;
             font-weight: 800;
-            color: #1a1a2e;
+            color: #fff;
             margin-bottom: 16px;
             text-align: left;
         }
@@ -232,29 +233,29 @@
             align-items: center;
             gap: 16px;
             padding: 16px;
-            background: #fff;
-            border: 1.5px solid #e2e8f0;
+            background: rgba(255,255,255,0.03);
+            border: 1.5px solid rgba(255,255,255,0.08);
             border-radius: 14px;
             cursor: pointer;
             transition: all 0.2s;
         }
 
         .pay-method-label:hover {
-            border-color: #cbd5e1;
-            background: #fcfcfd;
+            border-color: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
         }
 
         .pay-method-input {
             width: 20px;
             height: 20px;
-            accent-color: #764ba2;
+            accent-color: #6366f1;
             cursor: pointer;
         }
 
         .pay-method-label:has(input:checked) {
-            border-color: #764ba2;
-            background: rgba(118, 75, 162, 0.03);
-            box-shadow: 0 4px 12px rgba(118, 75, 162, 0.05);
+            border-color: #6366f1;
+            background: rgba(99, 102, 241, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .pay-method-info {
@@ -266,12 +267,12 @@
         .pay-method-name {
             font-size: 15px;
             font-weight: 700;
-            color: #1a1a2e;
+            color: #fff;
         }
 
         .pay-method-desc {
             font-size: 12px;
-            color: #64748b;
+            color: #94a3b8;
             margin-top: 2px;
         }
 
@@ -279,13 +280,13 @@
             font-size: 24px;
             width: 40px;
             height: 40px;
-            background: #f1f5f9;
+            background: rgba(255,255,255,0.05);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-    `;
+          `;
     document.head.appendChild(style);
 
     /**
@@ -542,3 +543,4 @@
     }
 
 })();
+

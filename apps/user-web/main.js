@@ -72,6 +72,33 @@
       }).catch(function(e) { console.warn('Lỗi tải stats', e); });
   }
 
+  function loadTopPartners() {
+    const container = document.getElementById('partnersContainer');
+    if (!container) return;
+
+    fetch('/api/public/businesses?limit=8')
+      .then(res => res.json())
+      .then(json => {
+        if (!json.success || !json.data.length) {
+          container.innerHTML = '<p style="color:#64748b; padding:2rem; text-align:center;">Hiện chưa có đối tác nổi bật.</p>';
+          return;
+        }
+
+        container.innerHTML = json.data.map(biz => `
+          <a href="business-profile.html?id=${biz._id || biz.customId}" class="partner-card">
+            <img src="${biz.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(biz.displayName||biz.name||'WV') + '&background=6366f1&color=fff&size=80'}" class="partner-avatar" alt="${biz.displayName}" onerror="this.src='https://ui-avatars.com/api/?name=WV&background=6366f1&color=fff&size=80'" />
+            <div class="partner-info">
+              <div class="partner-name">${biz.displayName || biz.name} ${biz.isVerified ? '✅' : ''}</div>
+              <div class="partner-cat">${biz.category}</div>
+            </div>
+          </a>
+        `).join('');
+      }).catch(err => {
+        console.error('Failed to load top partners:', err);
+        container.innerHTML = '<p>Lỗi tải dữ liệu đối tác.</p>';
+      });
+  }
+
   function fillStatsUI(d) {
     var sUser = document.getElementById('landing-stat-users');
     var sPlace = document.getElementById('landing-stat-places');
@@ -3105,21 +3132,24 @@
         }
 
         grid.innerHTML = bizPlaces.map(p => {
-          const rating = p.rating || (4 + Math.random()).toFixed(1); // Mock high ratings for premium look
+          const rating = p.rating || (4 + Math.random()).toFixed(1);
           const stars = '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
           
           return `
             <article class="biz-card">
-              <div class="biz-card__badge">Dịch vụ Đối tác</div>
-              <div class="biz-card__img" style="background-image: url('${p.image || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80'}')"></div>
+              <div class="biz-card__badge">${p.kind === 'utility' ? 'Tiện ích' : 'Dịch vụ'} Đối tác</div>
+              <div class="biz-card__img" style="background-image: url('${p.image || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80'}')" onclick="openPlaceModal('${p._id || p.id}')"></div>
               <div class="biz-card__content">
-                <h3 class="biz-card__title">${p.name}</h3>
+                <h3 class="biz-card__title" onclick="openPlaceModal('${p._id || p.id}')">${p.name}</h3>
+                <div style="font-size: 0.8rem; color: var(--accent); margin-bottom: 4px; font-weight: 700; cursor: pointer;" onclick="window.location.href='business-profile.html?id=${p.ownerId}'">
+                  🏢 Xem trang doanh nghiệp →
+                </div>
                 <div class="biz-card__meta">
                   <div class="biz-card__rating">
                     ${stars} <span>(${p.reviewsCount || Math.floor(Math.random() * 50) + 10})</span>
                   </div>
-                  <div style="color:var(--accent); font-weight:800; font-size:0.85rem;">
-                    ❤️ ${p.favoritesCount || Math.floor(Math.random() * 100) + 20}
+                  <div style="color:#10b981; font-weight:800; font-size:1.1rem;">
+                    ${(p.priceFrom || 0).toLocaleString()} ₫
                   </div>
                 </div>
                 <div class="biz-card__actions">
@@ -3181,5 +3211,10 @@
 
   window.addEventListener('hashchange', handleHashActions);
   setTimeout(handleHashActions, 1000); // Initial check
+
+  // Initialize new homepage features
+  loadPublicStats();
+  loadPublicReviews();
+  loadTopPartners();
 })();
 

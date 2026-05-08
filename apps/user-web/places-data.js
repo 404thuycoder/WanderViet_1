@@ -18,7 +18,7 @@ window.WANDER_PLACES = [{
   top: true,
   verified: true,
   text: "Đảo ngọc Phú Quốc với dải cát trắng mịn, resort cao cấp trải dài, hệ sinh thái biển đa dạng cùng chợ đêm sầm uất và làng chài truyền thống.",
-  image: "assets/img/phu-quoc.png",
+  image: "/assets/img/phu-quoc.png",
   lat: 10.2899,
   lng: 103.984,
   transportTips: "Đặt vé bay thẳng đến Phú Quốc. Trong đảo thuê xe máy hoặc xe điện VinBus để dạo quanh.",
@@ -37,7 +37,7 @@ window.WANDER_PLACES = [{
   }],
   amusementPlaces: [{
     name: "VinWonders Phú Quốc",
-    image: "https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1582650625119-3a31f8fa2699?w=400&q=80",
     rating: 4.8,
     description: "Công viên chủ đề lớn nhất Việt Nam với hơn 100 trò chơi hấp dẫn, khu vui chơi thế giới nước và thủy cung sứa vô cùng ấn tượng.",
     ticketPrice: "950,000 VND",
@@ -62,7 +62,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "JW Marriott Phu Quoc Resort",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&q=80",
     rating: 4.9,
     description: "Kiến trúc độc đáo tại Bãi Khem.",
     priceRange: "8M - 15M VND",
@@ -98,7 +98,7 @@ window.WANDER_PLACES = [{
   top: true,
   verified: true,
   text: "Hội An là di sản văn hóa thế giới UNESCO, đặc trưng bởi những nếp nhà cổ kính sơn vàng và sông Hoài lấp lánh hoa đăng về đêm.",
-  image: "assets/img/hoi-an.png",
+  image: "/assets/img/hoi-an.png",
   lat: 15.8801,
   lng: 108.338,
   transportTips: "Bay đến Đà Nẵng, di chuyển bằng taxi ~45 phút. Trong phố cổ đi bộ hoặc thuê xe đạp.",
@@ -117,7 +117,7 @@ window.WANDER_PLACES = [{
   }],
   amusementPlaces: [{
     name: "VinWonders Nam Hội An",
-    image: "https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80",
     rating: 4.7,
     description: "River Safari - Đi thuyền ngắm động vật hoang dã và Công viên Văn hóa.",
     ticketPrice: "600,000 VND",
@@ -134,7 +134,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "Anantara Hoi An Resort",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=400&q=80",
     rating: 4.8,
     description: "Nghỉ dưỡng sang trọng bên sông Thu Bồn.",
     priceRange: "5M - 10M VND",
@@ -170,7 +170,7 @@ window.WANDER_PLACES = [{
   top: true,
   verified: true,
   text: "Sa Pa chinh phục mọi du khách với đỉnh Fansipan hùng vĩ, ruộng bậc thang uốn lượn và bản sắc văn hóa dân tộc rực rỡ sắc màu Tây Bắc.",
-  image: "assets/img/sa-pa.png",
+  image: "/assets/img/sa-pa.png",
   lat: 22.3364,
   lng: 103.8438,
   transportTips: "Xe giường nằm hoặc tàu đêm từ Hà Nội (6-8h). Sa Pa lạnh quanh năm — luôn mang áo ấm.",
@@ -189,7 +189,7 @@ window.WANDER_PLACES = [{
   }],
   amusementPlaces: [{
     name: "Sun World Fansipan Legend",
-    image: "https://images.unsplash.com/photo-1544971587-b842c27f8e14?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400&q=80",
     rating: 4.9,
     description: "Hệ thống cáp treo đạt kỷ lục Guinness giúp chinh phục đỉnh Fansipan nhanh chóng.",
     ticketPrice: "800,000 VND",
@@ -206,7 +206,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "Hotel de la Coupole - MGallery",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1551882547-ff43c619363d?w=400&q=80",
     rating: 4.9,
     description: "Kiệt tác kiến trúc Pháp - Tây Bắc.",
     priceRange: "3.5M - 7M VND",
@@ -241,7 +241,7 @@ window.WANDER_PLACES = [{
   meta: "Kỳ quan thiên nhiên thế giới 2 lần UNESCO",
   top: true,
   text: "Hàng nghìn đảo đá vôi sừng sững giữa làn nước ngọc bích — Vịnh Hạ Long là Di sản Thiên nhiên Thế giới và biểu tượng du lịch Việt Nam.",
-  image: "assets/img/ha-long.png",
+  image: "/assets/img/ha-long.png",
   lat: 20.9101,
   lng: 107.1839,
   transportTips: "Cao tốc Hà Nội–Quảng Ninh rút ngắn còn 2-2.5 giờ. Nên đặt tour du thuyền 1-3 đêm.",
@@ -260,7 +260,7 @@ window.WANDER_PLACES = [{
   }],
   amusementPlaces: [{
     name: "Sun World Ha Long",
-    image: "https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1533038590840-1cde6b5697df?w=400&q=80",
     rating: 4.8,
     description: "Tổ hợp giải trí với vòng quay Mặt trời khổng lồ.",
     ticketPrice: "350k - 700k VND",
@@ -285,7 +285,7 @@ window.WANDER_PLACES = [{
   }],
   checkInSpots: [{
     name: "Bảo tàng Quảng Ninh",
-    image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&q=80",
     rating: 4.7,
     description: "Kiến trúc 'viên ngọc đen' độc đáo.",
     address: "Hồng Gai, Hạ Long"
@@ -304,7 +304,7 @@ window.WANDER_PLACES = [{
   meta: "Thủ đô nghìn năm văn hiến & Ẩm thực đường phố",
   top: false,
   text: "Hà Nội pha trộn lịch sử nghìn năm với nhịp sống hiện đại, nổi danh toàn cầu bởi phở, bún chả và cà phê trứng độc đáo.",
-  image: "assets/img/ha-noi.png",
+  image: "/assets/img/ha-noi.png",
   lat: 21.0285,
   lng: 105.8542,
   transportTips: "Dùng Grab hoặc xe ôm app. Phố cổ nên đi bộ; tránh giờ cao điểm 7-9h và 17-19h.",
@@ -323,7 +323,7 @@ window.WANDER_PLACES = [{
   }],
   amusementPlaces: [{
     name: "VinKE & Vinpearl Aquarium",
-    image: "https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1500091517711-1332a912aee8?w=400&q=80",
     rating: 4.6,
     description: "Thủy cung lớn nhất Hà Nội tại Times City.",
     ticketPrice: "170k - 250k VND",
@@ -332,7 +332,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "Sofitel Legend Metropole",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=400&q=80",
     rating: 4.9,
     description: "Khách sạn cổ điển lịch sử 100 năm.",
     priceRange: "6M - 15M VND",
@@ -348,7 +348,7 @@ window.WANDER_PLACES = [{
   }],
   checkInSpots: [{
     name: "Nhà Thờ Lớn Hà Nội",
-    image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1603566114828-9842a2202685?w=400&q=80",
     rating: 4.7,
     description: "Kiến trúc Gothic cổ điển trung tâm.",
     address: "40 Nhà Chung, Hà Nội"
@@ -386,7 +386,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "Ana Mandara Villas Dalat",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1445013517791-41bcd7401bb2?w=400&q=80",
     rating: 4.8,
     description: "Biệt thự Pháp cổ giữa rừng thông.",
     priceRange: "2.5M - 5M VND",
@@ -402,7 +402,7 @@ window.WANDER_PLACES = [{
   }],
   checkInSpots: [{
     name: "Quảng trường Lâm Viên",
-    image: "https://images.unsplash.com/photo-1539367628448-4bc5c9d171c8?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1594491911281-432f8664161a?w=400&q=80",
     rating: 4.6,
     description: "Biểu tượng nụ hoa Atiso khổng lồ.",
     address: "Trần Quốc Toản, Đà Lạt"
@@ -449,7 +449,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "InterContinental Danang",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&q=80",
     rating: 5.0,
     description: "Resort sang trọng bậc nhất Sơn Trà.",
     priceRange: "12M - 25M VND",
@@ -503,7 +503,7 @@ window.WANDER_PLACES = [{
   }],
   amusementPlaces: [{
     name: "VinWonders Nha Trang",
-    image: "https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1506929180237-7ce417df448f?w=400&q=80",
     rating: 4.8,
     description: "Công viên giải trí trên đảo Hòn Tre.",
     ticketPrice: "800,000 VND",
@@ -528,7 +528,7 @@ window.WANDER_PLACES = [{
   }],
   checkInSpots: [{
     name: "Tháp Bà Ponagar",
-    image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1506929180237-7ce417df448f?w=400&q=80",
     rating: 4.7,
     description: "Kiến trúc Chăm Pa lớn nhất miền Trung.",
     address: "2 Tháng 4, Nha Trang"
@@ -636,7 +636,7 @@ window.WANDER_PLACES = [{
   }],
   checkInSpots: [{
     name: "Hang Múa",
-    image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1501183638710-841dd1904471?w=400&q=80",
     rating: 4.8,
     description: "View 'quốc dân' nhìn xuống Tam Cốc.",
     address: "Hoa Lư, Ninh Bình"
@@ -655,7 +655,7 @@ window.WANDER_PLACES = [{
   meta: "Cố đô lăng tẩm & Ẩm thực Cung đình tinh tế",
   top: false,
   text: "Cố đô Huế gắn liền với nhà Nguyễn, ẩn chứa lăng tẩm nguy nga, cung đình hoành tráng và nền ẩm thực cung đình tinh tế độc nhất vô nhị.",
-  image: "assets/img/hue.png",
+  image: "/assets/img/hue.png",
   lat: 16.4637,
   lng: 107.5909,
   transportTips: "Bay đến sân bay Phú Bài hoặc đi tàu hỏa. Thuê xe máy để tham quan lăng tẩm ngoại ô.",
@@ -674,7 +674,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "Azerai La Residence",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1548013146-72479768bada?w=400&q=80",
     rating: 4.9,
     description: "Dinh thự cổ bên sông Hương.",
     priceRange: "4.5M - 8M VND",
@@ -728,7 +728,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "H'Mong Village Resort",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80",
     rating: 4.8,
     description: "Nhà hình quẩy tấu độc đáo.",
     priceRange: "1.5M - 3.5M VND",
@@ -744,7 +744,7 @@ window.WANDER_PLACES = [{
   }],
   checkInSpots: [{
     name: "Dốc Thẩm Mã",
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400&q=80",
     rating: 4.9,
     description: "Cung đường đèo chín khoanh uốn lượn.",
     address: "Quốc lộ 4C, Hà Giang"
@@ -836,7 +836,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "FLC City Hotel Quy Nhon",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=400&q=80",
     rating: 4.7,
     description: "Khách sạn hiện đại ngay mặt biển.",
     priceRange: "1.5M - 3M VND",
@@ -844,7 +844,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Nhà hàng Hải Sỹ",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80",
     rating: 4.5,
     description: "Nổi tiếng với món tôm hùm tươi sống.",
     priceRange: "300k - 800k VND",
@@ -898,7 +898,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Lẩu thả Mũi Né",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
     rating: 4.6,
     description: "Món lẩu đặc sản Bình Thuận.",
     priceRange: "200k - 500k VND",
@@ -944,7 +944,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "The Reverie Saigon",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=400&q=80",
     rating: 4.9,
     description: "Khách sạn 6 sao sang trọng nhất.",
     priceRange: "8M - 20M VND",
@@ -998,7 +998,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "Muong Thanh Luxury BMT",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1590073242678-70ee3fc28e8e?w=400&q=80",
     rating: 4.6,
     description: "Khách sạn cao cấp trung tâm thành phố.",
     priceRange: "1.2M - 2.5M VND",
@@ -1052,7 +1052,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "Poko Eco Lodge Tam Dao",
-    image: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400&q=80",
     rating: 4.5,
     description: "Khu nghỉ dưỡng xanh giữa lưng chừng núi.",
     priceRange: "1M - 2.5M VND",
@@ -1160,7 +1160,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "Hotel de la Coupole",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1551882547-ff43c619363d?w=400&q=80",
     rating: 4.9,
     description: "Khách sạn sang trọng nhất Sa Pa.",
     priceRange: "3.5M - 7M VND",
@@ -1168,7 +1168,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Nhà hàng A Phủ",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80",
     rating: 4.5,
     description: "Gà nướng tiêu xanh danh bất hư truyền.",
     priceRange: "150k - 400k VND",
@@ -1176,7 +1176,7 @@ window.WANDER_PLACES = [{
   }],
   checkInSpots: [{
     name: "Đỉnh Fansipan 3.143m",
-    image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400&q=80",
     rating: 4.9,
     description: "Chinh phục nóc nhà Đông Dương.",
     address: "Hoàng Liên Sơn"
@@ -1214,7 +1214,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "Moc Chau Arena Village",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=400&q=80",
     rating: 4.4,
     description: "Nghỉ dưỡng trong nhà container giữa đồi chè.",
     priceRange: "500k - 1.2M VND",
@@ -1222,7 +1222,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Bê chao Mộc Châu",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
     rating: 4.6,
     description: "Món ngon trứ danh thảo nguyên.",
     priceRange: "100k - 300k VND",
@@ -1268,7 +1268,7 @@ window.WANDER_PLACES = [{
   }],
   accommodations: [{
     name: "Phong Nha Farmstay",
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=400&q=80",
     rating: 4.7,
     description: "Nghỉ dưỡng giữa khung cảnh làng quê thanh bình.",
     priceRange: "800k - 2M VND",
@@ -1276,7 +1276,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Gà nướng Phong Nha",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80",
     rating: 4.6,
     description: "Món gà nướng đặc sản kèm muối cheo.",
     priceRange: "150k - 300k VND",
@@ -1330,7 +1330,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Vịt Cổ Lũng nướng",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80",
     rating: 4.7,
     description: "Đặc sản không thể bỏ qua tại Pù Luông.",
     priceRange: "200k - 400k VND",

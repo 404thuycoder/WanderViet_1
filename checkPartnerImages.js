@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 const Place = require('./models/Place');
 require('dotenv').config();
 
-async function checkImages() {
+async function checkPartnerImages() {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    const places = await Place.find({});
+    const places = await Place.find({ ownerId: { $exists: true, $ne: null } });
     places.forEach(p => {
-      console.log(`${p.name} | ${p.image}`);
+      console.log(`${p.name} | ${p.image} | ${p._id}`);
     });
     process.exit(0);
   } catch (err) {
@@ -15,4 +15,4 @@ async function checkImages() {
     process.exit(1);
   }
 }
-checkImages();
+checkPartnerImages();

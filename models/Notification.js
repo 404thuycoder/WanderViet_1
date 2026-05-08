@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const notificationSchema = new mongoose.Schema({
-  recipientId: { type: String, required: true, index: true }, // ID người nhận (User/ID/ROLE/ALL)
+  recipientId: { type: String, index: true }, // ID người nhận (User/ID/ROLE/ALL) - Removed required:true to prevent crash
   recipientType: { type: String, default: 'user' },
   
   senderId: { type: String }, // ID người gây ra hành động (có thể là ObjectId hoặc CustomID)
@@ -9,8 +9,8 @@ const notificationSchema = new mongoose.Schema({
   
   type: { 
     type: String, 
-    enum: ['like', 'comment', 'booking', 'tour_request', 'system', 'message', 'broadcast'], 
-    required: true 
+    enum: ['like', 'comment', 'booking', 'tour_request', 'system', 'message', 'broadcast'],
+    default: 'system'
   },
   
   title: String,

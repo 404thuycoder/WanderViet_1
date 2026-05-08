@@ -22,62 +22,62 @@
     // --- Styles ---
     const style = document.createElement('style');
     style.textContent = `
-        .rm-container { max-width: 1200px; margin: 0 auto; font-family: 'Inter', sans-serif; color: #1e293b; padding-bottom: 40px; }
+        .rm-container { max-width: 1200px; margin: 0 auto; font-family: 'Plus Jakarta Sans', sans-serif; color: #fff; padding-bottom: 40px; }
         .rm-header { margin-bottom: 24px; }
-        .rm-title { font-size: 28px; font-weight: 900; color: #0f172a; margin-bottom: 8px; }
-        .rm-subtitle { font-size: 15px; color: #64748b; }
+        .rm-title { font-size: 28px; font-weight: 900; color: #fff; margin-bottom: 8px; }
+        .rm-subtitle { font-size: 15px; color: #94a3b8; }
 
         .rm-grid { display: grid; grid-template-columns: 1fr 350px; gap: 24px; align-items: start; }
         @media (max-width: 900px) { .rm-grid { grid-template-columns: 1fr; } }
 
-        .rm-card { background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f1f5f9; padding: 24px; }
-        .rm-card-title { font-size: 18px; font-weight: 800; color: #1e293b; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .rm-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); padding: 24px; }
+        .rm-card-title { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
 
         /* Select Service */
-        .rm-select { width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 15px; font-weight: 600; outline: none; background: #f8fafc; transition: all 0.2s; cursor: pointer; color: #334155; margin-bottom: 24px; }
-        .rm-select:focus { border-color: #6366f1; background: #fff; box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
+        .rm-select { width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 15px; font-weight: 600; outline: none; background: rgba(255,255,255,0.03); transition: all 0.2s; cursor: pointer; color: #fff; margin-bottom: 24px; }
+        .rm-select:focus { border-color: #6366f1; background: rgba(255,255,255,0.06); box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
 
         /* Stats */
-        .rm-stats { display: flex; align-items: center; gap: 16px; padding: 20px; background: #f8fafc; border-radius: 16px; margin-bottom: 24px; }
-        .rm-stats-big { font-size: 36px; font-weight: 900; color: #0f172a; }
+        .rm-stats { display: flex; align-items: center; gap: 16px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 16px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.05); }
+        .rm-stats-big { font-size: 36px; font-weight: 900; color: #fff; }
         .rm-stats-stars { color: #f59e0b; font-size: 20px; letter-spacing: 2px; }
-        .rm-stats-total { font-size: 14px; color: #64748b; font-weight: 500; margin-top: 4px; }
+        .rm-stats-total { font-size: 14px; color: #94a3b8; font-weight: 500; margin-top: 4px; }
 
         /* Filters */
         .rm-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
-        .rm-filter-btn { padding: 8px 16px; border-radius: 10px; border: 1px solid #e2e8f0; background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; color: #64748b; transition: all 0.2s; }
-        .rm-filter-btn:hover { background: #f1f5f9; color: #0f172a; }
+        .rm-filter-btn { padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); font-size: 14px; font-weight: 600; cursor: pointer; color: #94a3b8; transition: all 0.2s; }
+        .rm-filter-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
         .rm-filter-btn.active { background: #6366f1; color: #fff; border-color: #6366f1; box-shadow: 0 4px 12px rgba(99,102,241,0.2); }
 
         /* Review List */
         .rm-list { display: flex; flex-direction: column; gap: 16px; }
-        .rm-item { padding: 20px; border-radius: 16px; border: 1px solid #f1f5f9; background: #fff; transition: all 0.2s; }
-        .rm-item:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.04); border-color: #e2e8f0; }
+        .rm-item { padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); background: rgba(255,255,255,0.02); transition: all 0.2s; }
+        .rm-item:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); }
         .rm-item-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
         .rm-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #a855f7); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; }
-        .rm-user { font-weight: 700; color: #1e293b; font-size: 15px; }
-        .rm-time { font-size: 13px; color: #94a3b8; font-weight: 500; margin-left: auto; }
+        .rm-user { font-weight: 700; color: #fff; font-size: 15px; }
+        .rm-time { font-size: 13px; color: #64748b; font-weight: 500; margin-left: auto; }
         .rm-stars { color: #f59e0b; font-size: 14px; letter-spacing: 1px; margin-bottom: 8px; }
-        .rm-comment { font-size: 15px; color: #475569; line-height: 1.6; }
+        .rm-comment { font-size: 15px; color: #cbd5e1; line-height: 1.6; }
 
         /* Form */
         .rm-form-group { margin-bottom: 16px; }
-        .rm-form-label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #334155; }
-        .rm-textarea { width: 100%; padding: 16px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 14px; font-family: inherit; resize: vertical; min-height: 120px; background: #f8fafc; transition: all 0.2s; box-sizing: border-box; }
-        .rm-textarea:focus { outline: none; border-color: #6366f1; background: #fff; box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
-        .rm-btn-submit { width: 100%; background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; box-shadow: 0 10px 20px rgba(99,102,241,0.25); }
+        .rm-form-label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #94a3b8; }
+        .rm-textarea { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); font-size: 14px; font-family: inherit; resize: vertical; min-height: 120px; background: rgba(255,255,255,0.03); transition: all 0.2s; box-sizing: border-box; color:#fff; }
+        .rm-textarea:focus { outline: none; border-color: #6366f1; background: rgba(255,255,255,0.06); box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
+        .rm-btn-submit { width: 100%; background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.3s; box-shadow: 0 10px 20px rgba(99,102,241,0.25); }
         .rm-btn-submit:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(99,102,241,0.35); }
         .rm-btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
         /* Star Selector */
         .rm-star-select { display: flex; gap: 8px; flex-direction: row-reverse; justify-content: flex-end; }
         .rm-star-select input { display: none; }
-        .rm-star-select label { font-size: 32px; color: #e2e8f0; cursor: pointer; transition: color 0.2s; }
+        .rm-star-select label { font-size: 32px; color: rgba(255,255,255,0.1); cursor: pointer; transition: color 0.2s; }
         .rm-star-select label:hover, .rm-star-select label:hover ~ label, .rm-star-select input:checked ~ label { color: #f59e0b; }
 
         /* Loader */
         .rm-loader { text-align: center; padding: 40px; color: #94a3b8; font-weight: 500; }
-        .rm-empty { text-align: center; padding: 60px 20px; background: #f8fafc; border-radius: 16px; border: 2px dashed #e2e8f0; }
+        .rm-empty { text-align: center; padding: 60px 20px; background: rgba(255,255,255,0.02); border-radius: 16px; border: 2px dashed rgba(255,255,255,0.1); }
         .rm-empty-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.5; }
     `;
     document.head.appendChild(style);
@@ -121,28 +121,25 @@
 
     function renderStars(rating) {
         const full = Math.floor(rating);
-        const hasHalf = rating % 1 >= 0.5;
         let stars = '';
         for(let i=0; i<5; i++) {
             if (i < full) stars += '★';
-            else stars += '☆'; // For simplicity, using outline star
+            else stars += '☆'; 
         }
         return stars;
     }
 
     // --- Data Fetching ---
     async function loadServices() {
-        // Guard: không gọi API nếu chưa đăng nhập
         if (!window.isLoggedIn()) {
             const select = document.getElementById('rm-service-select');
             if (select) select.innerHTML = '<option>Chưa đăng nhập</option>';
             return;
         }
         try {
-            const res = await window.api.get('/services');
+            const res = await window.api.get('/business/places');
             state.services = res.data || [];
             
-            // Auto select first service if none selected
             if (state.services.length > 0 && !state.selectedServiceId) {
                 state.selectedServiceId = state.services[0]._id;
             }
@@ -161,7 +158,7 @@
         renderReviews();
 
         try {
-            const res = await window.api.get(`/reviews/${state.selectedServiceId}`);
+            const res = await window.api.get(`/business/reviews?placeId=${state.selectedServiceId}`);
             state.reviews = res.data || [];
         } catch (err) {
             console.error(err);
@@ -205,26 +202,18 @@
             btn.textContent = 'Đang gửi...';
 
             try {
-                // API Call
-                await window.api.post('/reviews', {
+                await window.api.post('/business/reviews', {
                     serviceId: state.selectedServiceId,
                     rating: state.formRating,
                     comment: comment
                 });
 
                 toast('Đã gửi đánh giá thành công!');
-                
-                // Reset form
                 document.getElementById('rm-form-comment').value = '';
                 document.getElementById('star5').checked = true;
                 state.formRating = 5;
-
-                // Reload data to reflect new review & average rating
                 await loadReviews();
-
-                // If user is also managing services, we might want to refresh service list to get new rating
                 loadServices();
-
             } catch (err) {
                 toast(err.message || 'Lỗi khi gửi đánh giá', 'error');
             } finally {
@@ -318,7 +307,7 @@
             list.innerHTML = `
                 <div class="rm-empty">
                     <div class="rm-empty-icon">📭</div>
-                    <h3 style="color: #475569;">Chưa có đánh giá nào</h3>
+                    <h3 style="color: #cbd5e1;">Chưa có đánh giá nào</h3>
                     <p style="color: #94a3b8; font-size: 14px;">Hãy mời khách hàng trải nghiệm và để lại đánh giá.</p>
                 </div>
             `;
@@ -362,23 +351,20 @@
                 </select>
 
                 <div class="rm-grid">
-                    <!-- Left Column: Review List -->
                     <div>
                         <div class="rm-card" style="margin-bottom: 24px;">
                             <div class="rm-card-title">Tổng quan Đánh giá</div>
                             <div id="rm-stats" class="rm-stats"></div>
                             <div id="rm-filters" class="rm-filters"></div>
                         </div>
-
                         <div id="rm-list" class="rm-list"></div>
                     </div>
 
-                    <!-- Right Column: Simulate Form -->
                     <div>
                         <div class="rm-card" style="position: sticky; top: 24px;">
                             <div class="rm-card-title">Gửi Đánh giá (Test)</div>
-                            <p style="font-size: 13px; color: #64748b; margin-bottom: 20px; line-height: 1.5;">
-                                Sử dụng form này để kiểm thử việc lưu đánh giá vào cơ sở dữ liệu thật. Điểm rating của dịch vụ sẽ được tính lại tự động.
+                            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 20px; line-height: 1.5;">
+                                Sử dụng form này để kiểm thử việc lưu đánh giá vào cơ sở dữ liệu thật.
                             </p>
                             
                             <div class="rm-form-group">
@@ -386,16 +372,12 @@
                                 <div class="rm-star-select">
                                     <input type="radio" name="rating" id="star5" value="5" checked onclick="window.rmActions.setRating(5)">
                                     <label for="star5">★</label>
-                                    
                                     <input type="radio" name="rating" id="star4" value="4" onclick="window.rmActions.setRating(4)">
                                     <label for="star4">★</label>
-                                    
                                     <input type="radio" name="rating" id="star3" value="3" onclick="window.rmActions.setRating(3)">
                                     <label for="star3">★</label>
-                                    
                                     <input type="radio" name="rating" id="star2" value="2" onclick="window.rmActions.setRating(2)">
                                     <label for="star2">★</label>
-                                    
                                     <input type="radio" name="rating" id="star1" value="1" onclick="window.rmActions.setRating(1)">
                                     <label for="star1">★</label>
                                 </div>
@@ -403,19 +385,18 @@
 
                             <div class="rm-form-group">
                                 <label class="rm-form-label">Nhận xét của bạn *</label>
-                                <textarea id="rm-form-comment" class="rm-textarea" placeholder="Chia sẻ trải nghiệm của bạn về dịch vụ này..."></textarea>
+                                <textarea id="rm-form-comment" class="rm-textarea" placeholder="Chia sẻ trải nghiệm của bạn..."></textarea>
                             </div>
 
                             <button id="rm-submit-btn" class="rm-btn-submit" onclick="window.rmActions.submitReview()">Gửi đánh giá</button>
                         </div>
                     </div>
-                </div>
             </div>
         `;
 
-        // Initialize Data
         renderFilters();
         loadServices();
     };
 
 })();
+

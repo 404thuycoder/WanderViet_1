@@ -1,4 +1,4 @@
-/**
+﻿/**
  * dashboardStats.js
  * Tính toán và hiển thị Dashboard Thống kê
  *
@@ -103,3 +103,4 @@ function renderStats(containerId = 'dashboard-stats') {
     </div>
   `;
 }
+

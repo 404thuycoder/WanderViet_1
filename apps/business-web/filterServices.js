@@ -1,4 +1,4 @@
-/**
+﻿/**
  * filterServices.js
  * Chức năng filter dịch vụ theo tab (Tất cả | Đang hoạt động | Chờ duyệt | Tạm dừng)
  *
@@ -188,3 +188,4 @@ function initServiceFilter(tabBarId = 'tab-bar', gridId = 'service-grid', defaul
   // Render danh sách mặc định
   filterServices(defaultTab, gridId);
 }
+

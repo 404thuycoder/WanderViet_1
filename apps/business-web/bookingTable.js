@@ -1,4 +1,4 @@
-/**
+﻿/**
  * bookingTable.js
  * Bảng hiển thị đơn đặt chỗ gần đây
  *
@@ -279,3 +279,4 @@ function renderBookings(bookings, containerId = 'booking-table', options = {}) {
     detail: { total: bookings.length, shown: data.length }
   }));
 }
+

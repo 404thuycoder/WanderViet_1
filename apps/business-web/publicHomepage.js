@@ -1,4 +1,4 @@
-/**
+﻿/**
  * publicHomepage.js — Giao diện Trang chủ Doanh nghiệp Chuyên nghiệp (Ultimate Edition)
  * Thiết kế đẳng cấp, tối ưu UX/UI, đầy đủ các module: Hero, Services, Intro, Stats, Portfolio, Testimonials, CTA & Footer.
  */
@@ -115,14 +115,29 @@
     .pub-amenities-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:24px; }
     .pub-amenity-item { display:flex; align-items:center; gap:10px; padding:12px; background:#f8fafc; border-radius:12px; font-size:13px; font-weight:600; color:#334155; border:1px solid #f1f5f9; transition:all 0.2s; }
     .pub-amenity-item:hover { background:#f0f4ff; border-color:#6366f1; color:#4f46e5; }
-    .pub-detail-footer { padding:20px 24px; border-top:1px solid #f1f5f9; background:#fff; flex-shrink:0; display:flex; gap:12px; }
+    .pub-detail-chip.price { background:rgba(217,119,6,0.15); color:#fbbf24; }
+    .pub-detail-chip.rating { background:rgba(21,128,61,0.15); color:#4ade80; }
+    .pub-detail-desc { font-size:15px; color:#94a3b8; line-height:1.7; margin-bottom:24px; padding:16px; background:rgba(255,255,255,0.03); border-radius:14px; border-left:3px solid #6366f1; }
+    .pub-amenity-item { display:flex; align-items:center; gap:10px; padding:12px; background:rgba(255,255,255,0.03); border-radius:12px; font-size:13px; font-weight:600; color:#cbd5e1; border:1px solid rgba(255,255,255,0.05); }
     .pub-btn-book { flex:1; padding:14px; background:linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none; border-radius:14px; font-weight:800; font-size:15px; cursor:pointer; transition:all 0.2s; }
     .pub-btn-book:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(99,102,241,0.35); }
-    .pub-btn-chat { padding:14px 20px; background:#f1f5f9; color:#475569; border:none; border-radius:14px; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.2s; }
-    .pub-btn-chat:hover { background:#e2e8f0; }
+    .pub-btn-chat { padding:14px 20px; background:rgba(255,255,255,0.05); color:#f8fafc; border:none; border-radius:14px; font-weight:700; font-size:14px; cursor:pointer; transition:all 0.2s; }
+    .pub-btn-chat:hover { background:rgba(255,255,255,0.1); }
+
+
+        .ana-section { padding: 40px; font-family: 'Plus Jakarta Sans', sans-serif; background: transparent; color: #fff; }
+        .ana-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .ana-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); padding: 28px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); transition: all .3s; }
+        .ana-card:hover { transform: translateY(-5px); border-color: rgba(99,102,241,0.3); background: rgba(255,255,255,0.05); }
+        .ana-card-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1.5px; }
+        .ana-card-val { font-size: 32px; font-weight: 900; color: #fff; letter-spacing: -1px; }
+        .ana-row { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 40px; }
+        .ana-chart-box { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); padding: 32px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 32px; }
+        .ana-chart-title { font-size: 18px; font-weight: 800; margin-bottom: 24px; color: #fff; display: flex; align-items: center; gap: 12px; }
+        @media (max-width: 900px) { .ana-row { grid-template-columns: 1fr; } }
 
     .portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-    .portfolio-item { position: relative; border-radius: 30px; overflow: hidden; height: 350px; cursor: pointer; }
+    .portfolio-item { position: relative; border-radius: 30px; overflow: hidden; height: 350px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
     .portfolio-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
     .portfolio-overlay { 
         position: absolute; inset: 0; background: linear-gradient(to top, rgba(15,23,42,0.9), transparent); 
@@ -385,9 +400,8 @@
     function loadPublicReviews() {
         const grid = document.getElementById('pub-reviews-grid');
         if (!grid) return;
-        const token = localStorage.getItem('biz_auth_token') || localStorage.getItem('wander_business_token') || '';
-        fetch('/api/business/reviews', { headers: token ? {'x-auth-token': token} : {} })
-            .then(r => r.json())
+        
+        window.apiFetch('/api/business/reviews')
             .then(json => {
                 const list = json.success && json.data ? json.data : [];
                 if (!list.length) {
@@ -527,3 +541,4 @@
     };
 
 })();
+

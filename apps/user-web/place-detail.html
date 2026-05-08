@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Experience — WanderViệt</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="stylesheet" href="global-tokens.css?v=43" />
+    <link rel="stylesheet" href="styles.css?v=43" />
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg-system: #060912;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --glass-bg: rgba(15, 23, 42, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        html[data-theme="light"] body {
+            --bg-system: #f8fafc;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(0, 0, 0, 0.08);
+        }
+
+        body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg-system); color: var(--text-main); margin: 0; transition: background 0.4s; overflow-x: hidden; }
+
+        /* Hero Immersive Layout */
+        .hero { height: 85vh; position: relative; overflow: hidden; display: flex; align-items: flex-end; }
+        .hero-bg { position: absolute; inset: 0; z-index: -1; }
+        .hero-bg img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0.65); transform: scale(1.05); }
+        .hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-system) 2%, transparent 40%), linear-gradient(to right, rgba(6,9,18,0.8), transparent); }
+        
+        .hero-content { max-width: 1400px; margin: 0 auto; width: 100%; padding: 0 50px 100px; box-sizing: border-box; }
+        .p-badge { 
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(168, 85, 247, 0.4)); 
+            color: #fff; backdrop-filter: blur(12px); padding: 10px 24px; border-radius: 100px; 
+            font-size: 10px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; 
+            margin-bottom: 32px; display: inline-block; border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .content-container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 440px; gap: 80px; padding: 0 50px 120px; margin-top: -60px; position: relative; z-index: 10; }
+        
+        /* Premium Sections */
+        .bento-card { 
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 48px; 
+            padding: 56px; margin-bottom: 48px; backdrop-filter: blur(40px); 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.15); position: relative; overflow: hidden;
+        }
+        .bento-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle at center, rgba(99,102,241,0.05) 0%, transparent 70%); pointer-events: none; }
+        
+        .card-label { font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 4px; margin-bottom: 24px; display: block; opacity: 0.8; }
+        .card-title { font-family: 'Plus Jakarta Sans'; font-size: 2.8rem; margin: 0 0 40px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; }
+
+        /* SIDEBAR STICKY */
+        .side-sticky { 
+            background: var(--glass-bg); backdrop-filter: blur(60px); border: 1px solid var(--glass-border); 
+            border-radius: 56px; padding: 56px; position: sticky; top: 120px; 
+            box-shadow: 0 60px 120px rgba(0,0,0,0.25);
+        }
+        .price-area { position: relative; padding-bottom: 40px; border-bottom: 2px dashed var(--glass-border); margin-bottom: 40px; }
+        .price-area::after, .price-area::before { content: ''; position: absolute; bottom: -11px; width: 22px; height: 22px; background: var(--bg-system); border-radius: 50%; }
+        .price-area::before { left: -67px; }
+        .price-area::after { right: -67px; }
+
+        .price-label { font-size: 10px; font-weight: 800; color: var(--text-dim); letter-spacing: 4px; display: block; margin-bottom: 16px; }
+        .price-display { font-family: 'Space Grotesk'; font-size: 3.5rem; font-weight: 700; color: var(--primary); display: block; letter-spacing: -2px; }
+
+        /* GRID COMPONENTS */
+        .highlight-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
+        .h-item { 
+            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 32px; 
+            padding: 40px; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .h-item:hover { background: rgba(99,102,241,0.05); border-color: var(--primary); transform: translateY(-10px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .h-icon { font-size: 2.5rem; margin-bottom: 24px; display: block; filter: drop-shadow(0 10px 15px rgba(99,102,241,0.2)); }
+        .h-name { font-size: 1.4rem; font-weight: 800; display: block; margin-bottom: 12px; font-family: 'Plus Jakarta Sans'; }
+        .h-text { font-size: 15px; color: var(--text-dim); line-height: 1.8; }
+
+        .timeline { position: relative; padding-left: 50px; }
+        .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, var(--primary), transparent); }
+        .t-step { position: relative; margin-bottom: 60px; }
+        .t-dot { position: absolute; left: -50px; top: 6px; width: 22px; height: 22px; background: var(--primary); border: 5px solid var(--bg-system); border-radius: 50%; box-shadow: 0 0 20px var(--primary); }
+        .t-time { font-size: 11px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 12px; display: block; letter-spacing: 2px; }
+        .t-title { font-size: 1.6rem; font-weight: 800; margin: 0 0 16px; font-family: 'Plus Jakarta Sans'; }
+        .t-desc { font-size: 1.1rem; color: var(--text-dim); line-height: 2; }
+
+        /* BIZ CARD */
+        .biz-card { 
+            display: flex; align-items: center; gap: 24px; padding: 28px; 
+            background: rgba(255,255,255,0.02); border-radius: 32px; margin-top: 48px; 
+            border: 1px solid var(--glass-border); position: relative; overflow: hidden;
+        }
+        .biz-logo { 
+            width: 72px; height: 72px; border-radius: 22px; object-fit: cover; 
+            border: 3px solid var(--primary); box-shadow: 0 10px 20px rgba(99,102,241,0.2);
+        }
+        .biz-verified { position: absolute; top: 12px; right: 24px; font-size: 10px; font-weight: 800; color: #10b981; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* BUTTONS */
+        .btn-elite {
+            width: 100%; padding: 24px; border-radius: 28px; border: none; 
+            background: linear-gradient(135deg, var(--primary), #818cf8);
+            color: #fff; font-weight: 800; font-size: 1.2rem; cursor: pointer; transition: 0.5s;
+            box-shadow: 0 25px 50px rgba(99, 102, 241, 0.4); position: relative; overflow: hidden;
+            letter-spacing: 1px;
+        }
+        .btn-elite::after { content: ''; position: absolute; inset: 0; background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent); transform: translateX(-100%); transition: 0.8s; }
+        .btn-elite:hover::after { transform: translateX(100%); }
+        .btn-elite:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 30px 60px rgba(99, 102, 241, 0.5); }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { 
+            background: rgba(255, 255, 255, 0.95); width: 100%; max-width: 420px; border-radius: 40px; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); position: relative; max-height: 90vh; overflow-y: auto; 
+            border: 1px solid rgba(255,255,255,0.4); animation: modalOpen 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        [data-theme="dark"] .modal-content { background: rgba(15, 23, 42, 0.9); border-color: rgba(255,255,255,0.1); }
+        .modal-content::-webkit-scrollbar { width: 0px; }
+        .modal-inner { padding: 32px; }
+        @keyframes modalOpen { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal-overlay.is-active { display: flex; opacity: 1; }
+        
+        .lux-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 20px; padding: 20px 24px; color: var(--text-main); font-size: 16px; outline: none; transition: 0.3s; box-sizing: border-box; }
+        .lux-input:focus { border-color: var(--primary); background: rgba(255,255,255,0.1); box-shadow: 0 0 20px rgba(99,102,241,0.2); }
+
+        .status-screen { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%; min-height: 300px; animation: modalIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+
+        .success-box { background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 32px; padding: 32px 24px; width: 100%; box-sizing: border-box; position: relative; overflow: hidden; }
+        .booking-code { 
+            font-family: 'Space Grotesk'; font-size: 1.3rem; color: var(--primary); font-weight: 700; letter-spacing: 2px; 
+            margin: 20px 0; padding: 12px; border: 1px solid rgba(99,102,241,0.2); border-radius: 16px; background: rgba(99,102,241,0.05);
+            animation: codeEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
+        }
+        @keyframes codeEntrance { from { letter-spacing: 10px; opacity: 0; filter: blur(10px); } to { letter-spacing: 2px; opacity: 1; filter: blur(0); } }
+
+        /* ELITE SHIMMER */
+        .shimmer-sweep { 
+            position: absolute; inset: 0; background: linear-gradient(110deg, transparent 40%, rgba(255,255,255,0.4) 50%, transparent 60%); 
+            transform: translateX(-100%); pointer-events: none; z-index: 5;
+        }
+        .shimmer-active { animation: shimmerSweep 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes shimmerSweep { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        /* AMBIENT PARTICLES */
+        .ambient-p { position: absolute; background: var(--primary); border-radius: 50%; opacity: 0; pointer-events: none; }
+        @keyframes floatingP { 0% { transform: translateY(0) scale(0); opacity: 0; } 50% { opacity: 0.3; } 100% { transform: translateY(-100px) scale(1); opacity: 0; } }
+        /* ZENITH LUXURY CHECKMARK */
+        .v-check { width: 80px; height: 80px; margin: 0 auto 32px; position: relative; }
+        .v-check-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 3; stroke: #10b981; fill: none; animation: vStroke .6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
+        .v-check-check { stroke-dasharray: 48; stroke-dashoffset: 48; stroke-width: 4; stroke: #10b981; fill: none; animation: vStroke .3s cubic-bezier(0.65, 0, 0.45, 1) .6s forwards; }
+        .v-check-glow { position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); opacity: 0; animation: vGlow .8s ease-out .8s forwards; }
+        
+        @keyframes vStroke { 100% { stroke-dashoffset: 0; } }
+        @keyframes vGlow { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.2); } }
+        
+        /* CONFETTI PARTICLES */
+        .confetti-wrap { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 10; }
+        .p-confetti { position: absolute; width: 6px; height: 6px; border-radius: 50%; animation: pFly 1.2s ease-out forwards; opacity: 0; }
+        @keyframes pFly { 
+            0% { transform: translate(0, 0) scale(0); opacity: 1; } 
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 0; } 
+        }
+
+        .success-pulse { animation: sPulse 1.2s cubic-bezier(0.17, 0.67, 0.83, 0.67) both; perspective: 1000px; }
+        @keyframes sPulse { 
+            0% { transform: perspective(1000px) rotateX(20deg) scale(0.8); opacity: 0; } 
+            100% { transform: perspective(1000px) rotateX(0) scale(1); opacity: 1; } 
+        }
+
+        /* PAYMENT UPGRADE */
+        .pay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+        .pay-card { 
+            background: rgba(255,255,255,0.03); border: 2px solid var(--glass-border); border-radius: 24px; 
+            padding: 24px; cursor: pointer; transition: 0.3s; text-align: center;
+        }
+        .pay-card:hover { background: rgba(255,255,255,0.05); border-color: var(--primary); }
+        .pay-card.is-active { border-color: var(--primary); background: rgba(99, 102, 241, 0.1); box-shadow: 0 10px 20px rgba(99,102,241,0.1); }
+        .pay-card i { font-size: 1.5rem; display: block; margin-bottom: 8px; }
+        .pay-card b { font-size: 13px; display: block; margin-bottom: 2px; }
+        .pay-card span { font-size: 9px; color: var(--text-dim); }
+
+        /* LUXURY CHECKOUT LIST */
+        .pay-list { display: grid; gap: 12px; margin-bottom: 24px; }
+        .pay-item { 
+            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 20px; 
+            padding: 16px 20px; cursor: pointer; transition: 0.3s;
+        }
+        .pay-item.is-active { border-color: var(--primary); background: rgba(99,102,241,0.05); }
+        .pay-item-head { display: flex; align-items: center; gap: 16px; }
+        .pay-item-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .pay-item.is-active .pay-item-icon { background: var(--primary); color: #fff; }
+        
+        .pay-item-content { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); animation: slideDown 0.3s ease; }
+        .pay-item.is-active .pay-item-content { display: block; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .bank-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+        .bank-opt { 
+            width: 48px; height: 48px; border-radius: 12px; border: 1px solid var(--glass-border); 
+            background: #fff; cursor: pointer; transition: 0.3s; padding: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .bank-opt:hover, .bank-opt.active { border-color: var(--primary); box-shadow: 0 5px 15px rgba(99,102,241,0.2); transform: translateY(-2px); }
+        .bank-opt img { width: 100%; height: 100%; object-fit: contain; }
+        .bank-more { background: rgba(255,255,255,0.05); color: var(--text-main); font-weight: 800; font-size: 18px; border: 1px dashed var(--glass-border); }
+        .bank-more:hover { background: rgba(255,255,255,0.1); border-color: var(--primary); }
+
+        .booking-summary { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 24px; padding: 16px; margin-bottom: 24px; display: flex; gap: 12px; align-items: center; }
+        .summary-img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; }
+
+        .card-mockup { background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 16px; padding: 16px; margin-top: 0; border: 1px solid rgba(255,255,255,0.1); }
+        .qr-mockup { background: #fff; padding: 8px; border-radius: 12px; width: 110px; height: 110px; margin: 0 auto; }
+        .qr-mockup img { width: 100%; height: 100%; }
+
+
+
+        @keyframes icon-line-tip { 0% { width: 0; left: 1px; top: 19px; } 54% { width: 0; left: 1px; top: 19px; } 70% { width: 50px; left: -8px; top: 37px; } 84% { width: 17px; left: 21px; top: 48px; } 100% { width: 25px; left: 14px; top: 46px; } }
+        @keyframes icon-line-long { 0% { width: 0; right: 46px; top: 54px; } 65% { width: 0; right: 46px; top: 54px; } 84% { width: 55px; right: 0; top: 35px; } 100% { width: 47px; right: 8px; top: 38px; } }
+        @keyframes rotateCircle { 0% { transform: rotate(0); } 5% { transform: rotate(0); } 12% { transform: rotate(-405deg); } 100% { transform: rotate(-405deg); } }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <header id="header-container"></header>
+
+    <section class="hero">
+        <div class="hero-bg"><img id="hero-img" src=""></div>
+        <div class="hero-content">
+            <span class="p-badge" id="p-cat">Elite Experience</span>
+            <h1 id="p-title" style="font-family:'Plus Jakarta Sans'; font-size:4.5rem; font-weight:800; margin:0 0 24px; letter-spacing:-3px; line-height:1;">...</h1>
+            <div style="display:flex; gap:40px; color:var(--text-dim); font-weight:700; font-size:1.1rem;">
+                <span>⭐ <b style="color:var(--text-main);" id="p-rate">5.0</b> Ratings</span>
+                <span>📍 <span id="p-addr">...</span></span>
+            </div>
+        </div>
+    </section>
+
+    <div class="content-container">
+        <div class="left-col">
+            <div class="bento-card">
+                <span class="card-label">TRẢI NGHIỆM</span>
+                <h3 class="card-title">Câu chuyện diệu kỳ</h3>
+                <p id="p-desc" style="color:var(--text-dim); font-size:1.25rem; line-height:2.2; margin-bottom:0;"></p>
+            </div>
+
+            <div class="bento-card" id="highlights-sec" style="display:none;">
+                <span class="card-label">DẤU ẤN ĐẶC BIỆT</span>
+                <h3 class="card-title">Tại sao nên chọn?</h3>
+                <div class="highlight-grid" id="highlights-grid"></div>
+            </div>
+
+            <div class="bento-card" id="itinerary-sec" style="display:none;">
+                <span class="card-label">HÀNH TRÌNH CHI TIẾT</span>
+                <h3 class="card-title">Lịch trình tinh tuyển</h3>
+                <div class="timeline" id="itinerary-grid"></div>
+            </div>
+
+            <div class="bento-card">
+                <span class="card-label">ĐẶC QUYỀN WV ELITE</span>
+                <h3 class="card-title">Dịch vụ tối thượng</h3>
+                <div class="highlight-grid">
+                    <div class="h-item">
+                        <span class="h-icon">✨</span>
+                        <b class="h-name">Premium Support</b>
+                        <p class="h-text">Đội ngũ concierge riêng biệt hỗ trợ mọi yêu cầu của bạn 24/7 trong suốt hành trình.</p>
+                    </div>
+                    <div class="h-item">
+                        <span class="h-icon">🛡️</span>
+                        <b class="h-name">Elite Protection</b>
+                        <p class="h-text">Bảo hiểm du lịch cao cấp và hệ thống hỗ trợ khẩn cấp toàn cầu dành riêng cho đối tác Elite.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <aside>
+            <div class="side-sticky">
+                <div class="price-area">
+                    <span class="price-label">GIÁ TRẢI NGHIỆM</span>
+                    <span class="price-display" id="p-price">...</span>
+                </div>
+                
+                <div style="margin: 40px 0;">
+                    <button class="btn-elite" onclick="openPayment()">✨ ĐẶT CHỖ NGAY</button>
+                    <p style="text-align:center; font-size:12px; color:var(--text-dim); margin-top:16px; font-weight:600;">🛡️ Đảm bảo bởi WanderViệt Elite</p>
+                </div>
+
+                <div class="biz-card">
+                    <div class="biz-verified">ĐỐI TÁC TIN CẬY</div>
+                    <img id="biz-logo" class="biz-logo" src="">
+                    <div style="flex:1;">
+                        <b style="font-size:1.1rem; display:block;" id="biz-name">...</b>
+                        <div style="display:flex; flex-direction:column; gap:4px; margin-top:4px;">
+                            <span style="font-size:12px; color:var(--text-dim);">📞 <span id="biz-phone">...</span></span>
+                            <span style="font-size:12px; color:var(--text-dim);">✉️ <span id="biz-email">...</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ELITE PAYMENT MODAL -->
+    <div class="modal-overlay" id="p-modal" onclick="if(event.target==this) closePayment()">
+        <div class="modal-content">
+            <div class="modal-inner">
+                <!-- FORM STATE -->
+                <div id="p-form">
+                    <div class="booking-summary">
+                        <img id="sum-img" class="summary-img">
+                        <div style="flex:1;">
+                            <b style="font-size:14px; display:block;" id="sum-title">...</b>
+                            <span style="font-size:11px; color:var(--text-dim);" id="sum-price">...</span>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+                        <div class="lux-field" style="margin:0;"><label style="font-size:9px;">Số điện thoại</label><input type="tel" id="c-phone" class="lux-input" placeholder="0xxx..." style="padding:12px 16px; font-size:14px;"></div>
+                        <div class="lux-field" style="margin:0;"><label style="font-size:9px;">Ngày dự kiến</label><input type="date" id="c-date" class="lux-input" style="padding:12px 16px; font-size:14px;"></div>
+                    </div>
+                    
+                    <div class="lux-field" style="margin-bottom:20px;">
+                        <label style="font-size:9px;">Họ và tên</label>
+                        <input type="text" id="c-name" class="lux-input" placeholder="Tên của bạn" style="padding:12px 16px; font-size:14px;">
+                    </div>
+
+                    <div class="card-label" style="margin-bottom:12px; font-size:10px;">THANH TOÁN</div>
+                    <div class="pay-list">
+                        <div class="pay-item is-active" id="m-qr" onclick="setM('qr', this)">
+                            <div class="pay-item-head">
+                                <div class="pay-item-icon">📱</div>
+                                <div style="flex:1;"><b style="font-size:14px; display:block;">QR / Chuyển khoản</b><span style="font-size:10px; color:var(--text-dim);">MB, Momo, ZaloPay</span></div>
+                            </div>
+                            <div class="pay-item-content">
+                                <div style="display:flex; align-items:center; gap:20px;">
+                                    <div class="qr-mockup"><img id="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=WANDERVIET-PAY"></div>
+                                    <div style="flex:1;">
+                                        <div style="font-size:10px; font-weight:700; margin-bottom:12px; text-align:center;">CHỌN CỔNG THANH TOÁN</div>
+                                        <div class="bank-grid" id="bank-grid-main">
+                                            <div class="bank-opt active" onclick="setQR('mb', this, event)"><img src="https://api.vietqr.io/img/MB.png"></div>
+                                            <div class="bank-opt" onclick="setQR('momo', this, event)"><img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Transparent.png"></div>
+                                            <div class="bank-opt" onclick="setQR('zalopay', this, event)"><img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay-Square.png"></div>
+                                            <div class="bank-opt bank-more" id="bank-toggle" onclick="toggleBanks(event)" style="font-size:12px;">KHÁC</div>
+                                            
+                                            <!-- Hidden Banks -->
+                                            <div class="bank-opt b-ex" style="display:none;" onclick="setQR('vcb', this, event)"><img src="https://api.vietqr.io/img/VCB.png"></div>
+                                            <div class="bank-opt b-ex" style="display:none;" onclick="setQR('tcb', this, event)"><img src="https://api.vietqr.io/img/TCB.png"></div>
+                                            <div class="bank-opt b-ex" style="display:none;" onclick="setQR('bidv', this, event)"><img src="https://api.vietqr.io/img/BIDV.png"></div>
+                                            <div class="bank-opt b-ex" style="display:none;" onclick="setQR('tpb', this, event)"><img src="https://api.vietqr.io/img/TPB.png"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pay-item" id="m-card" onclick="setM('card', this)">
+                            <div class="pay-item-head">
+                                <div class="pay-item-icon">💳</div>
+                                <div style="flex:1;"><b style="font-size:14px; display:block;">Thẻ Quốc tế</b><span style="font-size:10px; color:var(--text-dim);">Visa, Mastercard, JCB</span></div>
+                            </div>
+                            <div class="pay-item-content">
+                                <div class="card-mockup">
+                                    <div class="lux-field" style="margin-bottom:12px;"><label style="color:#fff; opacity:0.6; font-size:8px;">SỐ THẺ</label><input type="text" class="lux-input" placeholder="**** **** **** ****" style="background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,0.1); border-radius:0; padding:8px 0; color:#fff;"></div>
+                                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                                        <div class="lux-field" style="margin:0;"><label style="color:#fff; opacity:0.6; font-size:8px;">HẾT HẠN</label><input type="text" class="lux-input" placeholder="MM/YY" style="background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,0.1); border-radius:0; padding:8px 0; color:#fff;"></div>
+                                        <div class="lux-field" style="margin:0;"><label style="color:#fff; opacity:0.6; font-size:8px;">CVC</label><input type="text" class="lux-input" placeholder="***" style="background:transparent; border:none; border-bottom:1px solid rgba(255,255,255,0.1); border-radius:0; padding:8px 0; color:#fff;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pay-item" id="pay-counter" onclick="setM('counter', this)">
+                            <div class="pay-item-head">
+                                <div class="pay-item-icon">💵</div>
+                                <div style="flex:1;"><b style="font-size:14px; display:block;" id="counter-label">Tiền mặt tại quầy</b><span style="font-size:10px; color:var(--text-dim);">Thanh toán trực tiếp khi đến</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btn-pay-main" class="btn-elite" style="padding:18px;" onclick="doPay()">XÁC NHẬN & THANH TOÁN</button>
+                </div>
+
+                <!-- STATUS STATE -->
+                <div id="p-status" class="status-screen">
+                    <div id="st-loading">
+                        <div style="width:40px; height:40px; border:3px solid var(--glass-border); border-top-color:var(--primary); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 24px;"></div>
+                        <p style="font-weight:800; letter-spacing:2px; font-size:11px;">ĐANG XÁC THỰC...</p>
+                    </div>
+                    <div id="st-success" style="display:none; width:100%;">
+                        <div class="success-box" id="success-card">
+                            <div class="shimmer-sweep" id="lux-shimmer"></div>
+                            <div class="v-check">
+                                <div class="v-check-glow"></div>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+                                    <circle class="v-check-circle" cx="26" cy="26" r="25"/>
+                                    <path class="v-check-check" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                                </svg>
+                                <div class="confetti-wrap" id="confetti-container"></div>
+                            </div>
+                            <h2 style="font-family:'Plus Jakarta Sans'; font-size:1.6rem; margin:0; font-weight:800; letter-spacing:-1px;">ĐẶT CHỖ HOÀN TẤT</h2>
+                            <p style="color:var(--text-dim); font-size:13px; margin:8px 0 0;">Cảm ơn bạn đã lựa chọn WanderViệt Elite</p>
+                            
+                            <div class="booking-code" id="b-id">#WV-XXXX</div>
+                            
+                            <button class="btn-elite" style="padding:16px;" onclick="window.location.href='history.html'">QUẢN LÝ ĐƠN HÀNG</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="footer-container"></footer>
+    <script src="SharedUI.js?v=43"></script>
+    <script>
+        // SỬA LỖI ĐỒNG BỘ THEME
+        const observer = new MutationObserver(() => {
+            const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+            document.body.setAttribute('data-theme', theme);
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+        const pid = new URLSearchParams(window.location.search).get('id');
+        let currentM = 'qr';
+
+        function openPayment() { 
+            document.getElementById('p-form').style.display = 'block';
+            document.getElementById('p-status').style.display = 'none';
+            document.getElementById('st-loading').style.display = 'none';
+            document.getElementById('st-success').style.display = 'none';
+            document.getElementById('p-modal').classList.add('is-active'); 
+            const d = new Date(); d.setDate(d.getDate() + 1); 
+            document.getElementById('c-date').value = d.toISOString().split('T')[0]; 
+            document.querySelector('.modal-content').scrollTop = 0;
+            const btn = document.getElementById('btn-pay-main');
+            if(btn) { btn.disabled = false; btn.innerText = 'XÁC NHẬN & THANH TOÁN'; }
+        }
+        function closePayment() { 
+            document.getElementById('p-modal').classList.remove('is-active'); 
+        }
+        function setM(t, el) { 
+            currentM = t; 
+            document.querySelectorAll('.pay-item').forEach(i=>i.classList.remove('is-active')); 
+            el.classList.add('is-active'); 
+        }
+        function setQR(bank, el, e) {
+            e.stopPropagation();
+            document.querySelectorAll('.bank-opt').forEach(i=>i.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${bank.toUpperCase()}-WANDERVIET`;
+        }
+        function toggleBanks(e) {
+            e.stopPropagation();
+            const ex = document.querySelectorAll('.b-ex');
+            const tg = document.getElementById('bank-toggle');
+            const isHidden = ex[0].style.display === 'none';
+            ex.forEach(el => el.style.display = isHidden ? 'flex' : 'none');
+            tg.innerText = isHidden ? 'Ít hơn' : 'Khác';
+        }
+
+        async function doPay() {
+            const name = document.getElementById('c-name').value;
+            if(!name) { alert("Vui lòng nhập tên!"); return; }
+            
+            const btn = document.getElementById('btn-pay-main');
+            btn.disabled = true;
+            btn.innerText = 'ĐANG XỬ LÝ...';
+
+            document.getElementById('p-form').style.display = 'none';
+            document.getElementById('p-status').style.display = 'flex';
+            document.getElementById('st-loading').style.display = 'block';
+            document.getElementById('st-success').style.display = 'none';
+            document.querySelector('.modal-content').scrollTop = 0;
+            
+            try {
+                const r = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('wander_token')}` },
+                    body: JSON.stringify({ placeId: pid, customerName: name, customerPhone: document.getElementById('c-phone').value, useDate: document.getElementById('c-date').value, paymentMethod: 'card' })
+                });
+                const j = await r.json();
+                if(j.success) {
+                    setTimeout(() => {
+                        document.getElementById('st-loading').style.display = 'none';
+                        document.getElementById('st-success').style.display = 'block';
+                        document.getElementById('b-id').innerText = '#WV-' + j.data.bookingId.split('-').pop().toUpperCase();
+                        
+                        // Zenith Effects
+                        const chime = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+                        chime.volume = 0.5;
+                        chime.play().catch(e=>console.log('Audio wait'));
+                        
+                        document.getElementById('success-card').classList.add('success-pulse');
+                        setTimeout(() => document.getElementById('lux-shimmer').classList.add('shimmer-active'), 500);
+                        
+                        const container = document.getElementById('confetti-container');
+                        const colors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#ffffff'];
+                        
+                        // Ambient Floating
+                        for(let i=0; i<8; i++) {
+                            const ap = document.createElement('div');
+                            ap.className = 'ambient-p';
+                            ap.style.width = ap.style.height = (2+Math.random()*4) + 'px';
+                            ap.style.left = (Math.random()*100) + '%';
+                            ap.style.bottom = '-10px';
+                            ap.style.animation = `floatingP ${3+Math.random()*5}s linear infinite`;
+                            ap.style.animationDelay = (Math.random()*2) + 's';
+                            document.getElementById('success-card').appendChild(ap);
+                        }
+
+                        for(let i=0; i<32; i++) {
+                            const p = document.createElement('div');
+                            p.className = 'p-confetti';
+                            const angle = Math.random() * Math.PI * 2;
+                            const dist = 60 + Math.random() * 120;
+                            p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+                            p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+                            p.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                            p.style.left = '50%'; p.style.top = '50%';
+                            p.style.animationDelay = (Math.random() * 0.3) + 's';
+                            container.appendChild(p);
+                        }
+                    }, 800);
+                } else { alert(j.message); document.getElementById('p-status').style.display = 'none'; document.getElementById('p-form').style.display = 'block'; }
+            } catch(e) { document.getElementById('p-status').style.display = 'none'; document.getElementById('p-form').style.display = 'block'; }
+        }
+
+        async function load() {
+            if(!pid) return;
+            try {
+                const res = await fetch(`/api/public/place/${pid}`);
+                const json = await res.json();
+                if(!json.success) return;
+                const p = json.data;
+                
+                // Update Base Info
+                document.getElementById('p-title').innerText = p.name;
+                document.getElementById('p-desc').innerText = p.description || 'Trải nghiệm du lịch đẳng cấp được tinh tuyển bởi WanderViệt.';
+                document.getElementById('p-price').innerText = (p.price || p.priceFrom || 0).toLocaleString('vi-VN') + ' ₫';
+                document.getElementById('sum-price').innerText = (p.price || p.priceFrom || 0).toLocaleString('vi-VN') + ' ₫';
+                document.getElementById('sum-title').innerText = p.name;
+                document.getElementById('sum-img').src = p.image;
+                document.getElementById('p-rate').innerText = p.ratingAvg || p.rating || '5.0';
+                document.getElementById('p-addr').innerText = (p.address || 'Việt Nam').split(',').pop().trim();
+                document.getElementById('hero-img').src = p.image;
+                document.getElementById('p-cat').innerText = p.isTour ? 'ELITE TOUR' : 'ELITE EXPERIENCE';
+                
+                // Show "Pay at Counter" if it's a food/drink category
+                const foodCats = ['quán ăn', 'nhà hàng', 'cà phê', 'ẩm thực', 'food', 'restaurant', 'cafe', 'eatery'];
+                const pKind = (p.kind || '').toLowerCase();
+                const pCat = (p.category || '').toLowerCase();
+                // Show "Pay at Counter" for almost everything except multi-day tours
+                if(!p.isTour || (p.duration && !p.duration.includes('ngày'))) {
+                    document.getElementById('pay-counter').style.display = 'block';
+                }
+
+                // Highlights
+                if(p.highlights && p.highlights.length) {
+                    document.getElementById('highlights-sec').style.display = 'block';
+                    document.getElementById('highlights-grid').innerHTML = p.highlights.map(h => `
+                        <div class="h-item">
+                            <span class="h-icon">💠</span>
+                            <b class="h-name">${h}</b>
+                            <p class="h-text">Trải nghiệm vượt bậc được cam kết chất lượng 5 sao từ đối tác chiến lược.</p>
+                        </div>
+                    `).join('');
+                }
+
+                // Itinerary
+                if(p.tourItinerary && p.tourItinerary.length) {
+                    document.getElementById('itinerary-sec').style.display = 'block';
+                    document.getElementById('itinerary-grid').innerHTML = p.tourItinerary.map(t => `
+                        <div class="t-step">
+                            <div class="t-dot"></div>
+                            <span class="t-time">Ngày ${t.day}</span>
+                            <h4 class="t-title">${t.title}</h4>
+                            <p class="t-desc">${t.detail}</p>
+                        </div>
+                    `).join('');
+                }
+
+                // Owner Info
+                if(p.owner) {
+                    document.getElementById('biz-name').innerText = p.owner.displayName || p.owner.name;
+                    document.getElementById('biz-logo').src = p.owner.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.owner.name)}&background=6366f1&color=fff`;
+                    document.getElementById('biz-phone').innerText = p.contactPhone || 'Contact WV Support';
+                    document.getElementById('biz-email').innerText = p.contactEmail || 'elite@wanderviet.vn';
+                }
+
+            } catch(e) { console.error('Load failed:', e); }
+        }
+        window.onload = load;
+    </script>
+    <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+</body>
+</html>

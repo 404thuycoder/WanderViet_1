@@ -1,4 +1,4 @@
-/**
+﻿/**
  * api.js — Global API Client (Axios-based)
  * Loaded BEFORE all other modules in index.html
  *
@@ -35,7 +35,9 @@
         function(config) {
             const token = _getToken();
             if (token) {
-                config.headers.Authorization = 'Bearer ' + token;
+                // Hỗ trợ cả 2 chuẩn header phổ biến
+                config.headers['Authorization'] = 'Bearer ' + token;
+                config.headers['x-auth-token'] = token;
             }
             return config;
         },
@@ -52,8 +54,6 @@
             const msg    = error.response && error.response.data ? error.response.data.message : 'Lỗi kết nối máy chủ';
 
             if (status === 401) {
-                // KHÔNG dùng alert() và KHÔNG redirect tự động
-                // Chỉ log để debug. Từng module tự hiển thị lỗi inline.
                 console.warn('[API 401] ' + msg);
             }
 
@@ -68,5 +68,39 @@
         return !!_getToken();
     };
 
+    // ── Global Fetch-like wrapper for Axios ───────────────────────
+    window.apiFetch = async function(url, options = {}) {
+        const method = (options.method || 'GET').toUpperCase();
+        
+        // Fix: Tránh lặp lại /api nếu baseURL đã có /api
+        let cleanUrl = url;
+        if (cleanUrl.startsWith('/api/')) {
+            cleanUrl = cleanUrl.substring(4); // Cắt bỏ "/api"
+        } else if (cleanUrl.startsWith('api/')) {
+            cleanUrl = cleanUrl.substring(3); // Cắt bỏ "api"
+        }
+
+        const config = {
+            url: cleanUrl,
+            method: method,
+            headers: options.headers || {}
+        };
+
+        if (options.body) {
+            try {
+                config.data = typeof options.body === 'string' ? JSON.parse(options.body) : options.body;
+            } catch(e) {
+                config.data = options.body;
+            }
+        }
+
+        try {
+            return await window.api(config);
+        } catch (err) {
+            return { success: false, message: err.message || 'API Error', status: err.status };
+        }
+    };
+
     console.log('[api.js] ✅ Khởi tạo OK — token hiện tại:', _getToken() ? 'CÓ ✓' : 'KHÔNG');
 })();
+

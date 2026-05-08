@@ -1,4 +1,4 @@
-/**
+﻿/**
  * durationFilter.js
  * Bộ lọc "Thời gian du lịch" (dành riêng cho các dịch vụ loại Tour)
  *
@@ -122,3 +122,4 @@ function initDurationFilter(wrapId = 'duration-filter-wrap') {
   html += `</div>`;
   wrap.innerHTML = html;
 }
+

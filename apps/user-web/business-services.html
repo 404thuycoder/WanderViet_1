@@ -720,9 +720,13 @@
       var reviewCount = p.reviewCount || (p.reviews && p.reviews.length) || 0;
       var ratingVal = parseFloat(p.ratingAvg) || 0;
       var ownerName = p.ownerName || 'Đối tác WanderViệt';
+      var ownerId = p.ownerId || '';
+      var profileUrl = ownerId ? 'business-profile.html?id=' + ownerId : '#';
+      var ownerAvatar = p.ownerAvatar || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(ownerName) + '&background=6366f1&color=fff&size=40');
+      var placeId = p.id || p._id || '';
 
       return `<article class="biz-card">
-        <div class="biz-card__img" style="background-image:url('${imgUrl}')">
+        <div class="biz-card__img" style="background-image:url('${imgUrl}'); cursor:pointer;" onclick="window.location.href='place-detail.html?id=${placeId}'">
           <div class="biz-card__badges">
             <span class="badge badge--partner">PARTNER</span>
             <span class="badge badge--kind">${kindLabel}</span>
@@ -730,8 +734,14 @@
           ${price ? `<div class="biz-card__price-tag">Từ ${price}</div>` : ''}
         </div>
         <div class="biz-card__content">
-          <div class="biz-card__owner">${ownerName}</div>
-          <h3 class="biz-card__title">${p.name}</h3>
+          <a href="${profileUrl}" class="biz-card__owner-row" style="display:flex;align-items:center;gap:8px;text-decoration:none;margin-bottom:8px;padding:6px 8px;border-radius:10px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.15);transition:background 0.2s;" onmouseover="this.style.background='rgba(99,102,241,0.2)'" onmouseout="this.style.background='rgba(99,102,241,0.08)'">
+            <img src="${ownerAvatar}" style="width:28px;height:28px;border-radius:8px;object-fit:cover;flex-shrink:0;" onerror="this.src='https://ui-avatars.com/api/?name=WV&background=6366f1&color=fff&size=40'"/>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:0.72rem;color:#818cf8;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">🏢 ${ownerName}</div>
+              <div style="font-size:0.65rem;color:#64748b;">Xem trang doanh nghiệp →</div>
+            </div>
+          </a>
+          <h3 class="biz-card__title" style="cursor:pointer;" onclick="window.location.href='place-detail.html?id=${placeId}'">${p.name}</h3>
           ${p.region || p.address ? `<div class="biz-card__location">${p.region || p.address}</div>` : ''}
           <div class="biz-card__rating">
             <span class="stars">${stars(ratingVal)}</span>
@@ -740,8 +750,8 @@
             <span class="fav-cnt">❤️ ${p.favoritesCount || 0}</span>
           </div>
           <div class="biz-card__actions">
-            <button class="btn-biz btn-biz--primary" onclick="openBookingModal('${p.id}')">🚀 Chi tiết &amp; Đặt lịch</button>
-            <button class="btn-biz btn-biz--outline" onclick="openChatWithBusiness('${p.ownerId}','${p.name.replace(/'/g,'')}')" title="Nhắn tin đối tác">💬</button>
+            <button class="btn-biz btn-biz--primary" onclick="openBookingModal('${placeId}')">📅 Đặt lịch ngay</button>
+            <button class="btn-biz btn-biz--outline" onclick="openChatWithBusiness('${ownerId}','${ownerName.replace(/'/g,'')}')" title="Nhắn tin đối tác">💬</button>
           </div>
         </div>
       </article>`;

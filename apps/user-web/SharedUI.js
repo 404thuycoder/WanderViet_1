@@ -105,6 +105,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   function forceLogout() {
     localStorage.removeItem('wander_token');
     localStorage.removeItem('wander_session');
+    localStorage.removeItem('wander_user'); // Fix stale user data
     sessionStorage.clear();
     window.location.href = '/?login=true';
   }
@@ -391,39 +392,62 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
   let syncInProgress = false;
   let lastSyncTime = 0;
-  const SYNC_THROTTLE = 5000; // 5 seconds
+  const SYNC_THROTTLE = 500; // 0.5 seconds - giảm để cập nhật nhanh hơn khi chuyển trang
 
   async function syncAuthUI() {
-    if (syncInProgress) return;
+    console.log("🔍 syncAuthUI called");
+    if (syncInProgress) {
+      console.log("⏳ syncAuthUI: already in progress, skipping (throttled)");
+      return;
+    }
     const now = Date.now();
-    if (now - lastSyncTime < SYNC_THROTTLE) return;
+    if (now - lastSyncTime < SYNC_THROTTLE) {
+      console.log("⏳ syncAuthUI: throttled, skipping");
+      return;
+    }
 
     syncInProgress = true;
     lastSyncTime = now;
 
     const token = localStorage.getItem('wander_token');
+    console.log("🔑 Token exists:", !!token);
+    
     const authBtns = document.querySelectorAll("[data-auth-open]");
     const profileTrays = document.querySelectorAll("[data-auth-show]");
+    console.log("🔘 Login buttons found:", authBtns.length);
+    console.log("👤 Profile trays found:", profileTrays.length);
+    
     const userNameEl = document.querySelector("[data-user-name]");
     const userAvatarImg = document.querySelector("[data-user-avatar]");
     const userInitial = document.querySelector("[data-user-initial]");
     const headerRankEl = document.getElementById('header-user-rank');
 
     if (!token) {
+      console.log("❌ No token - showing login button");
       authBtns.forEach(el => el.style.display = "flex");
       profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
       if (headerRankEl) headerRankEl.style.display = "none";
+      syncInProgress = false;
       return;
     }
 
     try {
       const parts = token.split('.');
-      if (parts.length !== 3) return;
+      if (parts.length !== 3) {
+        // Token không hợp lệ, xử lý như chưa đăng nhập
+        console.log("❌ Token invalid format (not 3 parts)");
+        authBtns.forEach(el => el.style.display = "flex");
+        profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
+        if (headerRankEl) headerRankEl.style.display = "none";
+        syncInProgress = false;
+        return;
+      }
       const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
       const padding = '='.repeat((4 - base64.length % 4) % 4);
       const payload = JSON.parse(decodeURIComponent(escape(atob(base64 + padding))));
       const u = payload.user || payload.account || payload;
 
+      console.log("✅ Token valid - hiding login, showing profile");
       authBtns.forEach(el => el.style.display = "none");
       profileTrays.forEach(el => { el.style.display = "flex"; el.removeAttribute('hidden'); });
 
@@ -439,6 +463,15 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       const ddBody = document.querySelector('.user-dropdown__body');
       if (ddBody) {
         ddBody.innerHTML = `
+          <a href="profile.html" class="user-dropdown-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Trang cá nhân
+          </a>
+          <a href="my-trips.html" class="user-dropdown-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            Chuyến đi của tôi
+          </a>
+          <div style="border-top:1px solid rgba(255,255,255,0.05); margin:0.5rem 0;"></div>
           <button type="button" class="user-dropdown-item" data-open-settings>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             Cài đặt hệ thống
@@ -454,7 +487,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       try {
         const r = await fetch('/api/auth/user/rank?t=' + Date.now(), { headers: { 'x-auth-token': token } });
         if (r.status === 401) {
+          console.log("❌ Token expired (401)");
           localStorage.removeItem('wander_token');
+          authBtns.forEach(el => el.style.display = "flex");
+          profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
+          if (headerRankEl) headerRankEl.style.display = "none";
+          syncInProgress = false;
           return;
         }
         const data = await r.json();
@@ -487,6 +525,10 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     } catch (e) {
       console.error("Auth sync error", e);
+      // Khi có lỗi parsing token, coi như chưa đăng nhập
+      authBtns.forEach(el => el.style.display = "flex");
+      profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
+      if (headerRankEl) headerRankEl.style.display = "none";
     } finally {
       syncInProgress = false;
     }
@@ -588,7 +630,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                    </div>
                 </div>
              </div>
-             <button class="btn btn--primary login-btn" data-auth-open onclick="location.href='index.html#auth'">Đăng nhập</button>
+             <button class="btn btn--primary login-btn" data-auth-open onclick="location.href='index.html#auth'" style="display: none;">Đăng nhập</button>
           </div>
         </div>
       </div>
@@ -2684,7 +2726,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     }
 
     // 7. Close Dropdown on outside click
-    const bubble = document.querySelector('[data-user-bubble]');
+    const bubble = document.querySelector('[data-user-toggle]');
     if (bubble && !bubble.contains(e.target)) {
       toggleUserMenu(false);
     }
@@ -2838,9 +2880,13 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
   // --- Init ---
   const initAll = () => {
-    if (window.WanderUI_Initialized) return;
+    if (window.WanderUI_Initialized) {
+      console.log("⚠️ WanderUI already initialized, skipping");
+      return;
+    }
     window.WanderUI_Initialized = true;
     console.log("🚀 WanderUI Initializing components...");
+    console.log("📄 Current page:", window.location.pathname);
     injectHeader();
     injectCommonComponents();
     initNavigation();
@@ -2855,6 +2901,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     window.addEventListener('hashchange', handleHashModal);
     handleHashModal();
     syncAuthUI();
+    // Force sync again after short delay to ensure DOM is fully rendered
+    setTimeout(() => { console.log("🔄 Force syncAuthUI (100ms)"); syncAuthUI(); }, 100);
+    setTimeout(() => { console.log("🔄 Force syncAuthUI (500ms)"); syncAuthUI(); }, 500);
     initTheme();
     initGlobalChatbot();
     initSettingsHandlers();
@@ -2862,6 +2911,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     setupHoverPrefetch();
     injectGlobalStyles();
     setupLazyLoading();
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'wander_token' || e.key === 'wander_session') {
+        lastSyncTime = 0; // Bypass throttle
+        syncAuthUI();
+      }
+    });
   };
 
   function injectPerformanceHints() {
@@ -3042,6 +3097,18 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   }
 
   injectGlobalStyles(); // Pre-inject
+
+  // Debug: Check token immediately on load
+  const _debugToken = localStorage.getItem('wander_token');
+  console.log("🔐 [SharedUI.js loaded] wander_token exists:", !!_debugToken);
+  if (_debugToken) {
+    try {
+      const parts = _debugToken.split('.');
+      console.log("🔐 [SharedUI.js loaded] token parts:", parts.length);
+    } catch(e) {
+      console.log("🔐 [SharedUI.js loaded] token invalid");
+    }
+  }
 
   return { setTheme, toggleTheme, showToast, setButtonLoading, toggleNotificationDrawer, updateNotificationBadge, markAsRead, markAllAsRead, syncAuthUI, forceLogout, toggleUserMenu, openAuthModal, confirm, openPlaceDetail, getRankBadgeHTML, getRankIcon, getStoreKey, initSettingsHandlers, trackQuestActivity, getQuestActivity, startTopLoader, finishTopLoader };
 })());

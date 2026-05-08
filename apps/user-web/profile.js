@@ -106,9 +106,9 @@ const UserProfile = {
         const avatarImg = document.getElementById('user-avatar-big');
         if (this.user.avatar) {
             avatarImg.src = this.user.avatar;
-            avatarImg.onerror = () => avatarImg.src = 'assets/default-avatar.svg';
+            avatarImg.onerror = () => avatarImg.src = '/assets/default-avatar.svg';
         } else {
-            avatarImg.src = 'assets/default-avatar.svg';
+            avatarImg.src = '/assets/default-avatar.svg';
         }
 
         // Cover
@@ -173,9 +173,9 @@ const UserProfile = {
                 const avatarImg = document.getElementById('user-avatar-big');
                 if (u.avatar) {
                     avatarImg.src = u.avatar;
-                    avatarImg.onerror = () => avatarImg.src = 'assets/default-avatar.svg';
+                    avatarImg.onerror = () => avatarImg.src = '/assets/default-avatar.svg';
                 } else {
-                    avatarImg.src = 'assets/default-avatar.svg';
+                    avatarImg.src = '/assets/default-avatar.svg';
                 }
 
                 const coverEl = document.getElementById('profile-cover-bg');
@@ -435,7 +435,7 @@ const UserProfile = {
         
         // Populate Previews
         const avatarPrev = document.getElementById('modal-avatar-preview');
-        if (avatarPrev) avatarPrev.src = this.user.avatar || 'assets/default-avatar.svg';
+        if (avatarPrev) avatarPrev.src = this.user.avatar || '/assets/default-avatar.svg';
         
         const coverPrev = document.getElementById('modal-cover-preview');
         if (coverPrev) {
@@ -707,7 +707,7 @@ const UserProfile = {
             html += `
                 <div class="fb-card composer-card" style="padding:12px 16px;">
                     <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
-                        <img src="${this.user.avatar || 'assets/default-avatar.svg'}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                        <img src="${this.user.avatar || '/assets/default-avatar.svg'}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
                         <div style="flex:1;background:#3a3b3c;border-radius:20px;padding:8px 16px;color:#b0b3b8;cursor:pointer;" onclick="window.location.href='social-hub.html'">
                             Bạn đang nghĩ gì?
                         </div>
@@ -737,13 +737,13 @@ const UserProfile = {
                 content.innerHTML = html + data.data.map(post => {
                     const myId = this.user?._id || this.user?.id;
                     const displayAvatar = (this.isOwnProfile && (post.userId === myId || post.userId === this.user?.customId))
-                        ? (this.user?.avatar || 'assets/default-avatar.svg')
-                        : (post.userAvatar || 'assets/default-avatar.svg');
+                        ? (this.user?.avatar || '/assets/default-avatar.svg')
+                        : (post.userAvatar || '/assets/default-avatar.svg');
 
                     return `
                         <div class="post-card">
                             <div class="post-header">
-                                <img src="${displayAvatar}" class="avatar-sm" alt="" onerror="this.src='assets/default-avatar.svg'">
+                                <img src="${displayAvatar}" class="avatar-sm" alt="" onerror="this.src='/assets/default-avatar.svg'">
                                 <div style="flex:1;">
                                     <h4 style="margin:0; font-size:1.1rem; color:var(--text);">${post.userName}</h4>
                                     <span style="font-size:0.85rem; color:var(--text-muted)">${this.formatTime(post.createdAt)}</span>
@@ -834,7 +834,7 @@ const UserProfile = {
             if (data.success && data.data.length > 0) {
                 content.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;">${data.data.map(f => `
                     <div class="premium-card" style="padding:28px;text-align:center;cursor:pointer; transition:transform 0.3s;" onmouseover="this.style.transform='translateY(-8px)'" onmouseout="this.style.transform='none'" onclick="window.location.href='profile.html?id=${f._id}'">
-                        <img src="${f.avatar || 'assets/default-avatar.svg'}" style="width:80px;height:80px;border-radius:24px;object-fit:cover;margin:0 auto 16px;display:block;box-shadow:var(--shadow-md);" onerror="this.src='assets/default-avatar.svg'">
+                        <img src="${f.avatar || '/assets/default-avatar.svg'}" style="width:80px;height:80px;border-radius:24px;object-fit:cover;margin:0 auto 16px;display:block;box-shadow:var(--shadow-md);" onerror="this.src='/assets/default-avatar.svg'">
                         <strong style="font-size:1.1rem; color:var(--text);">${f.displayName || f.name}</strong>
                         <p style="font-size:0.85rem;color:var(--text-muted);margin:8px 0 0; font-weight:600;">Hạng ${f.rank || 'Đồng'} · ${f.points || 0} XP</p>
                     </div>

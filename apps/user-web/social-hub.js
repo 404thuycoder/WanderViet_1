@@ -20,6 +20,15 @@ const SocialHub = {
 
     init: function () {
         console.log("📖 Social Hub v3 Initializing...");
+        
+        // Clear all prefetch cache for social APIs to ensure fresh data
+        Object.keys(sessionStorage).forEach(key => {
+            if (key.startsWith('wv_prefetch_/api/social/')) {
+                sessionStorage.removeItem(key);
+                console.log('[Cache] Cleared:', key);
+            }
+        });
+        
         const token = localStorage.getItem('wander_token');
         if (!token) {
             this.showGuestLanding();
@@ -295,7 +304,16 @@ const SocialHub = {
         const rankEl = document.getElementById('mini-rank');
         if (nameEl) nameEl.textContent = this.user.displayName || this.user.name;
         if (rankEl) rankEl.textContent = `Hạng ${this.user.rank || 'Đồng'} ${this.user.rankTier || 'I'}`;
-        if (this.user.avatar) document.querySelectorAll('#mini-avatar, #post-avatar').forEach(img => img.src = this.user.avatar);
+        
+        // Sync avatars across all profile elements with robust fallback
+        const avatarUrl = this.user.avatar || '/assets/default-avatar.svg';
+        document.querySelectorAll('#mini-avatar, #post-avatar, #modal-post-avatar').forEach(img => {
+            img.src = avatarUrl;
+            img.onerror = function() {
+                this.onerror = null; // Prevent infinite loop
+                this.src = '/assets/default-avatar.svg';
+            };
+        });
     },
 
     loadUserStats: async function () {
@@ -340,9 +358,9 @@ const SocialHub = {
         // Card Tạo tin
         let storiesHtml = `
             <div class="reel-card create-story" onclick="SocialHub.openCreateStoryModal()">
-                <div class="reel-thumb" style="background-image: url('${this.user?.avatar || 'assets/default-avatar.svg'}')"></div>
+                <div class="reel-thumb" style="background-image: url('${this.user?.avatar || '/assets/default-avatar.svg'}')"></div>
                 <div class="reel-create-overlay"><div class="reel-add-btn"><i class="fas fa-plus"></i></div></div>
-                <div class="reel-user-info"><img src="${this.user?.avatar || 'assets/default-avatar.svg'}" class="reel-avatar"><span>Tạo tin</span></div>
+                <div class="reel-user-info"><img src="${this.user?.avatar || '/assets/default-avatar.svg'}" class="reel-avatar"><span>Tạo tin</span></div>
             </div>
         `;
 
@@ -371,11 +389,11 @@ const SocialHub = {
             const isViewed = !group.hasUnviewed;
             const isVideo = latest.media?.[0]?.type === 'video';
             // Ưu tiên media thumbnail, fallback avatar
-            const thumb = latest.media?.[0]?.url || group.user?.avatar || 'assets/default-avatar.svg';
+            const thumb = latest.media?.[0]?.url || group.user?.avatar || '/assets/default-avatar.svg';
             const musicBadge = latest.music ? `<div class="reel-music-badge"><i class="fas fa-music"></i> ${latest.music.name}</div>` : '';
             const ringClass = isViewed ? '' : 'reel-unviewed';
             const displayName = group.user?.displayName || group.user?.name || 'Người dùng';
-            const avatar = group.user?.avatar || 'assets/default-avatar.svg';
+            const avatar = group.user?.avatar || '/assets/default-avatar.svg';
             storiesHtml += `
                 <div class="reel-card ${ringClass}" onclick="SocialHub.openStoryViewer('${group.uid}')">
                     <div class="reel-thumb" style="background-image: url('${thumb}')">
@@ -427,7 +445,7 @@ const SocialHub = {
                 </div>
                 <div class="story-header">
                     <div class="story-user-info">
-                        <img src="${userStories[0].user?.avatar || 'assets/default-avatar.svg'}" class="story-user-avatar">
+                        <img src="${userStories[0].user?.avatar || '/assets/default-avatar.svg'}" class="story-user-avatar">
                         <div class="story-user-text">
                             <div class="story-user-text-top">
                                 <span class="story-user-name">${userStories[0].user?.displayName || userStories[0].user?.name}</span>
@@ -648,7 +666,7 @@ const SocialHub = {
             mediaHtml = `<img src="${media.url}" class="story-media" style="${mediaStyle}" alt="story">`;
         } else {
             // Fallback: avatar người dùng
-            const av = story.user?.avatar || story.userId?.avatar || 'assets/default-avatar.svg';
+            const av = story.user?.avatar || story.userId?.avatar || '/assets/default-avatar.svg';
             mediaHtml = `<img src="${av}" class="story-media" style="${mediaStyle}" alt="story">`;
         }
 
@@ -772,7 +790,7 @@ const SocialHub = {
         const nameEl = document.querySelector('.story-user-name');
         if (nameEl) nameEl.textContent = storyUser.displayName || storyUser.name || 'Người dùng';
         const avatarEl = document.querySelector('.story-user-avatar');
-        if (avatarEl) avatarEl.src = storyUser.avatar || 'assets/default-avatar.svg';
+        if (avatarEl) avatarEl.src = storyUser.avatar || '/assets/default-avatar.svg';
     },
 
     toggleLikeStory: function (storyId) {
@@ -1546,9 +1564,17 @@ const SocialHub = {
         const feedContainer = document.getElementById('feed-container');
         if (!feedContainer) return;
         feedContainer.innerHTML = '<div class="loading-shimmer" style="padding:40px;text-align:center">Đang tải bảng tin...</div>';
+        
+        // Clear prefetch cache to ensure fresh data
+        sessionStorage.removeItem('wv_prefetch_/api/social/feed');
+        
         try {
             const res = await fetch('/api/social/feed', { headers: { 'x-auth-token': localStorage.getItem('wander_token') } });
             const data = await res.json();
+            console.log('[Feed] Posts loaded:', data.data?.length);
+            if (data.data?.length > 0) {
+                console.log('[Feed] First post media:', JSON.stringify(data.data[0].media));
+            }
             if (data.success) {
                 this.posts = data.data;
                 this.renderFeed();
@@ -1578,6 +1604,7 @@ const SocialHub = {
     },
 
     renderPostCard: function (post) {
+        console.log('[PostCard] Rendering post:', post._id, 'Media:', JSON.stringify(post.media));
         // Xử lý reactions (6 loại: like, love, wow, haha, sad, angry)
         const reactions = post.reactions || {};
         const userReaction = reactions[this.user?._id] || null;
@@ -1604,7 +1631,7 @@ const SocialHub = {
             <div class="glass-card post-card" data-post-id="${post._id}">
                 <div class="post-header">
                     <div class="post-user" onclick="SocialHub.viewProfile('${postAuthorId}')">
-                        <img src="${post.userAvatar || 'assets/default-avatar.svg'}" alt="" class="avatar-sm" onerror="if(!this.dataset.errorHandled){this.dataset.errorHandled='true';this.src='assets/default-avatar.svg'}">
+                        <img src="${post.userAvatar || '/assets/default-avatar.svg'}" alt="" class="avatar-sm" onerror="this.onerror=null; this.src='/assets/default-avatar.svg';">
                         <div>
                             <h4>${post.userName}</h4>
                             <span class="post-time">${this.formatTime(post.createdAt)}${post.location?.name ? ' · 📍' + post.location.name : ''}</span>
@@ -1631,15 +1658,15 @@ const SocialHub = {
                 ${post.media && post.media.length > 0 ? `
                     <div class="post-media ${post.mediaLayout ? 'media-layout-' + post.mediaLayout : (post.media.length > 1 ? 'media-grid' : '')}">
                         ${post.media.map((m, i) => {
-                            if (m.type === 'image') return `<img src="${m.url}" alt="Ảnh bài viết" onclick="SocialHub.viewImage('${m.url}')" onerror="this.onerror=null; this.src='assets/placeholder-image.svg';">`;
+                            console.log(`[Media] Type: ${m.type}, URL: ${m.url}`);
+                            if (m.type === 'image') return `<img src="${m.url}" alt="Ảnh bài viết" onclick="SocialHub.viewImage('${m.url}')" onerror="this.onerror=null; this.src='/assets/placeholder-image.svg';">`;
                             if (m.type === 'video') return `
                                 <video 
                                     src="${m.url}" 
                                     controls 
                                     playsinline 
                                     webkit-playsinline 
-                                    preload="metadata" 
-                                    poster="assets/video-placeholder.jpg" 
+                                    preload="auto" 
                                     style="width: 100%; max-height: 500px; background: #000; border-radius: 8px;"
                                     onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=\'media-error\' style=\'padding: 2rem; background: rgba(0,0,0,0.05); border-radius: 8px; text-align: center;\'><i class=\'fas fa-video-slash\' style=\'display:block; font-size: 2rem; margin-bottom: 0.5rem; color: var(--text-muted);\'></i>Không thể tải video</div>')"
                                 ></video>`;
@@ -1706,7 +1733,7 @@ const SocialHub = {
                     </div>
                     ${(post.comments || []).length > 3 ? `<button class="show-all-comments" onclick="SocialHub.showAllComments('${post._id}')">Xem tất cả ${post.comments.length} bình luận</button>` : ''}
                     <div class="comment-input-wrap">
-                        <img src="${this.user?.avatar || 'assets/default-avatar.svg'}" class="comment-avatar" alt="" onerror="this.src='assets/default-avatar.svg'">
+                        <img src="${this.user?.avatar || '/assets/default-avatar.svg'}" class="comment-avatar" alt="" onerror="this.src='/assets/default-avatar.svg'">
                         <div class="comment-input-box">
                             <input type="text" placeholder="Viết bình luận..." id="comment-input-${post._id}" 
                                    onkeydown="if(event.key==='Enter')SocialHub.addComment('${post._id}')">
@@ -1830,7 +1857,7 @@ const SocialHub = {
                 <div class="reactions-list">
                     ${users.map(u => `
                         <div class="reaction-user-item">
-                            <img src="assets/default-avatar.svg" class="avatar-sm">
+                            <img src="/assets/default-avatar.svg" class="avatar-sm">
                             <span>Người dùng</span>
                             <span class="user-reaction">${this.getReactionEmoji(u.reaction)}</span>
                         </div>
@@ -1845,8 +1872,8 @@ const SocialHub = {
         const isAuthor = (comment.userId?._id || comment.userId) === postAuthorId;
         return `
             <div class="comment-item" data-comment-id="${comment._id}">
-                <img src="${comment.userAvatar || 'assets/default-avatar.svg'}" class="comment-avatar" 
-                     onerror="if(!this.dataset.errorHandled){this.dataset.errorHandled='true';this.src='assets/default-avatar.svg'}">
+                <img src="${comment.userAvatar || '/assets/default-avatar.svg'}" class="comment-avatar" 
+                     onerror="if(!this.dataset.errorHandled){this.dataset.errorHandled='true';this.src='/assets/default-avatar.svg'}">
                 <div class="comment-content">
                     <div class="comment-bubble">
                         <div class="comment-user-info">
@@ -2120,7 +2147,7 @@ const SocialHub = {
             const nameEl = document.getElementById('modal-post-name');
             const avatarEl = document.getElementById('modal-post-avatar');
             if (nameEl && this.user) nameEl.textContent = this.user.displayName || this.user.name || 'Người dùng';
-            if (avatarEl && this.user) avatarEl.src = this.user.avatar || 'assets/default-avatar.svg';
+            if (avatarEl && this.user) avatarEl.src = this.user.avatar || '/assets/default-avatar.svg';
             
             m.removeAttribute('hidden');
             document.getElementById('post-content')?.focus();
@@ -2865,7 +2892,7 @@ const SocialHub = {
         if (list) {
             list.innerHTML = post.comments.map(c => `
                 <div class="comment-item">
-                    <img src="${c.userAvatar || 'assets/default-avatar.svg'}" class="comment-avatar" alt="" onerror="if(!this.dataset.errorHandled){this.dataset.errorHandled='true';this.src='assets/default-avatar.svg'}">
+                    <img src="${c.userAvatar || '/assets/default-avatar.svg'}" class="comment-avatar" alt="" onerror="if(!this.dataset.errorHandled){this.dataset.errorHandled='true';this.src='/assets/default-avatar.svg'}">
                     <div class="comment-body"><strong>${c.userName}</strong> ${c.text}</div>
                 </div>
             `).join('');
@@ -3059,7 +3086,7 @@ const SocialHub = {
             if (data.success && data.data.length > 0) {
                 container.innerHTML = data.data.map(f => `
                     <div class="friend-request-card">
-                        <img src="${f.requester?.avatar || 'assets/default-avatar.svg'}" class="avatar-sm" onerror="if(!this.dataset.errorHandled){this.dataset.errorHandled='true';this.src='assets/default-avatar.svg'}" onclick="SocialHub.viewProfile('${f.requester?._id || f.requester?.id}')" style="cursor:pointer">
+                        <img src="${f.requester?.avatar || '/assets/default-avatar.svg'}" class="avatar-sm" onerror="if(!this.dataset.errorHandled){this.dataset.errorHandled='true';this.src='/assets/default-avatar.svg'}" onclick="SocialHub.viewProfile('${f.requester?._id || f.requester?.id}')" style="cursor:pointer">
                         <div class="friend-info">
                             <strong>${f.requester?.displayName || f.requester?.name || 'Người dùng'}</strong>
                             <span>Hạng ${f.requester?.rank || 'Đồng'}</span>
@@ -3094,7 +3121,7 @@ const SocialHub = {
             if (data.success && data.data.length > 0) {
                 container.innerHTML = data.data.map(f => `
                     <div class="friend-item" onclick="SocialHub.viewProfile('${f._id || f.id}')">
-                        <img src="${f.avatar || 'assets/default-avatar.svg'}" class="avatar-sm" alt="" onerror="if(!this.dataset.errorHandled){this.dataset.errorHandled='true';this.src='assets/default-avatar.svg'}">
+                        <img src="${f.avatar || '/assets/default-avatar.svg'}" class="avatar-sm" alt="" onerror="if(!this.dataset.errorHandled){this.dataset.errorHandled='true';this.src='/assets/default-avatar.svg'}">
                         <div class="friend-info">
                             <strong>${f.displayName || f.name}</strong>
                             <span>Hạng ${f.rank || 'Đồng'}</span>
@@ -3118,7 +3145,7 @@ const SocialHub = {
             if (data.success && data.data.length > 0) {
                 container.innerHTML = data.data.map(c => `
                     <div class="convo-item" onclick="SocialHub.openChat('${c.otherUser?._id || c.otherUser?.id || ''}', '${(c.otherUser?.displayName || c.otherUser?.name || '').replace(/'/g, '')}', '${c.otherUser?.avatar || ''}')">
-                        <img src="${c.otherUser?.avatar || 'assets/default-avatar.svg'}" class="avatar-sm" alt="" onerror="this.src='assets/default-avatar.svg'">
+                        <img src="${c.otherUser?.avatar || '/assets/default-avatar.svg'}" class="avatar-sm" alt="" onerror="this.src='/assets/default-avatar.svg'">
                         <div class="convo-info">
                             <strong>${c.otherUser?.displayName || c.otherUser?.name || 'Người dùng'}</strong>
                             <p>${c.lastMessage?.substring(0, 40) || ''}${c.lastMessage?.length > 40 ? '...' : ''}</p>
@@ -3138,7 +3165,7 @@ const SocialHub = {
         if (!drawer) return;
         drawer.classList.add('open');
         document.getElementById('chat-target-name').textContent = name;
-        document.getElementById('chat-target-avatar').src = avatar || 'assets/default-avatar.svg';
+        document.getElementById('chat-target-avatar').src = avatar || '/assets/default-avatar.svg';
         const body = document.getElementById('chat-messages');
         body.innerHTML = '<div class="chat-loading"><span class="loading-spinner"></span> Đang tải...</div>';
         try {
@@ -3235,7 +3262,7 @@ const SocialHub = {
             if (data.success && data.data.length > 0) {
                 container.innerHTML = data.data.map(u => `
                     <div class="friend-request-card">
-                        <img src="${u.avatar || 'assets/default-avatar.svg'}" class="avatar-sm" onerror="if(!this.dataset.errorHandled){this.dataset.errorHandled='true';this.src='assets/default-avatar.svg'}" onclick="SocialHub.viewProfile('${u._id}')" style="cursor:pointer">
+                        <img src="${u.avatar || '/assets/default-avatar.svg'}" class="avatar-sm" onerror="if(!this.dataset.errorHandled){this.dataset.errorHandled='true';this.src='/assets/default-avatar.svg'}" onclick="SocialHub.viewProfile('${u._id}')" style="cursor:pointer">
                         <div class="friend-info">
                             <strong>${u.displayName || u.name}</strong>
                             <span>Hạng ${u.rank || 'Đồng'} · ${u.points || 0} XP</span>
@@ -3373,7 +3400,7 @@ const SocialHub = {
                 items.forEach(item => {
                     html += `
                         <div class="search-result-item" onclick="SocialHub.handleSearchResultClick('${item.type}', '${item.id}')">
-                            <img src="${item.avatar || 'assets/default-avatar.svg'}" alt="" onerror="this.src='assets/default-avatar.svg'">
+                            <img src="${item.avatar || '/assets/default-avatar.svg'}" alt="" onerror="this.src='/assets/default-avatar.svg'">
                             <div class="result-info">
                                 <b>${item.title}</b>
                                 <span>${item.subtitle}</span>
@@ -3472,7 +3499,7 @@ const SocialHub = {
                             ${items.map(item => `
                                 <div class="full-result-card" onclick="SocialHub.handleSearchResultClick('${item.type}', '${item.id}')">
                                     <div class="res-avatar-wrap">
-                                        <img src="${item.avatar || 'assets/default-avatar.svg'}" alt="" onerror="this.src='assets/default-avatar.svg'">
+                                        <img src="${item.avatar || '/assets/default-avatar.svg'}" alt="" onerror="this.src='/assets/default-avatar.svg'">
                                         ${item.type === 'user' ? '<div class="online-indicator"></div>' : ''}
                                     </div>
                                     <div class="res-content">

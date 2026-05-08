@@ -7,6 +7,8 @@
 
     <!-- 1. Tải CSS của thư viện Bản đồ Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=1776819067181" crossorigin=""/>
+    <link rel="stylesheet" href="global-tokens.css?v=1776819067181" />
+    <link rel="stylesheet" href="styles.css?v=1776819067181" />
 
     <!-- CSS (Giao diện đơn giản) -->
     <style>
@@ -38,9 +40,10 @@
         #map { width: 100%; height: 500px; border-radius: 8px; border: 2px solid #cbd5e1; }
     </style>
 </head>
-<body>
+<body style="padding-top: 70px;">
+<header class="site-header" id="header-container" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;"></header>
 
-<div class="container">
+<div class="container" style="margin-top: 10px;">
     <h2>🗺️ Ứng dụng Chỉ đường Đơn giản</h2>
 
     <!-- Bảng điều khiển -->
@@ -243,5 +246,6 @@
         return null; // Không tìm ra
     }
 </script>
+<script src="SharedUI.js?v=1777335000501"></script>
 </body>
 </html>

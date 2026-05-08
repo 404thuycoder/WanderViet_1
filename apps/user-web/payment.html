@@ -42,7 +42,8 @@
     .btn-cancel:hover { color: #fff; }
   </style>
 </head>
-<body>
+<body style="padding-top: 70px;">
+  <header class="site-header" id="header-container" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;"></header>
   <div class="gateway-bg"></div>
   <div class="payment-card">
     <div class="wv-brand">◈ Wander<span>Pay</span></div>
@@ -80,7 +81,7 @@
     <button class="btn-action btn-cancel" id="btn-cancel" onclick="window.history.back()">Quay lại / Hủy</button>
   </div>
 
-  <script src="SharedUI.js?v=4"></script>
+  <script src="SharedUI.js?v=1777335000501"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const urlParams = new URLSearchParams(window.location.search);

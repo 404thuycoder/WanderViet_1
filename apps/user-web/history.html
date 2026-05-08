@@ -191,7 +191,7 @@
     </div>
   </div>
 
-  <script src="SharedUI.js?v=1777335000010"></script>
+  <script src="SharedUI.js?v=1777335000501"></script>
   <script src="places-data.js"></script>
   <script>
     (function() {
@@ -383,7 +383,7 @@
 
                 <div class="dest-card-actions" style="margin-top:1rem; gap:10px;">
                   <button class="btn btn--primary btn--small btn-place-detail" data-place-id="${b.placeId}">Xem lại địa điểm</button>
-                  ${b.status === 'pending' ? \`<button class="btn btn--ghost btn--small" style="color:#f43f5e; border-color:rgba(244,63,94,0.2);" onclick="window.cancelBooking('\${b._id}')">Hủy yêu cầu</button>\` : ''}
+                  ${b.status === 'pending' ? `<button class="btn btn--ghost btn--small" style="color:#f43f5e; border-color:rgba(244,63,94,0.2);" onclick="window.cancelBooking('${b._id}')">Hủy yêu cầu</button>` : ''}
                 </div>
               </div>
             </div>

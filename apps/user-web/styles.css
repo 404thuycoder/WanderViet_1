@@ -104,7 +104,7 @@ a:hover {
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 1000;
+  z-index: 20000;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
 }
 
@@ -159,7 +159,7 @@ textarea:focus-visible {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 20000;
   height: var(--header-h);
   background: var(--header-bg);
   backdrop-filter: blur(24px) saturate(200%);

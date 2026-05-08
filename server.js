@@ -71,14 +71,17 @@ app.use('/api/payments', require('./routes/payments'));
 
 
 // Static User Web
+app.use('/assets', express.static(path.join(__dirname, 'apps/user-web/assets')));
 app.use(express.static(path.join(__dirname, 'apps/user-web')));
 
 // Catch-all: If not found, check if it's an API or static file request
 app.use((req, res) => {
     const isApi = req.path.startsWith('/api/');
-    const isStatic = req.path.startsWith('/uploads/') || req.path.startsWith('/assets/') || path.extname(req.path);
+    const isUpload = req.path.startsWith('/uploads/');
+    const isAsset = req.path.startsWith('/assets/');
+    const hasExt = path.extname(req.path) !== '';
     
-    if (isApi || isStatic) {
+    if (isApi || isUpload || isAsset || hasExt) {
         return res.status(404).json({ success: false, message: 'Resource not found' });
     }
     

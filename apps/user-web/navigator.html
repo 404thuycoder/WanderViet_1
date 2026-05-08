@@ -14,12 +14,15 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=1776819067182"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="global-tokens.css?v=1776819067182" />
+  <link rel="stylesheet" href="styles.css?v=1776819067182" />
   <link rel="stylesheet" href="navigator.css?v=1776819067182" />
   <link rel="stylesheet" href="companion.css?v=1776819067182" />
 </head>
 
 <body>
-  <div class="app-layout">
+  <header class="site-header" id="header-container" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;"></header>
+  <div class="app-layout" style="margin-top: 60px;">
     <!-- Sidebar trái (1/3): Chức năng, thông số -->
     <aside class="sidebar-left">
       <div class="sidebar-header">
@@ -160,6 +163,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js?v=1776819067182"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="SharedUI.js?v=1777335000501"></script>
   <script src="voice-helper.js?v=1776819067182"></script>
   <script src="navigator.js?v=1776819067182"></script>
   <script>

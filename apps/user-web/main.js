@@ -1829,7 +1829,7 @@
     var latlngs = [];
 
     // 1. User Position
-    if (userPos && userPos.lat && userPos.lng) {
+    if (userPos && typeof userPos.lat === 'number' && typeof userPos.lng === 'number') {
       var uLL = [userPos.lat, userPos.lng];
       waypoints.push(userPos.lng + "," + userPos.lat);
       latlngs.push(uLL);
@@ -1847,8 +1847,14 @@
     stopList.forEach(function (sid, i) {
       var p = placeById(sid);
       if (!p) return;
-      var ll = [p.lat, p.lng];
-      waypoints.push(p.lng + "," + p.lat);
+      var lat = parseFloat(p.lat);
+      var lng = parseFloat(p.lng);
+      if (isNaN(lat) || isNaN(lng)) {
+        console.warn('⚠️ Map: Invalid coordinates for stop:', sid, p.name);
+        return;
+      }
+      var ll = [lat, lng];
+      waypoints.push(lng + "," + lat);
       latlngs.push(ll);
       L.marker(ll).bindPopup("<strong>" + (i + 1) + ". " + p.name + "</strong>").addTo(markersLayer);
     });

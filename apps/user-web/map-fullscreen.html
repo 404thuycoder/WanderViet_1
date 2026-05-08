@@ -7,6 +7,8 @@
 
     <!-- Thư viện giao diện Bản Đồ (Leaflet CSS) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=1776819067181" crossorigin=""/>
+    <link rel="stylesheet" href="global-tokens.css?v=1776819067181" />
+    <link rel="stylesheet" href="styles.css?v=1776819067181" />
 
     <style>
         /* CSS Reset cơ bản để map tràn toàn màn hình */
@@ -125,10 +127,11 @@
         }
     </style>
 </head>
-<body>
+<body style="padding-top: 60px;">
+    <header class="site-header" id="header-container" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;"></header>
 
     <!-- Khung Bản Đồ Toàn Màn Hình -->
-    <div id="map"></div>
+    <div id="map" style="height: calc(100vh - 60px); top: 60px;"></div>
 
     <!-- Hộp Nhập Liệu Trôi Nổi (Floating Search Box) -->
     <div class="search-box">
@@ -170,6 +173,7 @@
 
     <!-- 2. Nạp Thư viện Bản đồ Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js?v=1776819067181" crossorigin=""></script>
+    <script src="SharedUI.js?v=1777335000501"></script>
 
     <!-- MÃ ĐIỀU KHIỂN CHÍNH (LOGIC APP) -->
     <script>

@@ -31,12 +31,12 @@ const upload = multer({ storage, limits: { fileSize: 20 * 1024 * 1024 }, fileFil
 const resolveCache = new Map();
 async function resolveUserId(idStr) {
   if (!idStr || idStr === 'undefined' || idStr === 'null') return null;
-  if (mongoose.Types.ObjectId.isValid(idStr)) return idStr;
+  if (mongoose.Types.ObjectId.isValid(idStr)) return new mongoose.Types.ObjectId(idStr);
   
   if (resolveCache.has(idStr)) return resolveCache.get(idStr);
   
   const user = await User.findOne({ $or: [{ customId: idStr }, { id: idStr }] }).select('_id');
-  const result = user ? user._id.toString() : null;
+  const result = user ? user._id : null;
   if (result) resolveCache.set(idStr, result);
   return result;
 }
@@ -49,7 +49,7 @@ router.get('/stories', auth, async (req, res) => {
   try {
     const realId = await resolveUserId(req.user.id);
     const friends = await Friendship.find({ $or: [{ requester: realId, status: 'accepted' }, { recipient: realId, status: 'accepted' }] });
-    const friendIds = friends.map(f => f.requester.toString() === realId ? f.recipient : f.requester);
+    const friendIds = friends.map(f => f.requester.equals(realId) ? f.recipient : f.requester);
     friendIds.push(realId);
 
     const stories = await Story.find({ 
@@ -57,6 +57,7 @@ router.get('/stories', auth, async (req, res) => {
       createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
     }).populate('userId', 'name displayName avatar').sort({ createdAt: -1 });
 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     const formattedStories = stories.map(s => {
       const obj = s.toObject();
       if (s.userId && typeof s.userId === 'object') {
@@ -69,6 +70,16 @@ router.get('/stories', auth, async (req, res) => {
       }
       obj.likeCount = s.likes ? s.likes.length : 0;
       obj.isLiked = s.likes ? s.likes.some(id => id.toString() === realId) : false;
+      
+      // Fix media URLs
+      if (obj.media && Array.isArray(obj.media)) {
+        obj.media = obj.media.map(m => {
+          if (m.url && m.url.startsWith('/uploads/')) {
+            m.url = `${baseUrl}${m.url}`;
+          }
+          return m;
+        });
+      }
       return obj;
     });
 
@@ -83,8 +94,9 @@ router.post('/stories', auth, upload.single('media'), async (req, res) => {
     const realId = await resolveUserId(req.user.id);
     if (!req.file) return res.status(400).json({ success: false, message: 'Vui lòng chọn ảnh hoặc video' });
 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     const media = {
-      url: `/uploads/${req.file.filename}`,
+      url: `${baseUrl}/uploads/${req.file.filename}`,
       type: req.file.mimetype.startsWith('video') ? 'video' : (req.file.mimetype.startsWith('audio') ? 'audio' : 'image')
     };
     
@@ -372,7 +384,7 @@ router.post('/posts', auth, async (req, res) => {
     // Real-time: broadcast new post to all friends
     try {
       const friends = await Friendship.find({ $or: [{ requester: realId, status: 'accepted' }, { recipient: realId, status: 'accepted' }] });
-      const friendIds = friends.map(f => f.requester.toString() === realId ? f.recipient : f.requester);
+      const friendIds = friends.map(f => f.requester.equals(realId) ? f.recipient : f.requester);
       emitToUsers(friendIds, 'new_post', result);
     } catch(e) { /* Non-critical */ }
     
@@ -388,7 +400,7 @@ router.get('/feed', auth, async (req, res) => {
     
     // Lấy danh sách bạn bè
     const friends = await Friendship.find({ $or: [{ requester: realId, status: 'accepted' }, { recipient: realId, status: 'accepted' }] });
-    const friendIds = friends.map(f => f.requester.toString() === realId ? f.recipient : f.requester);
+    const friendIds = friends.map(f => f.requester.equals(realId) ? f.recipient : f.requester);
     friendIds.push(realId);
     
     // Tìm bài viết từ bạn bè hoặc công khai
@@ -402,6 +414,8 @@ router.get('/feed', auth, async (req, res) => {
     .limit(30)
     .populate('userId', 'name displayName avatar rank rankTier')
     .populate('comments.userId', 'name displayName avatar');
+    
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     
     // Map lại data để đảm bảo name/avatar luôn mới nhất từ User model
     const populatedPosts = posts.map(post => {
@@ -419,6 +433,15 @@ router.get('/feed', auth, async (req, res) => {
                 c.userAvatar = c.userId.avatar;
             }
             return c;
+        });
+      }
+      // Fix media URLs - convert relative to absolute
+      if (p.media && Array.isArray(p.media)) {
+        p.media = p.media.map(m => {
+          if (m.url && m.url.startsWith('/uploads/')) {
+            m.url = `${baseUrl}${m.url}`;
+          }
+          return m;
         });
       }
       return p;
@@ -509,7 +532,7 @@ router.get('/friends', auth, async (req, res) => {
     const realId = await resolveUserId(req.user.id);
     if (!realId) return res.json({ success: true, data: [] });
     const friendships = await Friendship.find({ $or: [{ requester: realId }, { recipient: realId }], status: 'accepted' });
-    const friendIds = friendships.map(f => f.requester.toString() === realId ? f.recipient : f.requester);
+    const friendIds = friendships.map(f => f.requester.equals(realId) ? f.recipient : f.requester);
     const friends = await User.find({ _id: { $in: friendIds } }).select('name displayName avatar rank rankTier points customId').lean();
     res.json({ success: true, data: friends });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
@@ -531,7 +554,7 @@ router.get('/friends/suggestions', auth, async (req, res) => {
     const realId = await resolveUserId(req.user.id);
     if (!realId) return res.json({ success: true, data: [] });
     const friendships = await Friendship.find({ $or: [{ requester: realId }, { recipient: realId }] });
-    const excludeIds = friendships.map(f => f.requester.toString() === realId ? f.recipient.toString() : f.requester.toString());
+    const excludeIds = friendships.map(f => f.requester.equals(realId) ? f.recipient.toString() : f.requester.toString());
     excludeIds.push(realId);
     const excludeObjIds = excludeIds.filter(id => mongoose.Types.ObjectId.isValid(id)).map(id => new mongoose.Types.ObjectId(id));
     const suggestions = await User.find({ _id: { $nin: excludeObjIds }, role: 'user' }).select('name displayName avatar rank rankTier points customId').limit(10).lean();
@@ -583,7 +606,7 @@ router.delete('/posts/:id', auth, async (req, res) => {
     const realId = await resolveUserId(req.user.id);
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Không tìm thấy' });
-    if (post.userId.toString() !== realId) return res.status(403).json({ message: 'Không có quyền xóa' });
+    if (!post.userId.equals(realId)) return res.status(403).json({ message: 'Không có quyền xóa' });
     await Post.findByIdAndDelete(req.params.id);
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
@@ -595,7 +618,7 @@ router.put('/posts/:id', auth, async (req, res) => {
     const realId = await resolveUserId(req.user.id);
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ success: false, message: 'Không tìm thấy bài viết' });
-    if (post.userId.toString() !== realId) return res.status(403).json({ success: false, message: 'Không có quyền chỉnh sửa' });
+    if (!post.userId.equals(realId)) return res.status(403).json({ success: false, message: 'Không có quyền chỉnh sửa' });
     
     const { content, location, attachment, visibility } = req.body;
     
@@ -627,7 +650,22 @@ router.get('/posts/user/:userId', auth, async (req, res) => {
     const targetId = await resolveUserId(req.params.userId);
     if (!targetId) return res.json({ success: true, data: [] });
     const posts = await Post.find({ userId: targetId }).sort({ createdAt: -1 }).limit(50);
-    res.json({ success: true, data: posts });
+    
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const fixedPosts = posts.map(p => {
+      const post = p.toObject();
+      if (post.media && Array.isArray(post.media)) {
+        post.media = post.media.map(m => {
+          if (m.url && m.url.startsWith('/uploads/')) {
+            m.url = `${baseUrl}${m.url}`;
+          }
+          return m;
+        });
+      }
+      return post;
+    });
+    
+    res.json({ success: true, data: fixedPosts });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
@@ -636,7 +674,19 @@ router.get('/posts/:id', auth, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Không tìm thấy' });
-    res.json({ success: true, data: post });
+    
+    const result = post.toObject();
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    if (result.media && Array.isArray(result.media)) {
+      result.media = result.media.map(m => {
+        if (m.url && m.url.startsWith('/uploads/')) {
+          m.url = `${baseUrl}${m.url}`;
+        }
+        return m;
+      });
+    }
+    
+    res.json({ success: true, data: result });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
@@ -644,13 +694,14 @@ router.get('/posts/:id', auth, async (req, res) => {
 router.post('/posts/media', auth, upload.array('media', 5), async (req, res) => {
   try {
     const realId = await resolveUserId(req.user.id);
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     const media = (req.files || []).map(f => {
       let type = 'image';
       if (f.mimetype.startsWith('video')) type = 'video';
       else if (f.mimetype.startsWith('audio')) type = 'audio';
       
       console.log(`[Upload] File saved: ${f.filename} (${f.size} bytes) at ${f.path}`);
-      return { url: `/uploads/${f.filename}`, type };
+      return { url: `${baseUrl}/uploads/${f.filename}`, type };
     });
     
     let attachmentData;
@@ -679,7 +730,7 @@ router.post('/posts/media', auth, upload.array('media', 5), async (req, res) => 
     // Real-time: broadcast new post to all friends
     try {
       const friends = await Friendship.find({ $or: [{ requester: realId, status: 'accepted' }, { recipient: realId, status: 'accepted' }] });
-      const friendIds = friends.map(f => f.requester.toString() === realId ? f.recipient : f.requester);
+      const friendIds = friends.map(f => f.requester.equals(realId) ? f.recipient : f.requester);
       emitToUsers(friendIds, 'new_post', result);
     } catch(e) { /* Non-critical */ }
     
@@ -766,14 +817,28 @@ router.get('/messages/:recipientId', auth, async (req, res) => {
 router.get('/conversations', auth, async (req, res) => {
   try {
     const realId = await resolveUserId(req.user.id);
-    const convos = await Message.aggregate([{ $match: { conversationId: { $regex: realId } } }, { $sort: { createdAt: -1 } }, { $group: { _id: '$conversationId', lastMessage: { $first: '$text' }, lastTime: { $first: '$createdAt' } } }, { $sort: { lastTime: -1 } }, { $limit: 30 }]);
+    if (!realId) return res.status(401).json({ success: false, message: 'Unauthorized' });
+    
+    const convos = await Message.aggregate([
+        { $match: { conversationId: { $regex: realId.toString() } } }, 
+        { $sort: { createdAt: -1 } }, 
+        { $group: { _id: '$conversationId', lastMessage: { $first: '$text' }, lastTime: { $first: '$createdAt' } } }, 
+        { $sort: { lastTime: -1 } }, 
+        { $limit: 30 }
+    ]);
+
     const results = await Promise.all(convos.map(async (c) => {
       const parts = c._id.replace('dm_', '').split('_');
-      const otherUserId = parts[0] === realId ? parts[1] : parts[0];
+      if (parts.length < 2) return null;
+      
+      const otherUserId = parts[0] === realId.toString() ? parts[1] : parts[0];
+      if (!mongoose.Types.ObjectId.isValid(otherUserId)) return null;
+      
       const otherUser = await User.findById(otherUserId).select('name displayName avatar').lean();
       return { ...c, otherUser: otherUser || { name: 'Người dùng' } };
     }));
-    res.json({ success: true, data: results });
+    
+    res.json({ success: true, data: results.filter(r => r !== null) });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 

@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    biz-extend.js — Extended Business Dashboard Functionality
    Xử lý: navigation views, analytics, messages, promo form, CSV export
    ============================================================ */
@@ -60,7 +60,8 @@
     reviews:   { el: 'reviews-view',   label: 'Đánh giá dịch vụ',       load: function() { if(window.initReviewManagement) window.initReviewManagement(); } },
     'user-activity': { el: 'user-activity-view', label: 'Hoạt động người dùng', load: function() { if(window.initUserActivity) window.initUserActivity(); } },
     'business-performance': { el: 'business-performance-view', label: 'Hiệu suất kinh doanh', load: function() { if(window.initBusinessPerformance) window.initBusinessPerformance(); } },
-    support:   { el: 'support-view',   label: 'Hỗ trợ đối tác', load: loadSupport }
+    support:   { el: 'support-view',   label: 'Hỗ trợ đối tác', load: loadSupport },
+    settings:  { el: 'settings-view',  label: 'Cài đặt hệ thống', load: function() {} }
   };
 
   function loadSupport() {

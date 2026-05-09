@@ -664,6 +664,24 @@ router.put('/restore/:id', auth, async (req, res) => {
   }
 });
 
+// Cập nhật ngày khởi hành (Lên lịch lại)
+router.put('/update-date/:id', auth, async (req, res) => {
+  try {
+    const { newDate } = req.body;
+    if (!newDate) return res.status(400).json({ success: false, message: 'Thiếu ngày khởi hành mới.' });
+
+    const itin = await Itinerary.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      { tripDate: new Date(newDate), status: 'planning', isDeleted: false },
+      { returnDocument: 'after' }
+    );
+    if (!itin) return res.status(404).json({ success: false, message: 'Không tìm thấy chuyến đi.' });
+    res.json({ success: true, message: 'Đã cập nhật ngày khởi hành.', data: itin });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Lỗi server.' });
+  }
+});
+
 // Xóa vĩnh viễn
 router.delete('/permanent/:id', auth, async (req, res) => {
   try {

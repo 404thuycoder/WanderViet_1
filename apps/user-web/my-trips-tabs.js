@@ -38,10 +38,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // --- DELETE AND STATUS FUNCTIONS ---
   window.markTripStatus = function(tripId, status) {
-    fetch('/api/auth/user/activity/status', {
-      method: 'POST',
+    fetch('/api/planner/status/' + tripId, {
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-      body: JSON.stringify({ placeId: tripId, status: status })
+      body: JSON.stringify({ status: status })
     }).then(function(res) { return res.json(); })
       .then(function(json) {
         if (json.success) {
@@ -55,10 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
   window.deleteTrip = function(itemType, tripId, name) {
     console.log("deleteTrip called:", itemType, tripId, name);
     if (!confirm("Bạn có chắc chắn muốn xóa chuyến đi '" + name + "'?")) return;
-    fetch('/api/auth/user/activity/delete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-      body: JSON.stringify({ itemType: itemType || 'trip', itemId: tripId, name: name })
+    fetch('/api/planner/itinerary/' + tripId, {
+      method: 'DELETE',
+      headers: { 'x-auth-token': token }
     }).then(function(res) { return res.json(); })
       .then(function(json) {
         console.log("deleteTrip response:", json);
@@ -73,10 +72,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   window.restoreTrip = function(itemType, tripId) {
     console.log("restoreTrip called:", itemType, tripId);
-    fetch('/api/auth/user/activity/restore', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-      body: JSON.stringify({ itemType: itemType || 'trip', itemId: tripId })
+    fetch('/api/planner/restore/' + tripId, {
+      method: 'PUT',
+      headers: { 'x-auth-token': token }
     }).then(function(res) { return res.json(); })
       .then(function(json) {
         console.log("restoreTrip response:", json);
@@ -97,17 +95,17 @@ document.addEventListener('DOMContentLoaded', function() {
     var newDateStr = tomorrow.toISOString();
 
     // 1. Update Status
-    fetch('/api/auth/user/activity/status', {
-      method: 'POST',
+    fetch('/api/planner/status/' + tripId, {
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-      body: JSON.stringify({ placeId: tripId, status: 'scheduled' })
+      body: JSON.stringify({ status: 'planning' })
     }).then(function(res) { 
         if (!res.ok) throw new Error("Cập nhật trạng thái thất bại");
         // 2. Update Date to make it show in Planned tab
-        return fetch('/api/planner/update-date', {
+        return fetch('/api/planner/update-date/' + tripId, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-          body: JSON.stringify({ itineraryId: tripId, newDate: newDateStr })
+          body: JSON.stringify({ newDate: newDateStr })
         });
     }).then(function(res) { return res.json(); })
       .then(function(json) {
@@ -124,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   window.purgeTrip = function(tripId) {
     if (!confirm("Bạn có chắc chắn muốn xóa vĩnh viễn lịch trình này? Thao tác này không thể hoàn tác.")) return;
-    fetch('/api/planner/' + tripId, {
+    fetch('/api/planner/permanent/' + tripId, {
       method: 'DELETE',
       headers: { 'x-auth-token': token }
     }).then(function(res) { return res.json(); })
@@ -136,47 +134,33 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   };
 
-  function renderTripItems(tripsArray, activityLog, deleteHistory, mode) {
+  function renderTripItems(tripsArray, mode) {
     tripsList.innerHTML = '';
     var filtered = [];
     
-    // Create lookup maps
-    var statusMap = {};
-    if (activityLog) {
-      activityLog.forEach(function(a) { statusMap[a.placeId] = a.status; });
-    }
-    var deletedMap = {};
-    if (deleteHistory) {
-      deleteHistory.forEach(function(d) { 
-        if (d.itemType === 'trip' || d.itemType === 'itinerary') {
-          deletedMap[d.itemId] = true; 
-        }
-      });
-    }
-
     if (mode === 'deleted') {
-      if (!deleteHistory || deleteHistory.length === 0) {
+      filtered = tripsArray.filter(function(t) { return t.isDeleted; });
+      if (filtered.length === 0) {
         return renderEmpty('Thùng rác trống.');
       }
-      deleteHistory.forEach(function(d) {
-        if (d.itemType === 'trip' || d.itemType === 'itinerary') {
+      filtered.forEach(function(d) {
           var card = document.createElement('div');
           card.style.cssText = 'background: var(--bg-elevated); border-radius: 1rem; padding: 1.5rem; box-shadow: var(--shadow-sm); display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--border);';
-          var dt = new Date(d.deletedAt).toLocaleDateString('vi-VN');
+          
+          var dt = new Date(d.createdAt).toLocaleDateString('vi-VN');
           
           var info = '<div style="opacity: 0.9;">' +
-                     '<h3 style="margin: 0 0 0.5rem; color: var(--text); font-family: var(--font-display);">' + d.name + '</h3>' +
-                     '<p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Xóa ngày: ' + dt + '</p>' +
+                     '<h3 style="margin: 0 0 0.5rem; color: var(--text); font-family: var(--font-display);">' + (d.destination || 'Chuyến đi') + '</h3>' +
+                     '<p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Tạo ngày: ' + dt + '</p>' +
                      '</div>';
           
           var actions = '<div style="display: flex; gap: 0.5rem;">' +
-                        '<button class="btn btn--outline btn--small" onclick="restoreTrip(\'itinerary\', \'' + d.itemId + '\')">🔄 Khôi phục</button>' +
-                        '<button class="btn btn--danger btn--small" onclick="purgeTrip(\'' + d.itemId + '\')">🗑️ Xóa vĩnh viễn</button>' +
+                        '<button class="btn btn--outline btn--small" onclick="restoreTrip(\'itinerary\', \'' + d._id + '\')">🔄 Khôi phục</button>' +
+                        '<button class="btn btn--danger btn--small" onclick="purgeTrip(\'' + d._id + '\')">🗑️ Xóa vĩnh viễn</button>' +
                         '</div>';
           
           card.innerHTML = info + actions;
           tripsList.appendChild(card);
-        }
       });
       return;
     }
@@ -185,27 +169,25 @@ document.addEventListener('DOMContentLoaded', function() {
     today.setHours(0, 0, 0, 0);
 
     tripsArray.forEach(function(trip) {
-      var id = trip._id;
-      var isDeleted = deletedMap[id];
-      var dbStatus = statusMap[id] || 'scheduled'; 
+      if (trip.isDeleted) return; // Hide deleted from other tabs
+
+      var dbStatus = trip.status || 'planning'; 
       var tripDate = trip.tripDate ? new Date(trip.tripDate) : null;
       if (tripDate) tripDate.setHours(0, 0, 0, 0);
 
-      if (isDeleted) return; // Hide deleted from other tabs
-
       // === Strict Tab Classification Logic ===
-      if (mode === 'experienced' && dbStatus === 'experienced') {
+      if (mode === 'experienced' && dbStatus === 'completed') {
         filtered.push(trip);
       } else if (mode === 'planned') {
-        // Only show if scheduled AND not past due
-        if (dbStatus === 'scheduled' && (!tripDate || tripDate >= today)) {
+        // Only show if planning AND not past due
+        if (dbStatus === 'planning' && (!tripDate || tripDate >= today)) {
           filtered.push(trip);
         }
       } else if (mode === 'missed') {
-        // Show if explicitly missed OR scheduled but past due
+        // Show if explicitly missed OR planning but past due
         if (dbStatus === 'missed') {
           filtered.push(trip);
-        } else if (dbStatus === 'scheduled' && tripDate && tripDate < today) {
+        } else if (dbStatus === 'planning' && tripDate && tripDate < today) {
           filtered.push(trip);
         }
       }
@@ -225,9 +207,9 @@ document.addEventListener('DOMContentLoaded', function() {
       var tripDateLabel = '';
       var tripDateBadge = '';
       
-      var currentStatus = statusMap[it._id] || 'scheduled';
+      var currentStatus = it.status || 'planning';
       
-      if (currentStatus === 'experienced') {
+      if (currentStatus === 'completed') {
         tripDateBadge = '<span style="background:#10b981;color:#fff;padding:0.2rem 0.75rem;border-radius:2rem;font-size:0.8rem;font-weight:700;">✅ Đã đi</span>';
       } else if (currentStatus === 'missed') {
         tripDateBadge = '<span style="background:#f43f5e;color:#fff;padding:0.2rem 0.75rem;border-radius:2rem;font-size:0.8rem;font-weight:700;">❌ Bỏ lỡ</span>';
@@ -246,10 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
           tripDateBadge = '<span style="background:#6366f1;color:#fff;padding:0.2rem 0.75rem;border-radius:2rem;font-size:0.8rem;font-weight:700;">📅 Còn ' + diffDays + ' ngày</span>';
         }
-      } else if (currentStatus === 'experienced') {
-         tripDateBadge = '<span style="background:#10b981;color:#fff;padding:0.2rem 0.75rem;border-radius:2rem;font-size:0.8rem;font-weight:700;">✅ Đã đi</span>';
-      } else if (currentStatus === 'missed') {
-         tripDateBadge = '<span style="background:#f43f5e;color:#fff;padding:0.2rem 0.75rem;border-radius:2rem;font-size:0.8rem;font-weight:700;">❌ Bỏ lỡ</span>';
       }
       
       if (it.tripDate) {
@@ -311,7 +289,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.mark-experienced-btn').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         var id = btn.getAttribute('data-id');
-        markTripStatus(id, 'experienced');
+        markTripStatus(id, 'completed');
       });
     });
     document.querySelectorAll('.reschedule-trip-btn').forEach(function (btn) {
@@ -348,39 +326,14 @@ document.addEventListener('DOMContentLoaded', function() {
   function loadTab(mode) {
     tripsList.innerHTML = '<p style="text-align: center; color: #64748b;">Đang tải...</p>';
     
-    // Use individual catches to ensure one failure doesn't block the whole page
-    var p1 = fetchTrips().catch(function(e) { 
-      console.warn("fetchTrips failed:", e); 
-      return { success: false, data: [] }; 
-    });
-    var p2 = fetchActivities().catch(function(e) { 
-      console.warn("fetchActivities failed:", e); 
-      return { success: false, activityLog: [] }; 
-    });
-
-    Promise.all([p1, p2]).then(function(results) {
-      var tripsData = results[0];
-      var actData = results[1];
-      
+    fetchTrips().then(function(tripsData) {
       var tripsArray = (tripsData && tripsData.success) ? (tripsData.data || []) : [];
-      var activityLog = (actData && actData.success) ? (actData.activityLog || []) : [];
-      var deleteHistory = (actData && actData.success) ? (actData.deleteHistory || []) : [];
       
       try {
-        // Update Badge count defensively
-        var deletedIds = new Set();
-        if (Array.isArray(deleteHistory)) {
-          deleteHistory.forEach(function(d) {
-            if (d && (d.itemType === 'trip' || d.itemType === 'itinerary')) {
-              deletedIds.add(d.itemId);
-            }
-          });
-        }
-        
         var activeCount = 0;
         if (Array.isArray(tripsArray)) {
           activeCount = tripsArray.filter(function(t) { 
-            return t && t._id && !deletedIds.has(t._id); 
+            return t && t._id && !t.isDeleted; 
           }).length;
         }
         
@@ -390,7 +343,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn("Badge calculation error:", badgeErr);
       }
 
-      renderTripItems(tripsArray, activityLog, deleteHistory, mode);
+      renderTripItems(tripsArray, mode);
     }).catch(function(err) {
       console.error("Critical loadTab error:", err);
       tripsList.innerHTML = '<p style="color: red; text-align: center;">Lỗi tải dữ liệu: ' + err.message + '</p>';

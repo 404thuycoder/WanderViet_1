@@ -108,7 +108,7 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
 .topbar {
   background: rgba(6, 9, 18, 0.7); backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--glass-border); padding: 0 40px; height: 90px;
-  display: flex; align-items: center; gap: 32px; position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: 32px; position: sticky; top: 0; z-index: 1001;
 }
 .topbar-left h2 { font-size: 24px; font-weight: 800; color: #fff; }
 
@@ -127,6 +127,29 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
 
 .biz-view { animation: viewFadeIn 0.5s ease-out; }
 @keyframes viewFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Topbar user dropdown */
+.user-chip { position: relative; }
+.user-chip:hover { background: rgba(255,255,255,0.07) !important; }
+.user-dropdown-menu {
+  display: none; position: absolute; top: calc(100% + 10px); right: 0;
+  background: rgba(15,23,42,0.97); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+  min-width: 200px; z-index: 9999;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+.user-dropdown-menu.is-open { display: block; }
+.user-dropdown-item {
+  display: flex; align-items: center; gap: 10px; padding: 12px 18px;
+  color: #cbd5e1; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s; border: none; background: transparent; width: 100%;
+  text-align: left; text-decoration: none;
+}
+.user-dropdown-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.user-dropdown-item.danger { color: #f87171; }
+.user-dropdown-item.danger:hover { background: rgba(248,113,113,0.1); }
+.user-dropdown-sep { height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0; }
 
 /* Global Management Overrides (Zenith Elite) */
 .card, .bk-table-card, .bk-stat-chip, .bk-filter-tabs {
@@ -160,16 +183,23 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
   </div>
 
   <div class="profile">
-    <div class="profile-card">
+    <div class="profile-card user-chip" id="sidebar-user-chip" style="cursor: pointer; position: relative; padding-right: 30px;">
       <div class="avatar" id="sidebar-avatar">🏨</div>
       <div class="p-info">
         <div class="p-name" id="sidebar-name">Đang tải...</div>
         <div class="p-badge" id="sidebar-tier">PARTNER</div>
       </div>
+      <div style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 12px;">▾</div>
+      
+      <div class="user-dropdown-menu" id="sidebar-user-dropdown" style="top: calc(100% + 5px); left: 0; width: 100%;">
+        <button class="user-dropdown-item" onclick="window.navigateToView('profile'); document.getElementById('sidebar-user-dropdown').classList.remove('is-open');">👤 Trang cá nhân</button>
+        <button class="user-dropdown-item" onclick="window.navigateToView('settings'); document.getElementById('sidebar-user-dropdown').classList.remove('is-open');">⚙️ Cài đặt</button>
+        <div class="user-dropdown-sep"></div>
+        <button class="user-dropdown-item danger" onclick="window.bizLogout()">🚶 Đăng xuất</button>
+      </div>
     </div>
   </div>
 
-  <a href="/index.html" class="view-site-btn">🌐 Xem trang User Web</a>
 
   <nav id="main-nav">
     <div class="nav-header">🌍 Website & Social</div>
@@ -187,10 +217,6 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
     <a class="nav-item" href="#" data-view="profile">🏢 <span>Hồ sơ doanh nghiệp</span></a>
     <a class="nav-item" href="#" data-view="support">🆘 <span>Hỗ trợ Admin</span></a>
   </nav>
-
-  <div class="logout">
-    <button onclick="window.bizLogout()">🚪 <span>Đăng xuất</span></button>
-  </div>
 </div>
 
 <div class="content">
@@ -200,10 +226,16 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
     </div>
     <div class="date-chip" id="date-range">📅 Đang tải...</div>
     <div class="search"><span>🔍</span><input placeholder="Tìm kiếm dịch vụ, đặt chỗ..."></div>
-    <div class="bell">🔔<div class="bell-badge" id="nav-bell-badge">0</div></div>
-    <div class="user-chip" onclick="window.bizLogout()" title="Đăng xuất">
+    <div class="bell" style="cursor: pointer;" onclick="if(window.WanderUI) window.WanderUI.toggleNotificationDrawer();">🔔<div class="bell-badge" id="nav-bell-badge" data-notif-badge="true" style="display: none;">0</div></div>
+    <div class="user-chip" id="topbar-user-chip" title="Tài khoản">
       <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff">🏨</div>
       <span id="topbar-username">Đang tải...</span> ▾
+      <div class="user-dropdown-menu" id="topbar-user-dropdown">
+        <button class="user-dropdown-item" onclick="window.navigateToView('profile'); document.getElementById('topbar-user-dropdown').classList.remove('is-open');">👤 Trang cá nhân</button>
+        <button class="user-dropdown-item" onclick="window.navigateToView('settings'); document.getElementById('topbar-user-dropdown').classList.remove('is-open');">⚙️ Cài đặt</button>
+        <div class="user-dropdown-sep"></div>
+        <button class="user-dropdown-item danger" onclick="window.bizLogout()">🚶 Đăng xuất</button>
+      </div>
     </div>
   </div>
 
@@ -332,6 +364,102 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
     </div>
   </div>
 
+  <div id="settings-view" class="biz-view" style="display:none; padding: 40px; height: calc(100vh - 90px);">
+    <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+      <div style="background: #0f172a; border-radius: 16px; width: 850px; max-width: 95%; box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; overflow: hidden; position: relative;">
+        
+        <!-- Close button -->
+        <div style="position: absolute; top: 20px; right: 20px; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 14px; transition: background 0.2s;" onclick="window.navigateToView('home')" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">✕</div>
+
+        <!-- Header -->
+        <div style="padding: 30px; padding-bottom: 20px;">
+          <h2 style="color: #fff; font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px;">⚙️ Cài đặt hệ thống</h2>
+        </div>
+
+        <!-- Body -->
+        <div style="display: flex; border-top: 1px solid rgba(255,255,255,0.05);">
+          
+          <!-- Sidebar -->
+          <div style="width: 250px; border-right: 1px solid rgba(255,255,255,0.05); padding: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <button onclick="window.switchSettingsTab('security')" class="set-tab active" id="st-security" style="padding: 14px 20px; border-radius: 12px; background: #00e5ff; color: #fff; border: none; text-align: left; font-weight: 700; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 12px; transition: 0.2s;">
+                <span style="font-size: 16px;">🔒</span> Bảo mật
+              </button>
+              <button onclick="window.switchSettingsTab('appearance')" class="set-tab" id="st-appearance" style="padding: 14px 20px; border-radius: 12px; background: transparent; color: #94a3b8; border: none; text-align: left; font-weight: 600; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 12px; transition: 0.2s;">
+                <span style="font-size: 16px;">🌗</span> Giao diện
+              </button>
+              <button onclick="window.switchSettingsTab('notifications')" class="set-tab" id="st-notifications" style="padding: 14px 20px; border-radius: 12px; background: transparent; color: #94a3b8; border: none; text-align: left; font-weight: 600; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 12px; transition: 0.2s;">
+                <span style="font-size: 16px;">🔔</span> Thông báo
+              </button>
+              <button onclick="window.switchSettingsTab('privacy')" class="set-tab" id="st-privacy" style="padding: 14px 20px; border-radius: 12px; background: transparent; color: #94a3b8; border: none; text-align: left; font-weight: 600; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 12px; transition: 0.2s;">
+                <span style="font-size: 16px;">🔐</span> Quyền & Riêng tư
+              </button>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div style="flex: 1; padding: 40px; min-height: 450px;">
+            
+            <!-- Tab Bảo mật -->
+            <div id="set-content-security" class="set-content">
+              <h3 style="color: #fff; font-size: 20px; font-weight: 800; margin-bottom: 30px;">Tài khoản & Bảo mật</h3>
+              <div style="margin-bottom: 24px;">
+                <label style="display: block; color: #cbd5e1; font-size: 14px; font-weight: 700; margin-bottom: 10px;">Mật khẩu cũ</label>
+                <input type="password" style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 14px 16px; border-radius: 10px; color: #fff; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#00e5ff'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+              </div>
+              <div style="margin-bottom: 35px;">
+                <label style="display: block; color: #cbd5e1; font-size: 14px; font-weight: 700; margin-bottom: 10px;">Mật khẩu mới</label>
+                <input type="password" style="width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 14px 16px; border-radius: 10px; color: #fff; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#00e5ff'" onblur="this.style.borderColor='rgba(255,255,255,0.08)'">
+              </div>
+              <button style="background: #00b4ff; color: #fff; border: none; padding: 14px 28px; border-radius: 10px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(0,180,255,0.4); font-size: 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="alert('Đã cập nhật mật khẩu!')">Đổi mật khẩu</button>
+            </div>
+
+            <!-- Tab Giao diện -->
+            <div id="set-content-appearance" class="set-content" style="display: none;">
+              <h3 style="color: #fff; font-size: 20px; font-weight: 800; margin-bottom: 30px;">Tùy chỉnh Giao diện</h3>
+              <div style="margin-bottom: 40px;">
+                <h4 style="color: #e2e8f0; margin-bottom: 20px; font-size: 15px;">🌗 Chế độ hiển thị</h4>
+                <div style="display: flex; gap: 20px;">
+                  <button onclick="window.setThemeMode('dark')" id="theme-btn-dark" style="flex: 1; padding: 24px; border-radius: 12px; background: #1e293b; border: 2px solid #00e5ff; color: #fff; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: 0.2s;">
+                    <span style="font-size: 28px;">🌙</span>
+                    <span style="font-weight: 700; font-size: 15px;">Giao diện Tối</span>
+                  </button>
+                  <button onclick="window.setThemeMode('light')" id="theme-btn-light" style="flex: 1; padding: 24px; border-radius: 12px; background: #f8fafc; border: 2px solid transparent; color: #0f172a; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; transition: 0.2s;">
+                    <span style="font-size: 28px;">☀️</span>
+                    <span style="font-weight: 700; font-size: 15px;">Giao diện Sáng</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab Thông báo -->
+            <div id="set-content-notifications" class="set-content" style="display: none;">
+              <h3 style="color: #fff; font-size: 20px; font-weight: 800; margin-bottom: 30px;">Cài đặt Thông báo</h3>
+              <div style="display: flex; flex-direction: column; gap: 20px;">
+                <label style="display: flex; align-items: center; gap: 15px; color: #cbd5e1; cursor: pointer; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                  <input type="checkbox" checked style="width:20px;height:20px;accent-color:#00e5ff;">
+                  <span style="font-size:15px; font-weight: 600;">Thông báo Đơn hàng mới</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 15px; color: #cbd5e1; cursor: pointer; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+                  <input type="checkbox" checked style="width:20px;height:20px;accent-color:#00e5ff;">
+                  <span style="font-size:15px; font-weight: 600;">Thông báo Tin nhắn khách hàng</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Tab Quyền riêng tư -->
+            <div id="set-content-privacy" class="set-content" style="display: none;">
+              <h3 style="color: #fff; font-size: 20px; font-weight: 800; margin-bottom: 30px;">Quyền & Riêng tư</h3>
+              <p style="color: #94a3b8; font-size: 15px; line-height: 1.6;">Quản lý dữ liệu người dùng và thiết lập mức độ bảo mật cho cửa hàng trực tuyến của doanh nghiệp. Tính năng này đang được cập nhật thêm.</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div>
+
 </div>
 
 <!-- Scripts -->
@@ -349,6 +477,7 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
 <script src="messageManagement.js?v=5"></script>
 <script src="profileManagement.js?v=5"></script>
 <script src="paymentManagement.js?v=5"></script>
+<script src="SharedUI.js?v=999"></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', async function() {
@@ -408,6 +537,115 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
     }
   });
 </script>
+
+<script>
+  // Toggle user dropdown khi click vào user chip
+  (function() {
+    document.addEventListener('DOMContentLoaded', function() {
+      const setupDropdown = (chipId, dropdownId) => {
+        const chip = document.getElementById(chipId);
+        const dropdown = document.getElementById(dropdownId);
+        if (!chip || !dropdown) return;
+
+        chip.addEventListener('click', function(e) {
+          // Không close nếu đang click vào item bên trong dropdown
+          if (e.target.closest('.user-dropdown-item') || e.target.closest('.user-dropdown-sep')) return;
+          dropdown.classList.toggle('is-open');
+          e.stopPropagation();
+        });
+
+        // Đóng dropdown khi click ra ngoài
+        document.addEventListener('click', function(e) {
+          if (!chip.contains(e.target)) {
+            dropdown.classList.remove('is-open');
+          }
+        });
+      };
+
+      setupDropdown('topbar-user-chip', 'topbar-user-dropdown');
+      setupDropdown('sidebar-user-chip', 'sidebar-user-dropdown');
+    });
+  })();
+
+  // Restore saved theme on load
+  document.addEventListener('DOMContentLoaded', () => {
+    const savedMode = localStorage.getItem('biz_theme_mode') || 'dark';
+    window.setThemeMode(savedMode);
+  });
+
+  // Settings Theme Mode
+  window.setThemeMode = function(mode) {
+    const btnDark = document.getElementById('theme-btn-dark');
+    const btnLight = document.getElementById('theme-btn-light');
+    if (mode === 'light') {
+      document.body.classList.add('light-mode');
+      if(btnLight) btnLight.style.borderColor = '#00e5ff';
+      if(btnDark) btnDark.style.borderColor = 'transparent';
+    } else {
+      document.body.classList.remove('light-mode');
+      if(btnDark) btnDark.style.borderColor = '#00e5ff';
+      if(btnLight) btnLight.style.borderColor = 'transparent';
+    }
+    localStorage.setItem('biz_theme_mode', mode);
+  };
+
+  // Settings Tab Navigation
+  window.switchSettingsTab = function(tabId) {
+    // Hide all contents
+    document.querySelectorAll('.set-content').forEach(c => c.style.display = 'none');
+    // Reset all tabs
+    document.querySelectorAll('.set-tab').forEach(t => {
+      t.style.background = 'transparent';
+      t.style.color = '#94a3b8';
+      t.style.fontWeight = '600';
+    });
+    // Show target content
+    document.getElementById('set-content-' + tabId).style.display = 'block';
+    // Highlight active tab
+    const activeTab = document.getElementById('st-' + tabId);
+    if (activeTab) {
+      activeTab.style.background = '#00e5ff';
+      activeTab.style.color = '#fff';
+      activeTab.style.fontWeight = '700';
+    }
+  };
+</script>
+
+<style>
+  /* LIGHT MODE OVERRIDES */
+  body.light-mode { background: #f8fafc; color: #0f172a; }
+  body.light-mode .content { background: #f1f5f9; }
+  body.light-mode .sidebar { background: rgba(255,255,255,0.95); border-right: 1px solid #e2e8f0; }
+  body.light-mode .topbar { background: rgba(255,255,255,0.85); border-bottom: 1px solid #e2e8f0; }
+  body.light-mode .topbar-left h2, body.light-mode .nav-item { color: #0f172a; }
+  body.light-mode .nav-item:hover { background: #f1f5f9; }
+  body.light-mode .search { background: #fff; border: 1px solid #e2e8f0; }
+  body.light-mode .search input { color: #0f172a; }
+  body.light-mode .search input::placeholder { color: #94a3b8; }
+  body.light-mode .user-chip, body.light-mode .date-chip { background: #fff; border: 1px solid #e2e8f0; color: #0f172a; }
+  body.light-mode .user-dropdown-menu { background: #fff; border: 1px solid #e2e8f0; }
+  body.light-mode .user-dropdown-item { color: #0f172a; }
+  body.light-mode .user-dropdown-item:hover { background: #f1f5f9; }
+  body.light-mode .stat { background: #fff; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+  body.light-mode .stat-label { color: #64748b; }
+  body.light-mode .stat-num { color: #0f172a; }
+  body.light-mode .stat-trend { color: #64748b; }
+  body.light-mode .booking-table { background: #fff; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+  body.light-mode .booking-table th { background: #f8fafc; color: #475569; border-bottom: 1px solid #e2e8f0; }
+  body.light-mode .booking-table td { border-bottom: 1px solid #e2e8f0; color: #0f172a; }
+  
+  /* Settings Modal Light Mode */
+  body.light-mode #settings-view > div > div { background: #fff !important; border: 1px solid #e2e8f0 !important; box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important; }
+  body.light-mode #settings-view h2, body.light-mode #settings-view h3, body.light-mode #settings-view h4, body.light-mode #settings-view label { color: #0f172a !important; }
+  body.light-mode #settings-view .set-tab { color: #64748b !important; }
+  body.light-mode #settings-view .set-tab.active { color: #fff !important; }
+  body.light-mode #settings-view input[type="password"] { background: #f8fafc !important; color: #0f172a !important; border: 1px solid #e2e8f0 !important; }
+  body.light-mode #settings-view .set-content p { color: #64748b !important; }
+  body.light-mode #settings-view > div > div > div[style*="border-top"] { border-top-color: #e2e8f0 !important; }
+  body.light-mode #settings-view > div > div > div > div[style*="border-right"] { border-right-color: #e2e8f0 !important; }
+  body.light-mode #theme-btn-dark { background: #f8fafc !important; color: #0f172a !important; border-color: #e2e8f0 !important; }
+  body.light-mode #theme-btn-light { background: #fff !important; color: #0f172a !important; border-color: #00e5ff !important; box-shadow: 0 10px 20px rgba(0,229,255,0.1) !important; }
+</style>
 
 </body>
 </html>

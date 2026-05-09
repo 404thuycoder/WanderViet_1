@@ -254,7 +254,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       .wander-notif-drawer {
         position: fixed; top: 0; right: 0; bottom: 0; width: 380px; 
         background: var(--bg-elevated); border-left: 1px solid var(--border);
-        z-index: 10000; display: none; flex-direction: column;
+        z-index: 999999; display: none; flex-direction: column;
         box-shadow: -10px 0 30px rgba(0,0,0,0.3); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         transform: translateX(100%);
       }
@@ -1637,6 +1637,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     localStorage.removeItem('wander_shared_chat');
     let currentSessionId = null;
 
+    // Flag: chỉ đọc to (TTS) khi user dùng giọng nói, không đọc khi gõ text
+    let _lastInputWasVoice = false;
+
     // --- VOICE INTEGRATION ---
     function setupVoiceIntegration() {
         if (window.voiceGuide) {
@@ -1646,6 +1649,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                 const inputEl = document.getElementById('global-chat-input');
                 const formEl = document.getElementById('global-chat-form');
                 if (inputEl && formEl) {
+                    _lastInputWasVoice = true; // Đánh dấu: input từ giọng nói → AI sẽ nói lại
                     inputEl.value = text;
                     formEl.dispatchEvent(new Event('submit'));
                 }
@@ -1914,6 +1918,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       e.preventDefault();
       const msg = input.value.trim();
       if (!msg) return;
+      const wasVoice = _lastInputWasVoice; // true nếu input từ mic, false nếu gõ text
+      _lastInputWasVoice = false; // Reset sau mỗi lần gửi
       appendMsg(msg, 'user');
       input.value = '';
 
@@ -1946,8 +1952,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             const aiReply = resData.answer || resData.reply;
             appendMsg(aiReply, 'bot');
 
-            // AI TALK BACK
-            if (window.voiceGuide && aiReply) {
+            // AI TALK BACK — chỉ đọc to khi user dùng giọng nói (wasVoice = true)
+            if (wasVoice && window.voiceGuide && aiReply) {
                 // Lọc bỏ bớt ký tự đặc biệt hoặc mã nhúng nếu có để AI nói tự nhiên
                 const cleanText = aiReply.replace(/\[ITIN_PROPOSALS:.*?\]/g, '').replace(/https?:\/\/\S+/g, '').trim();
                 window.voiceGuide.speak(cleanText);

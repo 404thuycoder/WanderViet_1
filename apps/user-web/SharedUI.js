@@ -8,6 +8,11 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   'use strict';
 
   const STORAGE_THEME = 'wander_theme';
+  
+  // Global HTML escaping helper
+  window.esc = function(str) {
+    return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
 
   // ─── Global Fetch Interceptor for Suspension ─────────────────────────────
   const originalFetch = window.fetch;

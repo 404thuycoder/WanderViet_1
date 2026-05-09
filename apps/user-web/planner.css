@@ -2065,3 +2065,43 @@ a {
   font-size: 1rem !important;
   color: var(--text-muted);
 }
+
+/* Filter Tabs for Comparison Library */
+.filter-tab {
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.filter-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+.filter-tab.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+
+.trip-badge-mini {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.trip-badge-mini.completed { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.trip-badge-mini.missed { background: rgba(244, 63, 94, 0.15); color: #f43f5e; }
+.trip-badge-mini.deleted { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }

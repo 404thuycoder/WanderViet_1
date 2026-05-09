@@ -414,11 +414,13 @@ router.post('/business/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const accounts = await BusinessAccount.find({ email: String(email || '').toLowerCase() });
+    console.log(`[AUTH DEBUG] Found ${accounts ? accounts.length : 0} accounts for ${email}`);
     if (!accounts || accounts.length === 0) return res.status(400).json({ success: false, message: 'Email hoặc mật khẩu không đúng' });
     
     let matchedAccount = null;
     for (const acc of accounts) {
       const isMatch = await bcrypt.compare(password, acc.password);
+      console.log(`[AUTH DEBUG] Password match for ${acc.email}: ${isMatch}`);
       if (isMatch) {
         if (acc.status === 'suspended') {
           return res.status(403).json({ success: false, message: 'Tài khoản của bạn đã bị khóa' });
@@ -665,89 +667,92 @@ router.post('/user/add-xp', auth, async (req, res) => {
   }
 });
 
-// Cập nhật hồ sơ user
-router.put('/profile', auth, async (req, res) => {
+// Cập nhật hồ sơ (Hỗ trợ User, Business, Admin)
+router.put('/profile', sharedAuth, async (req, res) => {
   try {
     const { displayName, notes, avatar, cover, phone, preferences } = req.body;
     
-    const updateFields = {};
-    if (displayName !== undefined) updateFields.displayName = displayName;
-    if (notes !== undefined) updateFields.notes = notes;
-    if (avatar !== undefined) updateFields.avatar = avatar;
-    if (cover !== undefined) updateFields.cover = cover;
-    if (phone !== undefined) updateFields.phone = phone;
-    // Note: preferences merge is handled by the model or should be done carefully.
-    // For now, let's just allow partial updates if sent.
-    if (preferences !== undefined) updateFields.preferences = preferences;
+    // Select model based on portal
+    const modelMap = { 'user': User, 'business': BusinessAccount, 'admin': AdminAccount };
+    const Model = modelMap[req.user.portal] || User;
 
-    // Direct find and update for maximum transparency
     const searchId = req.user._id || req.user.id;
-    let user = await User.findOne({
+    let account = await Model.findOne({
         $or: [
             { _id: mongoose.Types.ObjectId.isValid(searchId) ? searchId : undefined },
-            { customId: req.user.id }
-        ].filter(q => q._id !== undefined || q.customId !== undefined)
+            { customId: req.user.id },
+            { id: req.user.id }
+        ].filter(q => q._id !== undefined || q.customId !== undefined || q.id !== undefined)
     });
 
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    if (!account) return res.status(404).json({ success: false, message: 'Account not found' });
     
     // Explicitly set each field
-    if (displayName !== undefined) user.displayName = displayName;
-    if (notes !== undefined) user.notes = notes;
-    if (avatar !== undefined) user.avatar = avatar;
-    if (cover !== undefined) user.cover = cover;
-    if (phone !== undefined) user.phone = phone;
-    if (preferences !== undefined) user.preferences = { ...user.preferences, ...preferences };
+    if (displayName !== undefined) {
+        account.displayName = displayName;
+        // Also update name if it was the same as displayName (syncing)
+        if (account.portal === 'business' || account.portal === 'admin') {
+            account.name = displayName;
+        }
+    }
+    if (notes !== undefined) account.notes = notes;
+    if (avatar !== undefined) account.avatar = avatar;
+    if (cover !== undefined) account.cover = cover;
+    if (phone !== undefined) account.phone = phone;
+    if (preferences !== undefined) account.preferences = { ...account.preferences, ...preferences };
 
-    await user.save();
+    await account.save();
     
     // Clear cache
-    const possibleIds = [req.user.id, req.user._id, user.customId, user._id.toString()];
+    const possibleIds = [req.user.id, req.user._id, account.customId, account.id, account._id.toString()];
     possibleIds.forEach(id => {
-      if (id) clearAuthCache(id, 'user');
+      if (id) clearAuthCache(id, req.user.portal);
     });
 
-    await logAction(user.email, user.role, 'USER_PROFILE_UPDATED', { changed: Object.keys(req.body) }, req.ip, req.headers['user-agent']);
-    res.json({ success: true, user: user.toObject() });
+    await logAction(account.email, account.role, `${req.user.portal.toUpperCase()}_PROFILE_UPDATED`, { changed: Object.keys(req.body) }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, user: { ...account.toObject(), role: account.role, portal: req.user.portal } });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    console.error('Profile update error:', err.message);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 
-// Đổi mật khẩu user
-router.put('/password', auth, async (req, res) => {
+// Đổi mật khẩu (Hỗ trợ User, Business, Admin)
+router.put('/password', sharedAuth, async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword) {
       return res.status(400).json({ success: false, message: 'Vui lòng nhập đầy đủ mật khẩu' });
     }
     
-    let user = await User.findOne({
+    const modelMap = { 'user': User, 'business': BusinessAccount, 'admin': AdminAccount };
+    const Model = modelMap[req.user.portal] || User;
+
+    let account = await Model.findOne({
       $or: [
         { customId: req.user.id },
         { id: req.user.id },
         ...(mongoose.Types.ObjectId.isValid(req.user.id) ? [{ _id: req.user.id }] : [])
       ]
     });
-    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    if (!account) return res.status(404).json({ success: false, message: 'Account not found' });
     
     // Kiểm tra mật khẩu cũ
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!isMatch && oldPassword !== user.password) { // Dự phòng pass lưu md5/plain-text cũ
+    const isMatch = await bcrypt.compare(oldPassword, account.password);
+    if (!isMatch && oldPassword !== account.password) { 
       return res.status(400).json({ success: false, message: 'Mật khẩu cũ không đúng' });
     }
 
     // Mã hóa và lưu mật khẩu mới
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
-    await user.save();
-    await logAction(user.email, user.role, 'USER_PASSWORD_CHANGED', {}, req.ip, req.headers['user-agent']);
+    account.password = await bcrypt.hash(newPassword, salt);
+    await account.save();
+    await logAction(account.email, account.role, `${req.user.portal.toUpperCase()}_PASSWORD_CHANGED`, {}, req.ip, req.headers['user-agent']);
     
     res.json({ success: true, message: 'Đổi mật khẩu thành công' });
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    console.error('Password update error:', err.message);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 

@@ -52,6 +52,14 @@
        MOCK AUTH SERVICE
        Thay đổi mockLogin() bằng fetch() thật khi có backend.
     ============================================================ */
+    const _getAuthToken = () => {
+      return localStorage.getItem('biz_auth_token') || 
+             localStorage.getItem('wander_business_token') ||
+             localStorage.getItem('biz_token') ||
+             localStorage.getItem('token') ||
+             sessionStorage.getItem('biz_auth_token') || 
+             sessionStorage.getItem('wander_business_token');
+    };
     const AUTH_TOKEN_KEY = 'biz_auth_token';
     const AUTH_USER_KEY  = 'biz_auth_user';
     const REG_DB_KEY     = 'biz_registered_users';
@@ -103,7 +111,7 @@
       },
       getSession() {
         try {
-          const token = localStorage.getItem(AUTH_TOKEN_KEY) || sessionStorage.getItem(AUTH_TOKEN_KEY);
+          const token = _getAuthToken();
           const raw   = localStorage.getItem(AUTH_USER_KEY)  || sessionStorage.getItem(AUTH_USER_KEY);
           if (token && raw) return { token, user: JSON.parse(raw) };
         } catch(e) {}
@@ -822,10 +830,7 @@
 
       useEffect(() => {
         // Nếu đã có token hợp lệ → redirect thẳng sang index.html
-        const token = localStorage.getItem('biz_auth_token') ||
-                      sessionStorage.getItem('biz_auth_token') ||
-                      localStorage.getItem('wander_business_token') ||
-                      sessionStorage.getItem('wander_business_token');
+        const token = _getAuthToken();
 
         if (token) {
           // Verify token với server trước khi redirect
@@ -856,7 +861,7 @@
       useEffect(() => {
         if (!currentUser) return;
         const ping = () => {
-          const token = localStorage.getItem('biz_auth_token') || sessionStorage.getItem('biz_auth_token');
+                    const token = _getAuthToken();
           if (!token) return;
           fetch('/api/auth/business/me', { headers: { 'x-auth-token': token } }).catch(() => {});
         };
@@ -873,7 +878,7 @@
       const handleLogout = useCallback(() => {
         mockAuthService.logout();
         // Xóa tất cả token keys
-        ['biz_auth_token', 'wander_business_token'].forEach(k => {
+        ['biz_auth_token', 'wander_business_token', 'biz_token', 'token'].forEach(k => {
           localStorage.removeItem(k);
           sessionStorage.removeItem(k);
         });
@@ -1011,7 +1016,7 @@
 
       useEffect(() => {
         const fetchData = async () => {
-          const token = localStorage.getItem('biz_auth_token') || sessionStorage.getItem('biz_auth_token');
+                    const token = _getAuthToken();
           if (!token) return;
           try {
             // Load items (từ Backend API)
@@ -1062,7 +1067,7 @@
       }, [currentUser]);
 
       const markNotifRead = async (id) => {
-        const token = localStorage.getItem('biz_auth_token') || sessionStorage.getItem('biz_auth_token');
+                  const token = _getAuthToken();
         await fetch(`/api/notifications/read/${id}`, { method: 'PUT', headers: { 'x-auth-token': token } });
         setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
         setUnreadNotifCount(prev => Math.max(0, prev - 1));
@@ -1120,7 +1125,7 @@
         e.preventDefault();
         if (!formData.name || !formData.category || !formData.region || !formData.address || !formData.description) return window.alert('Vui lòng điền đầy đủ tên, phân loại, khu vực, địa chỉ và mô tả.');
         
-        const token = localStorage.getItem('biz_auth_token') || sessionStorage.getItem('biz_auth_token');
+                  const token = _getAuthToken();
         const url = editingItem ? `/api/business/places/${editingItem.id}` : '/api/business/places';
         const method = editingItem ? 'PUT' : 'POST';
 
@@ -1147,7 +1152,7 @@
       };
       const handleDelete = async (id) => { 
         if (window.confirm('Bạn có chắc chắn muốn xóa mục này?')) {
-          const token = localStorage.getItem('biz_auth_token') || sessionStorage.getItem('biz_auth_token');
+                    const token = _getAuthToken();
           try {
             const res = await fetch(`/api/business/places/${id}`, { 
               method: 'DELETE',
@@ -1164,7 +1169,7 @@
 
       const handleReply = async () => {
         if (!activeConv || !replyText.trim()) return;
-        const token = localStorage.getItem('biz_auth_token') || sessionStorage.getItem('biz_auth_token');
+                  const token = _getAuthToken();
         try {
           const res = await fetch('/api/business/messages', {
             method: 'POST',

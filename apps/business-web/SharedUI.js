@@ -12,6 +12,11 @@ window.WanderUI = Object.assign(window.WanderUI || {}, function () {
   'use strict';
 
   var STORAGE_THEME = 'wander_theme';
+  
+  // Global HTML escaping helper
+  window.esc = function(str) {
+    return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
 
   // --- Theme Management ---
   function setTheme(theme) {

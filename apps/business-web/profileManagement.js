@@ -1,4 +1,4 @@
-﻿/**
+/**
  * profileManagement.js — Trang hồ sơ doanh nghiệp (Zenith Dark Edition)
  */
 (function () {
@@ -28,7 +28,7 @@
     function getDefaultBiz(user) {
         return {
             id:          (user && (user.id || user._id)) || 'biz_default',
-            name:        (user && (user.name || user.displayName)) || 'Doanh nghiệp của tôi',
+            name:        (user && (user.displayName || user.name)) || 'Doanh nghiệp của tôi',
             description: (user && user.description) || 'Chúng tôi cung cấp các dịch vụ du lịch cao cấp, trải nghiệm khó quên cho khách hàng trên khắp Việt Nam.',
             address:     (user && user.address) || '123 Đường Lê Lợi, Quận 1, TP. Hồ Chí Minh',
             phone:       (user && user.phone)   || '0901 234 567',

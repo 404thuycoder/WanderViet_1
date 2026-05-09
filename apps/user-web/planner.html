@@ -246,6 +246,14 @@
               <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.5rem;">Chọn một lịch trình đã lưu để đối chiếu với bản hiện tại</p>
             </div>
             
+            <div class="compare-filter-bar" style="display: flex; gap: 0.5rem; padding: 0 1.5rem; margin-bottom: 1rem; overflow-x: auto;">
+              <button class="filter-tab active" data-status="all" onclick="filterComparisonTrips('all')">Tất cả</button>
+              <button class="filter-tab" data-status="planning" onclick="filterComparisonTrips('planning')">Đang lên lịch</button>
+              <button class="filter-tab" data-status="completed" onclick="filterComparisonTrips('completed')">Đã đi</button>
+              <button class="filter-tab" data-status="missed" onclick="filterComparisonTrips('missed')">Bỏ lỡ</button>
+              <button class="filter-tab" data-status="deleted" onclick="filterComparisonTrips('deleted')">Đã xóa</button>
+            </div>
+
             <div id="savedTripsList" class="saved-trips-list-v2" style="flex:1; overflow-y:auto; padding:0.5rem;">
               <!-- List will be rendered here -->
             </div>
@@ -517,17 +525,8 @@
       // Tab switching (Mode selector)
       document.querySelectorAll('.mode-toggle-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          const resultsContainer = document.getElementById('itineraryResults');
-          const hasResults = resultsContainer && resultsContainer.innerHTML.trim() !== "";
-          
+          const resultsContainer = document.getElementById('timelineResult');
           if (btn.id === 'btnModeCompare') {
-            if (!hasResults) {
-              document.querySelectorAll('.mode-toggle-btn').forEach(b => b.classList.remove('active'));
-              document.getElementById('btnModeForm').classList.add('active');
-              document.getElementById('optionCount').value = "2";
-              alert("Hãy tạo lịch trình trước khi so sánh nhé! Đã bật chế độ tạo 2 phương án cho bạn.");
-              return;
-            }
             showComparisonView();
           } else {
             document.querySelectorAll('.mode-toggle-btn').forEach(b => b.classList.remove('active'));
@@ -541,11 +540,15 @@
     });
 
     function showComparisonView(plans, names) {
+      if (!plans || !Array.isArray(plans)) {
+        // Nếu không có dữ liệu so sánh, thử lấy từ lịch sử (nếu có) hoặc bỏ qua
+        return;
+      }
       const resultsContainer = document.getElementById('timelineContent');
       if (!resultsContainer) return;
       
       const comparisonCardsHtml = plans.map((plan, idx) => {
-        const name = names[idx] || `Lựa chọn ${idx + 1}`;
+        const name = (names && names[idx]) || `Lựa chọn ${idx + 1}`;
         const accentColor = idx % 2 === 0 ? '#2563eb' : '#d97706';
         const bgColor = idx % 2 === 0 ? '#f8fafc' : '#fffbeb';
         const borderColor = idx % 2 === 0 ? '#e2e8f0' : '#fef3c7';
@@ -715,34 +718,67 @@
         });
         const json = await res.json();
         
-        if (json.success && json.data.length > 0) {
-          list.innerHTML = json.data.map(trip => `
+        // Lưu trữ dữ liệu gốc để filter
+        window._allSavedTrips = json.data || [];
+        filterComparisonTrips('all'); // Mặc định hiện tất cả
+      } catch (e) {
+        list.innerHTML = '<p style="color:#f43f5e; text-align:center; padding:2rem;">Không thể tải danh sách.</p>';
+      }
+    }
+
+    window.filterComparisonTrips = function(status) {
+      // Update UI tabs
+      document.querySelectorAll('.filter-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.status === status);
+      });
+
+      const list = document.getElementById('savedTripsList');
+      if (!list || !window._allSavedTrips) return;
+
+      let filtered;
+      if (status === 'all') {
+        filtered = window._allSavedTrips;
+      } else if (status === 'deleted') {
+        filtered = window._allSavedTrips.filter(t => t.isDeleted === true);
+      } else {
+        filtered = window._allSavedTrips.filter(t => t.status === status && !t.isDeleted);
+      }
+
+      if (filtered.length > 0) {
+        list.innerHTML = filtered.map(trip => {
+          let statusBadge = '';
+          if (trip.status === 'completed') statusBadge = '<span class="trip-badge-mini completed">Đã đi</span>';
+          if (trip.status === 'missed') statusBadge = '<span class="trip-badge-mini missed">Bỏ lỡ</span>';
+          if (trip.isDeleted) statusBadge = '<span class="trip-badge-mini deleted">Đã xóa</span>';
+
+          return `
             <div class="saved-trip-item-v2" onclick="toggleTripSelection(this, '${trip._id}')">
               <div class="trip-selection-check">
-                <input type="checkbox" id="check_${trip._id}" class="trip-checkbox">
+                <input type="checkbox" id="check_${trip._id}" class="trip-checkbox" ${selectedTripIds.includes(trip._id) ? 'checked' : ''}>
               </div>
               <div class="trip-info">
-                <strong>📍 ${trip.destination}</strong>
+                <strong>📍 ${trip.destination}</strong> ${statusBadge}
                 <p>${trip.days} ngày - ${new Date(trip.createdAt).toLocaleDateString('vi-VN')}</p>
               </div>
             </div>
-          `).join('');
-          
-          // Thêm nút kích hoạt so sánh ở dưới cùng danh sách
-          list.insertAdjacentHTML('beforeend', `
-            <div id="compareActionArea" style="margin-top: 1.5rem; display: none;">
-              <button id="btnStartMultiCompare" class="planner-btn" style="background: var(--accent);">
-                🚀 So sánh các mục đã chọn
-              </button>
-            </div>
-          `);
-          
-          document.getElementById('btnStartMultiCompare').onclick = startMultiCompare;
-        } else {
-          list.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:2rem;">Bạn chưa có lịch trình nào đã lưu.</p>';
-        }
-      } catch (e) {
-        list.innerHTML = '<p style="color:#f43f5e; text-align:center; padding:2rem;">Không thể tải danh sách.</p>';
+          `;
+        }).join('');
+        
+        // Thêm nút kích hoạt so sánh ở dưới cùng danh sách
+        list.insertAdjacentHTML('beforeend', `
+          <div id="compareActionArea" style="margin-top: 1.5rem; display: block; background: var(--bg-elevated); padding: 1rem; border-top: 1px solid var(--border); position: sticky; bottom: 0;">
+            <button id="btnStartMultiCompare" class="planner-btn" style="background: var(--accent); width:100%;" ${selectedTripIds.length < 2 ? 'disabled' : ''}>
+              🚀 So sánh <span id="compareCount">${selectedTripIds.length}</span> lịch trình
+            </button>
+            ${selectedTripIds.length < 2 ? '<p style="font-size:0.7rem; color:var(--text-muted); text-align:center; margin-top:0.5rem;">Chọn ít nhất 2 bản để so sánh</p>' : ''}
+          </div>
+        `);
+        
+        const btn = document.getElementById('btnStartMultiCompare');
+        if (btn) btn.onclick = startMultiCompare;
+      } else {
+        const labels = { all: 'tất cả', planning: 'Đang lên lịch', completed: 'Đã đi', missed: 'Bỏ lỡ', deleted: 'Đã xóa' };
+        list.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding:2rem;">Bạn chưa có lịch trình nào ở trạng thái ${labels[status]}.</p>`;
       }
     }
 
@@ -760,11 +796,23 @@
         if (checkbox) checkbox.checked = true;
       }
       
+      // Cập nhật trạng thái nút và counter
+      const countEl = document.getElementById('compareCount');
+      const btn = document.getElementById('btnStartMultiCompare');
       const actionArea = document.getElementById('compareActionArea');
-      if (selectedTripIds.length > 0) {
-        actionArea.style.display = 'block';
-      } else {
-        actionArea.style.display = 'none';
+
+      if (countEl) countEl.textContent = selectedTripIds.length;
+      if (btn) {
+        btn.disabled = selectedTripIds.length < 2;
+        // Cập nhật hint text
+        let hint = btn.nextElementSibling;
+        if (selectedTripIds.length < 2) {
+          if (!hint || hint.tagName !== 'P') {
+            btn.insertAdjacentHTML('afterend', '<p style="font-size:0.7rem; color:var(--text-muted); text-align:center; margin-top:0.5rem;">Chọn ít nhất 2 bản để so sánh</p>');
+          }
+        } else {
+          if (hint && hint.tagName === 'P') hint.remove();
+        }
       }
     };
 

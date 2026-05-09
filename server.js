@@ -56,6 +56,9 @@ app.use((req, res, next) => {
 // Force UTF-8 for all JSON API responses to fix Vietnamese encoding issues
 app.use('/api', (req, res, next) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  if (req.path.includes('login')) {
+    console.log(`[API DEBUG] ${req.method} ${req.path}`, req.body);
+  }
   next();
 });
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * bookingManagement.js — Real Data Edition
  * Fetch đơn hàng thật từ API /api/bookings (role: business)
  * Hỗ trợ: lọc tab, tìm kiếm, cập nhật trạng thái, xuất CSV.
@@ -95,7 +95,7 @@
         .bk-loading { text-align: center; padding: 80px; color: var(--text-muted); }
         .bk-empty { text-align: center; padding: 80px; color: var(--text-muted); }
         /* Modal */
-        .bk-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 9000; }
+        .bk-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 999999; }
         .bk-modal-overlay.active { display: flex; }
         .bk-modal-card { background: #111827; border: 1px solid var(--border-color); border-radius: 24px; width: 100%; max-width: 560px; padding: 32px; box-shadow: 0 40px 100px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
         .bk-modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }

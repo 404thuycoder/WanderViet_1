@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
           var dt = new Date(d.createdAt).toLocaleDateString('vi-VN');
           
           var info = '<div style="opacity: 0.9;">' +
-                     '<h3 style="margin: 0 0 0.5rem; color: var(--text); font-family: var(--font-display);">' + (d.destination || 'Chuyến đi') + '</h3>' +
+                     '<h3 style="margin: 0 0 0.5rem; color: var(--text); font-family: var(--font-display);">' + esc(d.destination || 'Chuyến đi') + '</h3>' +
                      '<p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Tạo ngày: ' + dt + '</p>' +
                      '</div>';
           
@@ -240,16 +240,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if (mode === 'planned') {
         // Tab Đang lên lịch
-        actionsHtml += '<button class="delete-trip-btn btn btn--ghost btn--small" style="color:#f43f5e;" data-id="' + it._id + '" data-name="' + (it.destination || 'Chuyến đi') + '">Xóa</button>';
+        actionsHtml += '<button class="delete-trip-btn btn btn--ghost btn--small" style="color:#f43f5e;" data-id="' + it._id + '" data-name="' + esc(it.destination || 'Chuyến đi') + '">Xóa</button>';
         actionsHtml += '<button class="mark-experienced-btn btn btn--outline btn--small" style="color:#10b981; border-color:#10b981;" data-id="' + it._id + '">Đã đi</button>';
         if (!isPast) {
-           actionsHtml += '<button class="start-trip-btn btn btn--primary btn--small" style="border-radius: 8px;" data-dest="' + (it.destination || '') + '" data-json=\'' + jsonStr.replace(/'/g, "&#39;") + '\'>🚀 Lên đường ngay</button>';
+           actionsHtml += '<button class="start-trip-btn btn btn--primary btn--small" style="border-radius: 8px;" data-dest="' + esc(it.destination || '') + '" data-json=\'' + jsonStr.replace(/'/g, "&#39;") + '\'>🚀 Lên đường ngay</button>';
         }
       } else if (mode === 'experienced') {
-        actionsHtml += '<button class="delete-trip-btn btn btn--ghost btn--small" style="color:#f43f5e;" data-id="' + it._id + '" data-name="' + (it.destination || 'Chuyến đi') + '">Xóa</button>';
+        actionsHtml += '<button class="delete-trip-btn btn btn--ghost btn--small" style="color:#f43f5e;" data-id="' + it._id + '" data-name="' + esc(it.destination || 'Chuyến đi') + '">Xóa</button>';
         actionsHtml += '<button class="reschedule-trip-btn btn btn--outline btn--small" style="color:#6366f1; border-color:#6366f1;" data-id="' + it._id + '">🔄 Lập lịch lại</button>';
       } else if (mode === 'missed') {
-        actionsHtml += '<button class="delete-trip-btn btn btn--ghost btn--small" style="color:#f43f5e;" data-id="' + it._id + '" data-name="' + (it.destination || 'Chuyến đi') + '">Xóa</button>';
+        actionsHtml += '<button class="delete-trip-btn btn btn--ghost btn--small" style="color:#f43f5e;" data-id="' + it._id + '" data-name="' + esc(it.destination || 'Chuyến đi') + '">Xóa</button>';
         actionsHtml += '<button class="mark-experienced-btn btn btn--outline btn--small" style="color:#10b981; border-color:#10b981;" data-id="' + it._id + '">Đã đi</button>';
         actionsHtml += '<button class="reschedule-trip-btn btn btn--outline btn--small" style="color:#6366f1; border-color:#6366f1;" data-id="' + it._id + '">🔄 Lập lịch lại</button>';
       }
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
         '<div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">' +
           '<div>' +
             '<div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem; flex-wrap: wrap;">' +
-              '<h2 style="font-size: 1.5rem; color: var(--text); margin: 0; font-family: var(--font-display);">' + (it.destination || 'Điểm đến') + '</h2>' +
+              '<h2 style="font-size: 1.5rem; color: var(--text); margin: 0; font-family: var(--font-display);">' + esc(it.destination || 'Điểm đến') + '</h2>' +
               tripDateBadge +
             '</div>' +
             '<p style="color: var(--text-muted); font-size: 0.95rem;">🕒 Xếp lịch: ' + (it.days || 0) + ' Ngày' + companionInfo + costInfo + hotelInfo + ' ' + tripDateLabel + ' • 📅 Lưu ngày ' + dpDateString + '</p>' +

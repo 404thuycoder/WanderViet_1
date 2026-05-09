@@ -135,46 +135,89 @@
         });
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-        const ownerName = new URLSearchParams(window.location.search).get('name');
+        const params = new URLSearchParams(window.location.search);
+        const ownerName = params.get('name');
+        const ownerId = params.get('id');
         let isFollowing = false;
 
         function toggleFollow() {
             isFollowing = !isFollowing;
             const btn = document.getElementById('follow-btn');
+            const name = document.getElementById('biz-name').innerText;
             btn.innerText = isFollowing ? '✓ ĐANG THEO DÕI' : '+ THEO DÕI';
             btn.classList.toggle('active', isFollowing);
             if(window.WanderUI && window.WanderUI.showToast) {
-                window.WanderUI.showToast(isFollowing ? `Đã theo dõi ${ownerName}` : `Đã bỏ theo dõi`);
+                window.WanderUI.showToast(isFollowing ? `Đã theo dõi ${name}` : `Đã bỏ theo dõi`);
             }
         }
 
         async function load() {
-            if(!ownerName) return;
-            document.getElementById('biz-name').innerText = ownerName;
-            document.getElementById('biz-logo').innerText = ownerName.charAt(0).toUpperCase();
-            
             try {
-                const res = await fetch('/api/public/all-places');
-                const json = await res.json();
-                if(!json.success) return;
-                
-                const myPlaces = json.data.filter(p => p.ownerName === ownerName);
-                document.getElementById('svc-grid').innerHTML = myPlaces.map(p => `
-                    <div class="s-card" onclick="window.location.href='place-detail.html?id=${p._id || p.id}'">
-                        <div class="s-img"><img src="${p.image}"></div>
-                        <div class="s-body">
-                            <span style="color:var(--primary); font-size:10px; font-weight:800; letter-spacing:2px; display:block; margin-bottom:8px;">${p.category || 'DỊCH VỤ'}</span>
-                            <h4 style="margin:0 0 8px; font-size:1.1rem; font-weight:800;">${p.name}</h4>
-                            <b style="color:var(--text-main);">${(p.price || 0).toLocaleString()} ₫</b>
-                        </div>
-                    </div>
-                `).join('');
-                
-                if(myPlaces.length > 0) {
-                    document.getElementById('biz-loc').innerText = (myPlaces[0].address || '').split(',').pop().trim();
-                    document.getElementById('biz-banner').src = myPlaces[0].image;
+                let biz = null;
+                let places = [];
+
+                if (ownerId) {
+                    const res = await fetch(`/api/public/business/${ownerId}/full`);
+                    const json = await res.json();
+                    if (json.success) {
+                        biz = json.data.business;
+                        places = json.data.places || [];
+                    }
                 }
-            } catch(e) {}
+
+                if (!biz && ownerName) {
+                    const res = await fetch('/api/public/businesses');
+                    const json = await res.json();
+                    if (json.success) {
+                        biz = json.data.find(b => (b.displayName || b.name) === ownerName);
+                        if (biz) {
+                            const pRes = await fetch(`/api/public/places?ownerId=${biz._id || biz.id || biz.customId}`);
+                            const pJson = await pRes.json();
+                            places = pJson.success ? pJson.data : [];
+                        }
+                    }
+                }
+
+                if (!biz) {
+                    document.getElementById('biz-name').innerText = "Không tìm thấy doanh nghiệp";
+                    return;
+                }
+
+                // Render Profile
+                const name = biz.displayName || biz.name;
+                document.title = name + ' - WanderViệt';
+                document.getElementById('biz-name').innerText = name;
+                document.getElementById('biz-logo').innerText = name.charAt(0).toUpperCase();
+                if (biz.avatar) {
+                    document.getElementById('biz-logo').innerHTML = `<img src="${biz.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`;
+                }
+                if (biz.notes || biz.description) {
+                    document.getElementById('biz-desc').innerText = biz.notes || biz.description;
+                }
+
+                // Render Services
+                const grid = document.getElementById('svc-grid');
+                if (places.length === 0) {
+                    grid.innerHTML = '<p style="color:var(--text-dim); grid-column: 1/-1; text-align:center; padding:40px;">Doanh nghiệp chưa có dịch vụ nào.</p>';
+                } else {
+                    grid.innerHTML = places.map(p => `
+                        <div class="s-card" onclick="window.location.href='place-detail.html?id=${p._id || p.id}'">
+                            <div class="s-img"><img src="${p.image || 'assets/img/place-placeholder.jpg'}"></div>
+                            <div class="s-body">
+                                <span style="color:var(--primary); font-size:10px; font-weight:800; letter-spacing:2px; display:block; margin-bottom:8px;">${p.kind || 'DỊCH VỤ'}</span>
+                                <h4 style="margin:0 0 8px; font-size:1.1rem; font-weight:800;">${p.name}</h4>
+                                <b style="color:var(--text-main);">${(p.priceFrom || 0).toLocaleString()} ₫</b>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    document.getElementById('biz-loc').innerText = biz.address || places[0].region || 'Việt Nam';
+                    document.getElementById('biz-banner').src = places[0].image || document.getElementById('biz-banner').src;
+                }
+            } catch(e) {
+                console.error("Load business error:", e);
+                document.getElementById('biz-name').innerText = "Lỗi tải dữ liệu";
+            }
         }
         window.onload = load;
     </script>

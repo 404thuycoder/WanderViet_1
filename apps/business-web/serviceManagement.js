@@ -50,7 +50,7 @@
         .sm-badge.rejected { background:rgba(239,68,68,0.1); color:#f87171; }
         .sm-badge.paused { background:rgba(148,163,184,0.1); color:#94a3b8; }
 
-        .sm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(10px); z-index:9999; align-items:center; justify-content:center; }
+        .sm-modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(10px); z-index:999999; align-items:center; justify-content:center; }
         .sm-modal-overlay.active { display:flex; }
         .sm-modal { background:#111827; border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:36px; width:100%; max-width:700px; max-height:95vh; overflow-y:auto; box-shadow: 0 40px 100px rgba(0,0,0,0.5); color:#fff; }
         .sm-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:28px; }

@@ -9,13 +9,18 @@
 <script>
   // AUTH GUARD
   (function() {
-    var token = localStorage.getItem('biz_auth_token') ||
-                sessionStorage.getItem('biz_auth_token') ||
-                localStorage.getItem('wander_business_token') ||
-                sessionStorage.getItem('wander_business_token');
-    if (!token) {
+    function _getAuthToken() {
+        return localStorage.getItem('biz_auth_token') || 
+               localStorage.getItem('wander_business_token') ||
+               localStorage.getItem('biz_token') ||
+               localStorage.getItem('token') ||
+               sessionStorage.getItem('biz_auth_token') || 
+               sessionStorage.getItem('wander_business_token');
+    }
+    if (!_getAuthToken()) {
       window.location.replace('dashboard.html');
     }
+    window._getAuthToken = _getAuthToken;
   })();
 </script>
 <style>
@@ -499,23 +504,20 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
 
     // Render tên user từ API
     try {
+      var token = _getAuthToken();
       if (token) {
         var meRes = await fetch('/api/auth/business/me', { headers: { 'x-auth-token': token } });
         var meData = await meRes.json();
         if (meData.success && meData.user) {
-          var bizName = meData.user.name || meData.user.displayName || 'Doanh nghiệp';
+          var bizName = meData.user.displayName || meData.user.name || 'Doanh nghiệp';
           var nameEl = document.getElementById('sidebar-name');
           var topbarEl = document.getElementById('topbar-username');
           var avatarEl = document.getElementById('sidebar-avatar');
           var tierEl = document.getElementById('sidebar-tier');
           
-          function esc(str) {
-            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          }
-
           if (nameEl) nameEl.innerHTML = `
             <div style="font-weight:700; font-size:13px; color:#f1f5f9;">${esc(bizName)} <span style="color:#6ee7b7;">✓</span></div>
-            <div style="font-size:10px; color:#818cf8; font-weight:700; margin-top:2px;">ID: ${esc(meData.user.customId || '')}</div>
+            <div style="font-size:10px; color:#818cf8; font-weight:700; margin-top:2px;">ID: ${esc(meData.user.customId || meData.user.id || '')}</div>
           `;
           if (topbarEl) topbarEl.textContent = bizName;
           if (avatarEl) { avatarEl.textContent = ''; avatarEl.textContent = bizName.charAt(0).toUpperCase(); }

@@ -356,8 +356,8 @@
                                         <div style="font-size:10px; font-weight:700; margin-bottom:12px; text-align:center;">CHỌN CỔNG THANH TOÁN</div>
                                         <div class="bank-grid" id="bank-grid-main">
                                             <div class="bank-opt active" onclick="setQR('mb', this, event)"><img src="https://api.vietqr.io/img/MB.png"></div>
-                                            <div class="bank-opt" onclick="setQR('momo', this, event)"><img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-MoMo-Transparent.png"></div>
-                                            <div class="bank-opt" onclick="setQR('zalopay', this, event)"><img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay-Square.png"></div>
+                                            <div class="bank-opt" onclick="setQR('momo', this, event)"><img src="https://www.google.com/s2/favicons?domain=momo.vn&sz=128"></div>
+                                            <div class="bank-opt" onclick="setQR('zalopay', this, event)"><img src="https://www.google.com/s2/favicons?domain=zalopay.vn&sz=128"></div>
                                             <div class="bank-opt bank-more" id="bank-toggle" onclick="toggleBanks(event)" style="font-size:12px;">KHÁC</div>
                                             
                                             <!-- Hidden Banks -->
@@ -491,10 +491,14 @@
             document.querySelector('.modal-content').scrollTop = 0;
             
             try {
+                let pMethod = currentM;
+                if (currentM === 'counter') pMethod = 'contact';
+                if (currentM === 'qr') pMethod = 'transfer';
+
                 const r = await fetch('/api/bookings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('wander_token')}` },
-                    body: JSON.stringify({ placeId: pid, customerName: name, customerPhone: document.getElementById('c-phone').value, useDate: document.getElementById('c-date').value, paymentMethod: 'card' })
+                    body: JSON.stringify({ placeId: pid, customerName: name, customerPhone: document.getElementById('c-phone').value, useDate: document.getElementById('c-date').value, paymentMethod: pMethod })
                 });
                 const j = await r.json();
                 if(j.success) {

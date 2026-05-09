@@ -825,6 +825,7 @@ const UserProfile = {
             `;
         }
     },
+    },
 
     loadFriends: async function () {
         const content = document.getElementById('profile-tab-content');

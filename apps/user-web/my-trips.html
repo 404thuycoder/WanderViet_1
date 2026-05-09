@@ -151,8 +151,8 @@
     <!-- Hero -->
     <section class="trips-hero">
       <div class="container" style="position:relative;z-index:1;">
-        <h1>🎒 Chuyến Đi Của Tôi</h1>
-        <p>Quản lý tour du lịch đã đặt và các lịch trình do AI lên kế hoạch cho bạn.</p>
+        <h1>🎒 Chuyến Đi & Dịch Vụ</h1>
+        <p>Quản lý các dịch vụ đã đặt, tour du lịch và các lịch trình do AI lên kế hoạch.</p>
       </div>
     </section>
 
@@ -172,7 +172,7 @@
           <!-- Main Tabs -->
           <div class="main-tab-wrap">
             <button class="main-tab active" data-main-tab="tours">
-              🗺️ Tour Du Lịch
+              🏢 Dịch vụ & Tour
               <span class="tab-badge" id="badge-tours">0</span>
             </button>
             <button class="main-tab" data-main-tab="mytrips">
@@ -188,6 +188,14 @@
               <button class="sub-tab" data-tour-tab="confirmed">✅ Đã xác nhận</button>
               <button class="sub-tab" data-tour-tab="completed">🏁 Hoàn thành</button>
               <button class="sub-tab danger" data-tour-tab="cancelled">🚫 Đã hủy</button>
+            </div>
+            <!-- Category filters -->
+            <div class="sub-tabs" style="margin-top: -0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 1.5rem;">
+              <button class="sub-tab active" data-cat-tab="all" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">🏷️ Tất cả</button>
+              <button class="sub-tab" data-cat-tab="tour" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">🎒 Tour</button>
+              <button class="sub-tab" data-cat-tab="nha-hang" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">🥘 Nhà hàng</button>
+              <button class="sub-tab" data-cat-tab="khach-san" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">🏨 Khách sạn</button>
+              <button class="sub-tab" data-cat-tab="others" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">✨ Khác</button>
             </div>
             <div id="toursList"><div class="spinner"></div></div>
           </div>
@@ -233,8 +241,9 @@
     document.getElementById('tripsContainer').style.display = 'block';
 
     var currentTourTab = 'pending';
-    var currentTripTab = 'planned';
+    var currentCatTab = 'all';
     var allBookings = [];
+    var allPlaces = [];
     var cancelTargetId = null;
 
     // ── Payment method labels ──
@@ -260,40 +269,72 @@
     }
 
     // ── Load Tours (bookings type=tour + service) ──
-    function loadTours() {
+    async function loadTours() {
       var list = document.getElementById('toursList');
       list.innerHTML = '<div class="spinner"></div>';
-      fetch('/api/bookings/my', { headers: { 'x-auth-token': token } })
-        .then(function(r){ return r.json(); })
-        .then(function(json) {
-          allBookings = (json.success && json.data) ? json.data : [];
-          document.getElementById('badge-tours').textContent = allBookings.length;
-          renderTourTab(currentTourTab);
-        })
-        .catch(function() { list.innerHTML = '<div class="empty-state"><p style="color:#ef4444;">Lỗi tải dữ liệu</p></div>'; });
+      
+      try {
+        // Load places if not already loaded
+        if (allPlaces.length === 0) {
+          const pRes = await fetch('/api/places');
+          const pJson = await pRes.json();
+          allPlaces = pJson.success ? pJson.data : [];
+        }
+
+        const res = await fetch('/api/bookings/my', { headers: { 'x-auth-token': token } });
+        const json = await res.json();
+        allBookings = (json.success && json.data) ? json.data : [];
+        document.getElementById('badge-tours').textContent = allBookings.length;
+        renderTourTab(currentTourTab, currentCatTab);
+      } catch (err) {
+        list.innerHTML = '<div class="empty-state"><p style="color:#ef4444;">Lỗi tải dữ liệu</p></div>';
+      }
     }
 
-    function renderTourTab(tab) {
-      currentTourTab = tab;
+    function renderTourTab(status, cat) {
+      currentTourTab = status;
+      currentCatTab = cat;
       var list = document.getElementById('toursList');
-      var filtered = allBookings.filter(function(b){ return b.status === tab; });
+      
+      var filtered = allBookings.filter(function(b) {
+        // Filter by status
+        if (b.status !== status) return false;
+        
+        // Filter by category
+        if (cat === 'all') return true;
+        
+        const place = allPlaces.find(p => p.id === b.placeId || p._id === b.placeId) || {};
+        if (cat === 'tour') return b.bookingType === 'tour' || place.isTour;
+        if (cat === 'others') return b.bookingType !== 'tour' && !['nha-hang', 'khach-san'].includes(place.kind) && !place.isTour;
+        return place.kind === cat;
+      });
+
       if (filtered.length === 0) {
-        list.innerHTML = '<div class="empty-state"><div class="empty-state__icon">📭</div><h3>Chưa có đơn nào trong mục này</h3><p>Khám phá các tour trên trang <a href="business-services.html" style="color:#6366f1;">Dịch vụ đối tác</a></p></div>';
+        list.innerHTML = '<div class="empty-state"><div class="empty-state__icon">📭</div><h3>Chưa có đơn nào trong mục này</h3><p>Khám phá các dịch vụ trên trang <a href="business-directory.html" style="color:#6366f1;">Dịch vụ đối tác</a></p></div>';
         return;
       }
       list.innerHTML = filtered.map(function(b) {
-        var isService = b.bookingType === 'service';
         var actions = '';
         if (b.status === 'pending' || b.status === 'confirmed') {
           actions += '<button class="btn-sm btn-danger" onclick="openCancelModal(\'' + b._id + '\')">Hủy đặt</button>';
         }
         if (b.paymentStatus !== 'paid' && b.totalPrice > 0 && b.status !== 'cancelled') {
-          actions += '<button class="btn-sm btn-success" onclick="payBooking(\'' + b.bookingId + '\')">Thanh toán</button>';
+          // Chỉ hiện nút thanh toán cho trường hợp "Liên hệ" (chưa chọn phương thức online lúc đặt)
+          if (b.paymentMethod === 'contact') {
+            actions += '<button class="btn-sm btn-success" onclick="payBooking(\'' + b.bookingId + '\')">Thanh toán</button>';
+          }
         }
+        
+        const place = allPlaces.find(p => p.id === b.placeId || p._id === b.placeId) || {};
+        var kindLabel = (b.bookingType === 'tour' || place.isTour) ? '🎒 Tour' : '✨ Dịch vụ';
+        if (place.kind === 'nha-hang') kindLabel = '🥘 Nhà hàng';
+        if (place.kind === 'khach-san') kindLabel = '🏨 Khách sạn';
+
         return '<div class="booking-card">' +
           '<div class="booking-card__head">' +
             '<div>' +
               '<div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.4rem;">' +
+                '<span style="font-size:0.7rem; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; color:#94a3b8; font-weight:700;">' + kindLabel + '</span>' +
                 '<h3 class="booking-card__title">' + (b.placeName || 'Dịch vụ') + '</h3>' +
                 statusBadge(b.status) +
                 payBadge(b.paymentStatus || 'unpaid') +
@@ -302,7 +343,7 @@
                 '<span>🎫 #' + b.bookingId + '</span>' +
                 '<span>👤 ' + b.customerName + '</span>' +
                 '<span>📞 ' + (b.customerPhone || '—') + '</span>' +
-                (b.tourDate ? '<span>🛫 Khởi hành: ' + fmtDate(b.tourDate) + '</span>' : '') +
+                (b.tourDate ? '<span>🛫 Khởi hành: ' + fmtDate(b.tourDate) + '</span>' : '<span>📅 Ngày dùng: ' + fmtDate(b.useDate) + '</span>') +
                 '<span>👥 ' + (b.peopleCount||1) + ' người</span>' +
                 '<span class="price-hl">💰 ' + fmtPrice(b.totalPrice) + '</span>' +
                 '<span>' + (PM_LABELS[b.paymentMethod]||'📞 Liên hệ') + '</span>' +
@@ -350,7 +391,16 @@
       btn.addEventListener('click', function() {
         document.querySelectorAll('[data-tour-tab]').forEach(function(b){ b.classList.remove('active'); });
         btn.classList.add('active');
-        renderTourTab(btn.dataset.tourTab);
+        renderTourTab(btn.dataset.tourTab, currentCatTab);
+      });
+    });
+
+    // ── Sub-tab wiring for categories ──
+    document.querySelectorAll('[data-cat-tab]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-cat-tab]').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        renderTourTab(currentTourTab, btn.dataset.catTab);
       });
     });
 

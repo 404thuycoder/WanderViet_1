@@ -252,6 +252,9 @@
     if (window.WanderUI && WanderUI.syncAuthUI) {
       WanderUI.syncAuthUI();
     }
+    if (typeof updateContactPrefill === 'function') {
+      updateContactPrefill();
+    }
   }
   function syncRoleFromToken() {
     try {
@@ -2374,15 +2377,40 @@
   /* ——— Contact form ——— */
   function updateContactPrefill() {
     var form = document.querySelector("[data-contact-form]");
-    var sess = getSession();
-    if (!form || !sess) return;
-    var u = getUsers().find(function (x) {
-      return x.email === sess.email;
-    });
-    var em = form.querySelector('input[name="email"]');
-    var nm = form.querySelector('input[name="name"]');
-    if (em && !em.value) em.value = sess.email;
-    if (nm && u && !nm.value) nm.value = u.name || "";
+    if (!form) return;
+    
+    var userInfoEl = document.getElementById('contact-user-info');
+    var guestFieldsEl = document.getElementById('contact-guest-fields');
+    var displayNameEl = document.getElementById('contact-display-name');
+    
+    var token = localStorage.getItem('wander_token');
+    if (token) {
+      try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        const payload = JSON.parse(jsonPayload);
+        var user = payload.user || payload;
+        
+        if (userInfoEl) userInfoEl.style.display = 'block';
+        if (guestFieldsEl) guestFieldsEl.style.display = 'none';
+        if (displayNameEl) displayNameEl.textContent = user.displayName || user.name || user.email;
+        
+        // Remove required attribute from hidden fields to avoid validation errors
+        var nameInput = document.getElementById('contact-name');
+        var emailInput = document.getElementById('contact-email');
+        if (nameInput) nameInput.removeAttribute('required');
+        if (emailInput) emailInput.removeAttribute('required');
+      } catch (e) {
+        if (userInfoEl) userInfoEl.style.display = 'none';
+        if (guestFieldsEl) guestFieldsEl.style.display = 'block';
+      }
+    } else {
+      if (userInfoEl) userInfoEl.style.display = 'none';
+      if (guestFieldsEl) guestFieldsEl.style.display = 'block';
+    }
   }
   var form = document.querySelector("[data-contact-form]");
   var statusEl = document.querySelector("[data-form-status]");
@@ -2421,19 +2449,39 @@
     form.addEventListener("submit", function (e) {
       e.preventDefault();
       
-      // Validate email
-      var emailVal = emailInput ? emailInput.value.trim() : "";
-      if (!emailVal || !emailVal.includes('@') || !emailVal.includes('.')) {
-        statusEl.textContent = "✖ Email không hợp lệ";
-        statusEl.classList.add("is-error");
-        if (window.WanderUI) WanderUI.showToast('Email không hợp lệ', 'error');
-        return;
+      var token = localStorage.getItem('wander_token');
+      var nameVal = "", emailVal = "";
+      
+      if (token) {
+        try {
+          const base64Url = token.split('.')[1];
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+          const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join(''));
+          const payload = JSON.parse(jsonPayload);
+          const u = payload.user || payload.account || payload;
+          nameVal = u.displayName || u.name;
+          emailVal = u.email;
+        } catch(err) {}
+      }
+      
+      if (!nameVal || !emailVal) {
+          // Validate email for guests
+          emailVal = emailInput ? emailInput.value.trim() : "";
+          nameVal = nameInput ? nameInput.value.trim() : "";
+          if (!emailVal || !emailVal.includes('@') || !emailVal.includes('.')) {
+            statusEl.textContent = "✖ Email không hợp lệ";
+            statusEl.classList.add("is-error");
+            if (window.WanderUI) WanderUI.showToast('Email không hợp lệ', 'error');
+            return;
+          }
       }
       
       // Validate message
       var messageVal = form.querySelector('textarea[name="message"]').value.trim();
-      if (messageVal.length < 10) {
-        statusEl.textContent = "✖ Nội dung quá ngắn (tối thiểu 10 ký tự)";
+      if (messageVal.length < 5) {
+        statusEl.textContent = "✖ Nội dung quá ngắn";
         statusEl.classList.add("is-error");
         if (window.WanderUI) WanderUI.showToast('Nội dung quá ngắn', 'error');
         return;
@@ -2443,23 +2491,35 @@
       statusEl.classList.remove("is-success", "is-error");
       var fd = new FormData(form);
       var payload = {
-        name: fd.get("name") || "",
-        email: fd.get("email") || "",
+        name: nameVal || fd.get("name") || "",
+        email: emailVal || fd.get("email") || "",
         message: fd.get("message") || "",
         image: currentImageBase64
       };
+      
       fetch('/api/feedback', {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "x-auth-token": token || ""
+        },
         body: JSON.stringify(payload)
       }).then(function (res) { return res.json(); })
       .then(function (json) {
         if (json.success) {
-          statusEl.textContent = "✔ Đã gửi yêu cầu! Cảm ơn bạn.";
-          statusEl.classList.add("is-success");
+          statusEl.textContent = "";
           form.reset();
           currentImageBase64 = null;
           if (imagePreviewWrap) imagePreviewWrap.style.display = "none";
+          
+          var successMsg = document.getElementById('contact-success-msg');
+          if (successMsg) {
+              successMsg.style.display = 'block';
+              form.querySelector('button[type="submit"]').style.display = 'none';
+          } else {
+              statusEl.textContent = "✔ Đã gửi yêu cầu! Cảm ơn bạn.";
+              statusEl.classList.add("is-success");
+          }
           updateContactPrefill();
         } else {
           statusEl.textContent = "✖ Lỗi: " + (json.message || "Không thể gửi.");
@@ -3222,5 +3282,6 @@
   loadPublicStats();
   loadPublicReviews();
   loadTopPartners();
+  if (typeof updateContactPrefill === 'function') updateContactPrefill();
 })();
 

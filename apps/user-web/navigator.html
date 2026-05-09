@@ -23,7 +23,7 @@
 
 <body>
   <header class="site-header" id="header-container" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;"></header>
-  <div class="app-layout" style="margin-top: 60px;">
+  <div class="app-layout" style="height: calc(100vh - 60px); margin-top: 60px;">
     <!-- Sidebar trái (1/3): Chức năng, thông số -->
     <aside class="sidebar-left">
       <div class="sidebar-header">
@@ -104,16 +104,16 @@
         <div id="status-text" class="status-msg">Chờ tín hiệu GPS...</div>
         <div class="sidebar-actions">
           <div id="companion-toggle" class="mic-fab-sidebar" title="Trợ lý WanderViệt">
-            🎙️
+            <i class="fas fa-microphone"></i>
             <div class="pulse-rings"></div>
           </div>
           <div class="main-buttons">
             <div class="button-row">
-              <button id="start-nav-btn" class="btn btn--primary" hidden><i class="fas fa-rocket"></i> BẮT ĐẦU</button>
-              <button id="pause-nav-btn" class="btn btn--warning" hidden disabled><i class="fas fa-pause"></i> TẠM DỪNG</button>
+              <button id="start-nav-btn" class="btn btn--primary" hidden><i class="fas fa-rocket"></i> Bắt đầu</button>
+              <button id="pause-nav-btn" class="btn btn--warning" hidden disabled><i class="fas fa-pause"></i> Tạm dừng</button>
             </div>
-            <button id="exit-nav-btn" class="btn btn--danger btn-full" style="margin-top: 10px;" hidden><i class="fas fa-door-open"></i> THOÁT</button>
-            <button id="arrived-btn" class="btn btn--success btn-full" style="margin-top: 10px;" hidden><i class="fas fa-check-circle"></i> ĐẾN NƠI</button>
+            <button id="exit-nav-btn" class="btn btn--danger btn-full" style="margin-top: 10px;" hidden><i class="fas fa-door-open"></i> Thoát</button>
+            <button id="arrived-btn" class="btn btn--success btn-full" style="margin-top: 10px;" hidden><i class="fas fa-check-circle"></i> Đến nơi</button>
           </div>
         </div>
       </div>

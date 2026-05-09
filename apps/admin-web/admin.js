@@ -2511,10 +2511,12 @@
       const lastMsg = fb.replies && fb.replies.length > 0 ? fb.replies[fb.replies.length - 1].content : fb.message;
       const statusLabel = fb.status === 'open' ? '🟢' : (fb.status === 'resolved' ? '🔵' : '⚫');
       const timeStr = new Date(fb.createdAt).toLocaleDateString('vi-VN');
+      const lastUserReply = (fb.replies || []).slice().reverse().find(r => r.senderRole === 'user' || r.senderRole === 'business');
+      const displayName = lastUserReply ? lastUserReply.senderName : fb.name;
 
       div.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
-          <div style="font-weight:600; font-size:0.85rem; color:${currentSupportChatId === fb._id ? 'var(--primary)' : '#fff'};">${fb.name}</div>
+          <div style="font-weight:600; font-size:0.85rem; color:${currentSupportChatId === fb._id ? 'var(--primary)' : '#fff'};">${displayName}</div>
           <div style="display:flex; align-items:center; gap:6px;">
             <div style="font-size:0.7rem; color:var(--admin-text-muted);">${statusLabel} ${timeStr}</div>
             <button class="delete-fb-btn" data-id="${fb._id}" style="background:none; border:none; color:var(--admin-text-muted); padding:2px; cursor:pointer; opacity:0.6; transition:0.2s;" onmouseover="this.style.opacity='1';this.style.color='#ff4d4d'" onmouseout="this.style.opacity='0.6';this.style.color='var(--admin-text-muted)'">
@@ -2573,7 +2575,10 @@
     const inputEl = document.getElementById('support-input');
     const sendBtn = document.getElementById('btn-support-send');
 
-    titleEl.textContent = fb.name;
+    const lastUserReply = (fb.replies || []).slice().reverse().find(r => r.senderRole === 'user' || r.senderRole === 'business');
+    const displayName = lastUserReply ? lastUserReply.senderName : fb.name;
+
+    titleEl.textContent = displayName;
     metaEl.textContent = fb.email + ' - ' + new Date(fb.createdAt).toLocaleString('vi-VN');
     
     statusSelect.disabled = false;
@@ -2617,6 +2622,7 @@
               <div style="font-size:0.72rem; color:#a5b4fc; margin-bottom:4px; text-align:right;">${r.senderName} • ${timeStr}</div>
               <div style="background:linear-gradient(135deg,#6366f1,#4f46e5); color:#fff; padding:10px 14px; border-radius:12px 4px 12px 12px; font-size:0.88rem; line-height:1.5; word-break:break-word; box-shadow:0 4px 12px rgba(99,102,241,0.3);">
                 ${r.content}
+                ${r.image ? `<div style="margin-top:8px;"><img src="${r.image}" onclick="window.open('${r.image}', '_blank')" style="max-width:100%; border-radius:6px; max-height:180px; object-fit:cover; cursor:zoom-in;" /></div>` : ''}
               </div>
             </div>
           </div>
@@ -2626,6 +2632,7 @@
               <div style="font-size:0.72rem; color:var(--admin-text-muted); margin-bottom:4px;">${r.senderName} • ${timeStr}</div>
               <div style="background:rgba(255,255,255,0.07); color:#fff; padding:10px 14px; border-radius:4px 12px 12px 12px; font-size:0.88rem; line-height:1.5; word-break:break-word; border:1px solid rgba(255,255,255,0.08);">
                 ${r.content}
+                ${r.image ? `<div style="margin-top:8px;"><img src="${r.image}" onclick="window.open('${r.image}', '_blank')" style="max-width:100%; border-radius:6px; max-height:180px; object-fit:cover; cursor:zoom-in;" /></div>` : ''}
               </div>
             </div>
           </div>

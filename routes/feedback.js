@@ -19,30 +19,12 @@ const checkRole = (roles) => {
   };
 };
 
-// Optional auth middleware for public submission
-const optionalAuth = (req, res, next) => {
-  const token = req.header('x-auth-token');
-  if (!token || token === 'null' || token === 'undefined') return next();
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const account = decoded.account || decoded.user || decoded;
-    if (account) {
-      req.user = {
-        id: account.id || account._id || account.customId,
-        email: account.email,
-        name: account.name || account.displayName,
-        role: account.role || account.portal
-      };
-    }
-  } catch (err) {}
-  next();
-};
 
 // @route   GET /api/feedback/my-feedbacks (Flexible Auth)
 router.get('/my-feedbacks', flexibleAuth, async (req, res) => {
   try {
-    const email = req.user.email;
-    const userId = req.user.id;
+    const email = req.user ? req.user.email : null;
+    const userId = req.user ? req.user.id : null;
     const feedbacks = await Feedback.find({ 
       $or: [ { email: email }, { userId: userId } ] 
     }).sort({ createdAt: -1 });
@@ -53,10 +35,16 @@ router.get('/my-feedbacks', flexibleAuth, async (req, res) => {
 });
 
 // @route   POST /api/feedback (Public submission with merging)
-router.post('/', optionalAuth, async (req, res) => {
+router.post('/', flexibleAuth, async (req, res) => {
   try {
-    const { name, email, message, image } = req.body;
-
+    let { name, email, message, image } = req.body;
+    
+    // Auto-prefill from auth if missing
+    if (req.user) {
+      name = name || req.user.displayName || req.user.name;
+      email = email || req.user.email;
+    }
+    
     if (!message || !name || !email) {
       return res.status(400).json({ success: false, message: 'Vui lòng nhập đầy đủ tên, email và nội dung' });
     }
@@ -104,10 +92,11 @@ router.post('/', optionalAuth, async (req, res) => {
       recipientType: 'admin',
       senderId: req.user ? req.user.id : null,
       senderName: name,
-      type: 'system',
+      type: 'message',
       title: 'Phản hồi mới từ người dùng',
       message: `${name} vừa gửi một phản hồi mới.`,
-      link: '#support',
+      relatedId: targetFeedback._id,
+      link: 'feedback.html',
       isRead: false
     });
 
@@ -142,18 +131,17 @@ router.post('/:id/reply', flexibleAuth, async (req, res) => {
     if (!feedback) return res.status(404).json({ success: false, message: 'Không tìm thấy cuộc hội thoại' });
 
     const isAdmin = ['admin', 'superadmin'].includes(req.user.role);
-    const isOwner = (feedback.userId === req.user.id) || (feedback.email === req.user.email);
-    const isBusiness = req.user.role === 'business';
+    const isOwner = (feedback.userId && feedback.userId.toString() === req.user.id.toString()) || 
+                    (feedback.email && feedback.email.toLowerCase() === req.user.email.toLowerCase());
 
-    // Restriction: Only Admin or the owning Business can reply. Regular users are DENIED.
-    if (!isAdmin && !(isBusiness && isOwner)) {
+    if (!isAdmin && !isOwner) {
       return res.status(403).json({ success: false, message: 'Bạn không có quyền phản hồi hội thoại này.' });
     }
 
     const reply = {
       senderId: req.user.id,
-      senderName: req.user.name || (isAdmin ? 'Quản trị viên' : 'Đối tác'),
-      senderRole: isAdmin ? 'admin' : 'business',
+      senderName: req.user.displayName || req.user.name || (isAdmin ? 'Quản trị viên' : 'Thành viên'),
+      senderRole: isAdmin ? 'admin' : (req.user.role === 'business' ? 'business' : 'user'),
       content,
       image,
       createdAt: new Date()
@@ -181,7 +169,8 @@ router.post('/:id/reply', flexibleAuth, async (req, res) => {
           type: 'message',
           title: 'Phản hồi mới từ Quản trị viên',
           message: `Admin trả lời: "${content.substring(0, 50)}..."`,
-          link: (feedback.role === 'business' ? 'index.html#support' : 'history.html#feedbacks'),
+          relatedId: feedback._id,
+          link: 'feedback.html',
           isRead: false
         });
       }
@@ -192,10 +181,11 @@ router.post('/:id/reply', flexibleAuth, async (req, res) => {
         recipientType: 'admin',
         senderId: req.user.id,
         senderName: req.user.name || 'Đối tác',
-        type: 'system',
+        type: 'message',
         title: 'Tin nhắn mới từ Đối tác',
         message: `${req.user.name || 'Đối tác'} đã trả lời hỗ trợ.`,
-        link: '#support',
+        relatedId: feedback._id,
+        link: 'feedback.html',
         isRead: false
       });
       await logAction('FEEDBACK_REPLY', `Đối tác ${req.user.name} phản hồi hỗ trợ`, req, { feedbackId: req.params.id });

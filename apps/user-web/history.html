@@ -297,7 +297,6 @@
       <div class="history-tab" data-tab="trips">🎒 Chuyến đi</div>
       <div class="history-tab" data-tab="bookings">🏨 Dịch vụ đã đặt</div>
       <div class="history-tab" data-tab="reviews">⭐ Đánh giá địa điểm</div>
-      <div class="history-tab" data-tab="feedbacks">💬 Phản hồi hệ thống</div>
     </div>
   </div>
 
@@ -367,15 +366,29 @@
         });
 
         // Auto-select tab from hash or query
+        const urlParams = new URLSearchParams(window.location.search);
+        const openBookingId = urlParams.get('openBooking');
         const hash = window.location.hash.replace('#', '');
-        if (hash && ['wishlist', 'trips', 'bookings', 'reviews', 'feedbacks'].includes(hash)) {
+        
+        if (openBookingId) {
+          currentTab = 'bookings';
+        } else if (hash && ['wishlist', 'trips', 'bookings', 'reviews', 'feedbacks'].includes(hash)) {
           currentTab = hash;
-          tabs.forEach(t => {
-            t.classList.toggle('is-active', t.getAttribute('data-tab') === hash);
-          });
         }
 
-        loadTabData(currentTab);
+        tabs.forEach(t => {
+          t.classList.toggle('is-active', t.getAttribute('data-tab') === currentTab);
+        });
+
+        await loadTabData(currentTab);
+
+        if (openBookingId && currentTab === 'bookings') {
+          setTimeout(() => {
+            if (window.WanderUI && typeof WanderUI.openBookingDetail === 'function') {
+              WanderUI.openBookingDetail(openBookingId);
+            }
+          }, 600);
+        }
       }
 
       tabs.forEach(tab => {
@@ -401,8 +414,8 @@
           );
         } else if (tab === 'trips') {
           filters.push(
-            { id: 'planning', label: '📅 Đang lên kế hoạch' },
-            { id: 'completed', label: '✅ Đã hoàn thành' }
+            { id: 'completed', label: '✅ Đã hoàn thành' },
+            { id: 'missed', label: '🗑️ Bỏ lỡ & Đã xóa' }
           );
         } else if (tab === 'bookings') {
           filters.push(
@@ -411,15 +424,17 @@
             { id: 'khach-san', label: '🏨 Khách sạn' },
             { id: 'others', label: '✨ Khác' }
           );
+          // Add a second row for status if possible, or just merge them
+          // For simplicity in this UI, we'll keep it as one row or add a specific "History" filter
+          filters.push(
+            { id: 'sep', label: ' | ', disabled: true },
+            { id: 'completed', label: '🏁 Hoàn thành' },
+            { id: 'cancelled', label: '🚫 Đã hủy' }
+          );
         } else if (tab === 'reviews') {
           filters.push(
             { id: 'high', label: '🌟 Đánh giá tốt' },
             { id: 'low', label: '⚠️ Cần cải thiện' }
-          );
-        } else if (tab === 'feedbacks') {
-          filters.push(
-            { id: 'open', label: '🔓 Đang mở' },
-            { id: 'resolved', label: '✅ Đã giải quyết' }
           );
         }
 
@@ -428,6 +443,11 @@
         `).join('');
 
         subfiltersWrap.querySelectorAll('.subfilter-btn').forEach(btn => {
+          if (btn.dataset.filter === 'sep') {
+            btn.style.cursor = 'default';
+            btn.style.opacity = '0.3';
+            return;
+          }
           btn.onclick = async () => {
             subfiltersWrap.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('is-active'));
             btn.classList.add('is-active');
@@ -442,7 +462,6 @@
         else if (currentTab === 'trips') renderTrips(rawData.trips);
         else if (currentTab === 'bookings') await renderBookings(rawData.bookings);
         else if (currentTab === 'reviews') renderReviews(rawData.reviews);
-        else if (currentTab === 'feedbacks') renderFeedbacks(rawData.feedbacks);
       }
 
       async function loadTabData(tab) {
@@ -455,12 +474,14 @@
           } else if (tab === 'trips') {
             const res = await fetch('/api/planner/my-trips', { headers: { 'x-auth-token': token } });
             const json = await res.json();
-            rawData.trips = json.data || [];
+            // Filter only finished trips: completed, missed, or deleted
+            rawData.trips = (json.data || []).filter(t => t.status === 'completed' || t.status === 'missed' || t.isDeleted);
             renderTrips(rawData.trips);
           } else if (tab === 'bookings') {
             const res = await fetch('/api/bookings/my', { headers: { 'x-auth-token': token } });
             const json = await res.json();
-            rawData.bookings = json.data || [];
+            // Filter only finished bookings: completed or cancelled
+            rawData.bookings = (json.data || []).filter(b => b.status === 'completed' || b.status === 'cancelled');
             rawData.bookings.forEach(b => { bookingStore[b._id] = b; });
             await renderBookings(rawData.bookings);
           } else if (tab === 'reviews') {
@@ -468,11 +489,6 @@
             const json = await res.json();
             rawData.reviews = json.data || [];
             renderReviews(rawData.reviews);
-          } else if (tab === 'feedbacks') {
-            const res = await fetch('/api/feedback/my-feedbacks', { headers: { 'x-auth-token': token } });
-            const json = await res.json();
-            rawData.feedbacks = json.data || [];
-            renderFeedbacks(rawData.feedbacks);
           }
         } catch(e) {
           content.innerHTML = '<div class="empty-state"><h2>Lỗi tải dữ liệu</h2><p>Không thể kết nối với máy chủ. Vui lòng thử lại sau.</p></div>';
@@ -534,7 +550,10 @@
       function renderTrips(trips) {
         let filtered = trips;
         if (currentSubfilter !== 'all') {
-          filtered = trips.filter(t => t.status === currentSubfilter);
+          filtered = trips.filter(t => {
+            if (currentSubfilter === 'missed') return t.status === 'missed' || t.isDeleted;
+            return t.status === currentSubfilter;
+          });
         }
 
         if (!filtered.length) {
@@ -549,7 +568,9 @@
             <div class="history-card__content">
               <div style="display:flex; justify-content:space-between; align-items:start;">
                 <div class="history-card__type" style="color:var(--accent);">🎒 Lịch trình du lịch</div>
-                <span class="trip-status status-${t.status === 'completed' ? 'completed' : 'planning'}">${t.status === 'completed' ? 'Đã hoàn thành' : 'Đang lên kế hoạch'}</span>
+                <span class="trip-status status-${t.isDeleted ? 'cancelled' : (t.status === 'completed' ? 'completed' : 'cancelled')}">
+                  ${t.isDeleted ? 'Đã xóa' : (t.status === 'completed' ? 'Đã hoàn thành' : 'Bỏ lỡ')}
+                </span>
               </div>
               <h3 class="history-card__title" style="margin: 0.5rem 0;">${t.destination}</h3>
               <p class="history-card__meta">
@@ -586,9 +607,12 @@
         }
 
         let filtered = bookings;
-        if (currentSubfilter !== 'all') {
-          if (currentSubfilter === 'tour') filtered = bookings.filter(b => b.bookingType === 'tour' || (placeStore[b.placeId] && placeStore[b.placeId].isTour));
-          else if (currentSubfilter === 'others') {
+        if (currentSubfilter !== 'all' && currentSubfilter !== 'all_cat') {
+          if (currentSubfilter === 'tour') {
+            filtered = bookings.filter(b => b.bookingType === 'tour' || (placeStore[b.placeId] && placeStore[b.placeId].isTour));
+          } else if (currentSubfilter === 'completed' || currentSubfilter === 'cancelled') {
+            filtered = bookings.filter(b => b.status === currentSubfilter);
+          } else if (currentSubfilter === 'others') {
              filtered = bookings.filter(b => {
                 const p = placeStore[b.placeId] || {};
                 return b.bookingType !== 'tour' && !['nha-hang', 'khach-san'].includes(p.kind) && !p.isTour;
@@ -785,8 +809,6 @@
               </div>
 
               <!-- Reply area removed as per requirement: one-way admin announcements -->
-            </div>
-          </div>
             </div>
           </div>
         `).join('') + '</div>';

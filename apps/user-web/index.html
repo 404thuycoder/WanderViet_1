@@ -474,15 +474,22 @@
           <p>Để lại thông tin — chuyên gia của chúng tôi sẽ gọi lại trong 24 giờ (giờ hành chính).</p>
         </div>
         <form class="cta-form" data-contact-form>
+          <div id="contact-user-info" style="display:none; margin-bottom: 20px; padding: 15px; background: rgba(99, 102, 241, 0.1); border-radius: 12px; border: 1px solid rgba(99, 102, 241, 0.2);">
+            <p style="margin:0; font-size: 0.9rem; color: var(--text);">Đang gửi phản hồi với tư cách: <strong id="contact-display-name">...</strong></p>
+            <p style="margin:4px 0 0; font-size: 0.8rem; color: var(--text-muted);">Hệ thống sẽ tự động liên kết với tài khoản của bạn.</p>
+          </div>
 
-          <label class="field" id="field-name-wrap">
-            <span class="field-label">Họ tên</span>
-            <input type="text" name="name" id="contact-name" required autocomplete="name" placeholder="Nguyễn Văn A" />
-          </label>
-          <label class="field" id="field-email-wrap">
-            <span class="field-label">Email</span>
-            <input type="email" name="email" id="contact-email" required autocomplete="email" placeholder="ban@email.com" />
-          </label>
+          <div id="contact-guest-fields">
+            <label class="field" id="field-name-wrap">
+              <span class="field-label">Họ tên</span>
+              <input type="text" name="name" id="contact-name" autocomplete="name" placeholder="Nguyễn Văn A" />
+            </label>
+            <label class="field" id="field-email-wrap">
+              <span class="field-label">Email</span>
+              <input type="email" name="email" id="contact-email" autocomplete="email" placeholder="ban@email.com" />
+            </label>
+          </div>
+
           <label class="field field--full">
             <span class="field-label">Nội dung phản hồi / yêu cầu (*)</span>
             <textarea name="message" rows="3" required placeholder="Bạn cần hỗ trợ hoặc muốn góp ý gì cho chúng tôi?"></textarea>
@@ -495,6 +502,10 @@
             </div>
           </label>
           <button type="submit" class="btn btn--primary btn--block">Gửi Phản Hồi</button>
+          <div id="contact-success-msg" style="display:none; text-align:center; margin-top:15px;">
+            <p style="color: #10b981; font-weight: 600;">✔ Đã gửi yêu cầu thành công!</p>
+            <a href="feedback.html" class="btn btn--text" style="color: var(--accent); text-decoration: underline;">Theo dõi phản hồi của bạn tại đây →</a>
+          </div>
           <p class="form-status" data-form-status role="status" aria-live="polite"></p>
         </form>
       </div>
@@ -672,7 +683,7 @@
   <script src="SharedUI.js?v=1777335000501"></script>
   <script src="voice-helper.js?v=1777335000009" defer></script>
   <script src="chat-brain.js?v=1777335000009" defer></script>
-  <script src="main.js?v=1777335000009" defer></script>
+  <script src="main.js?v=1777335000010" defer></script>
   
   <script>
   // Global Booking logic for index.html

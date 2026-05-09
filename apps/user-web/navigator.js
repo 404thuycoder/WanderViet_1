@@ -674,7 +674,7 @@ function setTarget(lat, lng) {
 
   // Tự động tìm đường ngay khi có đích (nếu đã khoá được GPS)
   if (State.userLoc) {
-    fetchOSRMRoute();
+    fetchOSRMRoute(false);
   }
   if (State.userLoc) {
     State.map.fitBounds([[State.userLoc.lat, State.userLoc.lng], [State.targetLoc.lat, State.targetLoc.lng]], {
@@ -893,7 +893,7 @@ function queuedFetch(url) {
   });
 }
 
-async function smartGeocode(query, destName) {
+async function smartGeocode(query, destName, silent = false) {
   try {
     let cityData = null;
     if (destName) {
@@ -952,7 +952,7 @@ async function smartGeocode(query, destName) {
     
     // Nếu tất cả thất bại, dẫn về trung tâm
     if (cityData && cityData.length > 0) {
-      speakMsg(`Không tìm thấy chính xác ${cleanQuery}, đang dẫn tới trung tâm ${destName}.`);
+      if (!silent && window.speakMsg) speakMsg(`Không tìm thấy chính xác ${cleanQuery}, đang dẫn tới trung tâm ${destName}.`);
       return cityData;
     }
     return null;
@@ -1810,7 +1810,7 @@ async function drawItineraryOverview() {
     const wp = State.waypoints[i];
     const query = wp.split(': ')[1] || wp;
     try {
-      const data = await smartGeocode(query, destName);
+      const data = await smartGeocode(query, destName, true);
       if (data && data.length > 0) {
         const lat = parseFloat(data[0].lat);
         const lon = parseFloat(data[0].lon);

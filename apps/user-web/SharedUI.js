@@ -122,10 +122,10 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     if (syncWithBackend) {
       const token = localStorage.getItem('wander_token') || localStorage.getItem('wander_admin_token');
       if (token) {
-        fetch('/api/auth/theme', {
+        fetch('/api/auth/profile', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-          body: JSON.stringify({ theme })
+          body: JSON.stringify({ preferences: { theme } })
         }).catch(err => console.debug('Sync theme failed:', err));
       }
     }
@@ -280,6 +280,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         content: ''; position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
         width: 6px; height: 6px; background: var(--accent); border-radius: 50%;
       }
+      .wander-notif-item.is-system { cursor: default; }
+      .wander-notif-item.is-system:hover { background: transparent; }
       .wander-notif-item__title { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; color: var(--text); }
       .wander-notif-item__message { font-size: 0.88rem; color: var(--text-muted); line-height: 1.4; }
       .wander-notif-item__time { font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; opacity: 0.6; }
@@ -296,6 +298,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     updateNotificationBadge();
   }
 
+  let _notifCache = [];
+
   async function renderNotifications() {
     const body = document.getElementById('wander-notif-body');
     if (!body) return;
@@ -304,23 +308,30 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     const json = await res.json();
     if (!json.success || !json.data.length) {
       body.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--text-muted);">Không có thông báo mới</div>';
+      _notifCache = [];
       return;
     }
-    body.innerHTML = json.data.map(n => `
-      <div class="wander-notif-item ${n.isRead ? '' : 'is-unread'}" onclick="WanderUI.markAsRead('${n._id}', '${n.link}')">
-        <div class="wander-notif-item__title">${n.title}</div>
-        <div class="wander-notif-item__message">${n.message}</div>
-        <div class="wander-notif-item__time">${new Date(n.createdAt).toLocaleString('vi-VN')}</div>
-      </div>
-    `).join('');
+    _notifCache = json.data;
+    body.innerHTML = json.data.map((n, idx) => {
+      return `
+        <div class="wander-notif-item ${n.isRead ? '' : 'is-unread'} is-system">
+          <div class="wander-notif-item__title">${n.title}</div>
+          <div class="wander-notif-item__message">${n.message}</div>
+          <div class="wander-notif-item__time">${new Date(n.createdAt).toLocaleString('vi-VN')}</div>
+        </div>
+      `;
+    }).join('');
   }
 
-  async function markAsRead(id, link) {
+  window.WanderUI.handleNotifClick = async function(idx) {
+    // Interactivity disabled as per user request
+    return;
+  };
+
+  async function markAsRead(id) {
     const token = localStorage.getItem('wander_token') || localStorage.getItem('wander_admin_token');
     await fetch(`/api/notifications/read/${id}`, { method: 'PUT', headers: { 'x-auth-token': token } });
     updateNotificationBadge();
-    if (link) window.location.href = link;
-    else renderNotifications();
   }
 
   // ─── Rank ──────────────────────────────────────────────────────────
@@ -397,66 +408,99 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
   let syncInProgress = false;
   let lastSyncTime = 0;
-  const SYNC_THROTTLE = 500; // 0.5 seconds - giảm để cập nhật nhanh hơn khi chuyển trang
+  let lastSyncedData = null; // Big-Tech: Cache to prevent redundant re-renders
+  const SYNC_THROTTLE = 1000; // Increase throttle for better stability
 
-  async function syncAuthUI() {
-    if (syncInProgress) {
-      return;
-    }
+  async function syncAuthUI(force = false) {
+    if (syncInProgress && !force) return;
     const now = Date.now();
-    if (now - lastSyncTime < SYNC_THROTTLE) {
-      return;
-    }
+    if (!force && now - lastSyncTime < SYNC_THROTTLE) return;
 
     syncInProgress = true;
     lastSyncTime = now;
 
     try {
       const token = localStorage.getItem('wander_token');
-      
+      const headerArea = document.getElementById('header-user-area');
       const authBtns = document.querySelectorAll("[data-auth-open]");
       const profileTrays = document.querySelectorAll("[data-auth-show]");
       
-      const userNameEl = document.querySelector("[data-user-name]");
-      const userAvatarImg = document.querySelector("[data-user-avatar]");
-      const userInitial = document.querySelector("[data-user-initial]");
-      const headerRankEl = document.getElementById('header-user-rank');
+      if (!headerArea && authBtns.length === 0 && profileTrays.length === 0) return;
 
       if (!token) {
         authBtns.forEach(el => el.style.display = "flex");
         profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
-        if (headerRankEl) headerRankEl.style.display = "none";
+        if (document.getElementById('header-user-rank')) document.getElementById('header-user-rank').style.display = "none";
+        lastSyncedData = null;
         return;
       }
 
-      const parts = token.split('.');
-      if (parts.length !== 3) {
+      const payload = decodeJWT(token);
+      if (!payload) {
         authBtns.forEach(el => el.style.display = "flex");
         profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
-        if (headerRankEl) headerRankEl.style.display = "none";
+        if (document.getElementById('header-user-rank')) document.getElementById('header-user-rank').style.display = "none";
         return;
       }
-      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-      const padding = '='.repeat((4 - base64.length % 4) % 4);
-      const payload = JSON.parse(decodeURIComponent(escape(atob(base64 + padding))));
       const u = payload.user || payload.account || payload;
 
+      // Fetch fresh rank/profile data
+      const r = await fetch('/api/auth/user/rank?t=' + Date.now(), { headers: { 'x-auth-token': token } });
+      if (r.status === 401) {
+        WanderUI.forceLogout();
+        return;
+      }
+      const data = await r.json();
+      const freshUser = data.success ? data : u;
+
+      // Big-Tech: Deep compare to prevent blinking if data hasn't changed
+      const dataString = JSON.stringify({ ...freshUser, token: token.substring(0, 20) });
+      if (dataString === lastSyncedData) return;
+      lastSyncedData = dataString;
+
+      // Update UI visibility
       authBtns.forEach(el => el.style.display = "none");
       profileTrays.forEach(el => { el.style.display = "flex"; el.removeAttribute('hidden'); });
 
-      const initialName = u.displayName || u.name || "User";
-      if (userNameEl) userNameEl.textContent = initialName;
-      if (userInitial) {
-        userInitial.textContent = initialName.charAt(0).toUpperCase();
-        userInitial.style.display = 'flex';
+      const displayName = freshUser.displayName || freshUser.name || "Thành viên";
+      const userNameEl = document.querySelector("[data-user-name]");
+      if (userNameEl) {
+        userNameEl.innerHTML = `
+          <div style="display:flex; flex-direction:column; line-height:1.2;">
+            <span style="font-weight:700; color:#fff; font-size:0.95rem;">${esc(displayName)}</span>
+            <span style="font-size:0.7rem; color:var(--text-muted); opacity:0.8;">${freshUser.customId || ""}</span>
+            <span style="font-size:0.7rem; color:var(--text-muted);">${esc(freshUser.email || u.email || "")}</span>
+          </div>
+        `;
       }
-      if (userAvatarImg) userAvatarImg.setAttribute('hidden', '');
 
-      // Standardize Dropdown Body
+      const userInitial = document.querySelector("[data-user-initial]");
+      const userAvatarImg = document.querySelector("[data-user-avatar]");
+      if (freshUser.avatar) {
+        if (userAvatarImg) {
+          userAvatarImg.src = freshUser.avatar;
+          userAvatarImg.style.display = 'block';
+          userAvatarImg.removeAttribute('hidden');
+        }
+        if (userInitial) userInitial.style.display = 'none';
+      } else {
+        if (userInitial) {
+          userInitial.textContent = displayName.charAt(0).toUpperCase();
+          userInitial.style.display = 'flex';
+        }
+        if (userAvatarImg) userAvatarImg.setAttribute('hidden', '');
+      }
+
+      const headerRankEl = document.getElementById('header-user-rank');
+      if (headerRankEl) {
+        headerRankEl.innerHTML = getRankBadgeHTML(freshUser.rank, freshUser.rankTier);
+        headerRankEl.style.display = 'flex';
+      }
+
       const ddBody = document.querySelector('.user-dropdown__body');
       if (ddBody) {
         ddBody.innerHTML = `
-          <a href="profile.html" class="user-dropdown-item">
+          <a href="profile.html" class="user-dropdown-item" data-open-profile>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             Trang cá nhân
           </a>
@@ -469,58 +513,19 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
             Cài đặt hệ thống
           </button>
+          <a href="feedback.html" class="user-dropdown-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            Phản hồi
+          </a>
           <div style="border-top:1px solid rgba(255,255,255,0.05); margin:0.5rem 0;"></div>
-          <button type="button" class="user-dropdown-item user-dropdown-item--danger" data-logout-btn>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <button type="button" class="btn btn--danger btn--small w-full justify-center" data-logout-btn>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             Đăng xuất
           </button>
         `;
       }
-
-      try {
-        const r = await fetch('/api/auth/user/rank?t=' + Date.now(), { headers: { 'x-auth-token': token } });
-        if (r.status === 401) {
-          localStorage.removeItem('wander_token');
-          authBtns.forEach(el => el.style.display = "flex");
-          profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
-          if (headerRankEl) headerRankEl.style.display = "none";
-          return;
-        }
-        const data = await r.json();
-        if (data && data.success) {
-          const fullDis = data.displayName || data.name || initialName;
-          if (userNameEl) {
-            userNameEl.innerHTML = `
-               <div style="display:flex; flex-direction:column; line-height:1.2;">
-                 <span style="font-weight:700; color:#fff; font-size:0.95rem;">${fullDis.replace(/</g, '&lt;')}</span>
-                 <span style="font-size:0.7rem; color:var(--text-muted); opacity:0.8;">${data.customId || ""}</span>
-                 <span style="font-size:0.7rem; color:var(--text-muted);">${(data.email || u.email || "").replace(/</g, '&lt;')}</span>
-               </div>
-             `;
-          }
-          if (userAvatarImg && data.avatar) {
-            userAvatarImg.src = data.avatar;
-            userAvatarImg.style.display = 'block';
-            userAvatarImg.removeAttribute('hidden');
-            if (userInitial) userInitial.style.display = 'none';
-          }
-          if (headerRankEl) {
-            headerRankEl.innerHTML = getRankBadgeHTML(data.rank, data.rankTier);
-            headerRankEl.style.display = 'flex';
-            headerRankEl.style.alignItems = 'center';
-          }
-        }
-      } catch (err) {
-        console.error("Auth sync API error:", err);
-      }
-
     } catch (e) {
-      console.error("Auth sync error", e);
-      // Khi có lỗi, mặc định hiện nút đăng nhập
-      const authBtns = document.querySelectorAll("[data-auth-open]");
-      const profileTrays = document.querySelectorAll("[data-auth-show]");
-      authBtns.forEach(el => el.style.display = "flex");
-      profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
+      console.warn("Auth sync UI minor issue:", e);
     } finally {
       syncInProgress = false;
     }
@@ -627,6 +632,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       </div>
     `;
 
+    // Immediately sync auth UI after injection to avoid empty profile on reload
+    // Force sync auth UI immediately after injection to avoid empty profile due to race conditions
+    syncAuthUI(true);
   }
 
   function initNavigation() {
@@ -803,6 +811,19 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             </div>
           </div>
         </div>
+      <div class="modal" id="modal-notif-detail" data-modal="notif-detail" role="dialog" aria-modal="true" hidden>
+        <div class="modal__inner" style="max-width: 500px;">
+          <div class="modal__header">
+            <h3 class="modal__title" id="notif-detail-title">Chi tiết thông báo</h3>
+            <button type="button" class="modal__close" data-modal-close aria-label="Đóng">×</button>
+          </div>
+          <div class="modal__body" style="padding: 1.5rem;">
+            <div id="notif-detail-body" style="font-size: 1.1rem; line-height: 1.6; color: var(--text);"></div>
+            <div id="notif-detail-time" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; opacity: 0.7;"></div>
+            <div id="notif-detail-action" style="margin-top: 2rem;"></div>
+          </div>
+        </div>
+      </div>
       </div>
       <div class="modal" id="modal-auth" data-modal="auth" hidden>
         <div class="modal__inner">
@@ -3045,12 +3066,26 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     });
   }
 
+  // Big-Tech: Robust JWT decoding for UTF-8 support
+  function decodeJWT(token) {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      console.warn("JWT Decode failed:", e);
+      return null;
+    }
+  }
+
   // --- Init ---
   const initAll = () => {
-    if (window.WanderUI_Initialized) {
-      return;
-    }
+    if (window.WanderUI_Initialized) return;
     window.WanderUI_Initialized = true;
+    
     injectHeader();
     injectCommonComponents();
     initNavigation();
@@ -3064,8 +3099,10 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     };
     window.addEventListener('hashchange', handleHashModal);
     handleHashModal();
-    syncAuthUI();
-    // Force sync again after short delay to ensure DOM is fully rendered
+
+    // Final consolidated sync
+    setTimeout(() => syncAuthUI(), 300);
+    
     initTheme();
     initGlobalChatbot();
     initSettingsHandlers();
@@ -3073,6 +3110,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     setupHoverPrefetch();
     injectGlobalStyles();
     setupLazyLoading();
+
     window.addEventListener('storage', (e) => {
       if (e.key === 'wander_token' || e.key === 'wander_session') {
         lastSyncTime = 0; // Bypass throttle
@@ -3260,16 +3298,28 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
   injectGlobalStyles(); // Pre-inject
 
-  // Debug: Check token immediately on load
-  const _debugToken = localStorage.getItem('wander_token');
-  if (_debugToken) {
-    try {
-      const parts = _debugToken.split('.');
-    } catch(e) {
+  function openNotificationDetailModal(n) {
+    const titleEl = document.getElementById('notif-detail-title');
+    const bodyEl = document.getElementById('notif-detail-body');
+    const timeEl = document.getElementById('notif-detail-time');
+    const actionEl = document.getElementById('notif-detail-action');
+    
+    if (!titleEl || !bodyEl) return;
+    
+    titleEl.textContent = n.title || 'Chi tiết thông báo';
+    bodyEl.innerHTML = n.message.replace(/\n/g, '<br>');
+    timeEl.textContent = `Gửi lúc: ${new Date(n.createdAt).toLocaleString('vi-VN')}`;
+    
+    if (n.link) {
+      actionEl.innerHTML = `<button class="btn btn--primary" style="width:100%;" onclick="window.location.href='${n.link}'">Xem chi tiết hành động</button>`;
+    } else {
+      actionEl.innerHTML = `<button class="btn btn--ghost" style="width:100%;" onclick="WanderUI.closeModal('notif-detail')">Đã hiểu</button>`;
     }
+    
+    openModal('notif-detail');
   }
 
-  return { setTheme, toggleTheme, showToast, setButtonLoading, toggleNotificationDrawer, updateNotificationBadge, markAsRead, markAllAsRead, syncAuthUI, forceLogout, toggleUserMenu, openAuthModal, confirm, openPlaceDetail, openBookingDetail, openItineraryDetail, getRankBadgeHTML, getRankIcon, getStoreKey, initSettingsHandlers, trackQuestActivity, getQuestActivity, startTopLoader, finishTopLoader };
+  return { setTheme, toggleTheme, showToast, setButtonLoading, toggleNotificationDrawer, updateNotificationBadge, markAsRead, markAllAsRead, syncAuthUI, forceLogout, toggleUserMenu, openAuthModal, confirm, openPlaceDetail, openBookingDetail, openItineraryDetail, openNotificationDetailModal, getRankBadgeHTML, getRankIcon, getStoreKey, initSettingsHandlers, trackQuestActivity, getQuestActivity, startTopLoader, finishTopLoader, openModal, closeModal };
 })());
 
 

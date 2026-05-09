@@ -164,7 +164,8 @@ router.put('/:id', sharedAuth, async (req, res) => {
             recipientId: recipientId,
             title: 'Cập nhật đơn hàng',
             message: `Đơn hàng #${bIdShort} (${pName}) của bạn ${label}.`,
-            type: 'system',
+            type: 'booking',
+            relatedId: booking._id,
             link: '/history.html#bookings'
           });
           await newNotif.save();
@@ -219,9 +220,10 @@ router.put('/:id/status', businessAuth, async (req, res) => {
 
         const newNotif = new Notification({
           recipientId: booking.userId,
-          title: 'Cập nhật dịch vụ',
-          message: `Dịch vụ #${bIdStr.slice(-6).toUpperCase()} (${pName}) đã được doanh nghiệp ${label}.`,
-          type: 'system',
+          title: 'Cập nhật đơn hàng',
+          message: `Đơn hàng #${bIdStr.slice(-6).toUpperCase()} (${pName}) đã được doanh nghiệp ${label}.`,
+          type: 'booking',
+          relatedId: booking._id,
           link: '/history.html#bookings'
         });
         await newNotif.save();

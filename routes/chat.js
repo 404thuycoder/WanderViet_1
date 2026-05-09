@@ -721,7 +721,7 @@ router.post('/feedback', optionalAuth, async (req, res) => {
     const updated = await Conversation.findOneAndUpdate(
       { _id: messageId, userId: sessionKey },
       { $set: { feedback, feedbackReason: reason || '' } },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (updated) {

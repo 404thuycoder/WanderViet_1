@@ -514,14 +514,8 @@
     if (!token) return;
     console.log('[biz-extend] Bắt đầu đồng bộ dữ liệu thực tế...');
     
-    // Cập nhật tên hiển thị từ Token (nếu có)
-    try {
-      var payload = JSON.parse(atob(token.split('.')[1]));
-      var nameEl = document.querySelector('.user-chip');
-      if (nameEl && payload.displayName) {
-        nameEl.innerHTML = '<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff">🏨</div>' + payload.displayName + ' ▾';
-      }
-    } catch(e) {}
+    // Cập nhật tên hiển thị từ Token (đã có script đồng bộ xịn hơn trong index.html)
+    // (Bỏ phần này vì nó gây lỗi hiển thị sidebar)
 
     // 1. Sync Stats
     apiFetch(API + '/api/business/stats')

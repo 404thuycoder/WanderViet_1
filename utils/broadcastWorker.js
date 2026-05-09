@@ -22,7 +22,10 @@ function initBroadcastWorker() {
             
             if (pendingBroadcasts.length === 0) return;
             
-            console.log(`⏰ [BroadcastWorker] Found ${pendingBroadcasts.length} scheduled broadcasts to send.`);
+            // Quiet logic
+            if (pendingBroadcasts.length > 0) {
+               // console.log(`⏰ [BroadcastWorker] Found ${pendingBroadcasts.length} scheduled broadcasts to send.`);
+            }
             
             for (const b of pendingBroadcasts) {
                 try {
@@ -40,13 +43,18 @@ function initBroadcastWorker() {
                     b.status = 'sent';
                     await b.save();
                     
-                    console.log(`✅ [BroadcastWorker] Sent: "${b.title}" to ${b.targetId}`);
+                    // console.log(`✅ [BroadcastWorker] Sent: "${b.title}" to ${b.targetId}`);
                 } catch (err) {
                     console.error(`❌ [BroadcastWorker] Error sending broadcast ${b._id}:`, err);
                 }
             }
         } catch (error) {
-            console.error('❌ [BroadcastWorker] Critical Error:', error);
+            if (error.name === 'MongoNetworkError' || error.message.includes('getaddrinfo') || error.message.includes('selection timeout')) {
+                // Quiet network error
+                // console.error('❌ [BroadcastWorker] Database connectivity issue.');
+            } else {
+                console.error('❌ [BroadcastWorker] Critical Error:', error.message);
+            }
         }
     }, 30000); // 30 seconds
 }

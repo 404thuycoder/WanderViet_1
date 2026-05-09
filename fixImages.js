@@ -33,7 +33,7 @@ async function run() {
   await mongoose.connect(process.env.MONGODB_URI);
   console.log('Connected to MongoDB');
   for (const [id, image] of Object.entries(FIXED)) {
-    const r = await Place.findOneAndUpdate({ id }, { image }, { new: true });
+    const r = await Place.findOneAndUpdate({ id }, { image }, { returnDocument: 'after' });
     if (r) console.log(`✅ Updated ${id}`);
     else console.log(`❌ Not found: ${id}`);
   }

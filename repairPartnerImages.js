@@ -31,7 +31,7 @@ async function repair() {
     console.log('Connected to DB');
     
     for (const item of updates) {
-      const res = await Place.findByIdAndUpdate(item.id, { image: item.image }, { new: true });
+      const res = await Place.findByIdAndUpdate(item.id, { image: item.image }, { returnDocument: 'after' });
       if (res) {
         console.log(`Updated: ${res.name} -> ${item.image}`);
       } else {

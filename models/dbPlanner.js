@@ -4,11 +4,13 @@ const mongoose = require('mongoose');
 const plannerUri = (process.env.PLANNER_MONGODB_URI || process.env.MONGODB_URI || "").trim();
 
 if (!plannerUri) {
-  console.warn('⚠️  PLANNER_MONGODB_URI is not defined in .env! Planner features may not work properly.');
+  // console.warn('⚠️  PLANNER_MONGODB_URI is not defined in .env!');
 }
 
 const plannerDb = mongoose.createConnection(plannerUri, {
-  // các cấu hình bổ sung nếu cần (tuỳ chọn)
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  family: 4
 });
 
 plannerDb.on('connected', () => {
@@ -16,7 +18,11 @@ plannerDb.on('connected', () => {
 });
 
 plannerDb.on('error', (err) => {
-  console.error('❌ Planner DB connection error:', err);
+  if (err.message.includes('getaddrinfo') || err.message.includes('ENOTFOUND')) {
+    // console.error('❌ Planner DB: Connection issue.');
+  } else {
+    console.error('❌ Planner DB error:', err.message);
+  }
 });
 
 module.exports = plannerDb;

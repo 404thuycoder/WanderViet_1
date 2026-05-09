@@ -68,7 +68,7 @@ router.put('/methods/:id/default', auth, async (req, res) => {
     const method = await PaymentMethod.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
       { isDefault: true },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!method) return res.status(404).json({ success: false, message: 'Không tìm thấy phương thức thanh toán' });
     res.json({ success: true, data: method });

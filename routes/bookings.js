@@ -110,7 +110,7 @@ router.put('/:id/cancel', auth, async (req, res) => {
     const booking = await Booking.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id, status: { $in: ['pending', 'confirmed'] } },
       { status: 'cancelled' },
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!booking) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hoặc không thể hủy' });
     res.json({ success: true, data: booking, message: 'Đã hủy đặt lịch' });
@@ -141,7 +141,7 @@ router.put('/:id', sharedAuth, async (req, res) => {
     if (status) update.status = status;
     if (notes !== undefined) update.notes = notes;
 
-    const booking = await Booking.findOneAndUpdate(query, update, { new: true });
+    const booking = await Booking.findOneAndUpdate(query, update, { returnDocument: 'after' });
     if (!booking) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hàng hoặc bạn không có quyền thao tác.' });
     
     // Notify User on status change (if business/admin updated it)
@@ -205,7 +205,7 @@ router.put('/:id/status', businessAuth, async (req, res) => {
     const booking = await Booking.findOneAndUpdate(
       { _id: req.params.id, ownerId: req.user.id },
       update,
-      { new: true }
+      { returnDocument: 'after' }
     );
     if (!booking) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn hoặc sai quyền' });
 

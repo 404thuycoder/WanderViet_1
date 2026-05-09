@@ -869,7 +869,7 @@ router.put('/feedbacks/:id/status', adminTokenAuth, adminAuth, async (req, res) 
     if (!['open', 'closed', 'resolved'].includes(status)) {
       return res.status(400).json({ success: false, message: 'Trạng thái không hợp lệ' });
     }
-    const feedback = await Feedback.findByIdAndUpdate(req.params.id, { status, updatedAt: new Date() }, { new: true });
+    const feedback = await Feedback.findByIdAndUpdate(req.params.id, { status, updatedAt: new Date() }, { returnDocument: 'after' });
     if (!feedback) return res.status(404).json({ success: false, message: 'Không tìm thấy phản hồi' });
     
     res.json({ success: true, data: feedback });
@@ -1530,7 +1530,7 @@ router.put('/config', adminTokenAuth, superAdminAuth, async (req, res) => {
     const updateData = req.body;
     updateData.updatedAt = Date.now();
     
-    let config = await SystemConfig.findOneAndUpdate({}, updateData, { new: true, upsert: true });
+    let config = await SystemConfig.findOneAndUpdate({}, updateData, { returnDocument: 'after', upsert: true });
     
     await logAction(req.user.email, req.user.role, 'SYSTEM_CONFIG_UPDATED', updateData, req.ip, req.headers['user-agent']);
     

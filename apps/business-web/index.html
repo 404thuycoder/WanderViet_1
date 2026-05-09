@@ -187,23 +187,7 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
     </div>
   </div>
 
-  <div class="profile">
-    <div class="profile-card user-chip" id="sidebar-user-chip" style="cursor: pointer; position: relative; padding-right: 30px;">
-      <div class="avatar" id="sidebar-avatar">🏨</div>
-      <div class="p-info">
-        <div class="p-name" id="sidebar-name">Đang tải...</div>
-        <div class="p-badge" id="sidebar-tier">PARTNER</div>
-      </div>
-      <div style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 12px;">▾</div>
-      
-      <div class="user-dropdown-menu" id="sidebar-user-dropdown" style="top: calc(100% + 5px); left: 0; width: 100%;">
-        <button class="user-dropdown-item" onclick="window.navigateToView('profile'); document.getElementById('sidebar-user-dropdown').classList.remove('is-open');">👤 Trang cá nhân</button>
-        <button class="user-dropdown-item" onclick="window.navigateToView('settings'); document.getElementById('sidebar-user-dropdown').classList.remove('is-open');">⚙️ Cài đặt</button>
-        <div class="user-dropdown-sep"></div>
-        <button class="user-dropdown-item danger" onclick="window.bizLogout()">🚶 Đăng xuất</button>
-      </div>
-    </div>
-  </div>
+
 
 
   <nav id="main-nav">
@@ -509,19 +493,14 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
         var meRes = await fetch('/api/auth/business/me', { headers: { 'x-auth-token': token } });
         var meData = await meRes.json();
         if (meData.success && meData.user) {
-          var bizName = meData.user.displayName || meData.user.name || 'Doanh nghiệp';
-          var nameEl = document.getElementById('sidebar-name');
-          var topbarEl = document.getElementById('topbar-username');
-          var avatarEl = document.getElementById('sidebar-avatar');
-          var tierEl = document.getElementById('sidebar-tier');
+          // Sync with localStorage to fix corrupted local data
+          localStorage.setItem('biz_auth_user', JSON.stringify(meData.user));
           
-          if (nameEl) nameEl.innerHTML = `
-            <div style="font-weight:700; font-size:13px; color:#f1f5f9;">${esc(bizName)} <span style="color:#6ee7b7;">✓</span></div>
-            <div style="font-size:10px; color:#818cf8; font-weight:700; margin-top:2px;">ID: ${esc(meData.user.customId || meData.user.id || '')}</div>
-          `;
+          var bizName = meData.user.displayName || meData.user.name || 'Doanh nghiệp';
+          var topbarEl = document.getElementById('topbar-username');
           if (topbarEl) topbarEl.textContent = bizName;
-          if (avatarEl) { avatarEl.textContent = ''; avatarEl.textContent = bizName.charAt(0).toUpperCase(); }
-          if (tierEl) tierEl.textContent = (meData.user.points || 0) >= 1000 ? 'PLATINUM' : 'PARTNER';
+
+
         }
       }
     } catch(e) {
@@ -565,7 +544,6 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
       };
 
       setupDropdown('topbar-user-chip', 'topbar-user-dropdown');
-      setupDropdown('sidebar-user-chip', 'sidebar-user-dropdown');
     });
   })();
 

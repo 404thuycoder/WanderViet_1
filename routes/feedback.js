@@ -124,7 +124,7 @@ router.post('/', optionalAuth, async (req, res) => {
 router.put('/:id/status', adminTokenAuth, async (req, res) => {
   try {
     const { status } = req.body;
-    const feedback = await Feedback.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    const feedback = await Feedback.findByIdAndUpdate(req.params.id, { status }, { returnDocument: 'after' });
     if (!feedback) return res.status(404).json({ success: false, message: 'Feedback not found' });
     res.json({ success: true, data: feedback });
   } catch (err) {

@@ -1,5 +1,5 @@
 require('dotenv').config();
-console.log('🚀 [SERVER] Starting at', new Date().toISOString());
+// Server starting...
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,7 +9,7 @@ const http = require('http');
 const { initBroadcastWorker } = require('./utils/broadcastWorker');
 const { initSocket } = require('./utils/socketManager');
 
-// Clean up environment variables (remove spaces/newlines)
+// Clean up environment variables
 if (process.env.GROQ_API_KEY) process.env.GROQ_API_KEY = process.env.GROQ_API_KEY.trim();
 if (process.env.GROQ_API_KEY_PLANNER) process.env.GROQ_API_KEY_PLANNER = process.env.GROQ_API_KEY_PLANNER.trim();
 if (process.env.GROQ_API_KEY_NAVIGATION) process.env.GROQ_API_KEY_NAVIGATION = process.env.GROQ_API_KEY_NAVIGATION.trim();
@@ -20,8 +20,7 @@ const PORT = 3000;
 const app = express();
 app.set('trust proxy', true);
 
-
-app.use(compression()); // Bật nén dữ liệu
+app.use(compression());
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
@@ -31,33 +30,38 @@ const fs = require('fs');
 const uploadsDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
-    console.log('✅ Created uploads directory');
 }
 
 app.use('/uploads', express.static(uploadsDir));
 
-// Performance & Caching Policy
+// Performance & Caching Policy + UTF-8 Enforcement
 app.use((req, res, next) => {
     const ext = path.extname(req.path).toLowerCase();
     const isStaticAsset = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.woff', '.woff2', '.ttf'].includes(ext);
     
     if (isStaticAsset) {
-        // Cache static assets for 1 day
         res.setHeader('Cache-Control', 'public, max-age=86400');
+        if (['.js', '.css', '.svg', '.json'].includes(ext)) {
+            if (ext === '.js') res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+            else if (ext === '.css') res.setHeader('Content-Type', 'text/css; charset=utf-8');
+            else if (ext === '.json') res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        }
     } else {
-        // API and HTML should not be cached to ensure fresh data
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
+        if (ext === '.html' || req.path === '/' || !ext) {
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        }
     }
     next();
 });
 
-// Force UTF-8 for all JSON API responses to fix Vietnamese encoding issues
+// Force UTF-8 for all JSON API responses
 app.use('/api', (req, res, next) => {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   if (req.path.includes('login')) {
-    console.log(`[API DEBUG] ${req.method} ${req.path}`, req.body);
+    // console.log(`[API DEBUG] ${req.method} ${req.path}`, req.body);
   }
   next();
 });
@@ -76,31 +80,25 @@ app.use('/api/navi', require('./routes/ai-navigation'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/knowledge', require('./routes/knowledge'));
 app.use('/api/social', require('./routes/social'));
-app.use('/api/public', require('./routes/public'));
 app.use('/api/bookings', require('./routes/bookings'));
 app.use('/api/payments', require('./routes/payments'));
-
 
 // Static User Web
 app.use('/assets', express.static(path.join(__dirname, 'apps/user-web/assets')));
 app.use(express.static(path.join(__dirname, 'apps/user-web')));
 
-// Catch-all: If not found, check if it's an API or static file request
 app.use((req, res) => {
     const isApi = req.path.startsWith('/api/');
     const isUpload = req.path.startsWith('/uploads/');
     const isAsset = req.path.startsWith('/assets/');
     const hasExt = path.extname(req.path) !== '';
-    
     if (isApi || isUpload || isAsset || hasExt) {
         return res.status(404).json({ success: false, message: 'Resource not found' });
     }
-    
-    // Default to SPA entry point
     res.sendFile(path.join(__dirname, 'apps/user-web/index.html'));
 });
 
-// Proxy logic
+// Proxy logic for portals
 function makeProxy(targetPort) {
     return (req, res) => {
         const chunks = [];
@@ -120,21 +118,22 @@ function makeProxy(targetPort) {
     };
 }
 
-// Start Portals
 const startPortals = () => {
     const proxy = makeProxy(PORT);
     [{ p: 3001, d: 'apps/admin-web' }, { p: 3002, d: 'apps/business-web' }].forEach(config => {
         const pApp = express();
         pApp.use(cors({ origin: true, credentials: true }));
-        
-        // Fix cache issues
         pApp.use((req, res, next) => {
             res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-            res.setHeader('Pragma', 'no-cache');
-            res.setHeader('Expires', '0');
+            const ext = path.extname(req.path).toLowerCase();
+            if (['.html', '.js', '.css', '.json'].includes(ext) || req.path === '/' || !ext) {
+                if (ext === '.js') res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+                else if (ext === '.css') res.setHeader('Content-Type', 'text/css; charset=utf-8');
+                else if (ext === '.html' || req.path === '/' || !ext) res.setHeader('Content-Type', 'text/html; charset=utf-8');
+                else if (ext === '.json') res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            }
             next();
         });
-
         pApp.use('/api/', (req, res) => { req.url = '/api/' + req.url.replace(/^\//, ''); proxy(req, res); });
         pApp.use('/uploads/', (req, res) => { req.url = '/uploads/' + req.url.replace(/^\//, ''); proxy(req, res); });
         pApp.use(express.static(path.join(__dirname, config.d)));
@@ -144,7 +143,13 @@ const startPortals = () => {
 };
 
 // Database & Start
-mongoose.connect(process.env.MONGODB_URI.trim())
+const dbOptions = {
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+    family: 4
+};
+
+mongoose.connect(process.env.MONGODB_URI.trim(), dbOptions)
     .then(() => {
         console.log('👤 Web Người Dùng:   http://localhost:3000');
         console.log('🛡️ Web Quản Trị:     http://localhost:3001');
@@ -156,16 +161,18 @@ mongoose.connect(process.env.MONGODB_URI.trim())
         
         server.listen(PORT, '0.0.0.0', () => {
             startPortals();
-            initBroadcastWorker(); // Khởi chạy trình gửi thông báo tự động
+            initBroadcastWorker();
         }).on('error', (err) => {
             if (err.code === 'EADDRINUSE') {
-                console.error(`\n❌ LỖI: Cổng ${PORT} đang bị chiếm dụng!`);
-                console.error('Vui lòng tắt các tiến trình Node.js đang chạy ngầm rồi thử lại.');
+                console.error(`\n❌ Cổng ${PORT} đang bị chiếm dụng!`);
                 process.exit(1);
             }
-            console.error('Server error:', err);
         });
     })
     .catch((err) => {
-        console.error('MongoDB error:', err);
+        if (err.message.includes('getaddrinfo') || err.message.includes('ENOTFOUND')) {
+             console.error('❌ Main DB: Connection issue (check internet).');
+        } else {
+             console.error('❌ Main DB Error:', err.message);
+        }
     });

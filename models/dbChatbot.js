@@ -4,11 +4,13 @@ const mongoose = require('mongoose');
 const chatbotUri = (process.env.CHATBOT_MONGODB_URI || "").trim();
 
 if (!chatbotUri) {
-  console.warn('⚠️  CHATBOT_MONGODB_URI is not defined in .env! Chatbot features may not work properly.');
+  // console.warn('⚠️  CHATBOT_MONGODB_URI is not defined in .env!');
 }
 
 const chatbotDb = mongoose.createConnection(chatbotUri, {
-  // các cấu hình bổ sung nếu cần (tuỳ chọn)
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  family: 4
 });
 
 chatbotDb.on('connected', () => {
@@ -16,7 +18,11 @@ chatbotDb.on('connected', () => {
 });
 
 chatbotDb.on('error', (err) => {
-  console.error('❌ Chatbot DB connection error:', err);
+  if (err.message.includes('getaddrinfo') || err.message.includes('ENOTFOUND')) {
+    // console.error('❌ Chatbot DB: Connection issue.');
+  } else {
+    console.error('❌ Chatbot DB error:', err.message);
+  }
 });
 
 module.exports = chatbotDb;

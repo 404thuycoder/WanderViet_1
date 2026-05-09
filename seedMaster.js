@@ -40,7 +40,7 @@ async function seedMaster() {
         await Knowledge.findOneAndUpdate(
           { question: item.question },
           item,
-          { upsert: true, new: true, setDefaultsOnInsert: true }
+          { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
         );
       }
       

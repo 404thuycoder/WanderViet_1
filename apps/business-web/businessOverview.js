@@ -1,4 +1,4 @@
-﻿/**
+/**
  * businessOverview.js — Trang chủ Dashboard (Premium Edition)
  * Layout: Quick Actions | KPI Cards | Revenue Chart | [Activities & Messages] | [Featured Services & Reviews]
  */
@@ -265,8 +265,10 @@
         const biz = getCurrentBiz();
         if (!biz) return;
         
-        const nameElems = [document.getElementById('sidebar-name'), document.getElementById('topbar-username')];
-        nameElems.forEach(el => { if(el) el.textContent = biz.name; });
+        const topbarEl = document.getElementById('topbar-username');
+        if (topbarEl) topbarEl.textContent = biz.name;
+        
+        // sidebar-name is handled by index.html for complex structure (ID + checkmark)
         
         const tierEl = document.getElementById('sidebar-tier');
         if (tierEl) tierEl.textContent = biz.tier || 'PARTNER';

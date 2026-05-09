@@ -414,13 +414,13 @@ router.post('/business/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const accounts = await BusinessAccount.find({ email: String(email || '').toLowerCase() });
-    console.log(`[AUTH DEBUG] Found ${accounts ? accounts.length : 0} accounts for ${email}`);
+    // console.log(`[AUTH DEBUG] Found ${accounts ? accounts.length : 0} accounts for ${email}`);
     if (!accounts || accounts.length === 0) return res.status(400).json({ success: false, message: 'Email hoặc mật khẩu không đúng' });
     
     let matchedAccount = null;
     for (const acc of accounts) {
       const isMatch = await bcrypt.compare(password, acc.password);
-      console.log(`[AUTH DEBUG] Password match for ${acc.email}: ${isMatch}`);
+      // console.log(`[AUTH DEBUG] Password match for ${acc.email}: ${isMatch}`);
       if (isMatch) {
         if (acc.status === 'suspended') {
           return res.status(403).json({ success: false, message: 'Tài khoản của bạn đã bị khóa' });

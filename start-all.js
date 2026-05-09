@@ -1,6 +1,6 @@
 const { execSync, spawn } = require('child_process');
 
-console.log('🧹 Đang dọn dẹp các cổng mạng bị kẹt (3000, 3001, 3002, 5000)...');
+// console.log('🧹 Đang dọn dẹp các cổng mạng bị kẹt (3000, 3001, 3002, 5000)...');
 const ports = [3000, 3001, 3002, 5000];
 
 ports.forEach(port => {
@@ -13,11 +13,11 @@ ports.forEach(port => {
             if (parts.length > 4 && parts[1].endsWith(`:${port}`)) {
                 const pid = parts[parts.length - 1];
                 if (pid !== '0' && !killedPids.has(pid)) {
-                    console.log(`Tiến trình PID ${pid} đang chiếm cổng ${port}. Đang tắt...`);
+                    // console.log(`Tiến trình PID ${pid} đang chiếm cổng ${port}. Đang tắt...`);
                     try {
                         execSync(`taskkill /F /PID ${pid} 2>NUL`);
                         killedPids.add(pid);
-                        console.log(`✅ Đã giải phóng cổng ${port}`);
+                        // console.log(`✅ Đã giải phóng cổng ${port}`);
                     } catch (e) {
                         // ignore
                     }

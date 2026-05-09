@@ -989,7 +989,7 @@ section[id] {
 
 /* Destinations */
 .destinations {
-  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-elevated) 100%);
+  background: var(--bg-elevated);
 }
 
 .filter-bar {
@@ -1826,7 +1826,7 @@ section[id] {
 
 /* Smart search */
 .smart-search {
-  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg) 100%);
+  background: var(--bg-elevated);
 }
 
 .smart-grid {
@@ -2886,7 +2886,7 @@ section[id] {
 
 /* ===== PROMO BANNER ===== */
 .promo-banner {
-  background: linear-gradient(160deg, var(--bg-elevated) 0%, #0a1830 100%);
+  background: var(--bg-elevated);
   border-block: 1px solid rgba(148, 163, 184, 0.1);
 }
 
@@ -7007,7 +7007,7 @@ body {
 }
 /* ── Top Partners ────────────────────────── */
 .top-partners {
-  background: linear-gradient(to bottom, #0f172a, #0a0f1e);
+  background: var(--bg);
   padding: 6rem 0;
 }
 .partners-scroll {
@@ -7067,4 +7067,61 @@ body {
   font-size: 1.2rem;
   color: #94a3b8;
   font-family: 'Outfit', sans-serif;
+}
+
+/* ELITE SERVICE CARD */
+.svc-card {
+  background: var(--bg-card); 
+  border: 1px solid var(--border); 
+  border-radius: 32px; 
+  overflow: hidden; 
+  transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
+  cursor: pointer; 
+  position: relative; 
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+}
+.svc-card:hover { 
+  transform: translateY(-12px); 
+  border-color: var(--primary); 
+  box-shadow: 0 30px 60px rgba(0,0,0,0.2); 
+}
+.svc-img { 
+  height: 230px; 
+  position: relative; 
+}
+.svc-img img { 
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover; 
+}
+.svc-price { 
+  position: absolute; 
+  top: 20px; 
+  right: 20px; 
+  background: rgba(0,0,0,0.7); 
+  backdrop-filter: blur(10px); 
+  padding: 8px 16px; 
+  border-radius: 12px; 
+  color: #fff; 
+  font-weight: 800; 
+  font-size: 13px; 
+}
+.svc-info { 
+  padding: 28px; 
+}
+.svc-cat { 
+  color: var(--primary); 
+  font-size: 10px; 
+  font-weight: 800; 
+  text-transform: uppercase; 
+  letter-spacing: 2px; 
+  margin-bottom: 12px; 
+  display: block; 
+}
+.svc-name { 
+  font-size: 1.4rem; 
+  font-weight: 800; 
+  margin: 0 0 12px; 
+  color: var(--text); 
+  line-height: 1.3; 
 }

@@ -395,14 +395,11 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   const SYNC_THROTTLE = 500; // 0.5 seconds - giảm để cập nhật nhanh hơn khi chuyển trang
 
   async function syncAuthUI() {
-    console.log("🔍 syncAuthUI called");
     if (syncInProgress) {
-      console.log("⏳ syncAuthUI: already in progress, skipping (throttled)");
       return;
     }
     const now = Date.now();
     if (now - lastSyncTime < SYNC_THROTTLE) {
-      console.log("⏳ syncAuthUI: throttled, skipping");
       return;
     }
 
@@ -411,12 +408,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     try {
       const token = localStorage.getItem('wander_token');
-      console.log("🔑 Token exists:", !!token);
       
       const authBtns = document.querySelectorAll("[data-auth-open]");
       const profileTrays = document.querySelectorAll("[data-auth-show]");
-      console.log("🔘 Login buttons found:", authBtns.length);
-      console.log("👤 Profile trays found:", profileTrays.length);
       
       const userNameEl = document.querySelector("[data-user-name]");
       const userAvatarImg = document.querySelector("[data-user-avatar]");
@@ -424,7 +418,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       const headerRankEl = document.getElementById('header-user-rank');
 
       if (!token) {
-        console.log("❌ No token - showing login button");
         authBtns.forEach(el => el.style.display = "flex");
         profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
         if (headerRankEl) headerRankEl.style.display = "none";
@@ -433,7 +426,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
       const parts = token.split('.');
       if (parts.length !== 3) {
-        console.log("❌ Token invalid format (not 3 parts)");
         authBtns.forEach(el => el.style.display = "flex");
         profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
         if (headerRankEl) headerRankEl.style.display = "none";
@@ -444,7 +436,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       const payload = JSON.parse(decodeURIComponent(escape(atob(base64 + padding))));
       const u = payload.user || payload.account || payload;
 
-      console.log("✅ Token valid - hiding login, showing profile");
       authBtns.forEach(el => el.style.display = "none");
       profileTrays.forEach(el => { el.style.display = "flex"; el.removeAttribute('hidden'); });
 
@@ -484,7 +475,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       try {
         const r = await fetch('/api/auth/user/rank?t=' + Date.now(), { headers: { 'x-auth-token': token } });
         if (r.status === 401) {
-          console.log("❌ Token expired (401)");
           localStorage.removeItem('wander_token');
           authBtns.forEach(el => el.style.display = "flex");
           profileTrays.forEach(el => { el.style.display = "none"; el.hidden = true; });
@@ -552,7 +542,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   const isHistory = page.includes('history');
 
   function injectHeader() {
-    console.log("🛠️ WanderUI: Injecting Header...");
     const container = document.getElementById('header-container') || document.querySelector('[data-header]') || document.querySelector('.site-header') || document.querySelector('header');
     if (!container) {
       console.error("❌ WanderUI: Header container NOT found!");
@@ -980,6 +969,17 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           </div>
         </div>
       </div>
+      <div class="modal" id="modal-booking-detail" data-modal="booking-detail" hidden>
+        <div class="modal__inner modal__inner--large" style="max-width:1000px;">
+          <div class="modal__header">
+            <h3>Chi tiết dịch vụ đã đặt</h3>
+            <button class="modal__close" data-modal-close>×</button>
+          </div>
+          <div class="modal__body" id="booking-detail-content" style="padding:2rem; max-height:85vh; overflow-y:auto;">
+            <!-- Content will be injected here -->
+          </div>
+        </div>
+      </div>
     `;
     while (div.firstChild) document.body.appendChild(div.firstChild);
 
@@ -988,7 +988,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       const script2 = document.createElement('script');
       script2.src = 'voice-helper.js';
       script2.onload = () => {
-        console.log("🎙️ WanderUI: voice-helper.js loaded.");
         if (window.WanderUI && window.WanderUI.setupVoiceIntegration) {
           window.WanderUI.setupVoiceIntegration();
         }
@@ -1066,23 +1065,46 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         return `<div class="place-detail__section"><h4 class="detail-section-title">${title}</h4><div class="detail-card-grid">${cards}</div></div>`;
       }).join('');
 
+      const isLocalService = ['khach-san', 'nha-hang', 'tien-ich', 'giai-tri'].includes(p.kind);
+      const transportHtml = (isLocalService && !p.transportTips) 
+        ? `<p style="margin-bottom:8px;"><strong>📍 Địa chỉ:</strong> ${p.address || 'Liên hệ để biết vị trí chính xác'}</p>`
+        : `<p style="margin-bottom:8px;"><strong>🚢 Di chuyển:</strong> ${p.transportTips || 'Bay đến sân bay gần nhất và di chuyển bằng taxi/bus.'}</p>`;
+
       wrap.innerHTML = `
         <div class="place-view-content animate-in">
           <div class="place-detail__hero"><img src="${heroImage}" id="hero-target"></div>
           ${galleryHtml}
           <div class="place-detail__info-wrap">
             <h3 class="place-detail__title-v2">${p.name}</h3>
-            <p class="place-detail__meta-v2">🛡️ ${p.region} · ${p.budgetLabel || 'Tiết kiệm'} · ${p.paceLabel || 'Thong thả'}</p>
-            <p class="place-detail__desc" style="line-height:1.7; color:var(--text-muted); font-size:1rem;">${p.text || ''}</p>
+            <p class="place-detail__meta-v2">🛡️ ${p.region} ${p.priceFrom ? `· Giá từ <strong style="color:var(--accent)">${new Intl.NumberFormat('vi-VN').format(p.priceFrom)}đ</strong>` : ''}</p>
+            <p class="place-detail__desc" style="line-height:1.7; color:var(--text-muted); font-size:1rem;">${p.description || p.text || 'Thông tin chi tiết về dịch vụ này đang được cập nhật.'}</p>
+            
+            ${p.highlights && p.highlights.length ? `
+            <div style="margin-top:1.5rem;">
+              <h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text); display:flex; align-items:center; gap:8px;">✨ Điểm nổi bật</h4>
+              <ul style="padding-left:1.5rem; color:var(--text-muted); line-height:1.7;">
+                ${p.highlights.map(h => `<li style="margin-bottom:0.5rem;">${h}</li>`).join('')}
+              </ul>
+            </div>` : ''}
+
+            ${p.policy ? `
+            <div style="margin-top:1.5rem;">
+              <h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text); display:flex; align-items:center; gap:8px;">📄 Chính sách dịch vụ</h4>
+              <div style="padding:1.25rem; background:rgba(244,63,94,0.05); border:1px solid rgba(244,63,94,0.15); border-radius:16px; color:var(--text-muted); line-height:1.6; font-size:0.95rem;">
+                ${p.policy.replace(/\n/g, '<br>')}
+              </div>
+            </div>` : ''}
+
             <div class="place-detail__guide" style="margin-top:1.5rem; padding:1.25rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:20px;">
-               <p style="margin-bottom:8px;"><strong>🚢 Di chuyển:</strong> ${p.transportTips || 'Bay đến sân bay gần nhất và di chuyển bằng taxi/bus.'}</p>
+               ${transportHtml}
                ${p.sourceUrl ? `<p><strong>🔗 Tham khảo:</strong> <a href="${p.sourceUrl}" target="_blank" style="color:var(--accent); text-decoration:none;">${p.sourceName || 'Website chính thức'}</a></p>` : ''}
             </div>
           </div>
+          ${actsHtml ? `
           <div class="place-detail__activities-v2">
             <h4 class="detail-section-title">📅 Lịch trình gợi ý</h4>
             ${actsHtml}
-          </div>
+          </div>` : ''}
           ${sectionsHtml}
           <div id="place-map" class="place-detail__map-v2"></div>
           <div class="place-detail__actions-v2" style="padding: 1.5rem 2.5rem 2.5rem; display:flex; gap:12px;">
@@ -1215,6 +1237,144 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     }
 
     contentEl.innerHTML = html;
+  }
+
+  async function openBookingDetail(id, localBooking) {
+    const contentEl = document.getElementById('booking-detail-content');
+    if (!contentEl) return;
+    openModal('booking-detail');
+    contentEl.innerHTML = '<div style="padding:40px; text-align:center;"><div class="btn-loading" style="width:30px; height:30px; margin:0 auto 10px;"></div>Đang tải chi tiết dịch vụ...</div>';
+
+    try {
+      let b = localBooking;
+      if (!b) {
+        const token = localStorage.getItem('wander_token');
+        const res = await fetch(`/api/bookings/${id}`, { headers: { 'x-auth-token': token } });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message);
+        b = json.data;
+      }
+      
+      // Fetch place details to get more info (image, description, location)
+      let p = {};
+      try {
+        const pRes = await fetch(`/api/places/${b.placeId}`);
+        const pJson = await pRes.json();
+        if (pJson.success) p = pJson.data;
+      } catch(e) {}
+
+      const heroImage = (p.images && p.images[0]) || p.image || '';
+      const statusMap = {
+        'pending': { label: 'Chờ xử lý', color: '#3b82f6', icon: '⏳' },
+        'confirmed': { label: 'Đã xác nhận', color: '#10b981', icon: '✅' },
+        'completed': { label: 'Hoàn thành', color: '#10b981', icon: '✨' },
+        'cancelled': { label: 'Đã hủy', color: '#f43f5e', icon: '❌' }
+      };
+      const s = statusMap[b.status] || { label: b.status, color: 'var(--text-muted)', icon: 'ℹ️' };
+
+      contentEl.innerHTML = `
+        <div class="booking-detail-view animate-in">
+          <div style="display:flex; gap:2.5rem; flex-wrap:wrap;">
+            <div style="flex:1; min-width:320px;">
+              ${heroImage ? `<img src="${heroImage}" style="width:100%; border-radius:24px; aspect-ratio:16/9; object-fit:cover; margin-bottom:1.5rem; box-shadow:var(--shadow-lg);">` : ''}
+              <h2 style="font-size:2rem; margin-bottom:0.75rem; font-family:var(--font-display); font-weight:800; color:var(--text);">${p.name || b.placeName}</h2>
+              <div style="display:flex; gap:12px; margin-bottom:1.5rem;">
+                 <span style="background:rgba(56,189,248,0.1); color:var(--accent); padding:4px 12px; border-radius:8px; font-size:0.85rem; font-weight:700;">${p.region || 'Việt Nam'}</span>
+                 <span style="background:rgba(16,185,129,0.1); color:#10b981; padding:4px 12px; border-radius:8px; font-size:0.85rem; font-weight:700;">${b.bookingType === 'tour' ? 'Tour du lịch' : 'Dịch vụ đối tác'}</span>
+              </div>
+              
+              <div style="margin-bottom:2rem;">
+                <h4 style="font-size:1.1rem; margin-bottom:0.75rem; color:var(--text);">Thông tin dịch vụ</h4>
+                <p style="color:var(--text-muted); line-height:1.7; font-size:1rem;">${p.description || p.text || 'Thông tin chi tiết về dịch vụ này đang được cập nhật. Bạn có thể liên hệ trực tiếp với đối tác để được hỗ trợ thêm.'}</p>
+                
+                ${p.highlights && p.highlights.length ? `
+                  <div style="margin-top:1.5rem; padding:1.25rem; background:rgba(255,255,255,0.02); border-radius:16px;">
+                    <h5 style="margin-bottom:0.5rem; color:var(--accent);">✨ Điểm nổi bật</h5>
+                    <ul style="padding-left:1.5rem; color:var(--text-muted); margin:0;">
+                      ${p.highlights.map(h => `<li>${h}</li>`).join('')}
+                    </ul>
+                  </div>
+                ` : ''}
+                
+                ${p.policy ? `
+                  <div style="margin-top:1rem; padding:1.25rem; background:rgba(244,63,94,0.05); border-radius:16px;">
+                    <h5 style="margin-bottom:0.5rem; color:#f43f5e;">📄 Chính sách dịch vụ</h5>
+                    <p style="color:var(--text-muted); margin:0; font-size:0.9rem;">${p.policy.replace(/\n/g, '<br>')}</p>
+                  </div>
+                ` : ''}
+              </div>
+
+              <div style="padding:1.5rem; background:var(--bg-elevated); border:1px solid var(--border); border-radius:20px;">
+                <h4 style="margin-bottom:1rem; font-size:1rem; display:flex; align-items:center; gap:8px;">📍 Địa điểm & Liên hệ</h4>
+                <div style="display:grid; gap:12px;">
+                  <div style="display:flex; gap:10px;">
+                    <span style="opacity:0.6;">📍</span>
+                    <span style="font-size:0.95rem;"><strong>Địa chỉ:</strong> ${p.address || p.region || 'Liên hệ để biết chi tiết'}</span>
+                  </div>
+                  ${p.phone || p.contactPhone ? `
+                  <div style="display:flex; gap:10px;">
+                    <span style="opacity:0.6;">📞</span>
+                    <span style="font-size:0.95rem;"><strong>Hotline:</strong> ${p.phone || p.contactPhone}</span>
+                  </div>` : ''}
+                  ${p.contactEmail ? `
+                  <div style="display:flex; gap:10px;">
+                    <span style="opacity:0.6;">✉️</span>
+                    <span style="font-size:0.95rem;"><strong>Email:</strong> ${p.contactEmail}</span>
+                  </div>` : ''}
+                </div>
+              </div>
+            </div>
+            
+            <div style="width:380px; flex-shrink:0;">
+              <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:28px; padding:2rem; box-shadow:var(--shadow-xl); position:sticky; top:0;">
+                <div style="text-align:center; margin-bottom:2rem;">
+                  <div style="width:64px; height:64px; background:${s.color}15; color:${s.color}; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 1rem;">${s.icon}</div>
+                  <h3 style="font-size:1.25rem; margin-bottom:0.25rem;">Trạng thái đơn hàng</h3>
+                  <span style="color:${s.color}; font-weight:800; font-size:0.9rem; text-transform:uppercase; letter-spacing:1px;">${s.label}</span>
+                </div>
+                
+                <div style="display:grid; gap:1.25rem; padding:1.5rem; background:rgba(255,255,255,0.02); border-radius:20px; border:1px solid rgba(255,255,255,0.05);">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--text-muted); font-size:0.9rem;">Mã giao dịch</span>
+                    <strong style="color:var(--accent); font-family:monospace; font-size:1.1rem;">#${(b.bookingId || b._id).toString().slice(-8).toUpperCase()}</strong>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--text-muted); font-size:0.9rem;">Ngày sử dụng</span>
+                    <strong style="font-size:0.95rem;">${new Date(b.useDate).toLocaleDateString('vi-VN')}</strong>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--text-muted); font-size:0.9rem;">Thời gian đặt</span>
+                    <span style="font-size:0.9rem; opacity:0.8;">${new Date(b.createdAt || Date.now()).toLocaleDateString('vi-VN')}</span>
+                  </div>
+                  
+                  <div style="margin-top:0.75rem; padding-top:1.25rem; border-top:2px dashed var(--border); display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:1rem; font-weight:700;">Tổng thanh toán</span>
+                    <span style="font-size:1.4rem; font-weight:900; color:var(--primary);">${new Intl.NumberFormat('vi-VN').format(b.totalPrice)}đ</span>
+                  </div>
+                </div>
+                
+                ${b.notes ? `
+                  <div style="margin-top:1.5rem; padding:1.25rem; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.2); border-radius:16px; font-size:0.95rem; line-height:1.5;">
+                    <strong style="color:#10b981; display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+                      <span style="font-size:1.1rem;">💬</span> Phản hồi từ doanh nghiệp:
+                    </strong>
+                    <div style="color:var(--text); font-style:italic;">"${b.notes}"</div>
+                  </div>
+                ` : ''}
+                
+                <div style="margin-top:2rem; display:grid; gap:12px;">
+                  <button class="btn btn--primary" style="width:100%; justify-content:center; padding:1rem;" onclick="closeModal('booking-detail')">Đã rõ</button>
+                  <p style="text-align:center; font-size:0.75rem; color:var(--text-muted); opacity:0.6;">Mọi thắc mắc vui lòng liên hệ hỗ trợ hệ thống.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+    } catch (e) {
+      contentEl.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-muted);"><div style="font-size:3rem; margin-bottom:1rem;">⚠️</div>Lỗi: ${e.message}</div>`;
+    }
   }
 
 
@@ -1643,7 +1803,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     // --- VOICE INTEGRATION ---
     function setupVoiceIntegration() {
         if (window.voiceGuide) {
-            console.log("🎙️ WanderUI: Connecting VoiceGuide...");
             window.voiceGuide.onResultCallback = (text) => {
                 console.log("🎙️ Voice Result:", text);
                 const inputEl = document.getElementById('global-chat-input');
@@ -2884,12 +3043,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   // --- Init ---
   const initAll = () => {
     if (window.WanderUI_Initialized) {
-      console.log("⚠️ WanderUI already initialized, skipping");
       return;
     }
     window.WanderUI_Initialized = true;
-    console.log("🚀 WanderUI Initializing components...");
-    console.log("📄 Current page:", window.location.pathname);
     injectHeader();
     injectCommonComponents();
     initNavigation();
@@ -2905,8 +3061,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     handleHashModal();
     syncAuthUI();
     // Force sync again after short delay to ensure DOM is fully rendered
-    setTimeout(() => { console.log("🔄 Force syncAuthUI (100ms)"); syncAuthUI(); }, 100);
-    setTimeout(() => { console.log("🔄 Force syncAuthUI (500ms)"); syncAuthUI(); }, 500);
     initTheme();
     initGlobalChatbot();
     initSettingsHandlers();
@@ -3103,17 +3257,14 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
   // Debug: Check token immediately on load
   const _debugToken = localStorage.getItem('wander_token');
-  console.log("🔐 [SharedUI.js loaded] wander_token exists:", !!_debugToken);
   if (_debugToken) {
     try {
       const parts = _debugToken.split('.');
-      console.log("🔐 [SharedUI.js loaded] token parts:", parts.length);
     } catch(e) {
-      console.log("🔐 [SharedUI.js loaded] token invalid");
     }
   }
 
-  return { setTheme, toggleTheme, showToast, setButtonLoading, toggleNotificationDrawer, updateNotificationBadge, markAsRead, markAllAsRead, syncAuthUI, forceLogout, toggleUserMenu, openAuthModal, confirm, openPlaceDetail, getRankBadgeHTML, getRankIcon, getStoreKey, initSettingsHandlers, trackQuestActivity, getQuestActivity, startTopLoader, finishTopLoader };
+  return { setTheme, toggleTheme, showToast, setButtonLoading, toggleNotificationDrawer, updateNotificationBadge, markAsRead, markAllAsRead, syncAuthUI, forceLogout, toggleUserMenu, openAuthModal, confirm, openPlaceDetail, openBookingDetail, openItineraryDetail, getRankBadgeHTML, getRankIcon, getStoreKey, initSettingsHandlers, trackQuestActivity, getQuestActivity, startTopLoader, finishTopLoader };
 })());
 
 

@@ -231,7 +231,7 @@
     <header id="header-container"></header>
 
     <section class="hero">
-        <div class="hero-bg"><img id="hero-img" src=""></div>
+        <div class="hero-bg"><img id="hero-img" src="" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=1200&q=80'"></div>
         <div class="hero-content">
             <span class="p-badge" id="p-cat">Elite Experience</span>
             <h1 id="p-title" style="font-family:'Plus Jakarta Sans'; font-size:4.5rem; font-weight:800; margin:0 0 24px; letter-spacing:-3px; line-height:1;">...</h1>
@@ -250,10 +250,22 @@
                 <p id="p-desc" style="color:var(--text-dim); font-size:1.25rem; line-height:2.2; margin-bottom:0;"></p>
             </div>
 
+            <div class="bento-card" id="gallery-sec" style="display:none; padding:40px;">
+                <span class="card-label" style="margin-bottom:16px;">KHÔNG GIAN & TIỆN ÍCH</span>
+                <h3 class="card-title" style="margin-bottom:24px; font-size:2rem;">Bộ sưu tập hình ảnh</h3>
+                <div id="gallery-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:16px;"></div>
+            </div>
+
             <div class="bento-card" id="highlights-sec" style="display:none;">
                 <span class="card-label">DẤU ẤN ĐẶC BIỆT</span>
                 <h3 class="card-title">Tại sao nên chọn?</h3>
                 <div class="highlight-grid" id="highlights-grid"></div>
+            </div>
+
+            <div class="bento-card" id="policy-sec" style="display:none;">
+                <span class="card-label">THÔNG TIN QUAN TRỌNG</span>
+                <h3 class="card-title">Chính sách dịch vụ</h3>
+                <div id="policy-content" style="color:var(--text-dim); font-size:1.1rem; line-height:2; background:rgba(255,255,255,0.02); padding:32px; border-radius:24px; border:1px solid var(--glass-border);"></div>
             </div>
 
             <div class="bento-card" id="itinerary-sec" style="display:none;">
@@ -293,7 +305,7 @@
 
                 <div class="biz-card">
                     <div class="biz-verified">ĐỐI TÁC TIN CẬY</div>
-                    <img id="biz-logo" class="biz-logo" src="">
+                    <img id="biz-logo" class="biz-logo" src="" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=WV&background=6366f1&color=fff'">
                     <div style="flex:1;">
                         <b style="font-size:1.1rem; display:block;" id="biz-name">...</b>
                         <div style="display:flex; flex-direction:column; gap:4px; margin-top:4px;">
@@ -563,11 +575,34 @@
                 // Highlights
                 if(p.highlights && p.highlights.length) {
                     document.getElementById('highlights-sec').style.display = 'block';
-                    document.getElementById('highlights-grid').innerHTML = p.highlights.map(h => `
+                    document.getElementById('highlights-grid').innerHTML = p.highlights.map(h => {
+                        // Extract icon if present (e.g. "🏊 Hồ bơi" -> icon "🏊", text "Hồ bơi")
+                        const match = h.match(/^([\uD800-\uDBFF][\uDC00-\uDFFF]|\S)\s*(.*)/);
+                        let icon = '💠'; let text = h;
+                        if (match && match[1] && match[1].match(/[\uD800-\uDBFF][\uDC00-\uDFFF]/)) {
+                            icon = match[1]; text = match[2] || h;
+                        }
+                        return `
                         <div class="h-item">
-                            <span class="h-icon">💠</span>
-                            <b class="h-name">${h}</b>
-                            <p class="h-text">Trải nghiệm vượt bậc được cam kết chất lượng 5 sao từ đối tác chiến lược.</p>
+                            <span class="h-icon">${icon}</span>
+                            <b class="h-name">${text}</b>
+                            <p class="h-text" style="opacity:0.6; font-size:14px; margin-top:8px;">Trải nghiệm vượt bậc được cam kết chất lượng bởi đối tác.</p>
+                        </div>
+                    `}).join('');
+                }
+
+                // Policy
+                if(p.policy) {
+                    document.getElementById('policy-sec').style.display = 'block';
+                    document.getElementById('policy-content').innerHTML = p.policy.replace(/\n/g, '<br>');
+                }
+
+                // Gallery
+                if(p.images && p.images.length > 1) {
+                    document.getElementById('gallery-sec').style.display = 'block';
+                    document.getElementById('gallery-grid').innerHTML = p.images.map(img => `
+                        <div style="border-radius:16px; overflow:hidden; aspect-ratio:4/3; border:1px solid rgba(255,255,255,0.05); cursor:pointer; transition:0.3s;" onclick="document.getElementById('hero-img').src=this.querySelector('img').src">
+                            <img src="${img}" style="width:100%; height:100%; object-fit:cover; transition:0.5s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
                         </div>
                     `).join('');
                 }
@@ -586,12 +621,11 @@
                 }
 
                 // Owner Info
-                if(p.owner) {
-                    document.getElementById('biz-name').innerText = p.owner.displayName || p.owner.name;
-                    document.getElementById('biz-logo').src = p.owner.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.owner.name)}&background=6366f1&color=fff`;
-                    document.getElementById('biz-phone').innerText = p.contactPhone || 'Contact WV Support';
-                    document.getElementById('biz-email').innerText = p.contactEmail || 'elite@wanderviet.vn';
-                }
+                const ownerName = p.owner ? (p.owner.displayName || p.owner.name || 'Đối tác WanderViệt') : 'Hệ thống WanderViệt';
+                document.getElementById('biz-name').innerText = ownerName;
+                document.getElementById('biz-logo').src = (p.owner && p.owner.avatar) ? p.owner.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(ownerName)}&background=6366f1&color=fff`;
+                document.getElementById('biz-phone').innerText = p.contactPhone || p.phone || '1900 9999 (WV Support)';
+                document.getElementById('biz-email').innerText = p.contactEmail || 'elite@wanderviet.vn';
 
             } catch(e) { console.error('Load failed:', e); }
         }

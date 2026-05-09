@@ -1877,8 +1877,7 @@
       var lat = parseFloat(p.lat);
       var lng = parseFloat(p.lng);
       if (isNaN(lat) || isNaN(lng)) {
-        console.warn('⚠️ Map: Invalid coordinates for stop:', sid, p.name);
-        return;
+        return; // Silently skip places without coordinates
       }
       var ll = [lat, lng];
       waypoints.push(lng + "," + lat);
@@ -3080,7 +3079,6 @@
           if (window.WanderUI) window.WanderUI.showToast('✅ Đặt thành công! Mã đơn: ' + bId, 'success');
           else alert('Đặt chỗ thành công! Bạn có thể theo dõi trạng thái tại phần Lịch sử hoạt động.');
           
-          // Redirect to payment if needed
           if (pmVal && pmVal.value !== 'contact') {
             setTimeout(() => { window.location.href = 'payment.html?pay=' + bId; }, 1000);
           }
@@ -3109,10 +3107,7 @@
   function renderBusinessServices() {
     const grid = document.getElementById('biz-services-grid');
     if (!grid) return;
-
-    // Skip if we are on the dedicated business-services.html page to avoid duplication
     if (window.location.pathname.includes('business-services.html')) return;
-
 
     fetch('/api/places')
       .then(r => r.json())
@@ -3122,42 +3117,53 @@
           return;
         }
 
-        // Filter places that have an owner (business services)
         const bizPlaces = json.data.filter(p => p.ownerId);
-        window._allBizPlaces = bizPlaces; // Ensure booking modal can find them
+        window._allBizPlaces = bizPlaces;
 
         if (bizPlaces.length === 0) {
-          grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:4rem;color:#94a3b8;">Hiện chưa có tour du lịch nào từ đối tác.</p>';
+          grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:4rem;color:#94a3b8;">Hiện chưa có dịch vụ nào từ đối tác.</p>';
           return;
         }
 
         grid.innerHTML = bizPlaces.map(p => {
-          const rating = p.rating || (4 + Math.random()).toFixed(1);
-          const stars = '★'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+          const rating = parseFloat(p.ratingAvg || 5.0).toFixed(1);
+          const priceStr = (p.price || p.priceFrom || 0).toLocaleString('vi-VN') + ' ₫';
+          let fallbackImg = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80';
+          if (p.kind === 'khach-san') fallbackImg = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80';
+          else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') fallbackImg = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80';
+          else if (p.isTour || p.kind === 'trai-nghiem') fallbackImg = 'https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=600&q=80';
+
+          const imgUrl = (p.images && p.images[0] && p.images[0].length > 5) ? p.images[0] : (p.image && p.image.length > 5 ? p.image : fallbackImg);
+          const addrStr = (p.address||'').split(',').pop().trim() || 'Việt Nam';
+          const ownerName = p.ownerName || 'WanderViệt Partner';
           
+          let catLabel = 'Trải nghiệm';
+          if (p.kind === 'khach-san') catLabel = 'Lưu trú Elite';
+          else if (p.isTour || p.kind === 'trai-nghiem') catLabel = 'Trải nghiệm Tour';
+          else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') catLabel = 'Ẩm thực & Giải trí';
+
           return `
-            <article class="biz-card">
-              <div class="biz-card__badge">${p.kind === 'utility' ? 'Tiện ích' : 'Dịch vụ'} Đối tác</div>
-              <div class="biz-card__img" style="background-image: url('${p.image || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80'}')" onclick="openPlaceModal('${p._id || p.id}')"></div>
-              <div class="biz-card__content">
-                <h3 class="biz-card__title" onclick="openPlaceModal('${p._id || p.id}')">${p.name}</h3>
-                <div style="font-size: 0.8rem; color: var(--accent); margin-bottom: 4px; font-weight: 700; cursor: pointer;" onclick="window.location.href='business-profile.html?id=${p.ownerId}'">
-                  🏢 Xem trang doanh nghiệp →
+            <div class="svc-card" onclick="window.location.href='place-detail.html?id=${p._id || p.id}'">
+                <div class="svc-img">
+                  <img src="${imgUrl}" onerror="this.onerror=null;this.src='${fallbackImg}';">
+                  <div class="svc-price">${priceStr}</div>
                 </div>
-                <div class="biz-card__meta">
-                  <div class="biz-card__rating">
-                    ${stars} <span>(${p.reviewsCount || Math.floor(Math.random() * 50) + 10})</span>
-                  </div>
-                  <div style="color:#10b981; font-weight:800; font-size:1.1rem;">
-                    ${(p.priceFrom || 0).toLocaleString()} ₫
-                  </div>
+                <div class="svc-info">
+                    <span class="svc-cat">${catLabel}</span>
+                    <h3 class="svc-name">${p.name}</h3>
+                    <div style="display:flex; gap:16px; font-size:12px; color:var(--text-muted);">
+                      <span>⭐ ${rating}</span>
+                      <span>📍 ${addrStr}</span>
+                    </div>
+                    <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                          <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(ownerName)}&background=6366f1&color=fff" style="width:24px; height:24px; border-radius:6px; object-fit:cover;"> 
+                          <span style="font-size:11px; font-weight:700; color:var(--text-muted);">${ownerName}</span>
+                        </div>
+                        <span style="color:var(--primary); font-size:9px; font-weight:800;">VERIFIED 🛡️</span>
+                    </div>
                 </div>
-                <div class="biz-card__actions">
-                  <button class="btn-biz btn-biz--primary" onclick="openPlaceModal('${p._id || p.id}')">Chi tiết & Đặt lịch</button>
-                  <button class="btn-biz btn-biz--outline" onclick="openChatWithBusiness('${p.ownerId}', '${p.name}')" title="Nhắn tin tư vấn">💬</button>
-                </div>
-              </div>
-            </article>
+            </div>
           `;
         }).join('');
       })

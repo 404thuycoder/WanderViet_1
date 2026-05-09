@@ -301,9 +301,16 @@
                 document.getElementById('display-grid').innerHTML = `<div style="grid-column:span 3; padding:100px; text-align:center; color:var(--text-dim);">Không tìm thấy dịch vụ nào phù hợp với bộ lọc.</div>`;
                 return;
             }
-            document.getElementById('display-grid').innerHTML = data.map(p => `
+            document.getElementById('display-grid').innerHTML = data.map(p => {
+                let fallbackImg = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80';
+                if (p.kind === 'khach-san') fallbackImg = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80';
+                else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') fallbackImg = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80';
+                else if (p.isTour || p.kind === 'trai-nghiem') fallbackImg = 'https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=600&q=80';
+                const imgUrl = (p.images && p.images[0] && p.images[0].length > 5) ? p.images[0] : (p.image && p.image.length > 5 ? p.image : fallbackImg);
+                
+                return `
                 <div class="svc-card" onclick="window.location.href='place-detail.html?id=${p._id || p.id}'">
-                    <div class="svc-img"><img src="${p.image}"><div class="svc-price">${(p.price || p.priceFrom || 0).toLocaleString('vi-VN')} ₫</div></div>
+                    <div class="svc-img"><img src="${imgUrl}" onerror="this.onerror=null;this.src='${fallbackImg}';"><div class="svc-price">${(p.price || p.priceFrom || 0).toLocaleString('vi-VN')} ₫</div></div>
                     <div class="svc-info">
                         <span class="svc-cat">${p.category || (p.kind === 'khach-san' ? 'Lưu trú Elite' : (p.isTour || p.kind === 'trai-nghiem') ? 'Trải nghiệm Tour' : (p.kind === 'nha-hang' || p.kind === 'giai-tri') ? 'Ẩm thực & Giải trí' : 'Trải nghiệm')}</span>
                         <h3 class="svc-name">${p.name}</h3>
@@ -314,7 +321,7 @@
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         function renderBiz(data) {
@@ -338,15 +345,21 @@
                             <button class="btn-search" style="padding:10px 24px;">TRUY CẬP KÊNH</button>
                         </div>
                         <div class="biz-ecosystem">
-                            ${b.places.slice(0, 4).map(p => `
+                            ${b.places.slice(0, 4).map(p => {
+                                let fallbackImg = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80';
+                                if (p.kind === 'khach-san') fallbackImg = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80';
+                                else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') fallbackImg = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80';
+                                else if (p.isTour || p.kind === 'trai-nghiem') fallbackImg = 'https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=600&q=80';
+                                const imgUrl = (p.images && p.images[0] && p.images[0].length > 5) ? p.images[0] : (p.image && p.image.length > 5 ? p.image : fallbackImg);
+                                return `
                                 <div class="eco-item" onclick="event.stopPropagation(); window.location.href='place-detail.html?id=${p._id || p.id}'">
-                                    <img src="${p.image}">
+                                    <img src="${imgUrl}" onerror="this.onerror=null;this.src='${fallbackImg}';">
                                     <div style="overflow:hidden;">
                                         <b style="font-size:12px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</b>
                                         <span style="font-size:9px; color:var(--primary); font-weight:800;">${(p.price || 0).toLocaleString()} ₫</span>
                                     </div>
                                 </div>
-                            `).join('')}
+                                `}).join('')}
                         </div>
                     </div>
                 </div>

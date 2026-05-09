@@ -1,4 +1,4 @@
-﻿/**
+/**
  * serviceManagement.js — API Integrated version
  */
 (function() {
@@ -232,38 +232,52 @@
             const btn = document.querySelector('.sm-modal-actions .sm-btn-primary');
             const originalHtml = btn.innerHTML;
             
-            const payload = {
-                name: document.getElementById('sm-form-name').value.trim(),
-                kind: document.getElementById('sm-form-kind').value,
-                region: document.getElementById('sm-form-region').value.trim(),
-                address: document.getElementById('sm-form-address').value.trim(),
-                priceFrom: Number(document.getElementById('sm-form-priceFrom').value) || 0,
-                image: document.getElementById('sm-form-image').value.trim(),
-                description: document.getElementById('sm-form-description').value.trim(),
-                isTour: document.getElementById('sm-form-isTour').checked,
-                highlights: document.getElementById('sm-form-highlights').value.trim(),
-                policy: document.getElementById('sm-form-policy').value.trim()
-            };
-
-            if (!payload.name || !payload.region) {
+            const name = document.getElementById('sm-form-name').value.trim();
+            const region = document.getElementById('sm-form-region').value.trim();
+            if (!name || !region) {
                 toast('⚠️ Vui lòng điền Tên và Khu vực!', 'error'); return;
             }
 
+            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px"></div>';
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-small"></span> Đang lưu...';
+
+            const payload = new FormData();
+            payload.append('name', name);
+            payload.append('kind', document.getElementById('sm-form-kind').value);
+            payload.append('region', region);
+            payload.append('address', document.getElementById('sm-form-address').value.trim());
+            payload.append('priceFrom', Number(document.getElementById('sm-form-priceFrom').value) || 0);
+            payload.append('image', document.getElementById('sm-form-image').value.trim());
+            payload.append('description', document.getElementById('sm-form-description').value.trim());
+            payload.append('isTour', document.getElementById('sm-form-isTour').checked);
+            
+            const highlightsText = document.getElementById('sm-form-highlights').value.trim();
+            if (highlightsText) {
+                highlightsText.split('\n').filter(l => l.trim()).forEach(h => payload.append('highlights', h.trim()));
+            }
+            
+            payload.append('policy', document.getElementById('sm-form-policy').value.trim());
+            
+            const fileInput = document.getElementById('sm-form-image-file');
+            if (fileInput && fileInput.files.length > 0) {
+                Array.from(fileInput.files).forEach(f => {
+                    payload.append('imageFile', f);
+                });
+            }
+
+            const token = window.getAuthToken ? window.getAuthToken() : (localStorage.getItem('biz_auth_token') || sessionStorage.getItem('biz_auth_token') || localStorage.getItem('wander_business_token'));
 
             try {
-                const method = state.editingId ? 'PUT' : 'POST';
                 const url = state.editingId ? `/api/business/places/${state.editingId}` : '/api/business/places';
-                
-                const res = await apiFetch(url, {
-                    method: method,
-                    body: JSON.stringify(payload)
-                });
+                const res = await fetch(url, {
+                    method: state.editingId ? 'PUT' : 'POST',
+                    headers: { 'x-auth-token': token },
+                    body: payload
+                }).then(r => r.json());
 
                 if (res.success) {
                     toast(state.editingId ? 'Cập nhật thành công' : 'Đã gửi yêu cầu phê duyệt', 'success');
-                    this.closeModal();
+                    window.smActions.closeModal();
                     loadServices();
                 } else {
                     toast(res.message || 'Lỗi lưu dữ liệu', 'error');
@@ -274,6 +288,21 @@
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
             }
+        },
+        
+        previewImages(input) {
+            const preview = document.getElementById('sm-form-image-preview');
+            preview.innerHTML = '';
+            if (!input.files || input.files.length === 0) return;
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML += `<div style="position:relative; width:60px; height:60px; border-radius:8px; overflow:hidden; border:1px solid rgba(255,255,255,0.1)">
+                        <img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">
+                    </div>`;
+                };
+                reader.readAsDataURL(file);
+            });
         },
         
         support(id) {
@@ -322,11 +351,12 @@
                         <div class="sm-form-group">
                             <label class="sm-form-label">Phân loại</label>
                             <select id="sm-form-kind" class="sm-form-control">
-                                <option value="diem-du-lich">🏝️ Điểm du lịch</option>
-                                <option value="khach-san">🏨 Khách sạn</option>
-                                <option value="nha-hang">🍽️ Nhà hàng</option>
+                                <option value="diem-du-lich">🏛️ Điểm tham quan</option>
+                                <option value="trai-nghiem">🎨 Trải nghiệm</option>
+                                <option value="khach-san">🏨 Lưu trú Elite</option>
+                                <option value="nha-hang">🥘 Ẩm thực & Giải trí</option>
                                 <option value="giai-tri">🎡 Giải trí</option>
-                                <option value="tien-ich">🛠️ Tiện ích</option>
+                                <option value="tien-ich">⚙️ Tiện ích</option>
                             </select>
                         </div>
                         <div class="sm-form-group" style="flex-direction:row; align-items:center; gap:10px; margin-top:25px">
@@ -346,8 +376,16 @@
                             <input type="number" id="sm-form-priceFrom" class="sm-form-control" placeholder="Ví dụ: 2500000">
                         </div>
                         <div class="sm-form-group full">
-                            <label class="sm-form-label">Link ảnh đại diện</label>
-                            <input type="text" id="sm-form-image" class="sm-form-control" placeholder="Dán link ảnh tại đây (unsplash, google...)">
+                            <label class="sm-form-label">Hình ảnh dịch vụ</label>
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                <input type="text" id="sm-form-image" class="sm-form-control" placeholder="Dán link ảnh đại diện chính (unsplash, google...)">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span style="font-size:12px; color:#94a3b8;">Hoặc tải nhiều ảnh từ thiết bị:</span>
+                                    <button class="sm-btn-action" style="background:rgba(255,255,255,0.05); color:#fff; padding:8px 16px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); cursor:pointer; font-size:12px;" onclick="document.getElementById('sm-form-image-file').click()">📸 Chọn ảnh</button>
+                                    <input type="file" id="sm-form-image-file" accept="image/*" multiple hidden onchange="window.smActions.previewImages(this)">
+                                </div>
+                                <div id="sm-form-image-preview" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:5px; min-height: 40px;"></div>
+                            </div>
                         </div>
                         <div class="sm-form-group full">
                             <label class="sm-form-label">Mô tả dịch vụ</label>

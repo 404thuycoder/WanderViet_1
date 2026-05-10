@@ -1005,19 +1005,29 @@
                const p = document.querySelector('.chart-period-select[data-chart="ai"]')?.value || 'day';
                loadAIIntel(false, 'line', p).catch(e => {});
             }
-
-            // Wait for panel to show before resizing charts
-            setTimeout(() => {
-              if (window.activityChart) window.activityChart.resize();
-              if (window.distributionChart) window.distributionChart.resize();
-              if (window.sentimentChartInstance) window.sentimentChartInstance.resize();
-              if (window.deviceChartInstance) window.deviceChartInstance.resize();
-              if (window.userManagerChart) window.userManagerChart.resize();
-              if (window.placeManagerChart) window.placeManagerChart.resize();
-              if (window.logManagerChart) window.logManagerChart.resize();
-              if (window.aiTrendChartInstance) window.aiTrendChartInstance.resize();
-            }, 50);
+            if (hubTab === 'analytics-revenue') loadRevenueStats().catch(e => {});
           }
+
+          if (hubTab.includes('social')) {
+            if (hubTab === 'social-posts') loadSocialPosts(true).catch(e => {});
+            if (hubTab === 'social-stories') loadSocialStories(true).catch(e => {});
+            if (hubTab === 'social-comments') loadCommentClassification().catch(e => {});
+          }
+
+          // Wait for panel to show before resizing charts
+          setTimeout(() => {
+            if (window.activityChart) window.activityChart.resize();
+            if (window.distributionChart) window.distributionChart.resize();
+            if (window.sentimentChartInstance) window.sentimentChartInstance.resize();
+            if (window.deviceChartInstance) window.deviceChartInstance.resize();
+            if (window.userManagerChart) window.userManagerChart.resize();
+            if (window.placeManagerChart) window.placeManagerChart.resize();
+            if (window.logManagerChart) window.logManagerChart.resize();
+            if (window.aiTrendChartInstance) window.aiTrendChartInstance.resize();
+            if (window.revenueTrendChartInstance) window.revenueTrendChartInstance.resize();
+            if (window.revenueClassChartInstance) window.revenueClassChartInstance.resize();
+            if (window.commentSentimentChartInstance) window.commentSentimentChartInstance.resize();
+          }, 50);
 
           // Trigger data load for Social Hub and Transactions sub-tabs
           if (hubTab === 'social-posts') loadSocialPosts();
@@ -4803,27 +4813,7 @@
     // Init with slight delay to ensure DOM bindings
     setTimeout(applySettings, 100);
 
-  // --- Security: Anti-Copy & Anti-Inspect ---
-  (function() {
-    // Disable right click
-    document.addEventListener('contextmenu', e => e.preventDefault());
-
-    // Disable shortcuts
-    document.addEventListener('keydown', e => {
-      const forbiddenKeys = ['c', 'v', 'u', 's', 'x', 'j', 'i'];
-      if (
-        (e.ctrlKey && forbiddenKeys.includes(e.key.toLowerCase())) ||
-        e.key === 'F12' ||
-        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j'))
-      ) {
-        e.preventDefault();
-        if (typeof WanderToast !== 'undefined') {
-          WanderToast.warn('Hệ thống bảo mật: Thao tác bị từ chối.');
-        }
-        return false;
-      }
-    });
-  })();
+  // Security block removed for Admin F12 access
 
   WanderAdmin.resetUserPassword = async (id, portal) => {
     const newPass = prompt('Nhập mật khẩu mới cho tài khoản này:');
@@ -5200,4 +5190,327 @@
       </div>
     `;
   }
+
+  async function loadRevenueStats(period = 'day') {
+    const subPanel = document.getElementById('sub-panel-analytics-revenue');
+    if (!subPanel) return;
+    
+    // Update UI buttons state
+    subPanel.querySelectorAll('[data-revenue-period]').forEach(btn => {
+      btn.classList.toggle('is-active', btn.dataset.revenuePeriod === period);
+    });
+
+    try {
+      const res = await apiFetch(`/api/admin/stats/revenue?period=${period}`);
+      if (!res || !res.success) {
+        if (totalEl) totalEl.textContent = "Lỗi tải dữ liệu";
+        return;
+      }
+      
+      const data = res.data || res;
+      if (!data.labels || !data.datasets) {
+        console.error("Missing chart data:", data);
+        return;
+      }
+      
+      // Update Total
+      const totalEl = document.getElementById('rev-total-val');
+      if (totalEl) totalEl.textContent = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(data.total || 0);
+      
+      // 1. Trend Chart with Gradients
+      const canvasTrend = document.getElementById('revenueTrendChart');
+      if (canvasTrend) {
+        const ctxTrend = canvasTrend.getContext('2d');
+        if (window.revenueTrendChartInstance) window.revenueTrendChartInstance.destroy();
+        
+        const lineColors = ['#a78bfa', '#10b981', '#f59e0b']; // Lavender, Emerald, Amber
+        const bgGradients = lineColors.map(color => {
+          const grad = ctxTrend.createLinearGradient(0, 0, 0, 400);
+          grad.addColorStop(0, color + '33');
+          grad.addColorStop(1, color + '00');
+          return grad;
+        });
+
+        window.revenueTrendChartInstance = new Chart(ctxTrend, {
+          type: 'line',
+          data: {
+            labels: data.labels,
+            datasets: data.datasets.map((ds, i) => ({
+              label: ds.label,
+              data: ds.data,
+              borderColor: lineColors[i % lineColors.length],
+              backgroundColor: bgGradients[i % bgGradients.length],
+              fill: true,
+              tension: 0.45,
+              borderWidth: 3,
+              pointRadius: 0,
+              pointHoverRadius: 6,
+              pointHoverBackgroundColor: lineColors[i % lineColors.length],
+              pointHoverBorderColor: '#fff',
+              pointHoverBorderWidth: 2
+            }))
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { 
+              legend: { 
+                display: true,
+                position: 'top',
+                align: 'end',
+                labels: {
+                  usePointStyle: true,
+                  pointStyle: 'circle',
+                  color: 'rgba(255,255,255,0.8)',
+                  padding: 25,
+                  boxWidth: 8,
+                  font: { size: 12, weight: '600' }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                titleColor: '#fff',
+                titleFont: { size: 13, weight: '700' },
+                bodyColor: 'rgba(255,255,255,0.9)',
+                bodyFont: { size: 12 },
+                borderColor: 'rgba(255,255,255,0.1)',
+                borderWidth: 1,
+                padding: 12,
+                displayColors: true,
+                usePointStyle: true,
+                boxPadding: 6,
+                callbacks: {
+                  label: function(context) {
+                    let label = context.dataset.label || '';
+                    if (label) label += ': ';
+                    if (context.parsed.y !== null) {
+                      label += new Intl.NumberFormat('vi-VN').format(context.parsed.y) + ' ₫';
+                    }
+                    return label;
+                  }
+                }
+              }
+            },
+            scales: { 
+              y: { 
+                beginAtZero: true,
+                grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
+                border: { display: false },
+                ticks: { 
+                  color: 'rgba(255,255,255,0.4)',
+                  font: { size: 10 },
+                  callback: (v) => v >= 1000000 ? (v/1000000).toFixed(1) + 'M' : v >= 1000 ? (v/1000).toFixed(0) + 'K' : v
+                }
+              },
+              x: {
+                grid: { display: false },
+                border: { display: false },
+                ticks: { 
+                  color: 'rgba(255,255,255,0.4)',
+                  font: { size: 10 },
+                  maxRotation: 0,
+                  autoSkip: true,
+                  maxTicksLimit: 12
+                }
+              }
+            }
+          }
+        });
+      }
+      
+      // 2. Class Chart (Premium Gradients & Center Info)
+      const canvasClass = document.getElementById('revenueClassChart');
+      if (canvasClass && data.classification) {
+        const ctxClass = canvasClass.getContext('2d');
+        if (window.revenueClassChartInstance) window.revenueClassChartInstance.destroy();
+        
+        // Create Gradients
+        const g1 = ctxClass.createLinearGradient(0, 0, 0, 400); g1.addColorStop(0, '#818cf8'); g1.addColorStop(1, '#6366f1');
+        const g2 = ctxClass.createLinearGradient(0, 0, 0, 400); g2.addColorStop(0, '#34d399'); g2.addColorStop(1, '#10b981');
+        const g3 = ctxClass.createLinearGradient(0, 0, 0, 400); g3.addColorStop(0, '#fbbf24'); g3.addColorStop(1, '#f59e0b');
+        const g4 = ctxClass.createLinearGradient(0, 0, 0, 400); g4.addColorStop(0, '#f87171'); g4.addColorStop(1, '#ef4444');
+        const g5 = ctxClass.createLinearGradient(0, 0, 0, 400); g5.addColorStop(0, '#22d3ee'); g5.addColorStop(1, '#0891b2');
+        const gradColors = [g1, g2, g3, g4, g5];
+        const baseColors = ['#818cf8', '#10b981', '#f59e0b', '#ef4444', '#0891b2'];
+        
+        const totalRev = data.classification.reduce((acc, c) => acc + (c.val || 0), 0);
+        const totalLabel = document.getElementById('rev-chart-total-label');
+        if (totalLabel) totalLabel.innerText = new Intl.NumberFormat('vi-VN').format(totalRev) + ' ₫';
+
+        window.revenueClassChartInstance = new Chart(ctxClass, {
+          type: 'doughnut',
+          data: {
+            labels: data.classification.map(c => c.name),
+            datasets: [{
+              data: data.classification.map(c => c.val),
+              backgroundColor: gradColors,
+              hoverBackgroundColor: baseColors,
+              borderWidth: 0,
+              spacing: 8,
+              borderRadius: 12,
+              cutout: '82%'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                titleFont: { size: 13, weight: 'bold' },
+                padding: 12,
+                cornerRadius: 10,
+                callbacks: {
+                  label: (ctx) => {
+                    const val = ctx.raw;
+                    const pct = ((val / totalRev) * 100).toFixed(1);
+                    return ` ${new Intl.NumberFormat('vi-VN').format(val)} ₫ (${pct}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // Legend (Enhanced with Percentages)
+        const legend = document.getElementById('revenue-class-legend');
+        if (legend) {
+          legend.innerHTML = data.classification.map((c, i) => {
+            const pct = totalRev > 0 ? ((c.val / totalRev) * 100).toFixed(0) : 0;
+            return `
+              <div class="rev-legend-item" data-idx="${i}" style="display:flex; flex-direction:column; align-items:center; gap:4px; cursor:pointer; min-width:60px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                  <div style="width:8px; height:8px; border-radius:50%; background:${baseColors[i % baseColors.length]}"></div>
+                  <span class="rev-legend-text" style="font-size:0.7rem; font-weight:600; color:rgba(255,255,255,0.5);">${c.name}</span>
+                </div>
+                <div style="font-size:0.85rem; font-weight:700; color:#fff;">${pct}%</div>
+              </div>
+            `;
+          }).join('');
+
+          legend.onclick = (e) => {
+            const item = e.target.closest('.rev-legend-item');
+            if (!item) return;
+            const idx = parseInt(item.dataset.idx);
+            const chart = window.revenueClassChartInstance;
+            if (!chart) return;
+            const meta = chart.getDatasetMeta(0);
+            const alreadyHidden = meta.data[idx].hidden;
+            chart.toggleDataVisibility(idx);
+            chart.update();
+            item.style.opacity = !alreadyHidden ? '0.3' : '1';
+            item.style.filter = !alreadyHidden ? 'grayscale(1)' : 'none';
+          };
+        }
+      }
+      
+    } catch (e) { console.error("Error loading revenue stats:", e); }
+  }
+
+  // Setup Event Listeners for Revenue Periods
+  document.addEventListener('click', (e) => {
+    if (e.target.matches('[data-revenue-period]')) {
+      const p = e.target.dataset.revenuePeriod;
+      loadRevenueStats(p);
+    }
+  });
+
+  async function loadCommentClassification() {
+    const subPanel = document.getElementById('sub-panel-social-comments');
+    if (!subPanel) return;
+    
+    try {
+      const res = await apiFetch('/api/admin/stats/comments');
+      const list = document.getElementById('admin-comments-list');
+      
+      if (!res || !res.success) {
+        if (list) list.innerHTML = '<div style="text-align:center; padding:2rem; color:#ef4444;">Không thể tải dữ liệu (Hết hạn phiên đăng nhập)</div>';
+        return;
+      }
+      
+      const data = res.data || res;
+      
+      // 1. Sentiment Chart
+      const ctx = document.getElementById('commentSentimentChart').getContext('2d');
+      if (window.commentSentimentChartInstance) window.commentSentimentChartInstance.destroy();
+      
+      const labels = {
+        positive: 'Tích cực',
+        toxic: 'Tiêu cực',
+        spam: 'Rác/Spam',
+        question: 'Câu hỏi',
+        other: 'Khác'
+      };
+      const colors = {
+        positive: '#10b981',
+        toxic: '#ef4444',
+        spam: '#f59e0b',
+        question: '#3b82f6',
+        other: '#94a3b8'
+      };
+      
+      const chartLabels = Object.keys(data.classification);
+      const chartData = Object.values(data.classification);
+      
+      window.commentSentimentChartInstance = new Chart(ctx, {
+        type: 'polarArea',
+        data: {
+          labels: chartLabels.map(k => labels[k]),
+          datasets: [{
+            data: chartData,
+            backgroundColor: chartLabels.map(k => colors[k] + 'cc')
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } }
+        }
+      });
+      
+      // Stats grid
+      const statsGrid = document.getElementById('comment-sentiment-stats');
+      if (statsGrid) {
+        statsGrid.innerHTML = chartLabels.map(k => `
+          <div class="glass-panel" style="padding:10px; text-align:center;">
+            <div style="font-size:0.7rem; color:var(--admin-text-muted); text-transform:uppercase;">${labels[k]}</div>
+            <div style="font-size:1.1rem; font-weight:700; color:${colors[k]}">${data.classification[k]}</div>
+          </div>
+        `).join('');
+      }
+      
+      // Recent List
+      if (list) {
+        const comments = data.comments || [];
+        if (comments.length === 0) {
+          list.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--admin-text-muted);">Chưa có bình luận nào</div>';
+        } else {
+          list.innerHTML = comments.map(c => {
+            const sIcons = { positive: '😊', toxic: '😠', spam: '🚫', question: '❓', other: '💬' };
+            const sColors = { positive: '#10b981', toxic: '#ef4444', spam: '#f59e0b', question: '#3b82f6', other: '#94a3b8' };
+            
+            return `
+              <div style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); display:flex; gap:12px; transition: background 0.2s; cursor:default;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
+                <div style="position:relative;">
+                  <img src="${c.userAvatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(c.author)}" style="width:40px; height:40px; border-radius:12px; object-fit:cover; border: 1px solid rgba(255,255,255,0.1);">
+                  <span style="position:absolute; bottom:-4px; right:-4px; font-size:0.8rem; background:rgba(15,23,42,0.8); border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; border:1px solid ${sColors[c.sentiment] || '#94a3b8'}">${sIcons[c.sentiment] || '💬'}</span>
+                </div>
+                <div style="flex:1;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <strong style="font-size:0.85rem; color:#fff;">${c.author}</strong>
+                    <span style="font-size:0.7rem; color:rgba(255,255,255,0.4);">${new Date(c.time).toLocaleString('vi-VN')}</span>
+                  </div>
+                  <p style="margin:0; font-size:0.85rem; line-height:1.5; color:rgba(255,255,255,0.8);">${c.text}</p>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+      
+    } catch (e) { console.error("Error loading comment stats:", e); }
+  }
+
 })();

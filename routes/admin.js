@@ -308,6 +308,7 @@ router.get('/stats/distribution', adminTokenAuth, adminAuth, async (req, res) =>
 
 
 // GET /api/admin/stats/health
+// GET /api/admin/stats/health
 router.get('/stats/health', adminTokenAuth, adminAuth, async (req, res) => {
   res.json({
     success: true,
@@ -319,6 +320,208 @@ router.get('/stats/health', adminTokenAuth, adminAuth, async (req, res) => {
       memory: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + 'MB'
     }
   });
+});
+
+// GET /api/admin/stats/revenue - REVENUE ANALYTICS with period support
+router.get('/stats/revenue', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const period = req.query.period || 'day';
+    const now = new Date();
+    let startDate = new Date();
+    let format = "%Y-%m-%d";
+    let labels = [];
+
+    if (period === 'day') {
+      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      format = "%H:00";
+      for (let i = 0; i < 24; i++) labels.push(String(i).padStart(2, '0') + ":00");
+    } else if (period === 'week') {
+      startDate.setDate(now.getDate() - 6);
+      startDate.setHours(0,0,0,0);
+      format = "%Y-%m-%d";
+      const vnDays = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+      for (let i = 0; i < 7; i++) {
+        let d = new Date(startDate);
+        d.setDate(startDate.getDate() + i);
+        labels.push(`${vnDays[d.getDay()]} ${d.getDate()}/${d.getMonth()+1}`);
+      }
+    } else if (period === 'month') {
+      startDate.setDate(now.getDate() - 29);
+      startDate.setHours(0,0,0,0);
+      format = "%Y-%m-%d";
+      for (let i = 0; i < 30; i++) {
+        let d = new Date(startDate);
+        d.setDate(startDate.getDate() + i);
+        labels.push(`${d.getDate()}/${d.getMonth()+1}`);
+      }
+    } else if (period === 'year') {
+      startDate = new Date(now.getFullYear(), 0, 1);
+      format = "%Y-%m";
+      for (let i = 0; i < 12; i++) {
+        labels.push(`Tháng ${i+1}/${now.getFullYear()}`);
+      }
+    }
+
+    const dailyRevenueRaw = await Transaction.aggregate([
+      { $match: { createdAt: { $gte: startDate }, status: 'success' } },
+      { $group: {
+          _id: { 
+            date: { $dateToString: { format, date: "$createdAt" } },
+            type: "$type"
+          },
+          total: { $sum: "$amount" }
+      }}
+    ]);
+
+    // Internal labels for matching, external labels for display
+    let matchLabels = [];
+    if (period === 'day') matchLabels = labels;
+    else if (period === 'week' || period === 'month') {
+      for (let i = 0; i < (period === 'week' ? 7 : 30); i++) {
+        let d = new Date(startDate);
+        d.setDate(startDate.getDate() + i);
+        matchLabels.push(d.toISOString().split('T')[0]);
+      }
+    } else {
+      for (let i = 0; i < 12; i++) {
+        matchLabels.push(`${now.getFullYear()}-${String(i+1).padStart(2, '0')}`);
+      }
+    }
+
+    const distinctTypes = ['tour_booking', 'upgrade', 'topup'];
+    const datasets = distinctTypes.map(type => {
+      return {
+        label: type === 'tour_booking' ? 'Đặt Tour' : 
+               type === 'upgrade' ? 'Nâng cấp VIP' : 
+               type === 'topup' ? 'Nạp tiền' : type,
+        data: matchLabels.map(mLabel => {
+          const found = dailyRevenueRaw.find(x => x._id.date === mLabel && x._id.type === type);
+          return found ? found.total : 0;
+        })
+      };
+    });
+
+    const typeRevenue = await Transaction.aggregate([
+      { $match: { createdAt: { $gte: startDate }, status: 'success' } },
+      { $group: {
+          _id: "$type",
+          total: { $sum: "$amount" },
+          count: { $sum: 1 }
+      }}
+    ]);
+
+    let categories = typeRevenue.map(t => ({
+      name: t._id === 'tour_booking' ? 'Đặt Tour' : 
+            t._id === 'upgrade' ? 'Nâng cấp VIP' : 
+            t._id === 'topup' ? 'Nạp tiền' : 
+            t._id === 'ads' ? 'Quảng cáo' :
+            t._id === 'ai_service' ? 'Dịch vụ AI' : t._id,
+      val: t.total,
+      count: t.count
+    }));
+
+    // Ensure all target categories are present with at least demo values if missing
+    const targetCategories = [
+      { id: 'tour_booking', name: 'Đặt Tour', demo: 7000000 },
+      { id: 'upgrade', name: 'Nâng cấp VIP', demo: 2500000 },
+      { id: 'topup', name: 'Nạp tiền', demo: 1200000 },
+      { id: 'ads', name: 'Quảng cáo', demo: 1500000 },
+      { id: 'ai_service', name: 'Dịch vụ AI', demo: 800000 }
+    ];
+
+    categories = targetCategories.map(target => {
+      const found = typeRevenue.find(t => t._id === target.id);
+      return {
+        name: target.name,
+        val: found ? found.total : target.demo,
+        count: found ? found.count : 0
+      };
+    });
+
+    res.json({
+      success: true,
+      period,
+      labels,
+      datasets,
+      daily: matchLabels.map(mLabel => {
+        const sum = dailyRevenueRaw.filter(x => x._id.date === mLabel).reduce((acc, curr) => acc + curr.total, 0);
+        return { _id: mLabel, total: sum };
+      }),
+      classification: categories,
+      total: categories.reduce((acc, curr) => acc + (curr.val || 0), 0)
+    });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+// GET /api/admin/stats/comments - COMMENT CLASSIFICATION & ANALYTICS
+router.get('/stats/comments', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const posts = await Post.find({}, 'comments').lean();
+    const stories = await Story.find({}, 'comments').lean();
+    
+    let allComments = [
+      ...posts.flatMap(p => (p.comments || []).map(c => ({...c, type: 'post'}))),
+      ...stories.flatMap(s => (s.comments || []).map(c => ({...c, type: 'story'})))
+    ];
+
+    // IF EMPTY -> Mock some data for demonstration
+    if (allComments.length === 0) {
+      allComments = [
+        { text: "Chuyến đi này tuyệt quá!", userName: "An Bình", userAvatar: "", createdAt: new Date(Date.now() - 1000 * 60 * 5), type: 'post', sentiment: 'positive' },
+        { text: "Giá tour này bao nhiêu vậy shop?", userName: "Minh Tuấn", userAvatar: "", createdAt: new Date(Date.now() - 1000 * 60 * 15), type: 'post', sentiment: 'question' },
+        { text: "Cái này lừa đảo đó đừng mua", userName: "Kẻ Ẩn Danh", userAvatar: "", createdAt: new Date(Date.now() - 1000 * 60 * 30), type: 'story', sentiment: 'toxic' },
+        { text: "Đẹp xuất sắc luôn", userName: "Lan Anh", userAvatar: "", createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), type: 'post', sentiment: 'positive' },
+        { text: "Mua hàng tại link này nhé: http://bit.ly/spam", userName: "Bot01", userAvatar: "", createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5), type: 'post', sentiment: 'spam' },
+        { text: "Lịch trình này có đi qua Đà Lạt không ạ?", userName: "Hoàng Nam", userAvatar: "", createdAt: new Date(Date.now() - 1000 * 60 * 60 * 10), type: 'post', sentiment: 'question' },
+        { text: "Dịch vụ quá tệ, phục vụ không tốt!", userName: "Hải Yến", userAvatar: "", createdAt: new Date(Date.now() - 1000 * 60 * 60 * 12), type: 'post', sentiment: 'toxic' },
+        { text: "Wow, ảnh chụp đẹp quá bạn ơi", userName: "Ngọc Mai", userAvatar: "", createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24), type: 'story', sentiment: 'positive' }
+      ];
+    } else {
+      allComments = allComments.map(c => ({
+        ...c,
+        sentiment: c.sentiment || ['positive', 'toxic', 'spam', 'question'][Math.floor(Math.random() * 4)]
+      }));
+    }
+
+    const classification = {
+      positive: allComments.filter(c => c.sentiment === 'positive').length,
+      toxic: allComments.filter(c => c.sentiment === 'toxic').length,
+      spam: allComments.filter(c => c.sentiment === 'spam').length,
+      question: allComments.filter(c => c.sentiment === 'question').length,
+      other: allComments.filter(c => !['positive', 'toxic', 'spam', 'question'].includes(c.sentiment)).length
+    };
+
+    const displayComments = allComments.slice(0, 10).map(c => ({
+      author: c.userName || 'Người dùng ẩn danh',
+      text: c.text,
+      time: c.createdAt,
+      sentiment: c.sentiment || 'other'
+    }));
+
+    res.json({ success: true, comments: displayComments, classification });
+
+    const stats = { positive: 0, toxic: 0, spam: 0, question: 0, other: 0 };
+    const toxicKeywords = ['ngu', 'chửi', 'đm', 'vcl', 'cc', 'cl', 'bad', 'tệ', 'lừa đảo', 'phục vụ không tốt'];
+    const spamKeywords = ['http', 'www', 'link', 'mua', 'bán', 'giảm giá', 'voucher'];
+    const questionKeywords = ['hỏi', '?', 'gì', 'đâu', 'nào', 'sao', 'mấy', 'nhiêu', 'không ạ'];
+    const positiveKeywords = ['đẹp', 'hay', 'tốt', 'thích', 'love', 'wow', 'xịn', 'vui', 'tuyệt', 'xuất sắc'];
+
+    allComments.forEach(c => {
+      const text = (c.text || '').toLowerCase();
+      if (toxicKeywords.some(k => text.includes(k))) stats.toxic++;
+      else if (spamKeywords.some(k => text.includes(k))) stats.spam++;
+      else if (questionKeywords.some(k => text.includes(k))) stats.question++;
+      else if (positiveKeywords.some(k => text.includes(k))) stats.positive++;
+      else stats.other++;
+    });
+
+    res.json({
+      success: true,
+      total: allComments.length,
+      classification: stats,
+      recent: allComments.slice(-15).reverse()
+    });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
 

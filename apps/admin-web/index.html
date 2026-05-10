@@ -36,17 +36,43 @@
       }
     }, 5000);
   </script>
-    <style>
+  <style>
       .chart-container {
         width: 100%;
         height: 500px;
         position: relative;
+      }
+      .admin-panel {
+        padding-top: 0.5rem !important;
       }
       .overview-grid {
         display: grid;
         grid-template-columns: 400px 1fr;
         gap: 1.5rem;
         width: 100%;
+      }
+      .btn-period {
+        padding: 6px 14px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        color: rgba(255,255,255,0.6);
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: inherit;
+      }
+      .btn-period:hover {
+        background: rgba(255,255,255,0.12);
+        color: #fff;
+        transform: translateY(-1px);
+      }
+      .btn-period.is-active {
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        color: #fff;
+        border-color: rgba(59, 130, 246, 0.5);
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
       }
     </style>
   </head>
@@ -526,11 +552,10 @@
               </div>
 
               <!-- Header -->
-              <div class="panel-header-top">
+              <div class="panel-header-top" style="margin-top: -1rem;">
                 <div style="display:flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
                   <div>
-                    <h1 class="main-title">Tổng quan hệ thống</h1>
-                    <p class="main-subtitle" style="margin-bottom:0">Theo dõi trạng thái và hiệu suất của WanderViệt trong thời gian thực.</p>
+                    <p class="main-subtitle" style="margin-bottom:0; font-weight: 500; color: rgba(255,255,255,0.6);">Theo dõi trạng thái và hiệu suất của WanderViệt trong thời gian thực.</p>
                   </div>
                 </div>
               </div>
@@ -696,6 +721,9 @@
                 </button>
                 <button class="hub-btn" data-hub-tab="analytics-logs" data-parent-panel="analytics">
                   <i class="fas fa-history"></i> Nhật ký
+                </button>
+                <button class="hub-btn" data-hub-tab="analytics-revenue" data-parent-panel="analytics">
+                  <i class="fas fa-money-bill-wave"></i> Doanh thu
                 </button>
                 <button class="hub-btn" data-hub-tab="analytics-ai" data-parent-panel="analytics">
                   <i class="fas fa-brain"></i> Trí tuệ AI
@@ -909,6 +937,47 @@
             </div>
 
             <!-- SUB-PANEL: AI Analytics (MOVED HERE) -->
+            <div id="sub-panel-analytics-revenue" class="sub-panel is-hidden">
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+                <!-- Main Revenue Chart -->
+                <div class="glass-panel" style="padding: 1.5rem;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
+                    <div>
+                      <h3 style="margin:0; font-size:1.1rem; font-weight:700; color:#fff;"><i class="fas fa-chart-line" style="color:var(--admin-primary); margin-right:8px;"></i> Phân tích Doanh thu & Tăng trưởng</h3>
+                      <div style="display:flex; gap:8px; margin-top:12px;">
+                        <button class="btn-period is-active" data-revenue-period="day">Hôm nay</button>
+                        <button class="btn-period" data-revenue-period="week">Tuần này</button>
+                        <button class="btn-period" data-revenue-period="month">Tháng này</button>
+                        <button class="btn-period" data-revenue-period="year">Năm nay</button>
+                      </div>
+                    </div>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;" id="rev-total-val">0 ₫</div>
+                  </div>
+                  <div style="height: 350px;">
+                    <canvas id="revenueTrendChart"></canvas>
+                  </div>
+                </div>
+                <!-- Revenue Classification -->
+                <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column;">
+                  <div style="display:flex; align-items:center; gap:8px; margin-bottom: 1rem;">
+                    <div style="width:8px; height:8px; border-radius:50%; background:#38bdf8; box-shadow:0 0 10px #38bdf8;"></div>
+                    <h3 style="margin:0; font-size:0.85rem; font-weight:800; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">📊 Phân bổ doanh thu</h3>
+                  </div>
+                  <div style="flex:1; position:relative; min-height: 250px; display: flex; align-items: center; justify-content: center;">
+                    <canvas id="revenueClassChart"></canvas>
+                    <!-- Center Info -->
+                    <div id="rev-chart-center-info" style="position: absolute; text-align: center; pointer-events: none;">
+                      <div style="font-size: 0.7rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px;">Tổng cộng</div>
+                      <div id="rev-chart-total-label" style="font-size: 1.2rem; font-weight: 800; color: #fff;">0 ₫</div>
+                    </div>
+                  </div>
+                  <div id="revenue-class-legend" style="display:flex; justify-content:center; flex-wrap:wrap; gap:12px 16px; margin-top:1rem;">
+                    <!-- JS populated -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div id="sub-panel-analytics-ai" class="sub-panel is-hidden">
                <div style="display:grid; grid-template-columns: repeat(4,1fr); gap:1.5rem; margin-bottom: 2rem;">
                 <div class="stat-card-v2" style="background: rgba(99, 102, 241, 0.1);">
@@ -1550,6 +1619,9 @@
               <button class="hub-btn" data-hub-tab="social-stories" data-parent-panel="social">
                 <i class="fas fa-history"></i> Thước phim (Stories)
               </button>
+              <button class="hub-btn" data-hub-tab="social-comments" data-parent-panel="social">
+                <i class="fas fa-comments"></i> Bình luận & Phân loại
+              </button>
             </div>
 
             <div id="sub-panel-social-posts" class="sub-panel">
@@ -1588,6 +1660,28 @@
                     <tr><td colspan="5" style="text-align:center; padding:3rem;">Đang tải thước phim...</td></tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+
+            <div id="sub-panel-social-comments" class="sub-panel is-hidden">
+              <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem;">
+                <!-- Comment Sentiment -->
+                <div class="glass-panel" style="padding: 1.5rem;">
+                  <h3 style="margin:0 0 1.5rem; font-size:1.1rem;"><i class="fas fa-smile-beam" style="color:#10b981"></i> Phân loại bình luận (AI)</h3>
+                  <div style="height: 250px;">
+                    <canvas id="commentSentimentChart"></canvas>
+                  </div>
+                  <div style="margin-top: 1.5rem; display:grid; grid-template-columns: 1fr 1fr; gap: 10px;" id="comment-sentiment-stats">
+                    <!-- JS populated -->
+                  </div>
+                </div>
+                <!-- Recent Comments List -->
+                <div class="glass-panel" style="padding: 1.5rem;">
+                  <h3 style="margin:0 0 1.5rem; font-size:1.1rem;"><i class="fas fa-list" style="color:var(--admin-primary)"></i> Bình luận gần đây</h3>
+                  <div style="max-height: 450px; overflow-y: auto;" id="admin-comments-list">
+                    <div style="text-align:center; padding: 2rem; color: var(--admin-text-muted);">Đang phân tích bình luận...</div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>

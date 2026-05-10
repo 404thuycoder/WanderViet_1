@@ -228,6 +228,10 @@
                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                Kho địa điểm
             </button>
+            <button type="button" class="sidebar-btn" data-admin-tab="social">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              Social Hub
+            </button>
             <button type="button" class="sidebar-btn" data-admin-tab="moderation">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
               Duyệt nội dung 
@@ -246,6 +250,10 @@
             <button type="button" class="sidebar-btn" data-admin-tab="vouchers">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="7" y1="15" x2="7.01" y2="15"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="17" y1="15" x2="17.01" y2="15"/></svg>
               Mã khuyến mãi
+            </button>
+            <button type="button" class="sidebar-btn" data-admin-tab="transactions">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              Giao dịch
             </button>
           </div>
 
@@ -1523,6 +1531,207 @@
             </div>
             <div style="margin-top:2rem; text-align:right;">
               <button class="btn btn--primary" style="padding:0.75rem 2.5rem;" onclick="saveSystemConfig()">💾 Lưu tất cả thay đổi</button>
+            </div>
+          </section>
+
+          <!-- Social Moderation Panel -->
+          <section id="panel-social" class="admin-panel glass-panel" hidden>
+            <div class="panel-header-pro">
+              <div>
+                <h1 class="main-title">Quản lý Mạng xã hội</h1>
+                <p class="main-subtitle">Kiểm duyệt bài viết, thước phim và theo dõi xu hướng người dùng.</p>
+              </div>
+            </div>
+            
+            <div class="panel-hub-nav" style="margin-bottom: 1.5rem;">
+              <button class="hub-btn is-active" data-hub-tab="social-posts" data-parent-panel="social">
+                <i class="fas fa-file-alt"></i> Bài viết (Posts)
+              </button>
+              <button class="hub-btn" data-hub-tab="social-stories" data-parent-panel="social">
+                <i class="fas fa-history"></i> Thước phim (Stories)
+              </button>
+            </div>
+
+            <div id="sub-panel-social-posts" class="sub-panel">
+              <div class="table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 250px;">Bài viết / Nội dung</th>
+                      <th>Người đăng</th>
+                      <th>Media</th>
+                      <th>Tương tác</th>
+                      <th>Ngày đăng</th>
+                      <th style="text-align:right">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody id="social-posts-tbody">
+                    <tr><td colspan="6" style="text-align:center; padding:3rem;">Đang tải bài viết...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="sub-panel-social-stories" class="sub-panel is-hidden">
+              <div class="table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 250px;">Thước phim</th>
+                      <th>Người đăng</th>
+                      <th>Loại Media</th>
+                      <th>Ngày tạo</th>
+                      <th style="text-align:right">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody id="social-stories-tbody">
+                    <tr><td colspan="5" style="text-align:center; padding:3rem;">Đang tải thước phim...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- Voucher Management Panel -->
+          <section id="panel-vouchers" class="admin-panel glass-panel" hidden>
+            <div class="panel-header-pro">
+              <div style="display:flex; justify-content: space-between; align-items: flex-end; width: 100%;">
+                <div>
+                  <h1 class="main-title">Quản lý Mã khuyến mãi (Vouchers)</h1>
+                  <p class="main-subtitle">Tạo và phát hành mã giảm giá, quà tặng cho người dùng và đối tác doanh nghiệp.</p>
+                </div>
+                <div style="display:flex; gap:0.75rem;">
+                   <button class="btn btn--ghost btn--small" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #f59e0b;">
+                     <i class="fas fa-gift"></i> Phát hành hàng loạt
+                   </button>
+                   <button class="btn btn--primary" style="box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);">
+                     <i class="fas fa-plus"></i> Thêm mã mới
+                   </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="table-wrap" style="margin-top: 2rem;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>MÃ / TÊN CHƯƠNG TRÌNH</th>
+                    <th>GIÁ TRỊ</th>
+                    <th>HẠN DÙNG / SỐ LƯỢNG</th>
+                    <th style="text-align:right">HÀNH ĐỘNG</th>
+                  </tr>
+                </thead>
+                <tbody id="vouchers-tbody">
+                  <tr>
+                    <td colspan="4" style="text-align:center; padding:4rem; color:var(--admin-text-muted);">
+                      Đang tải danh sách khuyến mãi...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- Campaign Management Panel -->
+          <section id="panel-campaigns" class="admin-panel glass-panel" hidden>
+            <div class="panel-header-pro">
+              <div style="display:flex; justify-content: space-between; align-items: flex-end; width: 100%;">
+                <div>
+                  <h1 class="main-title">Quản lý Chiến dịch</h1>
+                  <p class="main-subtitle">Theo dõi hiệu quả các chương trình marketing và tăng trưởng.</p>
+                </div>
+                <button class="btn btn--primary" style="box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);">
+                  <i class="fas fa-plus"></i> Tạo chiến dịch mới
+                </button>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5rem; margin-top: 2rem;">
+              <div class="glass-panel" style="padding: 2rem; background: rgba(0,0,0,0.2);">
+                <h3 style="margin-top:0; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
+                  🚀 Chiến dịch đang chạy
+                </h3>
+                <div id="campaign-active-list" style="padding: 3rem; text-align:center; color:var(--admin-text-muted);">
+                  Không có chiến dịch nào đang hoạt động.
+                </div>
+              </div>
+              
+              <div class="glass-panel" style="padding: 2rem; background: rgba(0,0,0,0.2);">
+                <h3 style="margin-top:0; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
+                  📈 Chỉ số tăng trưởng
+                </h3>
+                <div style="display:flex; flex-direction:column; gap:1.25rem; margin-top:1.5rem;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--admin-text-muted);">Người dùng mới (24h)</span>
+                    <span style="font-weight:700; color:#10b981;">+12</span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:var(--admin-text-muted);">Tỷ lệ chuyển đổi</span>
+                    <span style="font-weight:700; color:#38bdf8;">4.5%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Transactions Panel -->
+          <section id="panel-transactions" class="admin-panel glass-panel" hidden>
+            <div class="panel-header-pro">
+              <div>
+                <h1 class="main-title">Quản lý Giao dịch & Đặt chỗ</h1>
+                <p class="main-subtitle">Theo dõi luồng tiền và các hoạt động đặt dịch vụ giữa khách và chủ.</p>
+              </div>
+            </div>
+
+            <div class="panel-hub-nav" style="margin-bottom: 1.5rem;">
+              <button class="hub-btn is-active" data-hub-tab="trans-bookings" data-parent-panel="transactions">
+                <i class="fas fa-calendar-check"></i> Đơn hàng (Bookings)
+              </button>
+              <button class="hub-btn" data-hub-tab="trans-financial" data-parent-panel="transactions">
+                <i class="fas fa-money-bill-wave"></i> Nhật ký Tài chính
+              </button>
+            </div>
+
+            <div id="sub-panel-trans-bookings" class="sub-panel">
+              <div class="table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Mã Đơn</th>
+                      <th>Khách hàng</th>
+                      <th>Địa điểm / Dịch vụ</th>
+                      <th>Giá trị</th>
+                      <th>Thanh toán</th>
+                      <th>Trạng thái</th>
+                      <th>Ngày tạo</th>
+                    </tr>
+                  </thead>
+                  <tbody id="bookings-tbody">
+                    <tr><td colspan="7" style="text-align:center; padding:3rem;">Đang tải đơn hàng...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div id="sub-panel-trans-financial" class="sub-panel is-hidden">
+              <div class="table-wrap">
+                <table class="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Mã GD</th>
+                      <th>Người dùng</th>
+                      <th>Loại</th>
+                      <th>Số tiền</th>
+                      <th>Mô tả</th>
+                      <th>Trạng thái</th>
+                      <th>Thời gian</th>
+                    </tr>
+                  </thead>
+                  <tbody id="transactions-tbody">
+                    <tr><td colspan="7" style="text-align:center; padding:3rem;">Đang tải lịch sử giao dịch...</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </section>
 

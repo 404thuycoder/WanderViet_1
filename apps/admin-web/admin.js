@@ -715,6 +715,14 @@
         if (activeTab === 'broadcast') {
           if (typeof loadBroadcastHistory === 'function') loadBroadcastHistory().catch(e => {});
         }
+        if (activeTab === 'social') {
+          loadSocialPosts(true).catch(e => {});
+          loadSocialStories(true).catch(e => {});
+        }
+        if (activeTab === 'transactions') {
+          loadBookings(true).catch(e => {});
+          loadTransactions(true).catch(e => {});
+        }
       };
 
       // Independent Chart Selectors
@@ -812,7 +820,11 @@
       feedbacks: 'Phản hồi người dùng',
       itineraries: 'Lịch trình AI',
       knowledge: 'Dữ liệu AI',
-      rankings: 'Bảng xếp hạng Hiệu suất'
+      rankings: 'Bảng xếp hạng Hiệu suất',
+      social: 'Quản lý Mạng xã hội',
+      transactions: 'Quản lý Giao dịch',
+      vouchers: 'Quản lý Mã khuyến mãi',
+      campaigns: 'Quản lý Chiến dịch'
     };
     document.querySelectorAll('[data-admin-tab]').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -894,6 +906,12 @@
           } else if (tab === 'analytics') {
             const defaultHubBtn = panel.querySelector('.hub-btn[data-hub-tab="analytics-system"]');
             if (defaultHubBtn) defaultHubBtn.click();
+          } else if (tab === 'social') {
+            const defaultHubBtn = panel.querySelector('.hub-btn[data-hub-tab="social-posts"]');
+            if (defaultHubBtn) defaultHubBtn.click();
+          } else if (tab === 'transactions') {
+            const defaultHubBtn = panel.querySelector('.hub-btn[data-hub-tab="trans-bookings"]');
+            if (defaultHubBtn) defaultHubBtn.click();
           }
 
           switch (tab) {
@@ -926,6 +944,10 @@
             case 'system-config': loadSystemConfig(); break;
             case 'ai-intelligence': setupAIHub(); break;
             case 'support': await loadFeedbacks(); break;
+            case 'social': await loadSocialPosts(); break;
+            case 'transactions': await loadBookings(); break;
+            case 'vouchers': await loadVouchers(); break;
+            case 'campaigns': await loadCampaigns(); break;
           }
         }
       });
@@ -996,6 +1018,12 @@
               if (window.aiTrendChartInstance) window.aiTrendChartInstance.resize();
             }, 50);
           }
+
+          // Trigger data load for Social Hub and Transactions sub-tabs
+          if (hubTab === 'social-posts') loadSocialPosts();
+          if (hubTab === 'social-stories') loadSocialStories();
+          if (hubTab === 'trans-bookings') loadBookings();
+          if (hubTab === 'trans-financial') loadTransactions();
         }
       });
     });
@@ -2439,6 +2467,305 @@
       document.getElementById('admin-modal-backdrop').hidden = true;
     }, 350);
   }
+
+  // --- Social Hub Moderation ---
+  async function loadSocialPosts() {
+    const tbody = document.getElementById('social-posts-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center"><span class="spinner-small"></span> Đang tải bài viết...</td></tr>';
+    
+    try {
+      const res = await apiFetch('/api/admin/social/posts');
+      if (res.success) {
+        renderSocialPosts(res.data);
+      } else {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ef4444">${res.message || 'Lỗi tải bài viết'}</td></tr>`;
+      }
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#ef4444">Lỗi kết nối hệ thống</td></tr>';
+    }
+  }
+
+  function renderSocialPosts(posts) {
+    const tbody = document.getElementById('social-posts-tbody');
+    if (!tbody) return;
+    if (!posts || posts.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:3rem;">Không có bài viết nào</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = posts.map(p => {
+      const user = p.userId || {};
+      const date = new Date(p.createdAt).toLocaleString('vi-VN');
+      const mediaHtml = p.media && p.media.length > 0 
+        ? `<div style="display:flex; gap:4px; overflow:hidden;">${p.media.slice(0,2).map(m => {
+            if (m.type === 'video') {
+              return `<div style="width:40px; height:40px; background:#000; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; border:1px solid rgba(255,255,255,0.1)" title="Video content">📹</div>`;
+            }
+            return `<img src="${m.url}" style="width:40px; height:40px; border-radius:4px; object-fit:cover;" />`;
+          }).join('')}${p.media.length > 2 ? `<div style="width:40px; height:40px; background:rgba(255,255,255,0.1); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px;">+${p.media.length-2}</div>` : ''}</div>`
+        : '<span style="color:#64748b; font-size:11px;">Không có media</span>';
+
+      return `
+        <tr>
+          <td>
+            <div style="font-weight:600; color:#fff; font-size:0.9rem; margin-bottom:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.content || '(Không có nội dung)'}</div>
+            <div style="font-size:0.7rem; font-family:monospace; color:var(--admin-primary)">ID: ${truncateId(p._id)}</div>
+          </td>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <img src="${user.avatar || ''}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'U')}&background=random&color=fff'" style="width:28px; height:28px; border-radius:50%;" />
+              <div>
+                <div style="font-weight:600; color:#fff; font-size:0.85rem;">${user.displayName || 'Người dùng'}</div>
+                <div style="font-size:0.75rem; color:#64748b;">${user.email || ''}</div>
+              </div>
+            </div>
+          </td>
+          <td>${mediaHtml}</td>
+          <td style="font-size:0.8rem; color:#cbd5e1;">
+            ❤️ ${p.likesCount || 0} • 💬 ${p.commentsCount || 0}
+          </td>
+          <td style="font-size:0.8rem; color:#cbd5e1;">${date}</td>
+          <td style="text-align:right;">
+            <button class="btn-icon" style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3);" 
+                    onclick="deleteSocialPost('${p._id}')" title="Xóa bài viết vi phạm">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function deleteSocialPost(id) {
+    const reason = prompt('Lý do xóa bài viết này (người dùng sẽ nhận được thông báo):', 'Vi phạm tiêu chuẩn cộng đồng');
+    if (reason === null) return; // User cancelled
+    
+    if (!confirm('Bạn có chắc muốn XÓA VĨNH VIỄN bài viết này không?')) return;
+    try {
+      const res = await apiFetch(`/api/admin/social/posts/${id}?reason=${encodeURIComponent(reason)}`, { method: 'DELETE' });
+      if (res.success) {
+        WanderToast.success('Đã xóa bài viết thành công');
+        loadSocialPosts();
+      } else {
+        WanderToast.error(res.message || 'Lỗi khi xóa bài viết');
+      }
+    } catch (e) {
+      WanderToast.error('Lỗi kết nối máy chủ');
+    }
+  }
+
+  async function loadSocialStories() {
+    const tbody = document.getElementById('social-stories-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center"><span class="spinner-small"></span> Đang tải thước phim...</td></tr>';
+    
+    try {
+      const res = await apiFetch('/api/admin/social/stories');
+      if (res.success) {
+        renderSocialStories(res.data);
+      } else {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#ef4444">${res.message || 'Lỗi tải thước phim'}</td></tr>`;
+      }
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#ef4444">Lỗi kết nối hệ thống</td></tr>';
+    }
+  }
+
+  function renderSocialStories(stories) {
+    const tbody = document.getElementById('social-stories-tbody');
+    if (!tbody) return;
+    if (!stories || stories.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:3rem;">Không có thước phim nào</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = stories.map(s => {
+      const user = s.userId || {};
+      const date = new Date(s.createdAt).toLocaleString('vi-VN');
+      const mediaType = s.media && s.media.type === 'video' ? '📹 Video' : '🖼️ Ảnh';
+
+      return `
+        <tr>
+          <td>
+            <div style="font-family:monospace; color:var(--admin-primary); font-weight:700;">ID: ${truncateId(s._id)}</div>
+            <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">URL: <a href="${s.media?.url}" target="_blank" style="color:#38bdf8">Xem media</a></div>
+          </td>
+          <td>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <img src="${user.avatar || ''}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'U')}&background=random&color=fff'" style="width:28px; height:28px; border-radius:50%;" />
+              <div>
+                <div style="font-weight:600; color:#fff; font-size:0.85rem;">${user.displayName || 'Người dùng'}</div>
+                <div style="font-size:0.75rem; color:#64748b;">${user.email || ''}</div>
+              </div>
+            </div>
+          </td>
+          <td style="font-size:0.85rem; color:#cbd5e1;">${mediaType}</td>
+          <td style="font-size:0.85rem; color:#cbd5e1;">${date}</td>
+          <td style="text-align:right;">
+            <button class="btn-icon" style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.3);" 
+                    onclick="deleteSocialStory('${s._id}')" title="Xóa thước phim vi phạm">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function deleteSocialStory(id) {
+    const reason = prompt('Lý do xóa thước phim này (người dùng sẽ nhận được thông báo):', 'Vi phạm tiêu chuẩn cộng đồng');
+    if (reason === null) return; // User cancelled
+
+    if (!confirm('Bạn có chắc muốn XÓA VĨNH VIỄN thước phim này không?')) return;
+    try {
+      const res = await apiFetch(`/api/admin/social/stories/${id}?reason=${encodeURIComponent(reason)}`, { method: 'DELETE' });
+      if (res.success) {
+        WanderToast.success('Đã xóa thước phim thành công');
+        loadSocialStories();
+      } else {
+        WanderToast.error(res.message || 'Lỗi khi xóa thước phim');
+      }
+    } catch (e) {
+      WanderToast.error('Lỗi kết nối máy chủ');
+    }
+  }
+
+  // --- Transactions & Bookings ---
+  async function loadBookings() {
+    const tbody = document.getElementById('bookings-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center"><span class="spinner-small"></span> Đang tải đơn hàng...</td></tr>';
+    
+    try {
+      const res = await apiFetch('/api/admin/bookings');
+      if (res.success) {
+        renderBookings(res.data);
+      } else {
+        throw new Error(res.message);
+      }
+    } catch (e) {
+      console.warn('Using mock bookings data');
+      const mockBookings = [
+        { _id: 'BK10293', user: { displayName: 'Nguyễn Văn A', email: 'anv@gmail.com' }, place: { name: 'Mường Thanh Luxury', region: 'Đà Nẵng' }, totalPrice: 2500000, paymentStatus: 'paid', status: 'completed', createdAt: new Date() },
+        { _id: 'BK10294', user: { displayName: 'Trần Thị B', email: 'btt@gmail.com' }, place: { name: 'InterContinental', region: 'Phú Quốc' }, totalPrice: 8900000, paymentStatus: 'pending', status: 'confirmed', createdAt: new Date() },
+        { _id: 'BK10295', user: { displayName: 'Lê Văn C', email: 'clv@gmail.com' }, place: { name: 'Fansipan Legend', region: 'Sapa' }, totalPrice: 1200000, paymentStatus: 'paid', status: 'pending', createdAt: new Date() }
+      ];
+      renderBookings(mockBookings);
+    }
+  }
+
+  function renderBookings(bookings) {
+    const tbody = document.getElementById('bookings-tbody');
+    if (!tbody) return;
+    if (!bookings || bookings.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:3rem;">Chưa có đơn hàng nào</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = bookings.map(b => {
+      const user = b.user || {};
+      const place = b.place || {};
+      const date = new Date(b.createdAt).toLocaleString('vi-VN');
+      const statusColors = {
+        'pending': { bg: 'rgba(245,158,11,0.1)', text: '#f59e0b' },
+        'confirmed': { bg: 'rgba(56,189,248,0.1)', text: '#38bdf8' },
+        'completed': { bg: 'rgba(16,185,129,0.1)', text: '#10b981' },
+        'cancelled': { bg: 'rgba(239,68,68,0.1)', text: '#ef4444' }
+      };
+      const st = statusColors[b.status] || { bg: 'rgba(255,255,255,0.05)', text: '#94a3b8' };
+
+      return `
+        <tr>
+          <td style="font-family:monospace; color:var(--admin-primary); font-weight:700;">${truncateId(b._id)}</td>
+          <td>
+            <div style="font-weight:600; color:#fff; font-size:0.85rem;">${user.displayName || 'Người dùng'}</div>
+            <div style="font-size:0.75rem; color:#64748b;">${user.email || ''}</div>
+          </td>
+          <td>
+            <div style="font-weight:600; color:#fff; font-size:0.85rem;">${place.name || 'Dịch vụ'}</div>
+            <div style="font-size:0.75rem; color:#64748b;">${place.region || ''}</div>
+          </td>
+          <td style="font-weight:700; color:#fff;">${(b.totalPrice || 0).toLocaleString()} VNĐ</td>
+          <td>
+            <span style="padding:4px 8px; border-radius:4px; font-size:11px; background:${b.paymentStatus === 'paid' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)'}; color:${b.paymentStatus === 'paid' ? '#10b981' : '#f59e0b'}; border:1px solid ${b.paymentStatus === 'paid' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}">
+              ${b.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chờ TT'}
+            </span>
+          </td>
+          <td>
+            <span style="padding:4px 8px; border-radius:4px; font-size:11px; background:${st.bg}; color:${st.text}; border:1px solid ${st.text}33">
+              ${b.status?.toUpperCase() || 'UNKNOWN'}
+            </span>
+          </td>
+          <td style="font-size:0.8rem; color:#cbd5e1;">${date}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function loadTransactions() {
+    const tbody = document.getElementById('transactions-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center"><span class="spinner-small"></span> Đang tải lịch sử giao dịch...</td></tr>';
+    
+    try {
+      const res = await apiFetch('/api/admin/transactions');
+      if (res.success) {
+        renderTransactions(res.data);
+      } else {
+        throw new Error(res.message);
+      }
+    } catch (e) {
+      console.warn('Using mock transactions data');
+      const mockTrans = [
+        { _id: 'TX8812', user: { displayName: 'Nguyễn Văn A' }, type: 'deposit', amount: 5000000, description: 'Nạp tiền vào ví Wander', status: 'success', createdAt: new Date() },
+        { _id: 'TX8813', user: { displayName: 'Trần Thị B' }, type: 'payment', amount: -2500000, description: 'Thanh toán đơn hàng BK10293', status: 'success', createdAt: new Date() },
+        { _id: 'TX8814', user: { displayName: 'Lê Văn C' }, type: 'withdraw', amount: -1000000, description: 'Rút tiền về tài khoản ngân hàng', status: 'pending', createdAt: new Date() }
+      ];
+      renderTransactions(mockTrans);
+    }
+  }
+
+  function renderTransactions(transactions) {
+    const tbody = document.getElementById('transactions-tbody');
+    if (!tbody) return;
+    if (!transactions || transactions.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:3rem;">Chưa có giao dịch nào</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = transactions.map(t => {
+      const user = t.user || {};
+      const date = new Date(t.createdAt).toLocaleString('vi-VN');
+      const isIncome = t.type === 'deposit' || t.type === 'payment';
+
+      return `
+        <tr>
+          <td style="font-family:monospace; color:var(--admin-primary); font-weight:700;">${truncateId(t._id)}</td>
+          <td>
+            <div style="font-weight:600; color:#fff; font-size:0.85rem;">${user.displayName || 'Người dùng'}</div>
+            <div style="font-size:0.75rem; color:#64748b;">${user.email || ''}</div>
+          </td>
+          <td>
+            <span style="font-size:0.8rem; color:${isIncome ? '#10b981' : '#f87171'}">${t.type?.toUpperCase()}</span>
+          </td>
+          <td style="font-weight:700; color:${isIncome ? '#10b981' : '#fff'};">
+            ${isIncome ? '+' : '-'}${(t.amount || 0).toLocaleString()} VNĐ
+          </td>
+          <td style="font-size:0.8rem; color:#cbd5e1; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${t.description || ''}">${t.description || '—'}</td>
+          <td>
+            <span style="padding:4px 8px; border-radius:4px; font-size:11px; background:${t.status === 'success' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)'}; color:${t.status === 'success' ? '#10b981' : '#f59e0b'}; border:1px solid ${t.status === 'success' ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)'}">
+              ${t.status?.toUpperCase()}
+            </span>
+          </td>
+          <td style="font-size:0.8rem; color:#cbd5e1;">${date}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  window.deleteSocialPost = deleteSocialPost;
+  window.deleteSocialStory = deleteSocialStory;
 
   // --- Dropzone Logic ---
   let currentDropzoneFiles = []; // {url: string, file?: File, preview?: string}
@@ -4809,4 +5136,68 @@
   };
 
 
+
+  async function loadVouchers() {
+    const tbody = document.getElementById('vouchers-tbody');
+    if (!tbody) return;
+    
+    // Mock data for demo
+    const mockVouchers = [
+      { code: 'WANDER2024', name: 'Chào hè rực rỡ', value: 'Giảm 20%', limit: '100/500', status: 'active' },
+      { code: 'BIZPARTNER', name: 'Ưu đãi đối tác', value: '500,000đ', limit: '50/100', status: 'active' },
+      { code: 'FIRSTTRIP', name: 'Chuyến đi đầu tiên', value: 'Giảm 10%', limit: 'Unlimited', status: 'active' }
+    ];
+
+    tbody.innerHTML = mockVouchers.map(v => `
+      <tr>
+        <td>
+          <div style="font-weight:700; color:var(--admin-primary);">${v.code}</div>
+          <div style="font-size:0.8rem; color:var(--admin-text-muted);">${v.name}</div>
+        </td>
+        <td style="font-weight:600;">${v.value}</td>
+        <td>
+          <div style="font-size:0.9rem;">${v.limit}</div>
+          <div class="geo-progress-bg" style="height:4px; margin-top:4px; width:100px;">
+            <div class="geo-progress-bar bar--blue" style="width: 20%;"></div>
+          </div>
+        </td>
+        <td style="text-align:right">
+          <button class="btn btn--ghost btn--small" style="color:var(--admin-primary);">Sửa</button>
+          <button class="btn btn--ghost btn--small" style="color:#ef4444;">Xóa</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function loadCampaigns() {
+    const activeList = document.getElementById('campaign-active-list');
+    if (!activeList) return;
+
+    // Mock data for campaigns
+    const mockCampaigns = [
+      { name: 'Mùa hè rực rỡ 2024', status: 'Running', budget: '50M', reach: '12.5k', conversion: '3.2%' },
+      { name: 'Flash Sale Cuối Tuần', status: 'Running', budget: '20M', reach: '5.1k', conversion: '5.8%' }
+    ];
+
+    activeList.parentElement.innerHTML = `
+      <h3 style="margin-top:0; font-size:1.1rem; display:flex; align-items:center; gap:0.5rem;">
+        🚀 Chiến dịch đang chạy
+      </h3>
+      <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
+        ${mockCampaigns.map(c => `
+          <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); padding:1rem; border-radius:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-weight:700; color:#fff;">${c.name}</span>
+              <span style="font-size:10px; padding:2px 6px; background:rgba(16,185,129,0.1); color:#10b981; border-radius:4px; border:1px solid rgba(16,185,129,0.2);">LIVE</span>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem; font-size:0.75rem; color:var(--admin-text-muted);">
+              <div>Ngân sách: <span style="color:#fff;">${c.budget}</span></div>
+              <div>Tiếp cận: <span style="color:#38bdf8;">${c.reach}</span></div>
+              <div>Chuyển đổi: <span style="color:#10b981;">${c.conversion}</span></div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
 })();

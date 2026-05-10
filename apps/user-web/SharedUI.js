@@ -181,8 +181,24 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     }
   }
 
-  // ─── Notifications ────────────────────────────────────────────────────────
+  // ─── Notifications & Real-time ───────────────────────────────────────────
   let lastNotifCount = -1;
+  let socket = null;
+
+  function initSocket() {
+    const token = localStorage.getItem('wander_token');
+    if (!token || typeof io === 'undefined' || socket) return;
+
+    socket = io({ auth: { token } });
+    socket.on('notification', (notif) => {
+      WanderUI.showToast(notif.message || 'Bạn có thông báo mới!', 'info');
+      updateNotificationBadge();
+      if (document.getElementById('wander-notif-drawer')?.classList.contains('is-open')) {
+        renderNotifications();
+      }
+    });
+  }
+
   async function updateNotificationBadge() {
     const token = localStorage.getItem('wander_token') || localStorage.getItem('wander_admin_token');
     if (!token) return;
@@ -213,9 +229,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     } catch (e) { }
   }
 
-  // Start polling
-  setInterval(updateNotificationBadge, 60000); // Check every 1 minute instead of 30s
-  setTimeout(updateNotificationBadge, 3000);
+  // Start polling & Real-time
+  setInterval(updateNotificationBadge, 30000); // Check every 30s
+  setTimeout(() => {
+    updateNotificationBadge();
+    initSocket();
+  }, 2000);
 
   function toggleNotificationDrawer() {
     const drawer = document.getElementById('wander-notif-drawer') || createNotificationDrawer();

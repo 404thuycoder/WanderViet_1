@@ -13,6 +13,12 @@ const upload = require('../middlewares/upload');
 const SystemLog = require('../models/SystemLog');
 const logAction = require('../utils/logger');
 const bcrypt = require('bcryptjs');
+const Post = require('../models/Post');
+const Story = require('../models/Story');
+const Booking = require('../models/Booking');
+const Transaction = require('../models/Transaction');
+const Notification = require('../models/Notification');
+const { sendNotification } = require('../utils/socketManager');
 
 // Cấu hình Rank cho Admin API
 const RANK_CONFIG = [
@@ -1244,6 +1250,136 @@ router.get('/logs/recent', adminTokenAuth, adminAuth, async (req, res) => {
     res.json({ success: true, data: formatted });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────
+//  QUẢN LÝ MẠNG XÃ HỘI (SOCIAL MODERATION)
+// ─────────────────────────────────────────────
+
+// Lấy danh sách bài viết (Posts)
+router.get('/social/posts', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const posts = await Post.find()
+      .populate('userId', 'name displayName email avatar')
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .lean();
+    res.json({ success: true, data: posts });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi tải danh sách bài viết' });
+  }
+});
+
+// Xóa bài viết
+router.delete('/social/posts/:id', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const { reason } = req.query;
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ success: false, message: 'Không tìm thấy bài viết' });
+    
+    const author = await User.findById(post.userId);
+    const recipientId = author ? (author.customId || author.id || author._id.toString()) : post.userId.toString();
+    const postSummary = post.content ? post.content.substring(0, 30) + '...' : 'bài viết của bạn';
+
+    await Post.findByIdAndDelete(req.params.id);
+    
+    // Gửi thông báo cho người dùng (Lưu vào DB)
+    const notifData = {
+      recipientId: recipientId,
+      type: 'warning',
+      title: 'Nội dung bị gỡ bỏ',
+      message: `Bài viết "${postSummary}" đã bị gỡ bỏ do vi phạm tiêu chuẩn cộng đồng. Lý do: ${reason || 'Vi phạm nội dung'}`,
+      link: '/social-hub'
+    };
+    await Notification.create(notifData);
+
+    // Gửi thông báo thời gian thực (Socket.io)
+    sendNotification(recipientId, notifData);
+
+    await logAction(req.user.email, req.user.role, 'SOCIAL_POST_DELETED', { postId: req.params.id, reason }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, message: 'Đã xóa bài viết và gửi thông báo' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Lấy danh sách thước phim (Stories)
+router.get('/social/stories', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const stories = await Story.find()
+      .populate('userId', 'name displayName email avatar')
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .lean();
+    res.json({ success: true, data: stories });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi tải danh sách thước phim' });
+  }
+});
+
+// Xóa thước phim
+router.delete('/social/stories/:id', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const { reason } = req.query;
+    const story = await Story.findById(req.params.id);
+    if (!story) return res.status(404).json({ success: false, message: 'Không tìm thấy thước phim' });
+    
+    const author = await User.findById(story.userId);
+    const recipientId = author ? (author.customId || author.id || author._id.toString()) : story.userId.toString();
+
+    await Story.findByIdAndDelete(req.params.id);
+
+    // Gửi thông báo cho người dùng (Lưu vào DB)
+    const notifData = {
+      recipientId: recipientId,
+      type: 'warning',
+      title: 'Thước phim bị gỡ bỏ',
+      message: `Một thước phim của bạn đã bị gỡ bỏ do vi phạm tiêu chuẩn cộng đồng. Lý do: ${reason || 'Vi phạm nội dung'}`,
+      link: '/social-hub'
+    };
+    await Notification.create(notifData);
+
+    // Gửi thông báo thời gian thực (Socket.io)
+    sendNotification(recipientId, notifData);
+    
+    await logAction(req.user.email, req.user.role, 'SOCIAL_STORY_DELETED', { storyId: req.params.id, reason }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, message: 'Đã xóa thước phim và gửi thông báo' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────
+//  QUẢN LÝ GIAO DỊCH & ĐẶT CHỖ (TRANSACTIONS)
+// ─────────────────────────────────────────────
+
+// Lấy danh sách đơn hàng (Bookings)
+router.get('/bookings', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const bookings = await Booking.find()
+      .populate('user', 'name displayName email avatar')
+      .populate('place', 'name region')
+      .sort({ createdAt: -1 })
+      .limit(500)
+      .lean();
+    res.json({ success: true, data: bookings });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi tải danh sách đơn hàng' });
+  }
+});
+
+// Lấy danh sách giao dịch tài chính (Transactions)
+router.get('/transactions', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const transactions = await Transaction.find()
+      .populate('user', 'name displayName email avatar')
+      .sort({ createdAt: -1 })
+      .limit(500)
+      .lean();
+    res.json({ success: true, data: transactions });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Lỗi tải lịch sử giao dịch' });
   }
 });
 

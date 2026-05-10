@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const feedbackSchema = new mongoose.Schema({
   userId: { type: String, index: true },
+  businessId: { type: String, index: true },
   role: { type: String, default: 'user' },
   name: {
     type: String,

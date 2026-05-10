@@ -22,7 +22,6 @@ router.post('/', auth, async (req, res) => {
     const place = await Place.findOne({ $or: placeQuery });
 
     if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
-    if (!place.ownerId) return res.status(400).json({ success: false, message: 'Địa điểm này chưa được quản lý bởi doanh nghiệp' });
 
     const totalPrice = (place.price || place.priceFrom || 0) * (peopleCount || 1);
     const type = bookingType || (place.isTour ? 'tour' : 'service');
@@ -43,7 +42,7 @@ router.post('/', auth, async (req, res) => {
       specialRequests: specialRequests || '',
       paymentMethod:  paymentMethod || 'contact',
       paymentStatus:  paymentMethod === 'contact' ? 'unpaid' : 'pending',
-      ownerId:        place.ownerId,
+      ownerId:        place.ownerId || 'system',
       status:         'pending'
     });
 

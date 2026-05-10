@@ -153,26 +153,58 @@ router.post('/seed', adminTokenAuth, async (req, res) => {
 // API để cập nhật lượt yêu thích (Thả tim)
 router.post('/:id/favorite', auth, async (req, res) => {
   try {
-    const { action } = req.body; // 'add' hoặc 'remove'
-    const place = await Place.findOne({ id: req.params.id });
+    const id = req.params.id;
+    let place;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      place = await Place.findById(id);
+    }
+    if (!place) {
+      place = await Place.findOne({ id: id });
+    }
     
     if (!place) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
     }
 
-    if (action === 'add') {
+    // Flexible user lookup: by customId, id field, or _id
+    const userId = req.user.id || req.user._id;
+    const userQuery = { $or: [{ customId: userId }, { id: userId }] };
+    if (mongoose.Types.ObjectId.isValid(userId)) {
+      userQuery.$or.push({ _id: userId });
+    }
+    const user = await User.findOne(userQuery);
+    if (!user) return res.status(401).json({ success: false, message: 'Vui lòng đăng nhập' });
+
+    // Use _id.toString() as the canonical place identifier to store in favorites
+    const placeIdToSave = place._id.toString();
+    const isFavorited = Array.isArray(user.favorites) && user.favorites.includes(placeIdToSave);
+    
+    // Toggle: if currently favorited → remove, else → add
+    let updated = false;
+    let nowFavorited;
+    if (isFavorited) {
+      user.favorites = user.favorites.filter(favId => favId !== placeIdToSave);
+      place.favoritesCount = Math.max(0, (place.favoritesCount || 0) - 1);
+      nowFavorited = false;
+      updated = true;
+    } else {
+      if (!Array.isArray(user.favorites)) user.favorites = [];
+      user.favorites.push(placeIdToSave);
       place.favoritesCount = (place.favoritesCount || 0) + 1;
-    } else if (action === 'remove' && place.favoritesCount > 0) {
-      place.favoritesCount -= 1;
+      nowFavorited = true;
+      updated = true;
     }
 
-    await place.save();
-    if (place.ownerId) {
-      syncBusinessXP(place.ownerId).catch(err => console.error('BG Sync XP Error:', err));
+    if (updated) {
+      await Promise.all([user.save(), place.save()]);
+      if (place.ownerId) {
+        syncBusinessXP(place.ownerId).catch(err => console.error('BG Sync XP Error:', err));
+      }
     }
     
-    res.json({ success: true, favoritesCount: place.favoritesCount });
+    res.json({ success: true, favoritesCount: place.favoritesCount, isFavorited: nowFavorited });
   } catch (err) {
+    console.error('Favorite error:', err.message);
     res.status(500).json({ success: false, error: err.message });
   }
 });

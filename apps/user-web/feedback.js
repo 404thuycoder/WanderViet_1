@@ -95,13 +95,15 @@ const FeedbackHub = {
     getFilteredThreads: function() {
         const q = (document.getElementById('search-input')?.value || '').toLowerCase();
         return this.allThreads.filter(t => {
-            const isMatch = t.message.toLowerCase().includes(q) || 
-                          (t.replies && t.replies.some(r => r.content.toLowerCase().includes(q)));
+            const isMatch = (t.message || '').toLowerCase().includes(q) || 
+                          (t.replies && t.replies.some(r => (r.content || '').toLowerCase().includes(q)));
             
             if (this.currentTab === 'business') {
-                return isMatch && t.role === 'business';
+                // Doanh nghiệp: chỉ những thread có businessId
+                return isMatch && !!t.businessId;
             } else {
-                return isMatch && t.role !== 'business';
+                // Hệ thống: những thread KHÔNG có businessId
+                return isMatch && !t.businessId;
             }
         });
     },
@@ -149,13 +151,27 @@ const FeedbackHub = {
             // Limit preview length
             let preview = lastMsg.content;
             if (preview.length > 60) preview = preview.substring(0, 57) + '...';
+            
+            // Resolve display name for business threads
+            let displayName;
+            if (t.businessId) {
+                if (t.businessName) {
+                    displayName = '🏢 ' + t.businessName;
+                } else {
+                    // Extract from message pattern "[Từ dịch vụ: NAME]"
+                    const nameMatch = (t.message || '').match(/\[Từ dịch vụ:\s*(.*?)\]/);
+                    displayName = nameMatch ? '🏢 ' + nameMatch[1].trim() : '🏢 Doanh nghiệp';
+                }
+            } else {
+                displayName = '⚙️ Hỗ trợ hệ thống';
+            }
 
             return `
                 <div class="thread-item ${isActive ? 'is-active' : ''}" onclick="FeedbackHub.selectThread('${t._id}')">
                     <div class="thread-top">
                         <span class="thread-name">
                             <span class="status-dot ${t.status}"></span>
-                            #${t._id.substring(t._id.length - 6)}
+                            ${displayName}
                         </span>
                         <span class="thread-time">${date}</span>
                     </div>
@@ -170,7 +186,7 @@ const FeedbackHub = {
         const thread = this.allThreads.find(t => t._id === id);
         if (!thread) return;
 
-        this.renderThreadList(this.allThreads); // Refresh active state
+        this.renderThreadList(this.getFilteredThreads()); // Refresh active state with correct filter
         this.renderConversation(thread);
     },
 
@@ -178,14 +194,27 @@ const FeedbackHub = {
         const mainContainer = document.getElementById('feedback-main');
         const isWaiting = thread.status === 'open';
         
+        // Resolve display name for header
+        let headerName;
+        if (thread.businessId) {
+            if (thread.businessName) {
+                headerName = '🏢 ' + thread.businessName;
+            } else {
+                const nameMatch = (thread.message || '').match(/\[Từ dịch vụ:\s*(.*?)\]/);
+                headerName = nameMatch ? '🏢 ' + nameMatch[1].trim() : '🏢 Doanh nghiệp';
+            }
+        } else {
+            headerName = '⚙️ Hỗ trợ hệ thống';
+        }
+        
         mainContainer.innerHTML = `
             <div class="main-header">
                 <div class="thread-info">
                     <div style="display:flex; align-items:center; gap:12px;">
-                        <h3>Phản hồi #${thread._id.substring(thread._id.length - 6)}</h3>
+                        <h3>${headerName}</h3>
                         ${isWaiting ? '<span class="waiting-badge">⏳ Chờ phản hồi</span>' : '<span class="waiting-badge" style="background:rgba(16,185,129,0.1); color:#10b981;">✅ Đã xử lý</span>'}
                     </div>
-                    <p>Khởi tạo: ${new Date(thread.createdAt).toLocaleString('vi-VN')} · Loại: ${thread.role === 'business' ? 'Doanh nghiệp' : 'Hệ thống'}</p>
+                    <p>Khởi tạo: ${new Date(thread.createdAt).toLocaleString('vi-VN')} · Loại: ${thread.businessId ? 'Doanh nghiệp' : 'Hệ thống'} · #${thread._id.substring(thread._id.length - 6)}</p>
                 </div>
                 <div class="header-actions">
                     <button class="btn btn--ghost btn--small" onclick="FeedbackHub.loadThreads()">Làm mới</button>

@@ -27,7 +27,50 @@ router.get('/my-feedbacks', flexibleAuth, async (req, res) => {
     const userId = req.user ? req.user.id : null;
     const feedbacks = await Feedback.find({ 
       $or: [ { email: email }, { userId: userId } ] 
-    }).sort({ createdAt: -1 });
+    }).sort({ createdAt: -1 }).lean();
+    
+    // Attach businessName if applicable
+    const User = require('../models/User');
+    const BusinessAccount = require('../models/BusinessAccount');
+    const Place = require('../models/Place');
+    const mongoose = require('mongoose');
+    
+    for (let f of feedbacks) {
+      if (f.businessId) {
+        // 1. Try matching User or BusinessAccount directly by _id
+        let owner = null;
+        if (mongoose.Types.ObjectId.isValid(f.businessId)) {
+          owner = await BusinessAccount.findById(f.businessId).lean() || await User.findById(f.businessId).lean();
+        }
+        // 2. Try matching by customId
+        if (!owner) {
+          owner = await BusinessAccount.findOne({ customId: f.businessId }).lean() || await User.findOne({ customId: f.businessId }).lean();
+        }
+        // 3. Try finding a Place with this ownerId, then get that Place owner
+        if (!owner) {
+          const place = await Place.findOne({ ownerId: f.businessId }).lean();
+          if (place && place.ownerId) {
+            if (mongoose.Types.ObjectId.isValid(place.ownerId)) {
+              owner = await BusinessAccount.findById(place.ownerId).lean() || await User.findById(place.ownerId).lean();
+            }
+            if (!owner) {
+              owner = await BusinessAccount.findOne({ customId: place.ownerId }).lean() || await User.findOne({ customId: place.ownerId }).lean();
+            }
+          }
+        }
+        
+        if (owner) {
+          f.businessName = owner.displayName || owner.name;
+        } else {
+          // 4. Fallback: extract name from message pattern "[Từ dịch vụ: NAME]"
+          const match = (f.message || '').match(/\[Từ dịch vụ:\s*(.*?)\]/);
+          if (match && match[1]) {
+            f.businessName = match[1].trim();
+          }
+        }
+      }
+    }
+    
     res.json({ success: true, data: feedbacks });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi server khi lấy lịch sử phản hồi' });
@@ -51,6 +94,14 @@ router.post('/', flexibleAuth, async (req, res) => {
 
     // Find existing open thread: prefer userId match, fallback to email
     const query = { status: 'open' };
+    const isBusinessTarget = req.body.targetRole === 'business' || req.body.role === 'business';
+    if (isBusinessTarget) {
+      query.role = 'business';
+      if (req.body.businessId) query.businessId = req.body.businessId;
+    } else {
+      query.role = { $ne: 'business' }; // System feedback
+    }
+
     if (req.user && req.user.id) {
       query.$or = [{ userId: req.user.id }, { email }];
     } else {
@@ -79,28 +130,48 @@ router.post('/', flexibleAuth, async (req, res) => {
         image,
         replies: []
       };
+      const isBusinessTarget = req.body.targetRole === 'business' || req.body.role === 'business';
+      if (isBusinessTarget) {
+        feedbackData.role = 'business';
+        if (req.body.businessId) feedbackData.businessId = req.body.businessId;
+      }
       if (req.user) {
         feedbackData.userId = req.user.id;
-        feedbackData.role = req.user.role || 'user';
+        if (!feedbackData.role) feedbackData.role = req.user.role || 'user';
       }
       targetFeedback = await Feedback.create(feedbackData);
     }
 
-    // Notify Admin
-    await Notification.create({
-      recipientId: 'ROLE_ADMIN',
-      recipientType: 'admin',
-      senderId: req.user ? req.user.id : null,
-      senderName: name,
-      type: 'message',
-      title: 'Phản hồi mới từ người dùng',
-      message: `${name} vừa gửi một phản hồi mới.`,
-      relatedId: targetFeedback._id,
-      link: 'feedback.html',
-      isRead: false
-    });
+    // Notify Admin or Business
+    if (isBusinessTarget && req.body.businessId) {
+      await Notification.create({
+        recipientId: req.body.businessId,
+        recipientType: 'business',
+        senderId: req.user ? req.user.id : null,
+        senderName: name,
+        type: 'message',
+        title: 'Phản hồi mới từ khách hàng',
+        message: `${name} vừa gửi một yêu cầu phản hồi về dịch vụ.`,
+        relatedId: targetFeedback._id,
+        link: 'business-messages.html', // hypothetical link
+        isRead: false
+      });
+    } else {
+      await Notification.create({
+        recipientId: 'ROLE_ADMIN',
+        recipientType: 'admin',
+        senderId: req.user ? req.user.id : null,
+        senderName: name,
+        type: 'message',
+        title: 'Phản hồi mới từ người dùng',
+        message: `${name} vừa gửi một phản hồi mới.`,
+        relatedId: targetFeedback._id,
+        link: 'feedback.html',
+        isRead: false
+      });
+    }
 
-    await logAction('FEEDBACK_SUBMITTED', `Người dùng ${name} đã gửi một phản hồi mới`, req, { name, email });
+    await logAction('FEEDBACK_SUBMITTED', `Người dùng ${name} đã gửi một phản hồi mới`, req, { name, email, role: targetFeedback.role });
 
     res.status(201).json({ success: true, message: 'Gửi thành công', data: targetFeedback });
   } catch (err) {

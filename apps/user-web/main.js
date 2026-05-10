@@ -27,7 +27,7 @@
       try {
         const data = JSON.parse(cached);
         if (data && data.length > 0) {
-          PLACES = data;
+          PLACES = data.filter(p => !p.ownerId);
           renderDestCards();
           return Promise.resolve(true);
         }
@@ -39,7 +39,8 @@
       return res.json();
     }).then(function (json) {
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-        PLACES = json.data;
+        // Chỉ lấy những địa điểm hệ thống (không thuộc doanh nghiệp) cho mục đích AI lên lịch
+        PLACES = json.data.filter(p => !p.ownerId);
         sessionStorage.setItem('wv_cached_places', JSON.stringify(PLACES));
         return true;
       }
@@ -47,7 +48,7 @@
     }).catch(function (e) {
       console.warn('Không thể tải từ API, dùng dữ liệu tĩnh:', e);
       if (Array.isArray(window.WANDER_PLACES) && window.WANDER_PLACES.length > 0) {
-        PLACES = window.WANDER_PLACES;
+        PLACES = window.WANDER_PLACES.filter(p => !p.ownerId);
       }
       return false;
     }).finally(function() {
@@ -1091,11 +1092,18 @@
         var verifiedBadge = p.verified ? '<div class="verified-badge"><span class="icon">🛡️</span> Verified</div>' : '';
         var wOn = wishIsOn(p.id) ? " is-on" : "";
         var displayImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || "");
+        var fallbackImg = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80';
+        if (p.kind === 'khach-san') fallbackImg = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80';
+        else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') fallbackImg = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80';
+        else if (p.isTour || p.kind === 'trai-nghiem') fallbackImg = 'https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=600&q=80';
+        
+        if (!displayImg || displayImg.length < 5) displayImg = fallbackImg;
+        
         var favCount = parseInt(p.favoritesCount) || 0;
         if (wishIsOn(p.id) && favCount === 0) favCount = 1;
 
-        art.innerHTML = '<div class="dest-card-media">' + 
-                          '<img src="' + displayImg + '" loading="lazy" alt="' + escapeAttr(p.name || '') + '" class="dest-card-img" />' +
+        art.innerHTML = '<div class="dest-card-media" onclick="window.location.href=\'place-detail.html?id=' + p.id + '\'" style="cursor:pointer;" title="Xem chi tiết">' + 
+                          '<img src="' + displayImg + '" loading="lazy" alt="' + escapeAttr(p.name || '') + '" class="dest-card-img" onerror="this.onerror=null;this.src=\'' + fallbackImg + '\';" />' +
                           topBadge + verifiedBadge + 
                         '</div>' +
                        '<div class="dest-card-body">' +
@@ -1103,7 +1111,7 @@
                          '<h3 class="dest-card-title">' + escapeHtml(p.name || '') + '</h3>' +
                          '<p class="dest-card-text">' + escapeHtml(p.text || 'Khám phá vẻ đẹp tiềm ẩn của địa danh này...') + '</p>' +
                          '<div class="dest-card-actions" style="display:flex; justify-content:space-between; align-items:center; margin-top:1rem;">' +
-                           '<a href="#dest-details" class="dest-card-link" onclick="openPlaceModal(\'' + p.id + '\')">Chi tiết →</a>' +
+                           '<a href="place-detail.html?id=' + p.id + '" class="dest-card-link">Chi tiết →</a>' +
                            '<button type="button" class="btn btn--primary btn--small btn-add-trip" data-add-stop-id="' + escapeAttr(p.id) + '"><span>+</span> Chuyến đi</button>' +
                          '</div>' +
                        '</div>';
@@ -2754,29 +2762,44 @@
 
   function initHeroSlideshow() {
     var container = document.getElementById('heroSlideshow');
+    var floatingCard = document.querySelector('.floating-card');
     if (!container) return;
 
-    // Reduced resolution to 1200px for faster loading
-    var images = [
-      'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200', // Hoi An
-      'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?q=80&w=1200', // Ha Long
-      'https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?q=80&w=1200', // Sapa
-      'https://images.unsplash.com/photo-1559592442-7e182c9403db?q=80&w=1200', // Golden Bridge
-      'https://images.unsplash.com/photo-1589785834230-fb760205273d?q=80&w=1200', // Phu Quoc
-      'https://images.unsplash.com/photo-1563270412-2976f9d3b733?q=80&w=1200', // Hue
-      'https://images.unsplash.com/photo-1506462945848-ac8ea6f609cc?q=80&w=1200', // Mui Ne
-      'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?q=80&w=1200', // Ninh Binh
-      'https://images.unsplash.com/photo-1582234372722-50d7ccc30ebd?q=80&w=1200', // Ha Giang
-      'https://images.unsplash.com/photo-1555944858-752c8a522644?q=80&w=1200'  // Saigon Skyline
-    ];
+    var slides = [];
+    if (typeof PLACES !== 'undefined' && PLACES.length > 0) {
+      var topPlaces = PLACES.filter(p => p.top).slice(0, 10);
+      if (topPlaces.length < 5) topPlaces = PLACES.slice(0, 10);
+      slides = topPlaces.map(p => ({
+        url: (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200'),
+        id: p.id,
+        name: p.name,
+        region: p.region || 'Việt Nam',
+        verified: p.verified
+      }));
+    } else {
+      slides = [
+        { url: 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200', id: null, name: 'Phố cổ Hội An', region: 'Quảng Nam', verified: true },
+        { url: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?q=80&w=1200', id: null, name: 'Vịnh Hạ Long', region: 'Quảng Ninh', verified: true },
+        { url: 'https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?q=80&w=1200', id: null, name: 'Sa Pa', region: 'Lào Cai', verified: true }
+      ];
+    }
 
     var currentIndex = 0;
     var zIndexCounter = 10;
     
-    // Safety Net: Set container background to first image immediately
-    container.style.backgroundImage = 'url(' + images[0] + ')';
+    // Initial Setup
+    container.style.backgroundImage = 'url(' + slides[0].url + ')';
     container.style.backgroundSize = 'cover';
     container.style.backgroundPosition = 'center';
+    
+    if (floatingCard) {
+      floatingCard.style.transition = 'all 0.4s ease';
+      if (slides[0].id) {
+         floatingCard.onclick = function() { window.location.href = 'place-detail.html?id=' + slides[0].id; };
+         floatingCard.style.cursor = 'pointer';
+         floatingCard.title = "Xem chi tiết";
+      }
+    }
 
     function createSlide(url, active) {
       var slide = document.createElement('div');
@@ -2790,15 +2813,15 @@
       return slide;
     }
 
-    var currentSlide = createSlide(images[0], true);
+    var currentSlide = createSlide(slides[0].url, true);
 
     function next() {
-      var nextIndex = (currentIndex + 1) % images.length;
-      var nextUrl = images[nextIndex];
+      var nextIndex = (currentIndex + 1) % slides.length;
+      var nextData = slides[nextIndex];
       
       // Step 1: Create the next slide (it will start hidden and start loading)
       zIndexCounter++;
-      var nextSlide = createSlide(nextUrl, false);
+      var nextSlide = createSlide(nextData.url, false);
       nextSlide.style.zIndex = zIndexCounter;
       
       // Step 2: Trigger fade in after a tiny delay to ensure DOM insertion
@@ -2806,10 +2829,35 @@
         nextSlide.classList.add('is-active');
       });
 
+      // Update Floating Card
+      if (floatingCard) {
+        floatingCard.style.opacity = '0';
+        floatingCard.style.transform = 'translateY(10px) scale(0.98)';
+        setTimeout(function() {
+          var fImg = floatingCard.querySelector('img');
+          var fTitle = floatingCard.querySelector('h4');
+          var fLocation = floatingCard.querySelector('p');
+          var fBadge = floatingCard.querySelector('.floating-card__badge');
+          
+          if (fImg) fImg.src = nextData.url;
+          if (fTitle) fTitle.textContent = nextData.name;
+          if (fLocation) fLocation.textContent = '📍 ' + nextData.region;
+          if (fBadge) fBadge.style.display = nextData.verified ? 'inline-block' : 'none';
+          
+          if (nextData.id) {
+             floatingCard.onclick = function() { window.location.href = 'place-detail.html?id=' + nextData.id; };
+             floatingCard.style.cursor = 'pointer';
+          }
+          
+          floatingCard.style.opacity = '1';
+          floatingCard.style.transform = 'translateY(0) scale(1)';
+        }, 400);
+      }
+
       // Step 3: Keep the old slide for a while, then clean up
       var oldSlide = currentSlide;
       setTimeout(function() {
-        container.style.backgroundImage = 'url(' + nextUrl + ')';
+        container.style.backgroundImage = 'url(' + nextData.url + ')';
         if (oldSlide && oldSlide.parentNode) {
           oldSlide.parentNode.removeChild(oldSlide);
         }
@@ -2819,8 +2867,8 @@
       currentIndex = nextIndex;
     }
 
-    // Faster rotation: Every 4 seconds
-    setInterval(next, 4000);
+    // Rotation interval
+    setInterval(next, 5000);
   }
 
   /* ——— Boot ——— */
@@ -3212,7 +3260,7 @@
                     <span class="svc-cat">${catLabel}</span>
                     <h3 class="svc-name">${p.name}</h3>
                     <div style="display:flex; gap:16px; font-size:12px; color:var(--text-muted);">
-                      <span>⭐ ${rating}</span>
+                      <span>⭐ ${rating} <span style="opacity:0.7; font-size:10px;">(${p.reviewCount || 0} đánh giá)</span></span>
                       <span>📍 ${addrStr}</span>
                     </div>
                     <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">

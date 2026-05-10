@@ -197,7 +197,8 @@
                 const r = await fetch('/api/public/all-places');
                 const j = await r.json();
                 if(!j.success) return;
-                rawData = j.data;
+                // Chỉ hiển thị các địa điểm được quản lý bởi doanh nghiệp
+                rawData = j.data.filter(p => p.ownerId);
                 updateStats();
                 syncFilters();
             } catch(e) {}

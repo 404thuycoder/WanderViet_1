@@ -541,7 +541,18 @@ textarea:focus-visible {
 }
 
 .user-tray:hover {
-  transform: translateY(-1px);
+  transform: none;
+}
+
+/* Bridge the gap to the dropdown so hover isn't lost */
+.user-tray::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: transparent;
 }
 
 .user-rank-badge {
@@ -682,6 +693,13 @@ textarea:focus-visible {
   overflow: hidden;
   transform-origin: top right;
   animation: dropdownIn 0.3s var(--ease);
+}
+
+
+/* Prevent internal buttons from jumping and causing hover flicker */
+.user-dropdown .btn,
+.user-dropdown .btn:hover {
+  transform: none !important;
 }
 
 @keyframes dropdownIn {

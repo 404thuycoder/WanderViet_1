@@ -235,9 +235,18 @@
         <div class="hero-content">
             <span class="p-badge" id="p-cat">Elite Experience</span>
             <h1 id="p-title" style="font-family:'Plus Jakarta Sans'; font-size:4.5rem; font-weight:800; margin:0 0 24px; letter-spacing:-3px; line-height:1;">...</h1>
-            <div style="display:flex; gap:40px; color:var(--text-dim); font-weight:700; font-size:1.1rem;">
-                <span>⭐ <b style="color:var(--text-main);" id="p-rate">5.0</b> Ratings</span>
+            <div style="display:flex; gap:40px; color:var(--text-dim); font-weight:700; font-size:1.1rem; flex-wrap: wrap;">
+                <span>⭐ <b style="color:var(--text-main);" id="p-rate">5.0</b> <span id="p-review-count" style="font-size:0.9rem; font-weight:500; opacity:0.8;">(0 đánh giá)</span></span>
+                <span title="Lượt lưu">❤️ <b style="color:var(--text-main);" id="p-fav-count">0</b> lượt lưu</span>
                 <span>📍 <span id="p-addr">...</span></span>
+            </div>
+            <div style="display:flex; gap:16px; margin-top:28px; flex-wrap:wrap;" id="p-actions">
+                <button class="btn" style="background:linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.05)); border-radius:16px; padding:12px 28px; color:#fecaca; font-weight:700; border:1px solid rgba(239, 68, 68, 0.3); backdrop-filter:blur(12px); display:inline-flex; align-items:center; justify-content:center; gap:10px; transition:all 0.3s; box-shadow: 0 4px 15px rgba(239,68,68,0.1);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(239,68,68,0.2)'; this.style.background='rgba(239,68,68,0.25)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(239,68,68,0.1)'; this.style.background='linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.05))';" onclick="submitFavorite()">
+                    <span style="font-size:1.3rem;">🤍</span> Yêu thích
+                </button>
+                <button class="btn" id="btn-biz-feedback" style="display:none; background:linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.05)); border-radius:16px; padding:12px 28px; color:#e0e7ff; font-weight:700; border:1px solid rgba(99, 102, 241, 0.3); backdrop-filter:blur(12px); align-items:center; justify-content:center; gap:10px; transition:all 0.3s; box-shadow: 0 4px 15px rgba(99,102,241,0.1);" onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(99,102,241,0.2)'; this.style.background='rgba(99,102,241,0.25)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(99,102,241,0.1)'; this.style.background='linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.05))';" onclick="openBusinessFeedbackModal()">
+                    <span style="font-size:1.3rem;">💬</span> Phản hồi doanh nghiệp
+                </button>
             </div>
         </div>
     </section>
@@ -554,6 +563,7 @@
                 const json = await res.json();
                 if(!json.success) return;
                 const p = json.data;
+                window.currentPlace = p;
                 
                 // Update Base Info
                 document.getElementById('p-title').innerText = p.name;
@@ -562,8 +572,33 @@
                 document.getElementById('sum-price').innerText = (p.price || p.priceFrom || 0).toLocaleString('vi-VN') + ' ₫';
                 document.getElementById('sum-title').innerText = p.name;
                 document.getElementById('sum-img').src = p.image;
-                document.getElementById('p-rate').innerText = p.ratingAvg || p.rating || '5.0';
+                document.getElementById('p-rate').innerText = parseFloat(p.ratingAvg || p.rating || 5.0).toFixed(1);
+                document.getElementById('p-review-count').innerText = `(${(p.reviewCount || 0)} đánh giá)`;
+                document.getElementById('p-fav-count').innerText = p.favoritesCount || 0;
                 document.getElementById('p-addr').innerText = (p.address || 'Việt Nam').split(',').pop().trim();
+
+                // Check initial favorite state for logged-in users
+                const token = localStorage.getItem('wander_token');
+                if (token) {
+                    try {
+                        const me = await fetch('/api/auth/me', { headers: { 'x-auth-token': token } });
+                        const meJson = await me.json();
+                        if (meJson.success && meJson.user && meJson.user.favorites) {
+                            const isFavorited = meJson.user.favorites.includes(p._id);
+                            if (isFavorited) {
+                                const favBtn = document.querySelector('[onclick="submitFavorite()"]');
+                                if (favBtn) {
+                                    const icon = favBtn.querySelector('span');
+                                    if (icon) icon.textContent = '💖';
+                                    favBtn.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(220, 38, 38, 0.2))';
+                                    favBtn.style.borderColor = 'rgba(239, 68, 68, 0.6)';
+                                    favBtn.style.boxShadow = '0 4px 20px rgba(239,68,68,0.35)';
+                                }
+                            }
+                        }
+                    } catch(e) { console.error('Fav check error:', e); }
+                }
+                
                 document.getElementById('hero-img').src = p.image;
                 document.getElementById('p-cat').innerText = p.isTour ? 'ELITE TOUR' : 'ELITE EXPERIENCE';
                 
@@ -631,10 +666,126 @@
                 document.getElementById('biz-phone').innerText = p.contactPhone || p.phone || '1900 9999 (WV Support)';
                 document.getElementById('biz-email').innerText = p.contactEmail || 'elite@wanderviet.vn';
 
+                if (!p.ownerId && !p.owner) {
+                    const asideEl = document.querySelector('aside');
+                    if (asideEl) asideEl.style.display = 'none';
+                    const containerEl = document.querySelector('.content-container');
+                    if (containerEl) {
+                        containerEl.style.gridTemplateColumns = '1fr';
+                        containerEl.style.maxWidth = '1000px';
+                    }
+                } else {
+                    document.getElementById('btn-biz-feedback').style.display = 'inline-flex';
+                }
             } catch(e) { console.error('Load failed:', e); }
         }
+
+        async function submitFavorite() {
+            if (!localStorage.getItem('wander_token')) return window.WanderUI.openAuthModal();
+            const favBtn = event ? event.currentTarget : document.querySelector('[onclick="submitFavorite()"]');
+            if (favBtn) { favBtn.disabled = true; favBtn.style.opacity = '0.6'; }
+            try {
+                const res = await fetch(`/api/places/${pid}/favorite`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') },
+                    body: JSON.stringify({})
+                });
+                const json = await res.json();
+                if (json.success) {
+                    // Update count inline — no need to reload
+                    const countEl = document.getElementById('p-fav-count');
+                    if (countEl) countEl.innerText = json.favoritesCount;
+                    // Update button visual
+                    if (favBtn) {
+                        const icon = favBtn.querySelector('span');
+                        if (json.isFavorited) {
+                            if (icon) icon.textContent = '💖';
+                            favBtn.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.4), rgba(220, 38, 38, 0.2))';
+                            favBtn.style.borderColor = 'rgba(239, 68, 68, 0.6)';
+                            favBtn.style.boxShadow = '0 4px 20px rgba(239,68,68,0.35)';
+                        } else {
+                            if (icon) icon.textContent = '❤️';
+                            favBtn.style.background = 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.05))';
+                            favBtn.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+                            favBtn.style.boxShadow = '0 4px 15px rgba(239,68,68,0.1)';
+                        }
+                    }
+                    window.WanderUI.showToast(json.isFavorited ? '💖 Đã thêm vào Yêu thích!' : '💔 Đã bỏ yêu thích', json.isFavorited ? 'success' : 'info');
+                } else {
+                    window.WanderUI.showToast(json.message || 'Lỗi cập nhật yêu thích', 'error');
+                }
+            } catch(e) {
+                window.WanderUI.showToast('Lỗi kết nối máy chủ', 'error');
+            } finally {
+                if (favBtn) { favBtn.disabled = false; favBtn.style.opacity = '1'; }
+            }
+        }
+
+        function openBusinessFeedbackModal() {
+            if (!localStorage.getItem('wander_token')) return window.WanderUI.openAuthModal();
+            if (!window.currentPlace) return;
+            document.getElementById('fb-modal-title').innerText = window.currentPlace.name;
+            document.getElementById('fb-modal-img').src = window.currentPlace.image;
+            document.getElementById('biz-feedback-modal').style.display = 'flex';
+        }
+
+        function closeBusinessFeedbackModal() {
+            document.getElementById('biz-feedback-modal').style.display = 'none';
+        }
+
+        async function submitBusinessFeedback() {
+            const msgInput = document.getElementById('fb-modal-msg');
+            const msg = msgInput.value.trim();
+            if (!msg) return window.WanderUI.showToast('Vui lòng nhập nội dung.', 'error');
+            
+            const btn = document.getElementById('fb-submit-btn');
+            btn.innerHTML = '<span class="loader-inline"></span> Đang gửi...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(`/api/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') },
+                    body: JSON.stringify({
+                        message: `[Từ dịch vụ: ${document.getElementById('p-title').innerText}] ` + msg,
+                        targetRole: 'business',
+                        businessId: window.currentPlace ? window.currentPlace.ownerId : null,
+                        image: window.currentPlace ? window.currentPlace.image : null // Add image
+                    })
+                });
+                const json = await res.json();
+                if (json.success) {
+                    window.WanderUI.showToast('Đã gửi yêu cầu tới doanh nghiệp!', 'success');
+                    closeBusinessFeedbackModal();
+                    msgInput.value = '';
+                } else window.WanderUI.showToast(json.message, 'error');
+            } catch(e) { window.WanderUI.showToast('Lỗi hệ thống', 'error'); }
+            
+            btn.innerHTML = 'Gửi yêu cầu';
+            btn.disabled = false;
+        }
+
         window.onload = load;
     </script>
+    
+    <!-- Feedback Modal -->
+    <div id="biz-feedback-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:#111; border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:30px; width:90%; max-width:500px; position:relative; box-shadow:0 20px 40px rgba(0,0,0,0.5);">
+            <button onclick="closeBusinessFeedbackModal()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:#888; font-size:1.5rem; cursor:pointer; transition:0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#888'">&times;</button>
+            <h3 style="margin:0 0 20px; font-size:1.5rem; font-weight:700;">💬 Phản hồi Doanh nghiệp</h3>
+            <div style="display:flex; gap:15px; background:rgba(255,255,255,0.05); padding:15px; border-radius:16px; align-items:center; margin-bottom:20px; border:1px solid rgba(255,255,255,0.1);">
+                <img id="fb-modal-img" src="" style="width:60px; height:60px; border-radius:12px; object-fit:cover;">
+                <div>
+                    <div style="font-size:0.8rem; color:#a5b4fc; font-weight:600; margin-bottom:4px;">DỊCH VỤ / ĐỊA ĐIỂM</div>
+                    <div id="fb-modal-title" style="font-weight:700; font-size:1.1rem;">-</div>
+                </div>
+            </div>
+            <textarea id="fb-modal-msg" placeholder="Nhập câu hỏi, yêu cầu tư vấn hoặc phản hồi của bạn về dịch vụ này..." style="width:100%; height:120px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:15px; color:#fff; font-family:inherit; resize:none; margin-bottom:20px; outline:none; transition:0.3s;" onfocus="this.style.borderColor='rgba(99, 102, 241, 0.5)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"></textarea>
+            <div style="display:flex; justify-content:flex-end;">
+                <button id="fb-submit-btn" class="btn" style="background:linear-gradient(135deg, #6366f1, #4f46e5); padding:12px 30px; border-radius:12px; font-weight:700; border:none; color:#fff; cursor:pointer; transition:0.3s; box-shadow:0 4px 15px rgba(99,102,241,0.3);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(99,102,241,0.5)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(99,102,241,0.3)'" onclick="submitBusinessFeedback()">Gửi yêu cầu</button>
+            </div>
+        </div>
+    </div>
     <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
 </body>
 </html>

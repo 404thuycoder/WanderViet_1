@@ -585,6 +585,8 @@ const UserProfile = {
         }
     },
 
+
+
     loadSettings: function () {
         if (!this.isOwnProfile) {
             document.getElementById('profile-tab-content').innerHTML = '<div class="glass-card" style="text-align:center;padding:60px;"><p style="color:var(--text-muted)">Bạn không có quyền chỉnh sửa hồ sơ này.</p></div>';

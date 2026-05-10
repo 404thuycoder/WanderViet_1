@@ -1051,5 +1051,65 @@ router.use((req, res) => {
   });
 });
 
+// ==========================================
+// USER ACTIVITY STATS
+// ==========================================
+router.get('/profile/stats', auth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    // 1. Core counters
+    const postCount = await Post.countDocuments({ userId: userObjectId });
+    const interactionCount = await Interaction.countDocuments({ userId: userObjectId, type: 'like' });
+    const friendCount = await Friendship.countDocuments({ 
+      $or: [{ requester: userObjectId }, { recipient: userObjectId }], 
+      status: 'accepted' 
+    });
+    const bookingCount = await mongoose.model('Booking').countDocuments({ userId: userId.toString() });
+    
+    // 2. Activity Timeline (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const activityTimeline = await Post.aggregate([
+      { 
+        $match: { 
+          userId: userObjectId, 
+          createdAt: { $gte: thirtyDaysAgo } 
+        } 
+      },
+      { 
+        $group: { 
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, 
+          count: { $sum: 1 } 
+        } 
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // 3. Media Breakdown
+    const mediaBreakdown = await Post.aggregate([
+      { $match: { userId: userObjectId } },
+      { $unwind: "$media" },
+      { $group: { _id: "$media.type", count: { $sum: 1 } } }
+    ]);
+
+    res.json({
+      success: true,
+      stats: {
+        posts: postCount,
+        likes: interactionCount,
+        friends: friendCount,
+        bookings: bookingCount
+      },
+      timeline: activityTimeline,
+      media: mediaBreakdown
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;
 

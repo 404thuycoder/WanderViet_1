@@ -527,6 +527,10 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
             Chuyến đi của tôi
           </a>
+          <button type="button" class="user-dropdown-item" data-open-activity>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+            Thống kê hoạt động
+          </button>
           <div style="border-top:1px solid rgba(255,255,255,0.05); margin:0.5rem 0;"></div>
           <button type="button" class="user-dropdown-item" data-open-settings>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -757,12 +761,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                <div class="stats-card">
                   <span class="stats-card__label">Chuyến đi</span>
                   <span class="stats-card__value" data-stat-trips>...</span>
-                  <div class="stats-card__trend"><span style="color:#10b981">●</span> Đang lập kế hoạch</div>
+                  <div class="stats-card__trend"><span style="color:#10b981">●</span> Hành trình đã tạo</div>
                </div>
                <div class="stats-card">
-                  <span class="stats-card__label">Yêu thích</span>
-                  <span class="stats-card__value" data-stat-favs>...</span>
-                  <div class="stats-card__trend"><span style="color:#0ea5e9">●</span> Địa điểm đã lưu</div>
+                  <span class="stats-card__label">Cộng đồng</span>
+                  <span class="stats-card__value" data-stat-posts>...</span>
+                  <div class="stats-card__trend"><span style="color:#f43f5e">❤️</span> <span id="data-stat-likes-total">...</span> lượt thích</div>
                </div>
                <div class="stats-card">
                   <span class="stats-card__label">Trò chuyện</span>
@@ -2671,28 +2675,32 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       el.textContent = '...';
     });
 
-    fetch('/api/auth/user/stats', {
+     fetch('/api/auth/user/stats', {
       headers: { 'x-auth-token': token }
     })
       .then(r => r.json())
       .then(data => {
         if (!data.success) return;
 
-        const s = data.summary;
-        const c = data.charts;
+        let s = data.summary;
+        let c = data.charts;
 
         // Cập nhật summary
-        if (document.querySelector('[data-stat-trips]')) document.querySelector('[data-stat-trips]').textContent = s.trips;
-        if (document.querySelector('[data-stat-favs]')) document.querySelector('[data-stat-favs]').textContent = s.favorites;
-        if (document.querySelector('[data-stat-chat]')) document.querySelector('[data-stat-chat]').textContent = s.messages;
-        if (document.querySelector('[data-stat-exp]')) document.querySelector('[data-stat-exp]').textContent = s.exp.toLocaleString();
-        if (document.querySelector('[data-stat-rank]')) document.querySelector('[data-stat-rank]').textContent = 'Hạng: ' + s.rank;
+        const updateVal = (sel, val) => { const el = document.querySelector(sel); if(el) el.textContent = val; };
+        updateVal('[data-stat-trips]', s.trips);
+        updateVal('[data-stat-favs]', s.favorites);
+        updateVal('[data-stat-chat]', s.messages);
+        updateVal('[data-stat-posts]', s.posts);
+        updateVal('#data-stat-likes-total', s.likes);
+        updateVal('[data-stat-friends]', s.friends);
+        updateVal('[data-stat-exp]', (s.exp || 0).toLocaleString());
+        updateVal('[data-stat-rank]', 'Hạng: ' + s.rank);
 
         // 1. Hoạt động (Line Chart)
         const activityCtx = contexts[0].getContext('2d');
-        const actGradient = activityCtx.createLinearGradient(0, 0, 0, 200);
-        actGradient.addColorStop(0, 'rgba(0, 240, 255, 0.3)');
-        actGradient.addColorStop(1, 'rgba(0, 240, 255, 0)');
+        const actGradient = activityCtx.createLinearGradient(0, 0, 0, 300);
+        actGradient.addColorStop(0, 'rgba(56, 189, 248, 0.4)');
+        actGradient.addColorStop(1, 'rgba(56, 189, 248, 0)');
 
         chartInstances.line = new Chart(contexts[0], {
           type: 'line',
@@ -2700,14 +2708,16 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
             datasets: [{
               label: 'Hoạt động',
-              data: c.activity,
-              borderColor: '#00f0ff',
-              borderWidth: 3,
+              data: c.activity && c.activity.length ? c.activity : [0,0,0,0,0,0,0],
+              borderColor: '#38bdf8',
+              borderWidth: 4,
               fill: true,
               backgroundColor: actGradient,
               tension: 0.4,
-              pointRadius: 4,
-              pointBackgroundColor: '#00f0ff'
+              pointRadius: 6,
+              pointBackgroundColor: '#fff',
+              pointBorderColor: '#38bdf8',
+              pointBorderWidth: 2
             }]
           },
           options: {
@@ -2715,8 +2725,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { display: false }, ticks: { color: textColor } },
-              y: { grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1 }, beginAtZero: true }
+              x: { grid: { display: false }, ticks: { color: textColor, font: { weight: '600' } } },
+              y: { grid: { color: gridColor }, ticks: { color: textColor }, beginAtZero: true }
             }
           }
         });
@@ -2725,25 +2735,27 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         chartInstances.radar = new Chart(contexts[1], {
           type: 'radar',
           data: {
-            labels: ['Khám phá', 'Kỹ năng', 'AI', 'Dịch vụ', 'Bền bỉ', 'Sở thích'],
+            labels: ['Khám phá', 'Kỹ năng', 'AI', 'Cộng đồng', 'Bền bỉ', 'Sở thích'],
             datasets: [{
-              data: c.radar,
-              backgroundColor: 'rgba(0, 85, 255, 0.2)',
-              borderColor: '#0055ff',
-              borderWidth: 2,
-              pointRadius: 3
+              data: c.radar && c.radar.length ? c.radar : [50, 50, 50, 50, 50, 50],
+              backgroundColor: 'rgba(244, 63, 94, 0.2)',
+              borderColor: '#f43f5e',
+              borderWidth: 3,
+              pointRadius: 4,
+              pointBackgroundColor: '#f43f5e'
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: { padding: 15 },
             plugins: { legend: { display: false } },
             scales: {
               r: {
                 grid: { color: gridColor },
                 angleLines: { color: gridColor },
-                pointLabels: { color: textColor, font: { size: 10 } },
-                ticks: { display: false, max: 100 },
+                pointLabels: { color: textColor, font: { size: 12, weight: '700' } },
+                ticks: { display: false },
                 suggestedMin: 0, suggestedMax: 100
               }
             }
@@ -2751,16 +2763,16 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         });
 
         // 3. Vùng miền (Bar Chart)
-        const regions = Object.keys(c.regions);
-        const regionValues = Object.values(c.regions);
+        const regions = Object.keys(c.regions || {});
+        const regionValues = Object.values(c.regions || {});
         chartInstances.region = new Chart(contexts[2], {
           type: 'bar',
           data: {
             labels: regions.length ? regions : ['Chưa có'],
             datasets: [{
               data: regionValues.length ? regionValues : [0],
-              backgroundColor: ['#00f0ff', '#0055ff', '#f43f5e', '#10b981', '#fbbf24', '#8b5cf6'],
-              borderRadius: 8
+              backgroundColor: ['#38bdf8', '#8b5cf6', '#f43f5e', '#10b981', '#fbbf24', '#f97316'],
+              borderRadius: 12
             }]
           },
           options: {
@@ -2768,29 +2780,41 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-              x: { grid: { display: false }, ticks: { color: textColor } },
-              y: { grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1 }, beginAtZero: true }
+              x: { grid: { display: false }, ticks: { color: textColor, font: { weight: '600' } } },
+              y: { grid: { color: gridColor }, ticks: { color: textColor }, beginAtZero: true }
             }
           }
         });
 
         // 4. Sở thích (Doughnut Chart)
-        const interests = c.interests.slice(0, 5);
+        const interests = c.interests && c.interests.length ? c.interests.slice(0, 5) : ['Trống'];
         chartInstances.cat = new Chart(contexts[3], {
           type: 'doughnut',
           data: {
-            labels: interests.length ? interests : ['Chưa cập nhật'],
+            labels: interests,
             datasets: [{
-              data: interests.length ? interests.map(() => 1) : [1],
-              backgroundColor: ['#00f0ff', '#8b5cf6', '#fbbf24', '#f43f5e', '#10b981'],
-              borderWidth: 0
+              data: interests.length ? interests.map((_, i) => 20 - i * 3) : [1],
+              backgroundColor: ['#38bdf8', '#8b5cf6', '#fbbf24', '#f43f5e', '#10b981'],
+              borderWidth: 0,
+              hoverOffset: 20
             }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'right', labels: { color: textColor, boxWidth: 12, font: { size: 10 } } } },
-            cutout: '75%'
+            layout: { padding: 10 },
+            plugins: { 
+               legend: { 
+                  position: 'right', 
+                  labels: { 
+                    color: textColor, 
+                    boxWidth: 12, 
+                    padding: 12, 
+                    font: { size: 11, weight: '600' } 
+                  } 
+               } 
+            },
+            cutout: '70%'
           }
         });
 
@@ -3249,6 +3273,64 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       [data-theme="light"] .loading-shimmer {
         background: linear-gradient(90deg, rgba(0,0,0,0.05) 25%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.05) 75%);
         background-size: 200% 100%;
+      }
+
+      /* Stats Modal Premium Styles */
+      .stats-summary-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 3rem;
+      }
+      .stats-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 1.75rem;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        position: relative;
+        overflow: hidden;
+      }
+      .stats-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--primary);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4), 0 0 15px rgba(56, 189, 248, 0.2);
+      }
+      .stats-card::after {
+        content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.05) 0%, transparent 70%);
+        pointer-events: none; opacity: 0; transition: opacity 0.3s;
+      }
+      .stats-card:hover::after { opacity: 1; }
+      .stats-card__label {
+        display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted);
+        text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;
+      }
+      .stats-card__value {
+        display: block; font-size: 2.2rem; font-weight: 900; color: #fff;
+        font-family: 'Outfit', sans-serif; line-height: 1.2; margin-bottom: 0.75rem;
+      }
+      .stats-card__trend {
+        font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;
+      }
+      .activity-charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+      }
+      .chart-container {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 1.5rem;
+        height: 420px;
+        display: flex;
+        flex-direction: column;
+      }
+      .chart-title {
+        font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; color: var(--text);
+        display: flex; align-items: center; gap: 8px;
       }
     `;
     document.head.appendChild(style);

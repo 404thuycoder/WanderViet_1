@@ -95,6 +95,49 @@ async function resolveUserId(idStr) {
   return result;
 }
 
+// Helper: process post for API response (media URLs & reactions)
+function processPost(post, baseUrl) {
+  if (!post) return null;
+  const p = post.toObject ? post.toObject() : JSON.parse(JSON.stringify(post));
+  
+  // Sync author info if populated
+  if (post.userId && typeof post.userId === 'object') {
+    p.userName = post.userId.displayName || post.userId.name || p.userName;
+    p.userAvatar = post.userId.avatar || p.userAvatar;
+  }
+
+  // Sync comment authors if populated
+  if (p.comments && Array.isArray(p.comments)) {
+    p.comments = p.comments.map((c, idx) => {
+        const originalComment = post.comments && post.comments[idx];
+        if (originalComment && originalComment.userId && typeof originalComment.userId === 'object') {
+            c.userName = originalComment.userId.displayName || originalComment.userId.name || c.userName;
+            c.userAvatar = originalComment.userId.avatar || c.userAvatar;
+        }
+        return c;
+    });
+  }
+  
+  // Fix media URLs
+  if (p.media && Array.isArray(p.media)) {
+    p.media = p.media.map(m => {
+      if (m.url && m.url.startsWith('/uploads/')) {
+        m.url = `${baseUrl}${m.url}`;
+      }
+      return m;
+    });
+  }
+
+  // Convert Map to Object for JSON
+  if (post.reactions instanceof Map) {
+    p.reactions = Object.fromEntries(post.reactions);
+  } else {
+    p.reactions = p.reactions || {};
+  }
+
+  return p;
+}
+
 // ==========================================
 // STORIES ROUTES (MOVED TO TOP)
 // ==========================================
@@ -274,6 +317,7 @@ router.post('/like', auth, async (req, res) => {
   try {
     const { targetId, targetType } = req.body;
     const userId = req.user.id;
+    const realId = await resolveUserId(userId); // ⭐ FIX: resolve to ObjectId
 
     // Kiểm tra xem đã like chưa
     const existing = await Interaction.findOne({ userId, targetId, type: 'like' });
@@ -302,7 +346,7 @@ router.post('/like', auth, async (req, res) => {
         place.favoritesCount = (place.favoritesCount || 0) + 1;
         await place.save();
 
-        // GỬI THÔNG BÁO CHO DOANH NGHIỆP (Nếu có chủ sở hữu)
+        // GỌi THÔNG BÁO CHO DOANH NGHIỆP (Nếu có chủ sở hữu)
         if (place.ownerId) {
           const notification = new Notification({
             recipientId: place.ownerId,
@@ -320,14 +364,23 @@ router.post('/like', auth, async (req, res) => {
       }
     } else if (targetType === 'post') {
       // XỬ LÝ LIKE CHO BÀI VIẾT (SOCIAL POST)
-      const post = await Post.findOne({ _id: mongoose.Types.ObjectId.isValid(targetId) ? targetId : new mongoose.Types.ObjectId() });
+      if (!mongoose.Types.ObjectId.isValid(targetId)) {
+        return res.json({ success: true, message: 'Đã thêm vào yêu thích!' });
+      }
+      const post = await Post.findById(targetId);
       if (post) {
-        if (!post.likes.includes(userId)) {
-          post.likes.push(userId);
+        // ⭐ UPDATE: Also save to reactions map for consistency
+        if (!post.reactions) post.reactions = new Map();
+        post.reactions.set(realId.toString(), 'like');
+        post.markModified('reactions');
+
+        const alreadyLiked = post.likes.some(lid => lid.equals(realId));
+        if (!alreadyLiked) {
+          post.likes.push(realId); // push ObjectId, not string
           await post.save();
           
           // Thông báo cho chủ bài viết
-          if (post.userId.toString() !== userId.toString()) {
+          if (post.userId.toString() !== realId.toString()) {
             const notification = new Notification({
               recipientId: post.userId,
               recipientType: 'user',
@@ -335,7 +388,7 @@ router.post('/like', auth, async (req, res) => {
               senderName: req.user.displayName || req.user.name,
               type: 'like',
               title: 'Bài viết của bạn có lượt thích mới! ❤️',
-              message: `${req.user.displayName || req.user.name} đã thích bài viết "${post.content.substring(0, 20)}..." của bạn.`,
+              message: `${req.user.displayName || req.user.name} đã thích bài viết "${(post.content || '').substring(0, 20)}..." của bạn.`,
               relatedId: post._id,
               link: `/apps/user-web/social-hub.html`
             });
@@ -350,6 +403,8 @@ router.post('/like', auth, async (req, res) => {
               relatedId: post._id
             });
           }
+        } else {
+          await post.save(); // Save the reactions map update
         }
       }
     }
@@ -421,7 +476,13 @@ router.post('/posts', auth, async (req, res) => {
       userName: req.user.displayName || req.user.name, 
       userAvatar: req.user.avatar || '',
       content, 
-      media: media || [], 
+      media: (media || []).map(m => {
+        if (m.url && m.url.includes('/uploads/')) {
+          const parts = m.url.split('/uploads/');
+          m.url = '/uploads/' + parts[parts.length - 1];
+        }
+        return m;
+      }), 
       mediaLayout: req.body.mediaLayout || 'grid',
       location: location || null,
       attachment: attachment || undefined,
@@ -470,38 +531,9 @@ router.get('/feed', auth, async (req, res) => {
     .populate('comments.userId', 'name displayName avatar');
     
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-    
-    // Map lại data để đảm bảo name/avatar luôn mới nhất từ User model
-    const populatedPosts = posts.map(post => {
-      const p = post.toObject();
-      // Post Author
-      if (post.userId && typeof post.userId === 'object') {
-        p.userName = post.userId.displayName || post.userId.name;
-        p.userAvatar = post.userId.avatar;
-      }
-      // Comments Authors
-      if (p.comments && Array.isArray(p.comments)) {
-        p.comments = p.comments.map(c => {
-            if (c.userId && typeof c.userId === 'object') {
-                c.userName = c.userId.displayName || c.userId.name;
-                c.userAvatar = c.userId.avatar;
-            }
-            return c;
-        });
-      }
-      // Fix media URLs - convert relative to absolute
-      if (p.media && Array.isArray(p.media)) {
-        p.media = p.media.map(m => {
-          if (m.url && m.url.startsWith('/uploads/')) {
-            m.url = `${baseUrl}${m.url}`;
-          }
-          return m;
-        });
-      }
-      return p;
-    });
+    const data = posts.map(p => processPost(p, baseUrl));
 
-    res.json({ success: true, data: populatedPosts });
+    res.json({ success: true, data });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
@@ -649,7 +681,18 @@ router.post('/unlike', auth, async (req, res) => {
     const realId = await resolveUserId(req.user.id);
     const { targetId, targetType } = req.body;
     await Interaction.deleteOne({ userId: req.user.id, targetId, type: 'like' });
-    if (targetType === 'post') await Post.findByIdAndUpdate(targetId, { $pull: { likes: realId } });
+    
+    if (targetType === 'post') {
+      const post = await Post.findById(targetId);
+      if (post) {
+        post.likes = post.likes.filter(id => id.toString() !== realId.toString());
+        if (post.reactions) {
+          post.reactions.delete(realId.toString());
+          post.markModified('reactions');
+        }
+        await post.save();
+      }
+    }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
@@ -706,20 +749,7 @@ router.get('/posts/user/:userId', auth, async (req, res) => {
     const posts = await Post.find({ userId: targetId }).sort({ createdAt: -1 }).limit(50);
     
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const fixedPosts = posts.map(p => {
-      const post = p.toObject();
-      if (post.media && Array.isArray(post.media)) {
-        post.media = post.media.map(m => {
-          if (m.url && m.url.startsWith('/uploads/')) {
-            m.url = `${baseUrl}${m.url}`;
-          }
-          return m;
-        });
-      }
-      return post;
-    });
-    
-    res.json({ success: true, data: fixedPosts });
+    res.json({ success: true, data: posts.map(p => processPost(p, baseUrl)) });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
@@ -729,18 +759,8 @@ router.get('/posts/:id', auth, async (req, res) => {
     const post = await Post.findById(req.params.id);
     if (!post) return res.status(404).json({ message: 'Không tìm thấy' });
     
-    const result = post.toObject();
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-    if (result.media && Array.isArray(result.media)) {
-      result.media = result.media.map(m => {
-        if (m.url && m.url.startsWith('/uploads/')) {
-          m.url = `${baseUrl}${m.url}`;
-        }
-        return m;
-      });
-    }
-    
-    res.json({ success: true, data: result });
+    res.json({ success: true, data: processPost(post, baseUrl) });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
@@ -755,7 +775,7 @@ router.post('/posts/media', auth, upload.array('media', 5), async (req, res) => 
       else if (f.mimetype.startsWith('audio')) type = 'audio';
       
       console.log(`[Upload] File saved: ${f.filename} (${f.size} bytes) at ${f.path}`);
-      return { url: `${baseUrl}/uploads/${f.filename}`, type };
+      return { url: `/uploads/${f.filename}`, type }; // ⭐ Relative path
     });
     
     let attachmentData;
@@ -775,11 +795,8 @@ router.post('/posts/media', auth, upload.array('media', 5), async (req, res) => 
     });
     await post.save();
     const populatedPost = await Post.findById(post._id).populate('userId', 'name displayName avatar rank rankTier');
-    const result = populatedPost.toObject();
-    if (populatedPost.userId && typeof populatedPost.userId === 'object') {
-        result.userName = populatedPost.userId.displayName || populatedPost.userId.name;
-        result.userAvatar = populatedPost.userId.avatar;
-    }
+    
+    const result = processPost(populatedPost, baseUrl);
     
     // Real-time: broadcast new post to all friends
     try {
@@ -972,12 +989,15 @@ router.post('/posts/:id/reaction', auth, async (req, res) => {
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ success: false, message: 'Không tìm thấy bài viết' });
 
-    if (!post.reactions) post.reactions = {};
-    post.reactions[realUserId] = reaction;
+    if (!post.reactions) post.reactions = new Map();
+    post.reactions.set(realUserId.toString(), reaction);
     
     // Also update legacy likes array if it's a 'like'
-    if (reaction === 'like' && !post.likes.includes(realUserId)) {
+    if (reaction === 'like' && !post.likes.some(lid => lid.equals(realUserId))) {
       post.likes.push(realUserId);
+    } else if (reaction !== 'like') {
+      // If changed to another reaction, remove from legacy likes
+      post.likes = post.likes.filter(id => id.toString() !== realUserId.toString());
     }
 
     // Mark modified for Map types in Mongoose
@@ -1008,8 +1028,8 @@ router.delete('/posts/:id/reaction', auth, async (req, res) => {
     const post = await Post.findById(postId);
     if (!post) return res.status(404).json({ success: false, message: 'Không tìm thấy bài viết' });
 
-    if (post.reactions && post.reactions[realUserId]) {
-      delete post.reactions[realUserId];
+    if (post.reactions) {
+      post.reactions.delete(realUserId.toString());
       post.markModified('reactions');
     }
     

@@ -1265,7 +1265,15 @@ router.get('/social/posts', adminTokenAuth, adminAuth, async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(200)
       .lean();
-    res.json({ success: true, data: posts });
+
+    // Map counts
+    const data = posts.map(p => ({
+      ...p,
+      likesCount: p.likes ? p.likes.length : 0,
+      commentsCount: p.comments ? p.comments.length : 0
+    }));
+
+    res.json({ success: true, data });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi tải danh sách bài viết' });
   }
@@ -1312,7 +1320,15 @@ router.get('/social/stories', adminTokenAuth, adminAuth, async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(200)
       .lean();
-    res.json({ success: true, data: stories });
+
+    // Map counts
+    const data = stories.map(s => ({
+      ...s,
+      likesCount: s.likes ? s.likes.length : 0,
+      commentsCount: s.comments ? s.comments.length : 0
+    }));
+
+    res.json({ success: true, data });
   } catch (err) {
     res.status(500).json({ success: false, message: 'Lỗi tải danh sách thước phim' });
   }

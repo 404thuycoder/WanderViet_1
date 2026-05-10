@@ -1607,8 +1607,9 @@ const SocialHub = {
         console.log('[PostCard] Rendering post:', post._id, 'Media:', JSON.stringify(post.media));
         // Xử lý reactions (6 loại: like, love, wow, haha, sad, angry)
         const reactions = post.reactions || {};
-        const userReaction = reactions[this.user?._id] || null;
-        const totalReactions = Object.values(reactions).length;
+        const currentUserId = this.user?._id || this.user?.id;
+        const userReaction = currentUserId ? reactions[String(currentUserId)] : null;
+        const totalReactions = Object.keys(reactions).length;
 
         // Đếm từng loại reaction
         const reactionCounts = { like: 0, love: 0, wow: 0, haha: 0, sad: 0, angry: 0 };
@@ -1855,13 +1856,18 @@ const SocialHub = {
         ).join('')}
                 </div>
                 <div class="reactions-list">
-                    ${users.map(u => `
+                    ${users.map(u => {
+                        const isMe = String(u.userId) === String(this.user?._id || this.user?.id);
+                        const name = isMe ? 'Bạn' : 'Người dùng WanderViệt';
+                        const avatar = isMe ? (this.user?.avatar || '/assets/default-avatar.svg') : '/assets/default-avatar.svg';
+                        return `
                         <div class="reaction-user-item">
-                            <img src="/assets/default-avatar.svg" class="avatar-sm">
-                            <span>Người dùng</span>
+                            <img src="${avatar}" class="avatar-sm">
+                            <span>${name}</span>
                             <span class="user-reaction">${this.getReactionEmoji(u.reaction)}</span>
                         </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;

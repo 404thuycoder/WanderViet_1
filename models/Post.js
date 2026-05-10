@@ -27,6 +27,11 @@ const postSchema = new mongoose.Schema({
   },
   
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  reactions: {
+    type: Map,
+    of: String,
+    default: {}
+  },
   comments: [{
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     userName: String,

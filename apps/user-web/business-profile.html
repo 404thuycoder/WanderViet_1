@@ -1,6 +1,35 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+
+    <!-- WanderViet Translation Curtain -->
+    <script>
+      if (document.cookie.match(/googtrans=\/vi\/(?!vi)[a-zA-Z-]+/)) {
+        document.documentElement.classList.add('translating-curtain');
+      }
+    </script>
+    <style>
+      html.translating-curtain::before {
+        content: "Translating Experience...";
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: #0f172a; color: #f1f5f9;
+        display: flex; align-items: center; justify-content: center;
+        z-index: 9999999; font-family: sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 1px;
+      }
+      html.translating-curtain body {
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+      html.translated-ltr::before, html.translated-rtl::before {
+        display: none !important;
+      }
+      html.translated-ltr body, html.translated-rtl body {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transition: opacity 0.4s ease;
+      }
+    </style>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hồ sơ Doanh nghiệp — WanderViệt</title>
@@ -127,7 +156,7 @@
     </main>
 
     <footer id="footer-container"></footer>
-    <script src="SharedUI.js?v=47"></script>
+    <script src="SharedUI.js?v=1778466754685"></script>
     <script>
         const observer = new MutationObserver(() => {
             const t = document.documentElement.getAttribute('data-theme') || 'dark';

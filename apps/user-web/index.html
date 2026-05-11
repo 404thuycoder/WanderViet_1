@@ -2,6 +2,35 @@
 <html lang="vi" data-theme="dark">
 
 <head>
+
+    <!-- WanderViet Translation Curtain -->
+    <script>
+      if (document.cookie.match(/googtrans=\/vi\/(?!vi)[a-zA-Z-]+/)) {
+        document.documentElement.classList.add('translating-curtain');
+      }
+    </script>
+    <style>
+      html.translating-curtain::before {
+        content: "Translating Experience...";
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: #0f172a; color: #f1f5f9;
+        display: flex; align-items: center; justify-content: center;
+        z-index: 9999999; font-family: sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 1px;
+      }
+      html.translating-curtain body {
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+      html.translated-ltr::before, html.translated-rtl::before {
+        display: none !important;
+      }
+      html.translated-ltr body, html.translated-rtl body {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transition: opacity 0.4s ease;
+      }
+    </style>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description"
@@ -619,7 +648,7 @@
       </div>
     </div>
 
-  <!-- Unified Global Chatbot will be injected here by SharedUI.js?v=1777307000000 -->
+  <!-- Unified Global Chatbot will be injected here by SharedUI.js?v=1778466754685 -->
 
 
   <!-- ===== PARTNER LOGOS ===== -->
@@ -671,16 +700,16 @@
   </footer>
 
 
-  <!-- voice-overlay will be injected by SharedUI.js?v=1777307000000 -->
-  <!-- voice-overlay will be injected by SharedUI.js?v=1777335000003 -->
-  <!-- voice-overlay will be injected by SharedUI.js?v=1777335000005 -->
-  <!-- voice-overlay will be injected by SharedUI.js?v=1777335000005 -->
+  <!-- voice-overlay will be injected by SharedUI.js?v=1778466754685 -->
+  <!-- voice-overlay will be injected by SharedUI.js?v=1778466754685 -->
+  <!-- voice-overlay will be injected by SharedUI.js?v=1778466754685 -->
+  <!-- voice-overlay will be injected by SharedUI.js?v=1778466754685 -->
 
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
   <script src="places-data.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/regenerator-runtime/0.13.11/runtime.min.js" defer></script>
-  <script src="SharedUI.js?v=1777335000501"></script>
+  <script src="SharedUI.js?v=1778466754685"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="voice-helper.js?v=1777335000009" defer></script>
   <script src="chat-brain.js?v=1777335000009" defer></script>

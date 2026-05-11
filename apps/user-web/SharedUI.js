@@ -1,3 +1,24 @@
+
+  // WanderViet Translation Curtain Safety Fallback
+  (function() {
+    const curtainTimeout = setTimeout(() => {
+      document.documentElement.classList.remove('translating-curtain');
+      console.log("🕒 Translation curtain fallback triggered (1.5s)");
+    }, 1500);
+
+    window.addEventListener('load', () => {
+      // If page is fully loaded and curtain still there, remove it
+      setTimeout(() => {
+        document.documentElement.classList.remove('translating-curtain');
+      }, 500);
+    });
+
+    document.addEventListener('google-translate-finished', () => {
+      clearTimeout(curtainTimeout);
+      document.documentElement.classList.remove('translating-curtain');
+    });
+  })();
+
 /**
  * WanderViệt Shared UI Logic
  * Theme, Toast, Notifications, Rank Badges, Common Modals
@@ -860,7 +881,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           <span aria-hidden="true">💬</span>
           <span class="visually-hidden">Mở trợ lý du lịch</span>
         </button>
-        <div id="global-chat-panel" class="chat-panel" hidden>
+        <div id="global-chat-panel" class="chat-panel notranslate" hidden>
           <div class="chat-panel__head">
             <div class="chat-panel__head-left">
               <strong>Trợ lý WanderViệt</strong>
@@ -877,6 +898,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                   <button type="button" data-lang="fr">Français (FR)</button>
                 </div>
               </div>
+              <button type="button" class="btn-icon-sm" title="Phóng to" id="global-chat-expand-btn">⤢</button>
               <button type="button" class="btn-icon-sm" title="Chat mới" id="global-chat-new-btn">➕</button>
               <button type="button" class="btn-icon-sm" title="Lịch sử chat" id="global-chat-history-btn">🕒</button>
             </div>
@@ -1814,6 +1836,14 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     const form = document.getElementById('global-chat-form');
     const input = document.getElementById('global-chat-input');
     const log = document.getElementById('global-chat-log');
+    const isChatPage = window.location.pathname.includes('chatbot.html');
+    if (isChatPage) {
+        document.body.appendChild(panel);
+        panel.hidden = false;
+        panel.classList.add('chat-panel--fullscreen');
+        if (fabWrap) fabWrap.style.display = 'none';
+    }
+
 
     function togglePanel() {
       const isOpen = !panel.hidden;
@@ -1842,8 +1872,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     // Đảm bảo mỗi lần reset trang là một phiên chat mới hoàn toàn (như ChatGPT)
     // Các hội thoại cũ sẽ nằm trong phần Lịch sử (History)
-    localStorage.removeItem('wander_current_session');
-    localStorage.removeItem('wander_shared_chat');
+    // localStorage.removeItem('wander_current_session'); // Preserved for sync
+    // localStorage.removeItem('wander_shared_chat'); // Preserved for sync
     let currentSessionId = null;
 
     // Flag: chỉ đọc to (TTS) khi user dùng giọng nói, không đọc khi gõ text
@@ -1918,12 +1948,57 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       log.scrollTop = log.scrollHeight;
     }
 
-    const DEFAULT_SUGGESTIONS = [
-      { text: '🗺️ Lập lịch trình', query: 'Lập lịch trình du lịch cho mình' },
-      { text: '🏨 Tìm chỗ ở', query: 'Tìm khách sạn hoặc homestay đẹp' },
-      { text: '🍽️ Món ngon', query: 'Gợi ý các món ăn đặc sản địa phương' },
-      { text: '📸 Điểm check-in', query: 'Những địa điểm chụp ảnh đẹp nhất' }
-    ];
+    
+    function getLocalizedGreeting() {
+      const lang = localStorage.getItem('wander_chat_lang') || 'auto';
+      if (lang === 'en') return 'Hello! I am ready for a new conversation. How can I help you with your trip?';
+      if (lang === 'kr') return '안녕하세요! 새로운 대화를 시작할 준비가 되었습니다. 여행과 관련하여 무엇을 도와드릴까요?';
+      if (lang === 'jp') return 'こんにちは！新しい会話の準備ができました。ご旅行について何かお手伝いできることはありますか？';
+      if (lang === 'zh') return '你好！我已经准备好进行新的对话了。关于您的旅行，我能帮您什么忙吗？';
+      if (lang === 'fr') return 'Bonjour ! Je suis prêt pour une nouvelle conversation. Comment puis-je vous aider avec votre voyage ?';
+      return 'Chào bạn! Tôi đã sẵn sàng cho cuộc trò chuyện mới. Mình có thể giúp gì cho chuyến đi của bạn?';
+    }
+
+    function getDefaultSuggestions() {
+      const lang = localStorage.getItem('wander_chat_lang') || 'auto';
+      if (lang === 'en') return [
+        { text: '🗺️ Plan Itinerary', query: 'Plan a travel itinerary for me' },
+        { text: '🏨 Find Accommodation', query: 'Find a nice hotel or homestay' },
+        { text: '🍽️ Local Food', query: 'Suggest some local specialties' },
+        { text: '📸 Check-in Spots', query: 'Best spots for photography' }
+      ];
+      if (lang === 'kr') return [
+        { text: '🗺️ 일정 계획', query: '여행 일정을 계획해 주세요' },
+        { text: '🏨 숙소 찾기', query: '좋은 호텔이나 숙소를 찾아주세요' },
+        { text: '🍽️ 로컬 맛집', query: '현지 특산물을 추천해 주세요' },
+        { text: '📸 사진 명소', query: '사진 찍기 좋은 최고의 장소' }
+      ];
+      if (lang === 'jp') return [
+        { text: '🗺️ 日程を作成', query: '旅行のスケジュールを作成してください' },
+        { text: '🏨 宿泊先を探す', query: '素敵なホテルや民泊を見つけてください' },
+        { text: '🍽️ 地元グルメ', query: '地元の名物料理を提案してください' },
+        { text: '📸 撮影スポット', query: '写真撮影に最適なスポット' }
+      ];
+      if (lang === 'fr') return [
+        { text: '🗺️ Planifier l\'itinéraire', query: 'Planifiez un itinéraire de voyage pour moi' },
+        { text: '🏨 Trouver un logement', query: 'Trouver un bel hôtel ou chez l\'habitant' },
+        { text: '🍽️ Spécialités locales', query: 'Suggérer des spécialités locales' },
+        { text: '📸 Lieux de photos', query: 'Meilleurs endroits pour la photographie' }
+      ];
+      if (lang === 'zh') return [
+        { text: '🗺️ 计划行程', query: '为我制定一个旅行行程' },
+        { text: '🏨 寻找住宿', query: '找一家不错的酒店或民宿' },
+        { text: '🍽️ 当地美食', query: '推荐一些当地特色美食' },
+        { text: '📸 打卡地点', query: '最适合拍照的景点' }
+      ];
+      return [
+        { text: '🗺️ Lập lịch trình', query: 'Lập lịch trình du lịch cho mình' },
+        { text: '🏨 Tìm chỗ ở', query: 'Tìm khách sạn hoặc homestay đẹp' },
+        { text: '🍽️ Món ngon', query: 'Gợi ý các món ăn đặc sản địa phương' },
+        { text: '📸 Điểm check-in', query: 'Những địa điểm chụp ảnh đẹp nhất' }
+      ];
+    }
+
 
     function appendMsg(text, role, isHtml, skipCache = false) {
       if (!text) return;
@@ -1980,14 +2055,14 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         const arr = JSON.parse(localStorage.getItem('wander_shared_chat') || '[]');
         if (arr.length > 0) {
           arr.forEach(m => {
-            appendMsg(m.text, m.role, false, true); // skipCache = true
+            appendMsg(m.text, m.role, m.isHTML || false, true); // skipCache = true
           });
         } else if (!currentSessionId) {
-          appendMsg('Xin chào! Tôi là Trợ lý WanderViệt 🌟 Hỏi tôi bất cứ điều gì về du lịch Việt Nam nhé!', 'bot');
-          renderSuggestions(DEFAULT_SUGGESTIONS);
+          appendMsg(getLocalizedGreeting(), 'bot');
+          renderSuggestions(getDefaultSuggestions());
         }
       } catch (e) {
-        if (!currentSessionId) appendMsg('Xin chào! Tôi là Trợ lý WanderViệt 🌟 Hỏi tôi bất cứ điều gì về du lịch Việt Nam nhé!', 'bot');
+        if (!currentSessionId) appendMsg(getLocalizedGreeting(), 'bot');
       }
     }
 
@@ -2098,9 +2173,34 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         localStorage.removeItem('wander_current_session');
         localStorage.removeItem('wander_shared_chat');
         log.innerHTML = '';
-        appendMsg('Chào bạn! Tôi đã sẵn sàng cho cuộc trò chuyện mới. Mình có thể giúp gì cho chuyến đi của bạn?', 'bot');
-        renderSuggestions(DEFAULT_SUGGESTIONS);
+        appendMsg(getLocalizedGreeting(), 'bot');
+        renderSuggestions(getDefaultSuggestions());
       };
+    }
+
+
+    // --- COMPREHENSIVE CHAT LOGIC (Expand/Shrink/Auto-open) ---
+    const expandBtn = document.getElementById('global-chat-expand-btn');
+    if (isChatPage) {
+      if (expandBtn) {
+        expandBtn.innerHTML = '⤓';
+        expandBtn.title = 'Thu nhỏ';
+        expandBtn.onclick = (e) => {
+          e.preventDefault();
+          window.location.href = 'index.html?openchat=true';
+        };
+      }
+    } else {
+      if (expandBtn) {
+        expandBtn.onclick = (e) => {
+          e.preventDefault();
+          window.location.href = 'chatbot.html';
+        };
+      }
+      if (window.location.search.includes('openchat=true')) {
+        panel.hidden = false;
+        fab.setAttribute('aria-expanded', 'true');
+      }
     }
 
     // History Button
@@ -2545,9 +2645,16 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     // Welcome message or resume session
     setTimeout(() => {
-      loadSharedChat(); // Load instantly from cache
-      if (currentSessionId) {
-        loadChatHistory(currentSessionId); // Sync with server in background
+      const _sharedCache = JSON.parse(localStorage.getItem('wander_shared_chat') || '[]');
+      if (_sharedCache.length > 0) {
+        // Has cached messages - restore them (works for expand/shrink sync)
+        loadSharedChat();
+      } else if (currentSessionId) {
+        // No local cache - load from server
+        loadChatHistory(currentSessionId);
+      } else {
+        // Fresh start
+        loadSharedChat();
       }
     }, 100);
 
@@ -3235,7 +3342,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAll);
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initAll); } else { initAll(); }
   } else {
     initAll();
   }

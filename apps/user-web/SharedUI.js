@@ -1040,35 +1040,59 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
               </div>
               <button type="button" class="btn-icon-sm" title="Chat mới" id="global-chat-new-btn">➕</button>
               <button type="button" class="btn-icon-sm" title="Lịch sử chat" id="global-chat-history-btn">🕒</button>
+              <button type="button" class="btn-icon-sm chat-panel__expand-btn" id="global-chat-expand-btn" title="Phóng to / Thu nhỏ" aria-label="Phóng to chatbot" aria-pressed="false" style="font-size:15px; line-height:1;">⛶</button>
             </div>
             <button type="button" class="chat-panel__close" id="global-chat-close" aria-label="Đóng chat">×</button>
           </div>
           
-          <div class="chat-sessions-sidebar" id="global-chat-sessions-view" hidden>
-            <div class="chat-sessions-sidebar__inner">
-              <div class="chat-sessions-sidebar__header">
-                <span>Lịch sử trò chuyện</span>
-                <button type="button" class="btn-close-sidebar" id="global-chat-history-close">×</button>
+          <div class="chat-panel__main-container">
+            <div class="chat-sessions-sidebar" id="global-chat-sessions-view" hidden>
+              <div class="chat-sessions-sidebar__inner">
+                <div class="chat-sessions-sidebar__header">
+                  <span>Lịch sử trò chuyện</span>
+                  <button type="button" class="btn-close-sidebar" id="global-chat-history-close">×</button>
+                </div>
+                <div class="chat-sessions-sidebar__body" id="global-chat-sessions-list">
+                  <div class="chat-sessions-loading">Đang tải lịch sử...</div>
+                </div>
               </div>
-              <div class="chat-sessions-sidebar__body" id="global-chat-sessions-list">
-                <div class="chat-sessions-loading">Đang tải lịch sử...</div>
+            </div>
+
+            <div class="chat-panel__center">
+              <p class="chat-panel__disclaimer">Trợ lý ghép gợi ý từ dữ liệu trang + sở thích bạn lưu; không phải AI tổng quát. Visa/y tế vẫn cần nguồn chính thức.</p>
+              <div class="chat-log" id="global-chat-log" role="log" aria-live="polite"></div>
+              <form class="chat-form" id="global-chat-form">
+                <label class="visually-hidden" for="global-chat-input">Nhập câu hỏi</label>
+                <input id="global-chat-input" type="text" placeholder="Hỏi về du lịch Việt Nam…" autocomplete="off" />
+                <div class="companion-fab-wrapper">
+                  <div class="companion-fab" id="companion-toggle" title="Chế độ Hướng dẫn viên Chuyên gia">
+                    <span class="mic-icon">🎙️</span>
+                    <div class="pulse-rings"></div>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn--primary btn--small">Gửi</button>
+              </form>
+            </div>
+
+            <div class="chat-panel__right-sidebar" id="global-chat-info-panel">
+              <div class="chat-panel__right-inner">
+                <h4>💡 Mẹo trò chuyện</h4>
+                <div class="chat-tips-list">
+                  <div class="chat-tip-item" onclick="document.getElementById('global-chat-input').value='Lên lịch trình 3 ngày tại Đà Nẵng'; document.getElementById('global-chat-form').dispatchEvent(new Event('submit'));">📅 Lên lịch trình 3 ngày tại Đà Nẵng</div>
+                  <div class="chat-tip-item" onclick="document.getElementById('global-chat-input').value='Khách sạn gần Hồ Hoàn Kiếm'; document.getElementById('global-chat-form').dispatchEvent(new Event('submit'));">🏨 Khách sạn gần Hồ Hoàn Kiếm</div>
+                  <div class="chat-tip-item" onclick="document.getElementById('global-chat-input').value='Món ngon Sài Gòn nhất định phải thử'; document.getElementById('global-chat-form').dispatchEvent(new Event('submit'));">🥘 Món ngon Sài Gòn</div>
+                  <div class="chat-tip-item" onclick="document.getElementById('global-chat-input').value='Địa điểm sống ảo tại Hội An'; document.getElementById('global-chat-form').dispatchEvent(new Event('submit'));">📸 Check-in Hội An</div>
+                </div>
+                <hr style="opacity: 0.1; margin: 1.5rem 0;">
+                <h4>🏆 Top địa danh</h4>
+                <div class="chat-mini-list">
+                  <div class="chat-mini-item">📍 Vịnh Hạ Long</div>
+                  <div class="chat-mini-item">📍 Sa Pa</div>
+                  <div class="chat-mini-item">📍 Phú Quốc</div>
+                </div>
               </div>
             </div>
           </div>
-          
-          <p class="chat-panel__disclaimer">Trợ lý ghép gợi ý từ dữ liệu trang + sở thích bạn lưu; không phải AI tổng quát. Visa/y tế vẫn cần nguồn chính thức.</p>
-          <div class="chat-log" id="global-chat-log" role="log" aria-live="polite"></div>
-          <form class="chat-form" id="global-chat-form">
-            <label class="visually-hidden" for="global-chat-input">Nhập câu hỏi</label>
-            <input id="global-chat-input" type="text" placeholder="Hỏi về du lịch Việt Nam…" autocomplete="off" />
-            <div class="companion-fab-wrapper">
-              <div class="companion-fab" id="companion-toggle" title="Chế độ Hướng dẫn viên Chuyên gia">
-                <span class="mic-icon">🎙️</span>
-                <div class="pulse-rings"></div>
-              </div>
-            </div>
-            <button type="submit" class="btn btn--primary btn--small">Gửi</button>
-          </form>
         </div>
       </div>
       
@@ -2018,9 +2042,39 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     fab.addEventListener('click', togglePanel);
     closeBtn.addEventListener('click', (e) => {
+        // Nếu đang fullscreen, thoát fullscreen trước khi đóng
+        if (panel.classList.contains('chat-panel--fullscreen')) {
+          panel.classList.remove('chat-panel--fullscreen');
+          fabWrap.classList.remove('is-fullscreen');
+          const expandBtn = document.getElementById('global-chat-expand-btn');
+          if (expandBtn) { expandBtn.textContent = '⛶'; expandBtn.setAttribute('aria-pressed', 'false'); expandBtn.title = 'Phóng to toàn màn hình'; }
+        }
         togglePanel();
         if (window.voiceGuide) window.voiceGuide.cancelAll();
     });
+
+    // --- FULLSCREEN TOGGLE ---
+    const expandBtn = document.getElementById('global-chat-expand-btn');
+    if (expandBtn) {
+      expandBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Đảm bảo panel đang mở trước khi phóng to
+        if (panel.hidden) {
+          panel.hidden = false;
+          fab.setAttribute('aria-expanded', 'true');
+        }
+        const isFullscreen = panel.classList.toggle('chat-panel--fullscreen');
+        fabWrap.classList.toggle('is-fullscreen', isFullscreen);
+        expandBtn.textContent = isFullscreen ? '⊡' : '⛶';
+        expandBtn.setAttribute('aria-pressed', String(isFullscreen));
+        expandBtn.title = isFullscreen ? 'Thu nhỏ' : 'Phóng to toàn màn hình';
+        
+        // Tự động cuộn xuống cuối khi đổi mode để không bị lệch view
+        setTimeout(() => {
+          log.scrollTop = log.scrollHeight;
+        }, 300);
+      });
+    }
 
     // Also support external toggle buttons (like in header or hero)
     document.querySelectorAll('[data-chat-toggle]').forEach(btn => {

@@ -165,6 +165,30 @@ router.get('/destinations', async (req, res) => {
   }
 });
 
+// GET /api/public/places - Lấy danh sách địa điểm/dịch vụ công khai (có hỗ trợ lọc)
+router.get('/places', async (req, res) => {
+  try {
+    const { ownerId, kind, featured } = req.query;
+    const query = { status: 'approved' };
+    
+    if (ownerId) {
+      const ownerConditions = [{ ownerId: ownerId }];
+      if (mongoose.Types.ObjectId.isValid(ownerId)) {
+        ownerConditions.push({ ownerId: new mongoose.Types.ObjectId(ownerId) });
+      }
+      query.$or = ownerConditions;
+    }
+    
+    if (kind) query.kind = kind;
+    if (featured === 'true') query.top = true;
+
+    const places = await Place.find(query).sort({ createdAt: -1 });
+    res.json({ success: true, data: places });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // GET /api/public/all-places - Lấy TẤT CẢ dịch vụ, địa điểm (cho Business Directory)
 router.get('/all-places', async (req, res) => {
   try {

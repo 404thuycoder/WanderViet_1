@@ -1,0 +1,459 @@
+/* ============================================================
+   WanderViệt Business Web — UI Upgrade v2.0
+   Additive stylesheet — import AFTER styles.css & business.css
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* ============================================================
+   1. BODY & BASE
+   ============================================================ */
+
+body {
+  font-family: "Inter", "Be Vietnam Pro", system-ui, sans-serif;
+}
+
+h1, h2, h3, h4,
+.section-title,
+.card-title,
+.hero-title,
+.font-display {
+  font-family: "Plus Jakarta Sans", "Outfit", "Inter", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* ============================================================
+   2. SIDEBAR — Premium Dark Glass
+   ============================================================ */
+
+.sidebar,
+.biz-sidebar,
+#sidebar,
+[class*="sidebar"] {
+  background: linear-gradient(180deg, rgba(10, 15, 35, 0.97) 0%, rgba(18, 15, 61, 0.97) 100%) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+  border-right: 1px solid rgba(99, 102, 241, 0.12) !important;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Sidebar Navigation Items */
+.sidebar-item,
+.nav-item,
+.sidebar-link,
+[class*="sidebar"] a,
+[class*="sidebar"] li {
+  border-radius: 10px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.sidebar-item:hover,
+.nav-item:hover,
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #fff !important;
+}
+
+.sidebar-item.active,
+.nav-item.active,
+.sidebar-link.active,
+[class*="sidebar"] .active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.85), rgba(79, 70, 229, 0.85)) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3) !important;
+  font-weight: 600 !important;
+}
+
+/* Sidebar Group Headers */
+.sidebar-group-title,
+.nav-group-label,
+[class*="group-title"] {
+  font-size: 0.65rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: rgba(148, 163, 184, 0.6) !important;
+  padding: 0 0.75rem !important;
+  margin-bottom: 0.4rem !important;
+}
+
+/* Sidebar Profile Card */
+.sidebar-profile,
+.profile-card,
+[class*="profile-card"] {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(99, 102, 241, 0.12) !important;
+  border-radius: 14px !important;
+  padding: 1rem !important;
+  backdrop-filter: blur(12px);
+}
+
+/* ============================================================
+   3. TOPBAR / HEADER
+   ============================================================ */
+
+.topbar,
+.biz-header,
+.dashboard-header,
+.site-header {
+  background: rgba(8, 12, 28, 0.88) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.1) !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+.topbar-title,
+.dashboard-title,
+.page-title {
+  font-family: "Plus Jakarta Sans", "Outfit", sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Logo gradient */
+.logo,
+.brand-logo {
+  background: linear-gradient(135deg, #818cf8 0%, #22d3ee 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Search input */
+.search-input,
+.topbar-search input,
+[class*="search"] input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(99, 102, 241, 0.15) !important;
+  border-radius: 10px !important;
+  color: #f1f5f9 !important;
+  transition: all 0.2s ease !important;
+}
+
+.search-input:focus,
+.topbar-search input:focus {
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+  outline: none !important;
+}
+
+/* ============================================================
+   4. DASHBOARD STAT CARDS — Gradient backgrounds
+   ============================================================ */
+
+.stat-card,
+.metric-card,
+.kpi-card,
+[class*="stat-card"],
+[class*="metric-card"] {
+  border-radius: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  overflow: hidden;
+  position: relative;
+}
+
+.stat-card:hover,
+.metric-card:hover {
+  transform: translateY(-3px) !important;
+  border-color: rgba(99, 102, 241, 0.2) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Stat card gradient variants */
+.stat-card:nth-child(1),
+.metric-card:nth-child(1) {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12) 0%, rgba(6, 182, 212, 0.08) 100%) !important;
+  border-color: rgba(59, 130, 246, 0.15) !important;
+}
+
+.stat-card:nth-child(2),
+.metric-card:nth-child(2) {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(20, 184, 166, 0.08) 100%) !important;
+  border-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+.stat-card:nth-child(3),
+.metric-card:nth-child(3) {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(236, 72, 153, 0.08) 100%) !important;
+  border-color: rgba(139, 92, 246, 0.15) !important;
+}
+
+.stat-card:nth-child(4),
+.metric-card:nth-child(4) {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(249, 115, 22, 0.08) 100%) !important;
+  border-color: rgba(245, 158, 11, 0.15) !important;
+}
+
+/* Stat card numbers */
+.stat-value,
+.stat-number,
+.metric-value,
+[class*="stat-value"],
+[class*="stat-number"] {
+  font-family: "Plus Jakarta Sans", "Outfit", sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1.75rem !important;
+  letter-spacing: -0.03em !important;
+  background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ============================================================
+   5. DATA TABLES — Glass style
+   ============================================================ */
+
+table,
+.data-table,
+.biz-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+thead tr,
+.table-header,
+[class*="table"] thead tr {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+th,
+.table-th {
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: rgba(148, 163, 184, 0.8) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding: 0.85rem 1rem !important;
+}
+
+td,
+.table-td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  padding: 0.85rem 1rem !important;
+  font-size: 0.875rem !important;
+  color: #cbd5e1 !important;
+  transition: background 0.15s ease;
+}
+
+tr:hover td,
+.table-row:hover td {
+  background: rgba(99, 102, 241, 0.04) !important;
+}
+
+/* Status badges in tables */
+.badge-active, .status-active, [class*="badge--active"] {
+  background: rgba(134, 239, 172, 0.15) !important;
+  color: #4ade80 !important;
+  border: 1px solid rgba(134, 239, 172, 0.25) !important;
+  border-radius: 999px !important;
+  padding: 0.2rem 0.65rem !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+}
+
+.badge-pending, .status-pending, [class*="badge--pending"] {
+  background: rgba(253, 224, 71, 0.12) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(253, 224, 71, 0.2) !important;
+  border-radius: 999px !important;
+  padding: 0.2rem 0.65rem !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+}
+
+.badge-inactive, .status-inactive, [class*="badge--inactive"] {
+  background: rgba(148, 163, 184, 0.1) !important;
+  color: #64748b !important;
+  border: 1px solid rgba(148, 163, 184, 0.15) !important;
+  border-radius: 999px !important;
+  padding: 0.2rem 0.65rem !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+}
+
+/* ============================================================
+   6. CARDS — General glass panels
+   ============================================================ */
+
+.card,
+.glass-panel,
+.biz-card,
+.panel,
+[class*="-card"]:not(.stat-card) {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-radius: 16px !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+.card:hover,
+.biz-card:hover {
+  border-color: rgba(99, 102, 241, 0.18) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ============================================================
+   7. FORM INPUTS — Dark theme glass
+   ============================================================ */
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="password"],
+input[type="search"],
+textarea,
+select {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(99, 102, 241, 0.15) !important;
+  border-radius: 10px !important;
+  color: #f1f5f9 !important;
+  transition: all 0.2s ease !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: rgba(99, 102, 241, 0.45) !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+  outline: none !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(148, 163, 184, 0.6) !important;
+}
+
+label {
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  color: #94a3b8 !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* ============================================================
+   8. BUTTONS — Premium gradient
+   ============================================================ */
+
+.btn,
+button[class*="btn"],
+[type="submit"] {
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  font-family: "Inter", sans-serif !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn--primary,
+.btn-primary,
+button.primary {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
+}
+
+.btn--primary:hover,
+.btn-primary:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* ============================================================
+   9. CHARTS — Container styling
+   ============================================================ */
+
+.chart-container,
+.chart-wrapper,
+[class*="chart-"] {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-radius: 16px !important;
+  padding: 1.5rem !important;
+}
+
+.chart-title,
+[class*="chart-title"] {
+  font-family: "Plus Jakarta Sans", "Outfit", sans-serif !important;
+  font-weight: 700 !important;
+  color: #f1f5f9 !important;
+}
+
+/* ============================================================
+   10. SCROLLBAR
+   ============================================================ */
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.25); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.4); }
+
+/* ============================================================
+   11. NOTIFICATION BADGE
+   ============================================================ */
+
+.notif-badge,
+.notification-badge,
+[class*="notif-badge"] {
+  background: linear-gradient(135deg, #f472b6, #ec4899) !important;
+  box-shadow: 0 0 8px rgba(244, 114, 182, 0.5) !important;
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(244, 114, 182, 0.4); }
+  50% { box-shadow: 0 0 0 4px rgba(244, 114, 182, 0); }
+}
+
+/* ============================================================
+   12. SERVICE CARDS — Management UI
+   ============================================================ */
+
+.service-card,
+[class*="service-card"] {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(99, 102, 241, 0.1) !important;
+  border-radius: 14px !important;
+  transition: all 0.3s ease !important;
+}
+
+.service-card:hover {
+  border-color: rgba(99, 102, 241, 0.22) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Toggle switch — Indigo accent */
+input[type="checkbox"],
+.toggle,
+.switch {
+  accent-color: #6366f1;
+}
+
+/* ============================================================
+   13. MICRO-ANIMATIONS
+   ============================================================ */
+
+@keyframes biz-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stat-card,
+.card,
+.biz-card {
+  animation: biz-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}

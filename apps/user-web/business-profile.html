@@ -189,8 +189,8 @@
                     const res = await fetch(`/api/public/business/${ownerId}/full`);
                     const json = await res.json();
                     if (json.success) {
-                        biz = json.data.business;
-                        places = json.data.places || [];
+                        biz = json.data.profile;
+                        places = json.data.services || [];
                     }
                 }
 
@@ -198,11 +198,21 @@
                     const res = await fetch('/api/public/businesses');
                     const json = await res.json();
                     if (json.success) {
-                        biz = json.data.find(b => (b.displayName || b.name) === ownerName);
-                        if (biz) {
-                            const pRes = await fetch(`/api/public/places?ownerId=${biz._id || biz.id || biz.customId}`);
-                            const pJson = await pRes.json();
-                            places = pJson.success ? pJson.data : [];
+                        const found = json.data.find(b => (b.displayName || b.name) === ownerName);
+                        if (found) {
+                            // Gọi endpoint /full để lấy đầy đủ thông tin và danh sách dịch vụ
+                            const fRes = await fetch(`/api/public/business/${found._id || found.id || found.customId}/full`);
+                            const fJson = await fRes.json();
+                            if (fJson.success) {
+                                biz = fJson.data.profile;
+                                places = fJson.data.services || [];
+                            } else {
+                                biz = found;
+                                // Fallback nếu /full lỗi
+                                const pRes = await fetch(`/api/public/places?ownerId=${found._id || found.id || found.customId}`);
+                                const pJson = await pRes.json();
+                                places = pJson.success ? pJson.data : [];
+                            }
                         }
                     }
                 }

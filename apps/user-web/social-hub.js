@@ -1669,7 +1669,7 @@ const SocialHub = {
                                     webkit-playsinline 
                                     preload="auto" 
                                     style="width: 100%; max-height: 500px; background: #000; border-radius: 8px;"
-                                    onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=\'media-error\' style=\'padding: 2rem; background: rgba(0,0,0,0.05); border-radius: 8px; text-align: center;\'><i class=\'fas fa-video-slash\' style=\'display:block; font-size: 2rem; margin-bottom: 0.5rem; color: var(--text-muted);\'></i>Không thể tải video</div>')"
+                                    onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=&quot;media-error&quot; style=&quot;padding: 2rem; background: rgba(0,0,0,0.05); border-radius: 8px; text-align: center;&quot;><i class=&quot;fas fa-video-slash&quot; style=&quot;display:block; font-size: 2rem; margin-bottom: 0.5rem; color: var(--text-muted);&quot;></i>Không thể tải video</div>')"
                                 ></video>`;
                             if (m.type === 'audio') return `
                                 <div class="post-audio-card">

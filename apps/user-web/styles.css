@@ -309,9 +309,6 @@ textarea:focus-visible {
   white-space: nowrap;
   flex-shrink: 0;
 }
-  gap: 8px;
-  white-space: nowrap;
-}
 
 .nav-link:hover {
   color: var(--nav-link-hover);

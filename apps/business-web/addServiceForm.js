@@ -1,4 +1,4 @@
-﻿/**
+/**
  * addServiceForm.js - Elite Zenith Edition
  * Form thêm dịch vụ mới dạng Modal chuyên sâu cho đối tác Elite
  */
@@ -7,7 +7,8 @@
   if (document.getElementById('add-svc-styles')) return;
   const style = document.createElement('style');
   style.id = 'add-svc-styles';
-  style.te    .svc-modal-overlay {
+  style.textContent = `
+    .svc-modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(4, 9, 20, 0.7);
@@ -81,7 +82,7 @@
     .btn-svc-submit:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(99,102,241,0.3); }
  
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-    teY(0); } }
+
   `;
   document.head.appendChild(style);
 })();

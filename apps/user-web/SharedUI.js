@@ -472,6 +472,20 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       const data = await r.json();
       const freshUser = data.success ? data : u;
 
+      // Sync Language Preference if logged in
+      if (freshUser.preferences && freshUser.preferences.language) {
+        const savedLang = freshUser.preferences.language;
+        const currentCookie = document.cookie.match(/googtrans=\/vi\/([a-zA-Z-]+)/);
+        const activeLang = currentCookie ? currentCookie[1] : 'vi';
+        
+        if (savedLang !== activeLang) {
+          console.log(`[LangSync] Applying saved preference: ${savedLang}`);
+          if (typeof window.changeLang === 'function') {
+            window.changeLang(savedLang, true); // true = skip server save
+          }
+        }
+      }
+
       // Big-Tech: Deep compare to prevent blinking if data hasn't changed
       const dataString = JSON.stringify({ ...freshUser, token: token.substring(0, 20) });
       if (dataString === lastSyncedData) return;
@@ -609,15 +623,15 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
              </div>
           </div>
           <ul class="nav-list">
-             <li><a href="index.html" class="nav-link" data-link="home">🏠 Homepage</a></li>
-             <li><a href="index.html#destinations" class="nav-link" data-link="destinations">🗺️ Destination</a></li>
-             <li><a href="my-trips.html" class="nav-link" data-link="my-trips">📅 Trip</a></li>
-             <li><a href="planner.html" class="nav-link" data-link="ai-planner">🤖 AI Assistant</a></li>
-             <li><a href="social-hub.html" class="nav-link" data-link="social">👥 Community</a></li>
-             <li><a href="quests.html" class="nav-link" data-link="quests">🎯 Mission</a></li>
-             <li><a href="history.html" class="nav-link" data-link="history">⌛ History</a></li>
-             <li><a href="leaderboard.html" class="nav-link" data-link="leaderboard">🏆 Rankings</a></li>
-             <li><a href="business-directory.html" class="nav-link" data-link="business">🏨 Business</a></li>
+             <li><a href="index.html" class="nav-link" data-link="home">🏠 Trang chủ</a></li>
+             <li><a href="index.html#destinations" class="nav-link" data-link="destinations">🗺️ Điểm đến</a></li>
+             <li><a href="my-trips.html" class="nav-link" data-link="my-trips">📅 Chuyến đi</a></li>
+             <li><a href="planner.html" class="nav-link" data-link="ai-planner">🤖 AI Trợ lý</a></li>
+             <li><a href="social-hub.html" class="nav-link" data-link="social">👥 Cộng đồng</a></li>
+             <li><a href="quests.html" class="nav-link" data-link="quests">🎯 Nhiệm vụ</a></li>
+             <li><a href="history.html" class="nav-link" data-link="history">⌛ Lịch sử</a></li>
+             <li><a href="leaderboard.html" class="nav-link" data-link="leaderboard">🏆 BXH</a></li>
+             <li><a href="business-directory.html" class="nav-link" data-link="business">🏨 Doanh nghiệp</a></li>
           </ul>
           
           <div class="site-nav__mobile-footer">
@@ -690,12 +704,27 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     syncAuthUI(true);
 
     // Language Selector & Google Translate Setup
-    window.changeLang = function(lang) {
+    window.changeLang = function(lang, skipServerSave = false) {
       // 1. Update cookie safely without duplicate domains
+      const domain = window.location.hostname;
       if (lang === 'vi') {
         document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain}`;
+        localStorage.setItem('preferred_lang', 'vi');
       } else {
         document.cookie = `googtrans=/vi/${lang}; path=/`;
+        document.cookie = `googtrans=/vi/${lang}; path=/; domain=${domain}`;
+        localStorage.setItem('preferred_lang', lang);
+      }
+
+      // 1.5. Save to server if logged in
+      const token = localStorage.getItem('wander_token');
+      if (token && !skipServerSave) {
+        fetch('/api/auth/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+          body: JSON.stringify({ preferences: { language: lang } })
+        }).catch(err => console.error('[LangSync] Server save failed:', err));
       }
 
       // 2. Try to trigger Google Translate dropdown directly (instant translation)
@@ -751,9 +780,19 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       window.googleTranslateElementInit = function() {
         new google.translate.TranslateElement({
           pageLanguage: 'vi',
+          layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+          autoDisplay: false,
           includedLanguages: 'vi,en,ko,ja,zh-CN,th,fr,ru,es,de,it,pt,ar,hi,id,ms,nl,tl'
         }, 'google_translate_element');
       };
+      
+      // Force selected language from localStorage if cookie is missing
+      const savedLang = localStorage.getItem('preferred_lang');
+      if (savedLang && savedLang !== 'vi' && !document.cookie.includes('googtrans')) {
+        const domain = window.location.hostname;
+        document.cookie = `googtrans=/vi/${savedLang}; path=/; domain=${domain}`;
+      }
+      
       const script = document.createElement('script');
       script.id = 'google-translate-script';
       script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
@@ -1144,24 +1183,24 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           <div class="floating-toc-container" id="floating-toc">
              <button type="button" class="floating-toc-btn" onclick="this.parentElement.classList.toggle('is-open')" title="Mục lục Trang chủ">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                <span>Category</span>
+                <span>Danh mục</span>
              </button>
              <ul class="floating-toc-menu">
-                <li><a href="index.html#personal-picks" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">✨ Suggestions</a></li>
-                <li><a href="index.html#destinations" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">📍 Destinations</a></li>
-                <li><a href="index.html#top-partners" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🤝 Partners</a></li>
-                <li><a href="index.html#offers" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🎁 Offers</a></li>
-                <li><a href="index.html#business-services" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🏨 Services</a></li>
-                <li><a href="index.html#smart-search" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🔍 Smart Search</a></li>
-                <li><a href="index.html#planner" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">📅 Planner</a></li>
-                <li><a href="index.html#itineraries" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🗺️ Itineraries</a></li>
-                <li><a href="index.html#experiences" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🌟 Why Us</a></li>
-                <li><a href="index.html#reviews" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">💬 Reviews</a></li>
-                <li><a href="index.html#contact" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">📞 Contact</a></li>
+                <li><a href="index.html#personal-picks" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">✨ Gợi ý cho bạn</a></li>
+                <li><a href="index.html#destinations" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">📍 Điểm đến</a></li>
+                <li><a href="index.html#top-partners" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🤝 Đối tác</a></li>
+                <li><a href="index.html#offers" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🎁 Ưu đãi</a></li>
+                <li><a href="index.html#business-services" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🏨 Dịch vụ</a></li>
+                <li><a href="index.html#smart-search" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🔍 Tìm kiếm thông minh</a></li>
+                <li><a href="index.html#planner" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">📅 Lập kế hoạch</a></li>
+                <li><a href="index.html#itineraries" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🗺️ Lộ trình</a></li>
+                <li><a href="index.html#experiences" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🌟 Vì sao chọn chúng tôi</a></li>
+                <li><a href="index.html#reviews" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">💬 Đánh giá</a></li>
+                <li><a href="index.html#contact" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">📞 Liên hệ</a></li>
                 <li style="height: 1px; background: var(--border); margin: 8px 0; opacity: 0.5;"></li>
-                <li><a href="quests.html">🎯 Quests</a></li>
-                <li><a href="history.html">⏳ History</a></li>
-                <li><a href="leaderboard.html">🏆 Rankings</a></li>
+                <li><a href="quests.html">🎯 Nhiệm vụ</a></li>
+                <li><a href="history.html">⏳ Lịch sử</a></li>
+                <li><a href="leaderboard.html">🏆 BXH</a></li>
              </ul>
           </div>
         </div>

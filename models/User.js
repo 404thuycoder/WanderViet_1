@@ -30,7 +30,8 @@ const userSchema = new mongoose.Schema({
     pace: { type: String, default: 'vua' },
     interests: [String],
     habits: [String],
-    theme: { type: String, default: 'light' }
+    theme: { type: String, default: 'light' },
+    language: { type: String, default: 'vi' }
   },
   // AI Self-Learning Memory: Stores insights extracted from chats/actions
   preferenceProfile: {

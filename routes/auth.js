@@ -347,7 +347,8 @@ router.get('/user/rank', auth, async (req, res) => {
       displayName: accountData.displayName || accountData.name || 'Thành viên',
       name: accountData.name || '',
       email: accountData.email || '',
-      customId: accountData.customId || accountData.id
+      customId: accountData.customId || accountData.id,
+      preferences: accountData.preferences || {}
     });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

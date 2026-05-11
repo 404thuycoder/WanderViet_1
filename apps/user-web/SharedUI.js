@@ -720,11 +720,25 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       // 1.5. Save to server if logged in
       const token = localStorage.getItem('wander_token');
       if (token && !skipServerSave) {
+        console.log(`[LangSync] Sending ${lang} to server...`);
         fetch('/api/auth/profile', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
           body: JSON.stringify({ preferences: { language: lang } })
-        }).catch(err => console.error('[LangSync] Server save failed:', err));
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            console.log('[LangSync] Server sync complete');
+            // Show a subtle toast if possible
+            if (window.WanderUI && WanderUI.showToast) {
+              WanderUI.showToast('Language synchronized', 'success');
+            }
+          } else {
+            console.error('[LangSync] Server error:', data.message);
+          }
+        })
+        .catch(err => console.error('[LangSync] Server save failed:', err));
       }
 
       // 2. Try to trigger Google Translate dropdown directly (instant translation)

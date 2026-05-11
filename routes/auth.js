@@ -700,9 +700,14 @@ router.put('/profile', sharedAuth, async (req, res) => {
     if (avatar !== undefined) account.avatar = avatar;
     if (cover !== undefined) account.cover = cover;
     if (phone !== undefined) account.phone = phone;
-    if (preferences !== undefined) account.preferences = { ...account.preferences, ...preferences };
+    if (preferences !== undefined) {
+        console.log(`[ProfileUpdate] Updating preferences for ${account.email}:`, preferences);
+        account.preferences = { ...account.preferences, ...preferences };
+        account.markModified('preferences');
+    }
 
     await account.save();
+    console.log(`[ProfileUpdate] Successfully saved to DB for ${account.email}`);
     
     // Clear cache
     const possibleIds = [req.user.id, req.user._id, account.customId, account.id, account._id.toString()];

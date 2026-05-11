@@ -1,24 +1,3 @@
-
-  // WanderViet Translation Curtain Safety Fallback
-  (function() {
-    const curtainTimeout = setTimeout(() => {
-      document.documentElement.classList.remove('translating-curtain');
-      console.log("🕒 Translation curtain fallback triggered (1.5s)");
-    }, 1500);
-
-    window.addEventListener('load', () => {
-      // If page is fully loaded and curtain still there, remove it
-      setTimeout(() => {
-        document.documentElement.classList.remove('translating-curtain');
-      }, 500);
-    });
-
-    document.addEventListener('google-translate-finished', () => {
-      clearTimeout(curtainTimeout);
-      document.documentElement.classList.remove('translating-curtain');
-    });
-  })();
-
 /**
  * WanderViệt Shared UI Logic
  * Theme, Toast, Notifications, Rank Badges, Common Modals
@@ -606,7 +585,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       <div class="header-inner">
         <div class="header-left">
           <a href="index.html" class="logo">
-            <span class="logo-mark">◈</span>
+            <div class="logo-box">
+              <span class="logo-mark">◈</span>
+            </div>
             WanderViệt
           </a>
         </div>
@@ -628,15 +609,15 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
              </div>
           </div>
           <ul class="nav-list">
-             <li><a href="index.html" class="nav-link" data-link="home">🏠 Trang chủ</a></li>
-             <li><a href="index.html#destinations" class="nav-link" data-link="destinations">🗺️ Điểm đến</a></li>
-             <li><a href="my-trips.html" class="nav-link" data-link="my-trips">📅 Chuyến đi</a></li>
-             <li><a href="planner.html" class="nav-link" data-link="ai-planner">🤖 AI Trợ lý</a></li>
-             <li><a href="social-hub.html" class="nav-link" data-link="social">👥 Cộng đồng</a></li>
-             <li><a href="quests.html" class="nav-link" data-link="quests">🎯 Nhiệm vụ</a></li>
-             <li><a href="history.html" class="nav-link" data-link="history">⏳ Lịch sử</a></li>
-             <li><a href="leaderboard.html" class="nav-link" data-link="leaderboard">🏆 BXH</a></li>
-             <li><a href="business-directory.html" class="nav-link" data-link="business">🏨 Doanh nghiệp</a></li>
+             <li><a href="index.html" class="nav-link" data-link="home">🏠 Homepage</a></li>
+             <li><a href="index.html#destinations" class="nav-link" data-link="destinations">🗺️ Destination</a></li>
+             <li><a href="my-trips.html" class="nav-link" data-link="my-trips">📅 Trip</a></li>
+             <li><a href="planner.html" class="nav-link" data-link="ai-planner">🤖 AI Assistant</a></li>
+             <li><a href="social-hub.html" class="nav-link" data-link="social">👥 Community</a></li>
+             <li><a href="quests.html" class="nav-link" data-link="quests">🎯 Mission</a></li>
+             <li><a href="history.html" class="nav-link" data-link="history">⌛ History</a></li>
+             <li><a href="leaderboard.html" class="nav-link" data-link="leaderboard">🏆 Rankings</a></li>
+             <li><a href="business-directory.html" class="nav-link" data-link="business">🏨 Business</a></li>
           </ul>
           
           <div class="site-nav__mobile-footer">
@@ -645,6 +626,33 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         </nav>
 
         <div class="header-right">
+          <!-- Language Selector -->
+          <div class="lang-dropdown-wrapper" style="position: relative; margin-right: 4px;">
+            <button type="button" class="btn-icon" onclick="this.nextElementSibling.classList.toggle('show')" title="Ngôn ngữ">
+              <span class="current-flag"><img src="https://flagcdn.com/w20/vn.png" width="20" alt="VN" style="border-radius: 2px;"></span>
+            </button>
+            <ul class="lang-menu">
+              <li><button class="lang-item" onclick="changeLang('vi')"><img src="https://flagcdn.com/w20/vn.png" width="20" alt="VN" style="border-radius: 2px;"> Tiếng Việt</button></li>
+              <li><button class="lang-item" onclick="changeLang('en')"><img src="https://flagcdn.com/w20/gb.png" width="20" alt="GB" style="border-radius: 2px;"> English</button></li>
+              <li><button class="lang-item" onclick="changeLang('ko')"><img src="https://flagcdn.com/w20/kr.png" width="20" alt="KR" style="border-radius: 2px;"> 한국어</button></li>
+              <li><button class="lang-item" onclick="changeLang('ja')"><img src="https://flagcdn.com/w20/jp.png" width="20" alt="JP" style="border-radius: 2px;"> 日本語</button></li>
+              <li><button class="lang-item" onclick="changeLang('zh-CN')"><img src="https://flagcdn.com/w20/cn.png" width="20" alt="CN" style="border-radius: 2px;"> 中文</button></li>
+              <li><button class="lang-item" onclick="changeLang('th')"><img src="https://flagcdn.com/w20/th.png" width="20" alt="TH" style="border-radius: 2px;"> ภาษาไทย</button></li>
+              <li><button class="lang-item" onclick="changeLang('fr')"><img src="https://flagcdn.com/w20/fr.png" width="20" alt="FR" style="border-radius: 2px;"> Français</button></li>
+              <li><button class="lang-item" onclick="changeLang('ru')"><img src="https://flagcdn.com/w20/ru.png" width="20" alt="RU" style="border-radius: 2px;"> Русский</button></li>
+              <li><button class="lang-item" onclick="changeLang('es')"><img src="https://flagcdn.com/w20/es.png" width="20" alt="ES" style="border-radius: 2px;"> Español</button></li>
+              <li><button class="lang-item" onclick="changeLang('de')"><img src="https://flagcdn.com/w20/de.png" width="20" alt="DE" style="border-radius: 2px;"> Deutsch</button></li>
+              <li><button class="lang-item" onclick="changeLang('it')"><img src="https://flagcdn.com/w20/it.png" width="20" alt="IT" style="border-radius: 2px;"> Italiano</button></li>
+              <li><button class="lang-item" onclick="changeLang('pt')"><img src="https://flagcdn.com/w20/pt.png" width="20" alt="PT" style="border-radius: 2px;"> Português</button></li>
+              <li><button class="lang-item" onclick="changeLang('ar')"><img src="https://flagcdn.com/w20/sa.png" width="20" alt="SA" style="border-radius: 2px;"> العربية</button></li>
+              <li><button class="lang-item" onclick="changeLang('hi')"><img src="https://flagcdn.com/w20/in.png" width="20" alt="IN" style="border-radius: 2px;"> हिन्दी</button></li>
+              <li><button class="lang-item" onclick="changeLang('id')"><img src="https://flagcdn.com/w20/id.png" width="20" alt="ID" style="border-radius: 2px;"> Indonesia</button></li>
+              <li><button class="lang-item" onclick="changeLang('ms')"><img src="https://flagcdn.com/w20/my.png" width="20" alt="MY" style="border-radius: 2px;"> Melayu</button></li>
+              <li><button class="lang-item" onclick="changeLang('nl')"><img src="https://flagcdn.com/w20/nl.png" width="20" alt="NL" style="border-radius: 2px;"> Nederlands</button></li>
+              <li><button class="lang-item" onclick="changeLang('tl')"><img src="https://flagcdn.com/w20/ph.png" width="20" alt="PH" style="border-radius: 2px;"> Filipino</button></li>
+            </ul>
+          </div>
+          
           <button type="button" class="btn-icon notif-btn-user" onclick="WanderUI.toggleNotificationDrawer()" aria-label="Thông báo">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
             <span class="notif-badge" data-notif-badge style="display:none;"></span>
@@ -674,11 +682,90 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           </div>
         </div>
       </div>
+      <div id="google_translate_element" style="position:absolute; width:0; height:0; overflow:hidden;"></div>
     `;
 
     // Immediately sync auth UI after injection to avoid empty profile on reload
     // Force sync auth UI immediately after injection to avoid empty profile due to race conditions
     syncAuthUI(true);
+
+    // Language Selector & Google Translate Setup
+    window.changeLang = function(lang) {
+      // 1. Update cookie safely without duplicate domains
+      if (lang === 'vi') {
+        document.cookie = "googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+      } else {
+        document.cookie = `googtrans=/vi/${lang}; path=/`;
+      }
+
+      // 2. Try to trigger Google Translate dropdown directly (instant translation)
+      const selectField = document.querySelector(".goog-te-combo");
+      if (selectField) {
+        selectField.value = lang;
+        selectField.dispatchEvent(new Event("change"));
+        
+        // Update flag icon
+        const flags = { 
+          'vi': 'vn', 'en': 'gb', 'ko': 'kr', 'ja': 'jp', 'zh-CN': 'cn',
+          'th': 'th', 'fr': 'fr', 'ru': 'ru', 'es': 'es',
+          'de': 'de', 'it': 'it', 'pt': 'pt', 'ar': 'sa', 'hi': 'in',
+          'id': 'id', 'ms': 'my', 'nl': 'nl', 'tl': 'ph'
+        };
+        const countryCode = flags[lang] || 'vn';
+        document.querySelectorAll('.current-flag').forEach(el => {
+          el.innerHTML = `<img src="https://flagcdn.com/w20/${countryCode}.png" width="20" alt="${countryCode.toUpperCase()}" style="border-radius: 2px;">`;
+        });
+      } else {
+        // Fallback to reload if widget not ready
+        location.reload();
+      }
+    };
+
+    // Fallback to clear translation curtain after 1.5s just in case
+    setTimeout(() => {
+      document.documentElement.classList.remove('translating-curtain');
+      document.body.style.visibility = 'visible';
+      document.body.style.opacity = '1';
+      const curtain = document.getElementById('translate-curtain');
+      if (curtain) curtain.style.opacity = '0';
+      setTimeout(() => { if (curtain) curtain.remove(); }, 500);
+    }, 1500);
+
+    setTimeout(() => {
+      let currentLang = 'vi';
+      const match = document.cookie.match(/googtrans=\/vi\/([a-zA-Z-]+)/);
+      if (match && match[1]) currentLang = match[1];
+      const flags = { 
+        'vi': 'vn', 'en': 'gb', 'ko': 'kr', 'ja': 'jp', 'zh-CN': 'cn',
+        'th': 'th', 'fr': 'fr', 'ru': 'ru', 'es': 'es',
+        'de': 'de', 'it': 'it', 'pt': 'pt', 'ar': 'sa', 'hi': 'in',
+        'id': 'id', 'ms': 'my', 'nl': 'nl', 'tl': 'ph'
+      };
+      const countryCode = flags[currentLang] || 'vn';
+      document.querySelectorAll('.current-flag').forEach(el => {
+        el.innerHTML = `<img src="https://flagcdn.com/w20/${countryCode}.png" width="20" alt="${countryCode.toUpperCase()}" style="border-radius: 2px;">`;
+      });
+    }, 100);
+
+    if (!document.getElementById('google-translate-script')) {
+      window.googleTranslateElementInit = function() {
+        new google.translate.TranslateElement({
+          pageLanguage: 'vi',
+          includedLanguages: 'vi,en,ko,ja,zh-CN,th,fr,ru,es,de,it,pt,ar,hi,id,ms,nl,tl'
+        }, 'google_translate_element');
+      };
+      const script = document.createElement('script');
+      script.id = 'google-translate-script';
+      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      document.body.appendChild(script);
+    }
+    
+    // Close language menu on clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.lang-dropdown-wrapper')) {
+        document.querySelectorAll('.lang-menu').forEach(m => m.classList.remove('show'));
+      }
+    });
   }
 
   function initNavigation() {
@@ -881,7 +968,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           <span aria-hidden="true">💬</span>
           <span class="visually-hidden">Mở trợ lý du lịch</span>
         </button>
-        <div id="global-chat-panel" class="chat-panel notranslate" hidden>
+        <div id="global-chat-panel" class="chat-panel" hidden>
           <div class="chat-panel__head">
             <div class="chat-panel__head-left">
               <strong>Trợ lý WanderViệt</strong>
@@ -898,7 +985,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                   <button type="button" data-lang="fr">Français (FR)</button>
                 </div>
               </div>
-              <button type="button" class="btn-icon-sm" title="Phóng to" id="global-chat-expand-btn">⤢</button>
               <button type="button" class="btn-icon-sm" title="Chat mới" id="global-chat-new-btn">➕</button>
               <button type="button" class="btn-icon-sm" title="Lịch sử chat" id="global-chat-history-btn">🕒</button>
             </div>
@@ -1048,6 +1134,35 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           </div>
           <div class="modal__body" id="booking-detail-content" style="padding:2rem; max-height:85vh; overflow-y:auto;">
             <!-- Content will be injected here -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Floating Category Button - Fixed below logo -->
+      <div class="floating-toc-wrapper">
+        <div class="floating-toc-inner">
+          <div class="floating-toc-container" id="floating-toc">
+             <button type="button" class="floating-toc-btn" onclick="this.parentElement.classList.toggle('is-open')" title="Mục lục Trang chủ">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                <span>Category</span>
+             </button>
+             <ul class="floating-toc-menu">
+                <li><a href="index.html#personal-picks" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">✨ Suggestions</a></li>
+                <li><a href="index.html#destinations" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">📍 Destinations</a></li>
+                <li><a href="index.html#top-partners" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🤝 Partners</a></li>
+                <li><a href="index.html#offers" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🎁 Offers</a></li>
+                <li><a href="index.html#business-services" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🏨 Services</a></li>
+                <li><a href="index.html#smart-search" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🔍 Smart Search</a></li>
+                <li><a href="index.html#planner" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">📅 Planner</a></li>
+                <li><a href="index.html#itineraries" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🗺️ Itineraries</a></li>
+                <li><a href="index.html#experiences" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🌟 Why Us</a></li>
+                <li><a href="index.html#reviews" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">💬 Reviews</a></li>
+                <li><a href="index.html#contact" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">📞 Contact</a></li>
+                <li style="height: 1px; background: var(--border); margin: 8px 0; opacity: 0.5;"></li>
+                <li><a href="quests.html">🎯 Quests</a></li>
+                <li><a href="history.html">⏳ History</a></li>
+                <li><a href="leaderboard.html">🏆 Rankings</a></li>
+             </ul>
           </div>
         </div>
       </div>
@@ -1836,14 +1951,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     const form = document.getElementById('global-chat-form');
     const input = document.getElementById('global-chat-input');
     const log = document.getElementById('global-chat-log');
-    const isChatPage = window.location.pathname.includes('chatbot.html');
-    if (isChatPage) {
-        document.body.appendChild(panel);
-        panel.hidden = false;
-        panel.classList.add('chat-panel--fullscreen');
-        if (fabWrap) fabWrap.style.display = 'none';
-    }
-
 
     function togglePanel() {
       const isOpen = !panel.hidden;
@@ -1872,8 +1979,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     // Đảm bảo mỗi lần reset trang là một phiên chat mới hoàn toàn (như ChatGPT)
     // Các hội thoại cũ sẽ nằm trong phần Lịch sử (History)
-    // localStorage.removeItem('wander_current_session'); // Preserved for sync
-    // localStorage.removeItem('wander_shared_chat'); // Preserved for sync
+    localStorage.removeItem('wander_current_session');
+    localStorage.removeItem('wander_shared_chat');
     let currentSessionId = null;
 
     // Flag: chỉ đọc to (TTS) khi user dùng giọng nói, không đọc khi gõ text
@@ -1948,57 +2055,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       log.scrollTop = log.scrollHeight;
     }
 
-    
-    function getLocalizedGreeting() {
-      const lang = localStorage.getItem('wander_chat_lang') || 'auto';
-      if (lang === 'en') return 'Hello! I am ready for a new conversation. How can I help you with your trip?';
-      if (lang === 'kr') return '안녕하세요! 새로운 대화를 시작할 준비가 되었습니다. 여행과 관련하여 무엇을 도와드릴까요?';
-      if (lang === 'jp') return 'こんにちは！新しい会話の準備ができました。ご旅行について何かお手伝いできることはありますか？';
-      if (lang === 'zh') return '你好！我已经准备好进行新的对话了。关于您的旅行，我能帮您什么忙吗？';
-      if (lang === 'fr') return 'Bonjour ! Je suis prêt pour une nouvelle conversation. Comment puis-je vous aider avec votre voyage ?';
-      return 'Chào bạn! Tôi đã sẵn sàng cho cuộc trò chuyện mới. Mình có thể giúp gì cho chuyến đi của bạn?';
-    }
-
-    function getDefaultSuggestions() {
-      const lang = localStorage.getItem('wander_chat_lang') || 'auto';
-      if (lang === 'en') return [
-        { text: '🗺️ Plan Itinerary', query: 'Plan a travel itinerary for me' },
-        { text: '🏨 Find Accommodation', query: 'Find a nice hotel or homestay' },
-        { text: '🍽️ Local Food', query: 'Suggest some local specialties' },
-        { text: '📸 Check-in Spots', query: 'Best spots for photography' }
-      ];
-      if (lang === 'kr') return [
-        { text: '🗺️ 일정 계획', query: '여행 일정을 계획해 주세요' },
-        { text: '🏨 숙소 찾기', query: '좋은 호텔이나 숙소를 찾아주세요' },
-        { text: '🍽️ 로컬 맛집', query: '현지 특산물을 추천해 주세요' },
-        { text: '📸 사진 명소', query: '사진 찍기 좋은 최고의 장소' }
-      ];
-      if (lang === 'jp') return [
-        { text: '🗺️ 日程を作成', query: '旅行のスケジュールを作成してください' },
-        { text: '🏨 宿泊先を探す', query: '素敵なホテルや民泊を見つけてください' },
-        { text: '🍽️ 地元グルメ', query: '地元の名物料理を提案してください' },
-        { text: '📸 撮影スポット', query: '写真撮影に最適なスポット' }
-      ];
-      if (lang === 'fr') return [
-        { text: '🗺️ Planifier l\'itinéraire', query: 'Planifiez un itinéraire de voyage pour moi' },
-        { text: '🏨 Trouver un logement', query: 'Trouver un bel hôtel ou chez l\'habitant' },
-        { text: '🍽️ Spécialités locales', query: 'Suggérer des spécialités locales' },
-        { text: '📸 Lieux de photos', query: 'Meilleurs endroits pour la photographie' }
-      ];
-      if (lang === 'zh') return [
-        { text: '🗺️ 计划行程', query: '为我制定一个旅行行程' },
-        { text: '🏨 寻找住宿', query: '找一家不错的酒店或民宿' },
-        { text: '🍽️ 当地美食', query: '推荐一些当地特色美食' },
-        { text: '📸 打卡地点', query: '最适合拍照的景点' }
-      ];
-      return [
-        { text: '🗺️ Lập lịch trình', query: 'Lập lịch trình du lịch cho mình' },
-        { text: '🏨 Tìm chỗ ở', query: 'Tìm khách sạn hoặc homestay đẹp' },
-        { text: '🍽️ Món ngon', query: 'Gợi ý các món ăn đặc sản địa phương' },
-        { text: '📸 Điểm check-in', query: 'Những địa điểm chụp ảnh đẹp nhất' }
-      ];
-    }
-
+    const DEFAULT_SUGGESTIONS = [
+      { text: '🗺️ Lập lịch trình', query: 'Lập lịch trình du lịch cho mình' },
+      { text: '🏨 Tìm chỗ ở', query: 'Tìm khách sạn hoặc homestay đẹp' },
+      { text: '🍽️ Món ngon', query: 'Gợi ý các món ăn đặc sản địa phương' },
+      { text: '📸 Điểm check-in', query: 'Những địa điểm chụp ảnh đẹp nhất' }
+    ];
 
     function appendMsg(text, role, isHtml, skipCache = false) {
       if (!text) return;
@@ -2055,14 +2117,14 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         const arr = JSON.parse(localStorage.getItem('wander_shared_chat') || '[]');
         if (arr.length > 0) {
           arr.forEach(m => {
-            appendMsg(m.text, m.role, m.isHTML || false, true); // skipCache = true
+            appendMsg(m.text, m.role, false, true); // skipCache = true
           });
         } else if (!currentSessionId) {
-          appendMsg(getLocalizedGreeting(), 'bot');
-          renderSuggestions(getDefaultSuggestions());
+          appendMsg('Xin chào! Tôi là Trợ lý WanderViệt 🌟 Hỏi tôi bất cứ điều gì về du lịch Việt Nam nhé!', 'bot');
+          renderSuggestions(DEFAULT_SUGGESTIONS);
         }
       } catch (e) {
-        if (!currentSessionId) appendMsg(getLocalizedGreeting(), 'bot');
+        if (!currentSessionId) appendMsg('Xin chào! Tôi là Trợ lý WanderViệt 🌟 Hỏi tôi bất cứ điều gì về du lịch Việt Nam nhé!', 'bot');
       }
     }
 
@@ -2173,34 +2235,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         localStorage.removeItem('wander_current_session');
         localStorage.removeItem('wander_shared_chat');
         log.innerHTML = '';
-        appendMsg(getLocalizedGreeting(), 'bot');
-        renderSuggestions(getDefaultSuggestions());
+        appendMsg('Chào bạn! Tôi đã sẵn sàng cho cuộc trò chuyện mới. Mình có thể giúp gì cho chuyến đi của bạn?', 'bot');
+        renderSuggestions(DEFAULT_SUGGESTIONS);
       };
-    }
-
-
-    // --- COMPREHENSIVE CHAT LOGIC (Expand/Shrink/Auto-open) ---
-    const expandBtn = document.getElementById('global-chat-expand-btn');
-    if (isChatPage) {
-      if (expandBtn) {
-        expandBtn.innerHTML = '⤓';
-        expandBtn.title = 'Thu nhỏ';
-        expandBtn.onclick = (e) => {
-          e.preventDefault();
-          window.location.href = 'index.html?openchat=true';
-        };
-      }
-    } else {
-      if (expandBtn) {
-        expandBtn.onclick = (e) => {
-          e.preventDefault();
-          window.location.href = 'chatbot.html';
-        };
-      }
-      if (window.location.search.includes('openchat=true')) {
-        panel.hidden = false;
-        fab.setAttribute('aria-expanded', 'true');
-      }
     }
 
     // History Button
@@ -2645,16 +2682,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     // Welcome message or resume session
     setTimeout(() => {
-      const _sharedCache = JSON.parse(localStorage.getItem('wander_shared_chat') || '[]');
-      if (_sharedCache.length > 0) {
-        // Has cached messages - restore them (works for expand/shrink sync)
-        loadSharedChat();
-      } else if (currentSessionId) {
-        // No local cache - load from server
-        loadChatHistory(currentSessionId);
-      } else {
-        // Fresh start
-        loadSharedChat();
+      loadSharedChat(); // Load instantly from cache
+      if (currentSessionId) {
+        loadChatHistory(currentSessionId); // Sync with server in background
       }
     }, 100);
 
@@ -3342,7 +3372,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   }
 
   if (document.readyState === 'loading') {
-    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initAll); } else { initAll(); }
+    document.addEventListener('DOMContentLoaded', initAll);
   } else {
     initAll();
   }

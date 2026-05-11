@@ -177,12 +177,7 @@ router.post('/', optionalAuth, async (req, res) => {
     // Kiểm tra câu hỏi có trong Database chưa để tiết kiệm API (Chỉ áp dụng cho tiếng Việt hoặc Auto)
     let searchResult = null; // Lưu kết quả nếu phải đi "tìm kiếm"
 
-    // SmartCache only for Vietnamese/auto WITHOUT specific language intent
-    // If user selected EN/JP/KR etc OR message has language switch intent, skip cache
-    const _tempMsgLower = message.toLowerCase();
-    const _hasLangIntent = ['tiếng anh','tieng anh','english','tiếng nhật','tiếng hàn','tiếng pháp','tiếng trung',
-      'tieng nhat','tieng han','tieng phap','tieng trung','speak english','speak japanese','speak korean'].some(kw => _tempMsgLower.includes(kw));
-    if (chatbotDb.readyState === 1 && message.length > 2 && (targetLang === 'vi' || targetLang === 'auto') && !_hasLangIntent) {
+    if (chatbotDb.readyState === 1 && message.length > 2 && (targetLang === 'vi' || targetLang === 'auto')) {
       const timeSensitiveKeywords = ['thứ mấy', 'ngày nào', 'mấy giờ', 'hôm nay', 'bây giờ', 'thu may', 'ngay nao', 'may gio', 'hom nay', 'bay gio'];
       const isTimeSensitive = timeSensitiveKeywords.some(k => lowerMsg.includes(k));
       
@@ -370,97 +365,13 @@ QUY TẮC CỐT LÕI (CORE RULES):
       'fr': 'French (Français)'
     };
 
-
-    // --- INTENT-BASED LANGUAGE DETECTION ---
-    // Uses simple keyword matching on the normalized (lowercased) message
-    // This catches explicit language-switch requests typed in ANY language
-    const msgLower = message.toLowerCase();
-    
-    // Map of target language keywords to language codes
-    const LANG_KEYWORDS = {
-      'en': ['tieng anh', 'tiếng anh', 'english', 'speak english', 'reply english', 'in english', 'nói tiếng anh', 'trả lời bằng tiếng anh', 'nói bằng tiếng anh', 'nói chuyện bằng tiếng anh', 'hãy nói tiếng anh', 'dùng tiếng anh'],
-      'jp': ['tieng nhat', 'tiếng nhật', 'japanese', 'speak japanese', 'in japanese', 'nói tiếng nhật', 'trả lời bằng tiếng nhật'],
-      'kr': ['tieng han', 'tiếng hàn', 'korean', 'speak korean', 'in korean', 'nói tiếng hàn', 'trả lời bằng tiếng hàn'],
-      'fr': ['tieng phap', 'tiếng pháp', 'french', 'speak french', 'in french', 'nói tiếng pháp', 'trả lời bằng tiếng pháp'],
-      'zh': ['tieng trung', 'tiếng trung', 'chinese', 'speak chinese', 'in chinese', 'nói tiếng trung', 'trả lời bằng tiếng trung'],
-      'vi': ['tieng viet', 'tiếng việt', 'vietnamese', 'nói tiếng việt', 'trả lời bằng tiếng việt'],
-    };
-
-    // Check if the message explicitly requests a language switch
-    let detectedIntentLang = null;
-    for (const [lang, keywords] of Object.entries(LANG_KEYWORDS)) {
-      if (keywords.some(kw => msgLower.includes(kw))) {
-        detectedIntentLang = lang;
-        break;
-      }
-    }
-
-    const languageFullNames = {
-      'en': 'English', 'jp': 'Japanese (日本語)', 'kr': 'Korean (한국어)',
-      'fr': 'French (Français)', 'vi': 'Vietnamese (Tiếng Việt)', 'zh': 'Chinese (中文)', 'auto': 'auto'
-    };
-
-    // --- SERVER-SIDE LANGUAGE DETECTION (Script Analysis) ---
-    // Detects language by analyzing Unicode character ranges in the message
-    function detectScriptLang(text) {
-      if (!text || text.length < 2) return null;
-      const hasKorean = /[\uAC00-\uD7AF\u1100-\u11FF]/.test(text);
-      if (hasKorean) return 'kr';
-      const hasJapanese = /[\u3040-\u30FF\u3400-\u4DBF]/.test(text);
-      if (hasJapanese) return 'jp';
-      const hasChinese = /[\u4E00-\u9FFF]/.test(text);
-      if (hasChinese) return 'zh';
-      const hasVietnamese = /[\u00C0-\u017F\u1EA0-\u1EFF]/i.test(text);
-      if (hasVietnamese) return 'vi';
-      // If mostly ASCII letters with no Vietnamese diacritics → English/Latin
-      const asciiLetters = (text.match(/[a-zA-Z]/g) || []).length;
-      if (asciiLetters > text.length * 0.4) return 'en';
-      return null;
-    }
-
-    // Final effective language priority:
-    // 1. Explicit dropdown selector (targetLang !== 'auto')
-    // 2. Explicit intent in message ("nói tiếng Anh")
-    // 3. Server-side script detection
-    // 4. Fall back to auto (let AI decide)
-    
-    const scriptDetectedLang = detectScriptLang(message);
-    console.log("🛠️ STRICT VALIDATION CHECK:", { message, targetLang, scriptDetectedLang });
-
-    // --- USER LANGUAGE VALIDATION (STRICT MODE) ---
-    if (targetLang !== 'auto' && scriptDetectedLang !== null) {
-      let isInvalid = false;
-      if (['en', 'fr'].includes(targetLang)) {
-         if (['vi', 'kr', 'jp', 'zh'].includes(scriptDetectedLang)) isInvalid = true;
-      } else if (targetLang === 'vi') {
-         if (['kr', 'jp', 'zh'].includes(scriptDetectedLang)) isInvalid = true;
-      } else if (['kr', 'jp', 'zh'].includes(targetLang)) {
-         if (scriptDetectedLang !== targetLang) isInvalid = true;
-      }
-
-      require('fs').writeFileSync('d:/D_n_mới/WanderViet_1/scratch/debug.json', JSON.stringify({targetLang, message, scriptDetectedLang, isInvalid}));
-
-      if (isInvalid) {
-         const langNames = { 'en': 'Tiếng Anh (English)', 'jp': 'Tiếng Nhật (日本語)', 'kr': 'Tiếng Hàn (한국어)', 'fr': 'Tiếng Pháp (Français)', 'vi': 'Tiếng Việt', 'zh': 'Tiếng Trung (中文)' };
-         return res.json({
-            success: true,
-            answer: `⚠️ Lỗi ngôn ngữ! Bạn đang chọn chế độ **${langNames[targetLang]}**. Vui lòng nhập bằng ${langNames[targetLang]} hoặc chuyển sang chế độ **AUTO**.`,
-            sessionId: currentSessionId,
-            source: 'language-validation'
-         });
-      }
-    }
-
-    const effectiveLang = (targetLang !== 'auto') ? targetLang
-      : (detectedIntentLang || scriptDetectedLang || 'auto');
-
-    // Build language rule — this will be PREPENDED to the system prompt
+    // Tạo chỉ dẫn ngôn ngữ cực kỳ nghiêm ngặt (Language Jail)
     let langRule = "";
-    if (effectiveLang === 'auto') {
-      langRule = `[ABSOLUTE RULE #1 — LANGUAGE]: Detect the language of the user message and respond ONLY in that exact language. Never use Vietnamese unless the user wrote in Vietnamese.`;
+    if (targetLang === 'auto') {
+      langRule = "DETECT: Identify the user's language and respond ONLY in that language.";
     } else {
-      const langName = languageFullNames[effectiveLang] || 'English';
-      langRule = `[ABSOLUTE RULE #1 — LANGUAGE]: You MUST respond ONLY in ${langName}. This overrides everything else. Do NOT use any other language — not even one word.`;
+      const langName = languageNames[targetLang] || 'Tiếng Việt';
+      langRule = `STRICT LANGUAGE MODE: You MUST respond ONLY in ${langName}. DO NOT use any other language.`;
     }
 
     // --- AI SELF-LEARNING MEMORY ---
@@ -476,18 +387,18 @@ QUY TẮC CỐT LÕI (CORE RULES):
       }
     }
 
-    // CRITICAL: Prepend language rule FIRST before any Vietnamese content
-    // This ensures the model reads the language constraint before being biased by Vietnamese text
-    systemPrompt = langRule + "\n\n" + systemPrompt;
-
     systemPrompt += `
+${langRule}
 CHARACTER: WanderViệt Assistant (Friendly, Proactive, Travel Expert).
 CONTEXT: ${locationContext} | ${tripContext}
-${userMemoryContext ? 'USER MEMORY: ' + userMemoryContext + '\n' : ''}
-${searchResult ? 'RESEARCH DATA: ' + searchResult + '\n' : ''}
+${userMemoryContext ? 'THÔNG TIN CÁ NHÂN (HÃY SỬ DỤNG ĐỂ CÁ NHÂN HÓA): ' + userMemoryContext + '\n' : ''}
+${searchResult ? 'THÔNG TIN MỚI TRA CỨU (HÃY SỬ DỤNG ĐỂ TRẢ LỜI): ' + searchResult + '\n' : ''}
 USER ROLE: ${userRole} | CURRENT PAGE: ${scope}
 LIMIT: Under 80 words.
-REMINDER: ${langRule}
+INSTRUCTION: 
+- Nếu người dùng nhắc đến thời tiết tốt/mát mẻ, hãy CHỦ ĐỘNG gợi ý họ đi dạo hoặc ghé thăm các địa điểm có cảnh quan đẹp.
+- Nếu đề xuất chuyến đi, hãy định dạng câu trả lời kèm theo thông tin chi tiết.
+- Luôn giữ thái độ thân thiện như một người bạn (BFF).
     `;
 
     // --- PHÁT HIỆN YÊU CẦU LẬP LỊCH TRÌNH (ITINERARY GENERATION) ---
@@ -595,11 +506,11 @@ Trả về CHỈ JSON theo format:
     try {
       // Ép model tuân thủ ngôn ngữ bằng cách nhúng thẳng lệnh vào câu hỏi cuối cùng
       let finalUserMessage = message;
-      if (effectiveLang !== 'auto') {
-        const langName = languageFullNames[effectiveLang] || 'Vietnamese';
-        finalUserMessage = `${message}\n\n[SYSTEM INSTRUCTION: You MUST reply ONLY in ${langName}. The user has explicitly requested this. Do NOT use any other language.]`;
+      if (targetLang !== 'auto') {
+        const langName = languageNames[targetLang] || 'Tiếng Việt';
+        finalUserMessage = `${message}\n\n[SYSTEM INSTRUCTION: You MUST reply in ${langName}. Do NOT use any other language.]`;
       } else {
-        finalUserMessage = `${message}\n\n[SYSTEM INSTRUCTION: Detect the language of my message and reply ONLY in that same language. Do not mix languages.]`;
+        finalUserMessage = `${message}\n\n[SYSTEM INSTRUCTION: Detect the language of my message and reply in that same language.]`;
       }
 
       // 4. Gọi Groq API

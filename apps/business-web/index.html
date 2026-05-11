@@ -148,6 +148,38 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
 .user-dropdown-item {
   display: flex; align-items: center; gap: 10px; padding: 12px 18px;
   color: #cbd5e1; font-size: 13px; font-weight: 600; cursor: pointer;
+  width: 100%; text-align: left; background: none; border: none;
+}
+.user-dropdown-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.user-dropdown-item.danger { color: #f43f5e; }
+.user-dropdown-sep { height: 1px; background: rgba(255,255,255,0.08); margin: 6px 0; }
+
+/* Business Topbar Switchers */
+.topbar-switcher {
+  display: flex; align-items: center; gap: 8px; position: relative;
+}
+.switcher-btn {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+  width: 44px; height: 44px; border-radius: 12px; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: 0.3s;
+}
+.switcher-btn:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
+.switcher-dropdown {
+  position: absolute; top: calc(100% + 12px); right: 0;
+  background: rgba(15,23,42,0.97); backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+  width: 220px; z-index: 9999; display: none; padding: 10px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.switcher-dropdown.is-active { display: block; }
+.sw-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  color: #cbd5e1; font-size: 13px; font-weight: 600; cursor: pointer;
+  border-radius: 10px; transition: 0.2s; text-decoration: none;
+}
+.sw-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+.sw-divider { height: 1px; background: rgba(255,255,255,0.08); margin: 6px 0; }
   transition: background 0.2s; border: none; background: transparent; width: 100%;
   text-align: left; text-decoration: none;
 }
@@ -215,6 +247,29 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
     </div>
     <div class="date-chip" id="date-range">📅 Đang tải...</div>
     <div class="search"><span>🔍</span><input placeholder="Tìm kiếm dịch vụ, đặt chỗ..."></div>
+    
+    <div class="topbar-switcher" id="biz-cat-switcher">
+      <div class="switcher-btn" title="Danh mục" onclick="this.parentElement.querySelector('.switcher-dropdown').classList.toggle('is-active'); event.stopPropagation();">🗂️</div>
+      <div class="switcher-dropdown">
+        <a href="#" class="sw-item"><span>🏨</span> Khách sạn</a>
+        <a href="#" class="sw-item"><span>🍴</span> Nhà hàng</a>
+        <a href="#" class="sw-item"><span>🎡</span> Giải trí</a>
+        <a href="#" class="sw-item"><span>🚌</span> Vận chuyển</a>
+        <div class="sw-divider"></div>
+        <a href="#" class="sw-item" style="color:var(--primary)">Xem tất cả →</a>
+      </div>
+    </div>
+
+    <div class="topbar-switcher" id="biz-lang-switcher">
+      <div class="switcher-btn" title="Ngôn ngữ" onclick="this.parentElement.querySelector('.switcher-dropdown').classList.toggle('is-active'); event.stopPropagation();"><span id="biz-current-flag">🇻🇳</span></div>
+      <div class="switcher-dropdown">
+        <div class="sw-item" onclick="document.getElementById('biz-current-flag').textContent='🇻🇳'; this.parentElement.classList.remove('is-active');">🇻🇳 Tiếng Việt</div>
+        <div class="sw-item" onclick="document.getElementById('biz-current-flag').textContent='🇬🇧'; this.parentElement.classList.remove('is-active');">🇬🇧 English</div>
+        <div class="sw-item" onclick="document.getElementById('biz-current-flag').textContent='🇯🇵'; this.parentElement.classList.remove('is-active');">🇯🇵 日本語</div>
+        <div class="sw-item" onclick="document.getElementById('biz-current-flag').textContent='🇰🇷'; this.parentElement.classList.remove('is-active');">🇰🇷 한국어</div>
+      </div>
+    </div>
+
     <div class="bell" style="cursor: pointer;" onclick="if(window.WanderUI) window.WanderUI.toggleNotificationDrawer();">🔔<div class="bell-badge" id="nav-bell-badge" data-notif-badge="true" style="display: none;">0</div></div>
     <div class="user-chip" id="topbar-user-chip" title="Tài khoản">
       <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff">🏨</div>
@@ -627,5 +682,10 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
   body.light-mode #theme-btn-light { background: #fff !important; color: #0f172a !important; border-color: #00e5ff !important; box-shadow: 0 10px 20px rgba(0,229,255,0.1) !important; }
 </style>
 
+  <script>
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.switcher-dropdown').forEach(dd => dd.classList.remove('is-active'));
+    });
+  </script>
 </body>
 </html>

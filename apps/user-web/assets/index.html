@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WanderViệt Brand - Design System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 50%, #06B6D4 100%);
+      --bg: #040914;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 100px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    header {
+      padding: 80px 0 40px;
+      text-align: center;
+    }
+
+    .brand-title {
+      font-size: 3rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+
+    .brand-subtitle {
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .main-showcase {
+      background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+      padding: 60px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .logo-frame {
+      width: 400px;
+      height: 400px;
+      padding: 20px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+      position: relative;
+    }
+
+    .logo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 32px;
+      margin-top: 80px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      backdrop-filter: blur(10px);
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #818cf8;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .meaning-item {
+      margin-bottom: 24px;
+    }
+
+    .meaning-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .meaning-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #06B6D4;
+      box-shadow: 0 0 10px #06B6D4;
+    }
+
+    .meaning-title {
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .meaning-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      padding-left: 20px;
+    }
+
+    .color-swatch {
+      height: 60px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .footer {
+      margin-top: 100px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      background: var(--primary-gradient);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 class="brand-title">WanderViệt</h1>
+      <p class="brand-subtitle">Thiết kế Logo Động — Ý tưởng & Chuyển động chuyên nghiệp</p>
+    </header>
+
+    <div class="main-showcase">
+      <div class="logo-frame">
+        <img src="/assets/wanderviet-logo-cropped-rounded.png" alt="WanderViet Final Logo">
+      </div>
+      <p style="margin-top: 20px; color: #818cf8; font-weight: 600;">Logo Chính Thức (Phiên bản cuối cùng)</p>
+    </div>
+
+    <!-- Step-by-Step Review Section -->
+    <div style="margin-top: 60px;">
+        <h2 style="text-align: center; margin-bottom: 40px; font-size: 1.5rem; letter-spacing: 2px; color: #f8fafc;">📋 KIỂM TRA TỪNG BƯỚC (STEP-BY-STEP)</h2>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+            <div class="card" style="padding: 15px;">
+                <img src="logo-steps/step-01.svg" style="width: 100%; border-radius: 12px; margin-bottom: 10px;">
+                <div style="font-size: 0.8rem; font-weight: 700;">01. ĐIỂM SÁNG</div>
+            </div>
+            <div class="card" style="padding: 15px;">
+                <img src="logo-steps/step-02.svg" style="width: 100%; border-radius: 12px; margin-bottom: 10px;">
+                <div style="font-size: 0.8rem; font-weight: 700;">02. VÒNG TRÒN</div>
+            </div>
+            <div class="card" style="padding: 15px;">
+                <img src="logo-steps/step-03.svg" style="width: 100%; border-radius: 12px; margin-bottom: 10px;">
+                <div style="font-size: 0.8rem; font-weight: 700;">03. HƯỚNG LA BÀN</div>
+            </div>
+            <div class="card" style="padding: 15px;">
+                <img src="logo-steps/step-04.svg" style="width: 100%; border-radius: 12px; margin-bottom: 10px;">
+                <div style="font-size: 0.8rem; font-weight: 700;">04. KIM XOAY</div>
+            </div>
+            <div class="card" style="padding: 15px;">
+                <img src="logo-steps/step-05.svg" style="width: 100%; border-radius: 12px; margin-bottom: 10px;">
+                <div style="font-size: 0.8rem; font-weight: 700;">05. GHIM ĐỊA ĐIỂM</div>
+            </div>
+            <div class="card" style="padding: 15px;">
+                <img src="logo-steps/step-06.svg" style="width: 100%; border-radius: 12px; margin-bottom: 10px;">
+                <div style="font-size: 0.8rem; font-weight: 700;">06. KHUÊ VĂN CÁC</div>
+            </div>
+            <div class="card" style="padding: 15px;">
+                <img src="logo-steps/step-07.svg" style="width: 100%; border-radius: 12px; margin-bottom: 10px;">
+                <div style="font-size: 0.8rem; font-weight: 700;">07. MÁY BAY</div>
+            </div>
+            <div class="card" style="padding: 15px;">
+                <img src="logo-steps/step-08.svg" style="width: 100%; border-radius: 12px; margin-bottom: 10px;">
+                <div style="font-size: 0.8rem; font-weight: 700;">08. HOÀN THIỆN</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="specs-grid">
+      <!-- Cột 1: Ý Nghĩa -->
+      <div class="card">
+        <h2>💎 Ý nghĩa thiết kế</h2>
+        
+        <div class="meaning-item">
+          <div class="meaning-header">
+            <div class="meaning-dot"></div>
+            <div class="meaning-title">La bàn & Định hướng</div>
+          </div>
+          <div class="meaning-desc">Vòng tròn la bàn tượng trưng cho sự dẫn lối, định hướng trong mỗi chuyến khám phá Việt Nam.</div>
+        </div>
+
+        <div class="meaning-item">
+          <div class="meaning-header">
+            <div class="meaning-dot" style="background: #8B5CF6; box-shadow: 0 0 10px #8B5CF6;"></div>
+            <div class="meaning-title">Điểm đến (Location Pin)</div>
+          </div>
+          <div class="meaning-desc">Được cách điệu như kim la bàn, đại diện cho những địa điểm đáng trải nghiệm.</div>
+        </div>
+
+        <div class="meaning-item">
+          <div class="meaning-header">
+            <div class="meaning-dot" style="background: #3B82F6; box-shadow: 0 0 10px #3B82F6;"></div>
+            <div class="meaning-title">Khuê Văn Các</div>
+          </div>
+          <div class="meaning-desc">Biểu tượng văn hóa, trí tuệ và bản sắc dân tộc Việt Nam được lồng ghép tinh tế.</div>
+        </div>
+      </div>
+
+      <!-- Cột 2: Hệ màu & Kỹ thuật -->
+      <div class="card">
+        <h2>🎨 Hệ màu & Kỹ thuật</h2>
+        
+        <div class="color-swatch" style="background: #8B5CF6; color: white;">#8B5CF6 - Premium Violet</div>
+        <div class="color-swatch" style="background: #3B82F6; color: white;">#3B82F6 - Electric Blue</div>
+        <div class="color-swatch" style="background: #06B6D4; color: white;">#06B6D4 - Sky Cyan</div>
+
+        <div style="margin-top: 32px;">
+          <h3 style="font-size: 0.9rem; color: #818cf8; margin-bottom: 12px;">KỊCH BẢN CHUYỂN ĐỘNG (4S)</h3>
+          <ol style="font-size: 0.85rem; color: var(--text-muted); padding-left: 20px;">
+            <li>01: Điểm sáng bùng nổ tại tâm</li>
+            <li>02: Vẽ vòng tròn la bàn bằng tia sáng</li>
+            <li>03: Hiển thị 4 hướng và các vạch chia</li>
+            <li>04: Kim la bàn tam giác xoay định hướng</li>
+            <li>05: Ghim địa điểm xuất hiện cùng hiệu ứng sóng nước</li>
+            <li>06: Khuê Văn Các hiện lên từ ánh sáng phía chân</li>
+            <li>07: Máy bay vẽ đường bay uốn lượn bao quanh</li>
+            <li>08: Hoàn thiện, toàn bộ logo bừng sáng và lặp lại</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      © 2026 WanderViệt — Premium Identity Design System
+    </div>
+  </div>
+</body>
+</html>

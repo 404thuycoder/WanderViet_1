@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WanderViet Animated Logo Demo</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --primary: #6366f1;
+            --secondary: #06b6d4;
+            --accent: #8b5cf6;
+            --glow: rgba(99, 102, 241, 0.6);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        .logo-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        svg {
+            width: 300px;
+            height: 300px;
+            filter: drop-shadow(0 0 10px var(--glow));
+        }
+
+        /* --- Bước 1: Điểm sáng trung tâm --- */
+        #center-dot {
+            opacity: 0;
+            animation: dot-appear 0.5s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes dot-appear {
+            0% { opacity: 0; transform: scale(0); filter: blur(10px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0); }
+        }
+
+        /* --- Bước 2: Vòng tròn la bàn --- */
+        #compass-ring {
+            stroke-dasharray: 630;
+            stroke-dashoffset: 630;
+            animation: draw-ring 1.5s ease-in-out forwards;
+            animation-delay: 1s;
+        }
+
+        @keyframes draw-ring {
+            to { stroke-dashoffset: 0; }
+        }
+
+        /* --- Bước 3: Các hướng la bàn --- */
+        .direction-arrow {
+            opacity: 0;
+            transform-origin: center;
+            animation: arrow-appear 0.5s ease-out forwards;
+        }
+        #arrow-n { animation-delay: 2.2s; }
+        #arrow-e { animation-delay: 2.4s; }
+        #arrow-s { animation-delay: 2.6s; }
+        #arrow-w { animation-delay: 2.8s; }
+
+        @keyframes arrow-appear {
+            0% { opacity: 0; transform: scale(0.5) translate(0, 10px); }
+            100% { opacity: 1; transform: scale(1) translate(0, 0); }
+        }
+
+        /* --- Bước 4: Kim la bàn xoay --- */
+        #compass-needle {
+            opacity: 0;
+            transform-origin: center;
+            animation: needle-appear 1s ease-out forwards, needle-spin 3s ease-in-out infinite alternate;
+            animation-delay: 3s, 4s;
+        }
+
+        @keyframes needle-appear {
+            from { opacity: 0; transform: rotate(-180deg) scale(0.5); }
+            to { opacity: 1; transform: rotate(0deg) scale(1); }
+        }
+
+        @keyframes needle-spin {
+            0% { transform: rotate(-10deg); }
+            100% { transform: rotate(10deg); }
+        }
+
+        /* --- Bước 5: Ghim vị trí --- */
+        #location-pin {
+            opacity: 0;
+            transform-origin: center;
+            animation: pin-drop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation-delay: 4.5s;
+        }
+
+        @keyframes pin-drop {
+            0% { opacity: 0; transform: translateY(-50px) scale(0.5); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* --- Bước 6: Khuê Văn Các --- */
+        #khue-van-cac {
+            opacity: 0;
+            animation: fade-in-glow 1s ease-out forwards;
+            animation-delay: 5.5s;
+        }
+
+        @keyframes fade-in-glow {
+            0% { opacity: 0; filter: brightness(2) blur(5px); }
+            100% { opacity: 1; filter: brightness(1) blur(0); }
+        }
+
+        /* --- Bước 7: Máy bay --- */
+        #airplane-group {
+            opacity: 0;
+            offset-path: path('M 250,150 C 350,50 450,250 250,350 C 50,450 -50,150 150,100');
+            animation: airplane-fly 4s linear infinite;
+            animation-delay: 7s;
+        }
+
+        @keyframes airplane-fly {
+            0% { opacity: 0; offset-distance: 0%; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; offset-distance: 100%; }
+        }
+
+        /* --- Bước 8: Hoàn thiện & Glow --- */
+        .logo-box {
+            position: relative;
+            padding: 20px;
+            border-radius: 60px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: box-glow 4s ease-in-out infinite alternate;
+            animation-delay: 8s;
+        }
+
+        @keyframes box-glow {
+            0% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.2); border-color: rgba(99, 102, 241, 0.1); }
+            100% { box-shadow: 0 0 50px rgba(99, 102, 241, 0.5); border-color: rgba(6, 182, 212, 0.4); }
+        }
+
+        .step-label {
+            margin-top: 30px;
+            color: white;
+            font-size: 14px;
+            opacity: 0.6;
+            text-align: center;
+            max-width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <div class="logo-box">
+            <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:var(--primary);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:var(--secondary);stop-opacity:1" />
+                    </linearGradient>
+                    <filter id="neon">
+                        <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+                        <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <!-- Bước 2: Vòng tròn la bàn -->
+                <circle id="compass-ring" cx="250" cy="250" r="100" fill="none" stroke="url(#grad1)" stroke-width="4" stroke-linecap="round" filter="url(#neon)" />
+
+                <!-- Bước 1: Điểm sáng -->
+                <circle id="center-dot" cx="250" cy="250" r="5" fill="white" filter="url(#neon)" />
+
+                <!-- Bước 3: Các hướng -->
+                <g id="directions" filter="url(#neon)">
+                    <path id="arrow-n" class="direction-arrow" d="M 250,120 L 260,140 L 250,135 L 240,140 Z" fill="white" />
+                    <path id="arrow-e" class="direction-arrow" d="M 380,250 L 360,240 L 365,250 L 360,260 Z" fill="white" />
+                    <path id="arrow-s" class="direction-arrow" d="M 250,380 L 240,360 L 250,365 L 260,360 Z" fill="white" />
+                    <path id="arrow-w" class="direction-arrow" d="M 120,250 L 140,260 L 135,250 L 140,240 Z" fill="white" />
+                </g>
+
+                <!-- Bước 4: Kim la bàn -->
+                <g id="compass-needle" filter="url(#neon)">
+                    <path d="M 250,200 L 265,250 L 250,240 L 235,250 Z" fill="var(--secondary)" />
+                    <path d="M 250,300 L 235,250 L 250,260 L 265,250 Z" fill="rgba(255,255,255,0.3)" />
+                </g>
+
+                <!-- Bước 6: Khuê Văn Các (Simplified) -->
+                <g id="khue-van-cac" transform="translate(210, 280) scale(0.4)" fill="none" stroke="white" stroke-width="8" filter="url(#neon)">
+                    <rect x="20" y="80" width="160" height="100" rx="5" />
+                    <path d="M 0,80 L 200,80 M 40,80 L 40,0 M 160,80 L 160,0 M 20,0 L 180,0" />
+                    <circle cx="100" cy="130" r="30" />
+                    <path d="M 0,180 L 200,180 M 50,180 L 50,220 M 150,180 L 150,220 M 20,220 L 180,220" />
+                </g>
+
+                <!-- Bước 5: Ghim vị trí -->
+                <g id="location-pin" filter="url(#neon)">
+                    <path d="M 250,270 C 230,270 215,255 215,235 C 215,215 250,180 250,180 C 250,180 285,215 285,235 C 285,255 270,270 250,270 Z" fill="url(#grad1)" />
+                    <circle cx="250" cy="235" r="8" fill="var(--bg-dark)" />
+                </g>
+
+                <!-- Bước 7: Máy bay -->
+                <g id="airplane-group">
+                    <path d="M -10,-10 L 10,0 L -10,10 L -5,0 Z" fill="white" filter="url(#neon)" transform="rotate(45)" />
+                </g>
+            </svg>
+        </div>
+        <div class="step-label" id="status-text">Đang khởi tạo...</div>
+    </div>
+
+    <script>
+        const statusText = document.getElementById('status-text');
+        const steps = [
+            { time: 500, text: "Bước 1: Xuất hiện điểm sáng ở giữa" },
+            { time: 1000, text: "Bước 2: Vẽ vòng tròn la bàn bằng ánh sáng" },
+            { time: 2200, text: "Bước 3: Hiện các hướng la bàn" },
+            { time: 3000, text: "Bước 4: Kim la bàn xoay và định hướng" },
+            { time: 4500, text: "Bước 5: Điểm đến (ghim) xuất hiện" },
+            { time: 5500, text: "Bước 6: Biểu tượng Khuê Văn Các hiện lên" },
+            { time: 7000, text: "Bước 7: Máy bay bay tạo đường bay uốn quanh" },
+            { time: 8000, text: "Bước 8: Hoàn thiện và tỏa sáng" }
+        ];
+
+        steps.forEach(step => {
+            setTimeout(() => {
+                statusText.innerText = step.text;
+                statusText.style.opacity = "1";
+            }, step.time);
+        });
+    </script>
+</body>
+</html>

@@ -18,7 +18,7 @@
                sessionStorage.getItem('wander_business_token');
     }
     if (!_getAuthToken()) {
-      window.location.replace('dashboard.html');
+      window.location.replace('pages/dashboard.html');
     }
     window._getAuthToken = _getAuthToken;
   })();
@@ -503,20 +503,20 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-<script src="api.js?v=5"></script>
-<script src="mockData.js?v=5"></script>
-<script src="biz-extend.js?v=5"></script>
-<script src="chatBox.js?v=5"></script>
-<script src="publicHomepage.js?v=7"></script>
-<script src="userAnalytics.js?v=7"></script>
-<script src="businessOverview.js?v=14"></script>
-<script src="serviceManagement.js?v=5"></script>
-<script src="reviewManagement.js?v=5"></script>
-<script src="bookingManagement.js?v=5"></script>
-<script src="messageManagement.js?v=5"></script>
-<script src="profileManagement.js?v=5"></script>
-<script src="paymentManagement.js?v=5"></script>
-<script src="SharedUI.js?v=999"></script>
+<script src="/js/api.js?v=5"></script>
+<script src="/js/mockData.js?v=5"></script>
+<script src="/js/biz-extend.js?v=5"></script>
+<script src="/js/chatBox.js?v=5"></script>
+<script src="/js/publicHomepage.js?v=7"></script>
+<script src="/js/userAnalytics.js?v=7"></script>
+<script src="/js/businessOverview.js?v=14"></script>
+<script src="/js/serviceManagement.js?v=5"></script>
+<script src="/js/reviewManagement.js?v=5"></script>
+<script src="/js/bookingManagement.js?v=5"></script>
+<script src="/js/messageManagement.js?v=5"></script>
+<script src="/js/profileManagement.js?v=5"></script>
+<script src="/js/paymentManagement.js?v=5"></script>
+<script src="/js/SharedUI.js?v=999"></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', async function() {

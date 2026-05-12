@@ -6,8 +6,8 @@ const cors = require('cors');
 const compression = require('compression');
 const path = require('path');
 const http = require('http');
-const { initBroadcastWorker } = require('./utils/broadcastWorker');
-const { initSocket } = require('./utils/socketManager');
+const { initBroadcastWorker } = require('./server/utils/broadcastWorker');
+const { initSocket } = require('./server/utils/socketManager');
 
 // Clean up environment variables
 if (process.env.GROQ_API_KEY) process.env.GROQ_API_KEY = process.env.GROQ_API_KEY.trim();
@@ -67,21 +67,21 @@ app.use('/api', (req, res, next) => {
 });
 
 // API Routes
-app.use('/api/public', require('./routes/public'));
-app.use('/api/chat', require('./routes/chat'));
-app.use('/api/places', require('./routes/places'));
-app.use('/api/auth', require('./routes/auth').router);
-app.use('/api/admin', require('./routes/admin'));
-app.use('/api/business', require('./routes/business'));
-app.use('/api/feedback', require('./routes/feedback'));
-app.use('/api/planner', require('./routes/planner'));
-app.use('/api/directions', require('./routes/directions'));
-app.use('/api/navi', require('./routes/ai-navigation'));
-app.use('/api/notifications', require('./routes/notifications'));
-app.use('/api/knowledge', require('./routes/knowledge'));
-app.use('/api/social', require('./routes/social'));
-app.use('/api/bookings', require('./routes/bookings'));
-app.use('/api/payments', require('./routes/payments'));
+app.use('/api/public', require('./server/routes/public'));
+app.use('/api/chat', require('./server/routes/chat'));
+app.use('/api/places', require('./server/routes/places'));
+app.use('/api/auth', require('./server/routes/auth').router);
+app.use('/api/admin', require('./server/routes/admin'));
+app.use('/api/business', require('./server/routes/business'));
+app.use('/api/feedback', require('./server/routes/feedback'));
+app.use('/api/planner', require('./server/routes/planner'));
+app.use('/api/directions', require('./server/routes/directions'));
+app.use('/api/navi', require('./server/routes/ai-navigation'));
+app.use('/api/notifications', require('./server/routes/notifications'));
+app.use('/api/knowledge', require('./server/routes/knowledge'));
+app.use('/api/social', require('./server/routes/social'));
+app.use('/api/bookings', require('./server/routes/bookings'));
+app.use('/api/payments', require('./server/routes/payments'));
 
 // Static User Web
 app.use('/assets', express.static(path.join(__dirname, 'apps/user-web/assets')));
@@ -144,9 +144,12 @@ const startPortals = () => {
 
 // Database & Start
 const dbOptions = {
-    serverSelectionTimeoutMS: 5000,
+    serverSelectionTimeoutMS: 10000, // Increase to 10s
     socketTimeoutMS: 45000,
-    family: 4
+    connectTimeoutMS: 10000,
+    heartbeatFrequencyMS: 10000,
+    retryWrites: true,
+    w: 'majority'
 };
 
 mongoose.connect(process.env.MONGODB_URI.trim(), dbOptions)

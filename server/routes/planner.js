@@ -463,22 +463,54 @@ ${userContext}`;
   }
 });
 
-// Lưu lịch trình theo User ID
 router.post('/save', auth, async (req, res) => {
   try {
-    const { itineraryId } = req.body;
-    if (!itineraryId) return res.status(400).json({ success: false, message: 'Mã lịch trình không hợp lệ.' });
+    const { itineraryId, planJson, destination, days, budget } = req.body;
+    
+    // TRƯỜNG HỢP 1: Lưu từ ID đã tồn tại (Draft -> My Trips)
+    if (itineraryId) {
+      const itin = await Itinerary.findById(itineraryId);
+      if (!itin) return res.status(404).json({ success: false, message: 'Không tìm thấy lịch trình.' });
 
-    const itin = await Itinerary.findById(itineraryId);
-    if (!itin) return res.status(404).json({ success: false, message: 'Không tìm thấy lịch trình.' });
+      itin.userId = req.user.id;
+      await itin.save();
+      return res.json({ success: true, message: 'Đã lưu lịch trình thành công.' });
+    } 
+    
+    // TRƯỜNG HỢP 2: Lưu lịch trình mới toanh (từ AI Chat trực tiếp)
+    if (planJson) {
+      if (!destination || !days) {
+        return res.status(400).json({ success: false, message: 'Thiếu thông tin điểm đến hoặc số ngày.' });
+      }
 
-    // Gắn userId cho itinerary này
-    itin.userId = req.user.id;
-    await itin.save();
+      // Lấy thêm thông tin user để DB đầy đủ
+      const userDoc = await User.findOne({
+        $or: [
+          { customId: req.user.id },
+          { id: req.user.id },
+          { _id: mongoose.Types.ObjectId.isValid(req.user.id) ? req.user.id : new mongoose.Types.ObjectId() }
+        ]
+      });
 
-    res.json({ success: true, message: 'Đã lưu lịch trình thành công.' });
+      const newItin = new Itinerary({
+        userId: req.user.id,
+        destination: String(destination),
+        days: Number(days),
+        budget: String(budget || planJson.estimatedCost || ""),
+        planJson: planJson,
+        userName: userDoc ? (userDoc.displayName || userDoc.name) : 'Thành viên',
+        userEmail: userDoc ? userDoc.email : ''
+      });
+
+      const saved = await newItin.save();
+      await logAction(newItin.userEmail, 'user', 'ITINERARY_SAVED_FROM_CHAT', { itineraryId: saved._id });
+      
+      return res.json({ success: true, message: 'Đã lưu lịch trình từ Chat!', itineraryId: saved._id });
+    }
+
+    return res.status(400).json({ success: false, message: 'Dữ liệu không hợp lệ để lưu.' });
   } catch (error) {
-    console.error('Planner DB Error:', error);
+    console.error('Planner Save Error:', error);
     res.status(500).json({ success: false, message: 'Lỗi server khi lưu thông tin.' });
   }
 });

@@ -402,46 +402,103 @@ INSTRUCTION:
 
     // --- PHÁT HIỆN YÊU CẦU LẬP LỊCH TRÌNH (ITINERARY GENERATION) ---
     const itineraryKeywords = [
-      'lập lịch', 'tạo lịch', 'lên kế hoạch', 'lịch trình', 'itinerary', 'hành trình cho', 'đặt lịch', 'thiết kế chuyến', 'tạo chuyến',
-      'lap lich', 'tao lich', 'len ke hoach', 'lich trinh', 'hanh trinh cho', 'dat lich', 'thiet ke chuyen', 'tao chuyen',
-      'đổi lịch', 'đổi điểm', 'đổi địa điểm', 'tạo lại lịch', 'làm lại lịch', 'thay điểm', 'đổi nha',
-      'doi lich', 'doi diem', 'doi dia diem', 'tao lai lich', 'lam lai lich', 'thay diem', 'doi nha'
+      'lên lịch', 'lập lịch', 'tạo lịch', 'lên kế hoạch', 'lịch trình', 'itinerary', 'hành trình cho', 'đặt lịch', 'thiết kế chuyến', 'tạo chuyến', 'lên plan', 'plan chuyến',
+      'len lich', 'lap lich', 'tao lich', 'len ke hoach', 'lich trinh', 'hanh trinh cho', 'dat lich', 'thiet ke chuyen', 'tao chuyen', 'len plan', 'plan chuyen',
+      'đổi lịch', 'đổi điểm', 'đổi địa điểm', 'tạo lại lịch', 'làm lại lịch', 'thay điểm',
+      'doi lich', 'doi diem', 'doi dia diem', 'tao lai lich', 'lam lai lich', 'thay diem',
+      'đi đâu', 'chơi gì', 'di dau', 'choi gi', 'muốn đi', 'muon di', 'cho mình đi', 'cho minh di'
     ];
     // Phát hiện thêm các câu đổi ý chung chung như "k thích đại điểm này đổi đi"
     const isModification = lowerMsg.includes('đổi') || lowerMsg.includes('doi') || lowerMsg.includes('k thích') || lowerMsg.includes('không thích') || lowerMsg.includes('khong thich');
     const isItineraryRequest = itineraryKeywords.some(k => lowerMsg.includes(k)) || 
-                               (isModification && (lowerMsg.includes('điểm') || lowerMsg.includes('diem') || lowerMsg.includes('chỗ') || lowerMsg.includes('cho') || lowerMsg.includes('này') || lowerMsg.includes('nay')));
+                               (isModification && (lowerMsg.includes('điểm') || lowerMsg.includes('diem') || lowerMsg.includes('chỗ') || lowerMsg.includes('cho') || lowerMsg.includes('này') || lowerMsg.includes('nay'))) ||
+                               (lowerMsg.includes('lịch') && lowerMsg.includes('trình')) ||
+                               (lowerMsg.includes('kế') && lowerMsg.includes('hoạch'));
 
 
     if (isItineraryRequest) {
       try {
-        // Trích xuất thông tin từ tin nhắn (hỗ trợ cả không dấu)
-        const destMatch = message.match(/(?:ở|tại|đến|đi|cho)\s+([A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+(?:\s[A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+)*)/i);
-        const daysMatch = message.match(/(\d+)\s*(?:ngày|ngay)/i);
+        // Trích xuất thông tin từ tin nhắn - regex linh hoạt hơn
+        // Ưu tiên: tìm tên địa điểm sau giới từ
+        let destMatch = message.match(/(?:ở|tại|đến|đi|cho|lên lịch|lập lịch|tạo lịch|hành trình|trip to)\s+([A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+(?:\s[A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+)*)/i);
+        // Fallback: tìm địa điểm ngay trước số ngày (vd: "Đà Lạt 3 ngày")
+        if (!destMatch) {
+          destMatch = message.match(/([A-ZÀ-Ỹ][a-zà-ỹ]+(?:\s[A-ZÀ-Ỹ][a-zà-ỹ]+){0,2})\s+\d+\s*(?:ngày|ngay)/i);
+        }
+        // Fallback: tìm tên tỉnh thành phổ biến trực tiếp trong câu
+        if (!destMatch) {
+          const popularDests = ['Hà Nội', 'Hồ Chí Minh', 'Sài Gòn', 'Đà Lạt', 'Đà Nẵng', 'Hội An', 'Nha Trang', 'Phú Quốc', 'Huế', 'Hạ Long', 'Sa Pa', 'Cần Thơ', 'Mũi Né', 'Phan Thiết', 'Tuyên Quang', 'Ninh Bình', 'Quy Nhơn', 'Bình Định', 'Vũng Tàu', 'Côn Đảo', 'Bình Thuận', 'Lào Cai', 'Điện Biên'];
+          const found = popularDests.find(d => message.toLowerCase().includes(d.toLowerCase()));
+          if (found) destMatch = [null, found];
+        }
+        const daysMatch = message.match(/(\d+)\s*(?:ngày|ngay|day)/i);
         const budgetMatch = message.match(/(\d+)\s*(?:triệu|tr|trieu)/i);
         const autoGenKeywords = ['tùy mày', 'tùy m', 'tự động', 'auto', 'tùy ý', 'tự tạo', 'muốn gì cũng được', 'bất kỳ', 'tuy may', 'tuy m', 'tu dong', 'tuy y', 'tu tao', 'muon gi cung duoc', 'bat ky'];
         const isAutoGen = autoGenKeywords.some(k => lowerMsg.includes(k));
 
         const destination = destMatch ? destMatch[1].trim() : null;
-        const days = daysMatch ? parseInt(daysMatch[1]) : null;
+        const days = daysMatch ? parseInt(daysMatch[1]) : (isAutoGen ? 3 : null);
         const budget = budgetMatch ? parseInt(budgetMatch[1]) : null;
 
-        // --- TỰ ĐỘNG LÊN LỊCH TRÌNH BẰNG AI (BỎ QUA FORM) ---
-        // AI sẽ tự động đoán hoặc dùng giá trị mặc định, kết hợp với bộ nhớ (BFF)
-        const finalDays = days || 3;
-        const finalBudget = budget || 5;
+        // --- QUYẾT ĐỊNH: PROPOSALS HAY DIRECT ITINERARY? ---
+        const isSpecific = destination && days;
 
-        console.log(`✈️ [Itinerary] Generating: ${destination || 'Auto-context'}, ${finalDays} ngày, ${finalBudget}tr...`);
+        if (isSpecific) {
+          console.log(`✈️ [Itinerary] Generating DIRECT Plan for: ${destination}, ${days} ngày...`);
+          const directCompletion = await groq.chat.completions.create({
+            messages: [
+              {
+                role: 'system',
+                content: `Bạn là chuyên gia lập lịch trình du lịch Việt Nam. Hãy tạo một lịch trình chi tiết và trả về CHỈ JSON.
+Cấu trúc JSON:
+{
+  "tripSummary": "Mô tả ngắn gọn",
+  "destination": "Tên tỉnh/thành",
+  "days": number,
+  "estimatedCost": "Khoảng giá",
+  "itinerary": [
+    {
+      "day": number,
+      "title": "Tên ngày",
+      "activities": [
+        { "time": "HH:MM", "name": "Hoạt động", "location": "Địa điểm", "tip": "Mẹo nhỏ", "cost": "Giá ước tính" }
+      ]
+    }
+  ]
+}`
+              },
+              ...chatHistory.slice(-4),
+              { role: 'user', content: `Lập lịch trình ${days} ngày tại ${destination}. ${message}` }
+            ],
+            model: 'llama-3.1-8b-instant',
+            temperature: 0.7,
+            response_format: { type: 'json_object' }
+          });
 
-        let userPrompt = `Lập lịch trình ${finalDays} ngày, ngân sách ${finalBudget} triệu VNĐ/người.`;
-        if (destination) {
-            userPrompt = `Lập lịch trình ${finalDays} ngày tại ${destination}, ngân sách ${finalBudget} triệu VNĐ/người.`;
+          const itinJson = JSON.parse(directCompletion.choices[0]?.message?.content || '{}');
+          if (itinJson && itinJson.itinerary) {
+            const answer = `Tuyệt vời! Mình đã lên lịch trình chi tiết cho chuyến đi ${destination} trong ${days} ngày của bạn đây. Bạn xem qua nhé! ✨\n[ITIN_CARD:${JSON.stringify(itinJson)}]`;
+            
+            if (chatbotDb.readyState === 1) {
+              if (!currentSessionId) currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+              await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'user', text: message }).save();
+              await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: answer }).save();
+            }
+
+            return res.json({
+              success: true,
+              answer: answer,
+              sessionId: currentSessionId,
+              itineraryCard: itinJson,
+              source: 'direct-itinerary-generator'
+            });
+          }
         }
-        userPrompt += ` Yêu cầu thêm từ người dùng: "${message}". 
-NẾU người dùng yêu cầu ĐỔI LỊCH (không thích địa điểm), hãy đọc kỹ lịch sử chat để biết điểm đến đang là tỉnh/thành phố nào, sau đó tạo một lịch trình MỚI HOÀN TOÀN thay thế các điểm họ không thích. Không thay đổi điểm đến (tỉnh/thành phố) trừ khi họ yêu cầu rõ.`;
-
 
         // --- TẠO NHIỀU ĐỀ XUẤT LỊCH TRÌNH (PROPOSALS) ---
+        const finalDays = days || 3;
+        const finalBudget = budget || 5;
+        const destContext = destination ? `tại ${destination}` : 'tại Việt Nam';
         console.log(`✈️ [Itinerary] Generating Proposals for: ${destination || 'Auto-context'}, ${finalDays} ngày, ${finalBudget}tr...`);
 
         const itinCompletion = await groq.chat.completions.create({
@@ -465,7 +522,7 @@ Trả về CHỈ JSON theo format:
 }`
             },
             ...chatHistory.slice(-6),
-            { role: 'user', content: userPrompt }
+            { role: 'user', content: `${message} (${finalDays} ngày, ngân sách ~${finalBudget}tr, ${destContext})` }
           ],
           model: 'llama-3.1-8b-instant',
           temperature: 0.8,

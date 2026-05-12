@@ -1,4 +1,5 @@
-﻿from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw
+
 
 def make_rounded_transparent(image_path, output_path, radius):
     img = Image.open(image_path).convert("RGBA")

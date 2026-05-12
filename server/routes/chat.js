@@ -414,7 +414,6 @@ INSTRUCTION:
 
 
     if (isItineraryRequest) {
-      console.log('🗓️ [Itinerary] Phát hiện yêu cầu lập lịch, đang xử lý...');
       try {
         // Trích xuất thông tin từ tin nhắn (hỗ trợ cả không dấu)
         const destMatch = message.match(/(?:ở|tại|đến|đi|cho)\s+([A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+(?:\s[A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+)*)/i);

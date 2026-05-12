@@ -2082,10 +2082,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       });
     });
 
-    // Đảm bảo mỗi lần reset trang là một phiên chat mới hoàn toàn (như ChatGPT)
-    // Các hội thoại cũ sẽ nằm trong phần Lịch sử (History)
-    localStorage.removeItem('wander_current_session');
-    localStorage.removeItem('wander_shared_chat');
+    // Cho phép giữ lại phiên chat để trải nghiệm liền mạch hơn
+    // localStorage.removeItem('wander_current_session');
+    // localStorage.removeItem('wander_shared_chat');
     let currentSessionId = null;
 
     // Flag: chỉ đọc to (TTS) khi user dùng giọng nói, không đọc khi gõ text
@@ -2095,7 +2094,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     function setupVoiceIntegration() {
         if (window.voiceGuide) {
             window.voiceGuide.onResultCallback = (text) => {
-                console.log("🎙️ Voice Result:", text);
                 const inputEl = document.getElementById('global-chat-input');
                 const formEl = document.getElementById('global-chat-form');
                 if (inputEl && formEl) {

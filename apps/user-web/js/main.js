@@ -2619,6 +2619,11 @@
       searchInput.value = query;
       suggestionsBox.classList.remove('is-visible');
 
+      // Record activity
+      if (window.WanderUI && WanderUI.recordActivity) {
+        WanderUI.recordActivity('search', `Đã tìm kiếm từ khóa: "${query}"`, { query: query });
+      }
+
       // Action based on current page
       var destSection = document.getElementById('destinations');
       if (destSection) {
@@ -2771,16 +2776,20 @@
       if (topPlaces.length < 5) topPlaces = PLACES.slice(0, 10);
       slides = topPlaces.map(p => ({
         url: (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200'),
-        id: p.id,
+        id: p.id || p._id,
         name: p.name,
-        region: p.region || 'Việt Nam',
+        region: p.region || p.province || 'Việt Nam',
         verified: p.verified
       }));
-    } else {
+    } 
+    
+    // Luôn đảm bảo có ít nhất vài slide chất lượng cao làm fallback nếu slides trống hoặc lỗi
+    if (slides.length === 0) {
       slides = [
         { url: 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200', id: null, name: 'Phố cổ Hội An', region: 'Quảng Nam', verified: true },
         { url: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?q=80&w=1200', id: null, name: 'Vịnh Hạ Long', region: 'Quảng Ninh', verified: true },
-        { url: 'https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?q=80&w=1200', id: null, name: 'Sa Pa', region: 'Lào Cai', verified: true }
+        { url: 'https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?q=80&w=1200', id: null, name: 'Sa Pa', region: 'Lào Cai', verified: true },
+        { url: 'https://images.unsplash.com/photo-1555431189-d58b1740006d?q=80&w=1200', id: null, name: 'Đà Nẵng', region: 'Miền Trung', verified: true }
       ];
     }
 

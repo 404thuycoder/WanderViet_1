@@ -605,6 +605,11 @@
                 document.getElementById('p-review-count').innerText = `(${(p.reviewCount || 0)} đánh giá)`;
                 document.getElementById('p-fav-count').innerText = p.favoritesCount || 0;
                 document.getElementById('p-addr').innerText = (p.address || 'Việt Nam').split(',').pop().trim();
+                
+                // Record activity
+                if (window.WanderUI && WanderUI.recordActivity) {
+                    WanderUI.recordActivity('view_place', `Đã xem địa điểm: ${p.name}`, { placeId: p._id, placeName: p.name });
+                }
 
                 // Check initial favorite state for logged-in users
                 const token = localStorage.getItem('wander_token');

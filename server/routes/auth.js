@@ -158,6 +158,7 @@ const verifyPortalToken = (expectedPortal) => async (req, res, next) => {
         rank: accountData.rank || 'Đồng',
         rankTier: accountData.rankTier || 'I',
         claimedQuests: accountData.claimedQuests || [],
+        favorites: accountData.favorites || [],
         cover: accountData.cover || '',
         notes: accountData.notes || ''
       };

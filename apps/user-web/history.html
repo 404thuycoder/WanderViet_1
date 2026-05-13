@@ -1,898 +1,153 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-
-    <!-- WanderViet Translation Curtain -->
-    <script>
-      if (document.cookie.match(/googtrans=\/vi\/(?!vi)[a-zA-Z-]+/)) {
-        document.documentElement.classList.add('translating-curtain');
-      }
-    </script>
-    <style>
-      html.translating-curtain::before {
-        content: "Translating Experience...";
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: #0f172a; color: #f1f5f9;
-        display: flex; align-items: center; justify-content: center;
-        z-index: 9999999; font-family: sans-serif; font-size: 16px; font-weight: 600; letter-spacing: 1px;
-      }
-      html.translating-curtain body {
-        opacity: 0 !important;
-        pointer-events: none !important;
-      }
-      html.translated-ltr::before, html.translated-rtl::before {
-        display: none !important;
-      }
-      html.translated-ltr body, html.translated-rtl body {
-        opacity: 1 !important;
-        pointer-events: auto !important;
-        transition: opacity 0.4s ease;
-      }
-    </style>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lịch sử hoạt động - WanderViệt</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌏</text></svg>">
-  <link rel="stylesheet" href="css/global-tokens.css">
-  <link rel="stylesheet" href="css/styles.css">
+  <title>Lịch sử & Hoạt động - WanderViệt</title>
+  <link rel="icon" type="image/png" href="/assets/wanderviet-logo-cropped-rounded.png">
+  <link rel="stylesheet" href="css/global-tokens.css?v=6.0">
+  <link rel="stylesheet" href="css/styles.css?v=6.0">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg-gradient: radial-gradient(circle at 50% -20%, #f1f5f9 0%, #e2e8f0 100%);
-    }
-    [data-theme="dark"] {
-      --bg-gradient: radial-gradient(circle at 50% -20%, #1e293b 0%, #0f172a 100%);
-    }
-    body {
-      background: var(--bg);
-      background-image: var(--bg-gradient);
-      color: var(--text);
-      min-height: 100vh;
-      transition: background 0.4s ease, color 0.4s ease;
-      margin: 0;
-    }
-    .history-hero {
-      padding: 6rem 0 4rem;
-      text-align: center;
-      position: relative;
-    }
-    .history-hero h1 {
-      font-size: 3.5rem;
-      font-family: var(--font-display);
-      margin-bottom: 1rem;
-      background: linear-gradient(to right, var(--text), var(--primary));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-weight: 800;
-      letter-spacing: -1px;
-    }
+    :root { --bg-soft: #f8fafc; --accent: #6366f1; --radius: 24px; }
+    body { background: var(--bg-soft); font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; margin: 0; }
+
+    /* ── Hero ── */
+    .hero { background: linear-gradient(135deg, #e0e7ff 0%, #ffffff 100%); padding: 100px 20px 60px; text-align: center; }
+    .hero h1 { font-size: 3.2rem; font-weight: 800; margin: 0 0 30px; color: #0f172a; letter-spacing: -2px; }
+    .hero-search { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 100px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); padding: 5px; display: flex; align-items: center; }
+    .hero-search input { flex: 1; border: none; padding: 15px 25px; font-size: 1rem; font-weight: 600; outline: none; border-radius: 100px; }
+    .hero-search button { background: var(--accent); color: #fff; border: none; padding: 12px 30px; border-radius: 100px; font-weight: 700; cursor: pointer; }
+
+    /* ── Layout ── */
+    .dashboard { max-width: 1500px; margin: 0 auto; padding: 40px; display: grid; grid-template-columns: 300px 1fr; gap: 40px; }
+
+    /* ── Sidebar ── */
+    .sidebar-wrapper { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 20px; }
+    .sidebar-card { background: #fff; border-radius: var(--radius); padding: 25px 15px; box-shadow: 0 4px 24px rgba(0,0,0,0.02); }
+    .sb-label { font-size: 0.7rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px 15px; }
+    .sb-label:first-child { margin-top: 0; }
     
-    .history-tabs-container {
-      position: sticky;
-      top: 72px;
-      z-index: 10;
-      background: var(--surface-overlay);
-      backdrop-filter: var(--glass-blur);
-      -webkit-backdrop-filter: var(--glass-blur);
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 2.5rem;
-      transition: all 0.3s ease;
-    }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-radius: 16px; color: #64748b; font-weight: 700; cursor: pointer; transition: 0.2s; position: relative; font-size: 0.9rem; }
+    .nav-item:hover { background: #f8fafc; color: #000; }
+    .nav-item.is-active { background: var(--accent); color: #fff; box-shadow: 0 10px 20px rgba(99,102,241,0.2); }
+    .nav-count { margin-left: auto; font-size: 0.75rem; font-weight: 800; opacity: 0.8; }
+    .dot-alert { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; display: none; animation: p 1.5s infinite; }
+    @keyframes p { 0%, 100% { opacity:1; } 50% { opacity:0.3; } }
+
+    /* ── Dynamic Filters in Sidebar ── */
+    .sb-filter-group { margin-top: 25px; padding-top: 20px; border-top: 1px solid #f1f5f9; }
+    .sb-filter-list { display: flex; flex-direction: column; gap: 5px; }
+    .sb-filter-item { padding: 8px 18px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; color: #64748b; cursor: pointer; transition: 0.2s; }
+    .sb-filter-item:hover { background: #f1f5f9; color: var(--accent); }
+    .sb-filter-item.active { color: var(--accent); background: #f5f3ff; font-weight: 800; }
+
+    /* ── Main Area ── */
+    .content-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; }
+    .top-left h2 { font-size: 2rem; font-weight: 800; margin: 0 0 5px; letter-spacing: -1px; }
+    .top-left p { color: #64748b; font-weight: 600; font-size: 0.9rem; margin: 0; }
     
-    .history-tabs {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      padding: 1rem;
-      max-width: 1200px;
-      margin: 0 auto;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-    .history-tabs::-webkit-scrollbar { display: none; }
+    .stats-row { display: flex; gap: 15px; }
+    .stat-mini { background: #fff; padding: 15px 25px; border-radius: 18px; border: 1px solid #f1f5f9; text-align: center; }
+    .stat-val { display: block; font-size: 1.3rem; font-weight: 800; color: #0f172a; }
+    .stat-lb { font-size: 0.65rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .history-tab {
-      padding: 0.85rem 1.75rem;
-      border-radius: 14px;
-      background: var(--glass-bg);
-      color: var(--text-muted);
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.3s var(--ease);
-      border: 1px solid var(--glass-border);
-      font-size: 0.95rem;
-    }
-    .history-tab.is-active {
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
-      border-color: transparent;
-      transform: translateY(-2px);
-    }
+    /* ── Grid & Timeline ── */
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+    .v-card { background: #fff; border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); transition: 0.3s; border: 1px solid #f1f5f9; }
+    .v-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.05); }
+    .v-img-wrap { height: 200px; position: relative; }
+    .v-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .v-badge-top { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.7); color:#fff; padding:5px 12px; border-radius:8px; font-weight:800; font-size:0.8rem; }
+    .v-status-tag { position: absolute; top: 12px; left: 12px; padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; color:#fff; }
+    .tag-info { background: #3b82f6; } .tag-warn { background: #f59e0b; } .tag-ok { background: #10b981; } .tag-err { background: #ef4444; }
 
-    .history-container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 2rem 5rem;
-    }
+    .v-body { padding: 20px; }
+    .v-cat { font-size: 0.65rem; font-weight: 800; color: var(--accent); text-transform: uppercase; margin-bottom: 5px; }
+    .v-title { font-size: 1.15rem; font-weight: 800; margin: 0 0 10px; color: #0f172a; line-height: 1.4; }
+    .v-meta { font-size: 0.8rem; color: #64748b; font-weight: 600; display: flex; gap: 12px; }
+    .v-footer { padding: 12px 20px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
 
-    .history-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-    }
+    /* ── Timeline ── */
+    .timeline { position: relative; padding-left: 40px; }
+    .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: #f1f5f9; }
+    .act-log { position: relative; margin-bottom: 25px; }
+    .act-dot { position: absolute; left: -36px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); z-index: 2; }
+    .act-info { background: #fff; padding: 15px 20px; border-radius: 18px; border: 1px solid #f1f5f9; }
+    .act-time { font-size: 0.75rem; font-weight: 800; color: #94a3b8; margin-bottom: 4px; }
+    .act-txt { font-weight: 700; font-size: 0.95rem; color: #1e293b; margin: 0; }
 
-    .history-card {
-      background: var(--bg-elevated);
-      border-radius: 24px;
-      padding: 1.75rem;
-      border: 1px solid var(--border);
-      display: flex;
-      gap: 1.75rem;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: var(--shadow-sm);
-    }
-    .history-card:hover {
-      transform: translateY(-6px) scale(1.01);
-      background: var(--glass-bg);
-      border-color: var(--primary);
-      box-shadow: var(--shadow-lg);
-    }
-    .history-card__media {
-      width: 140px;
-      height: 140px;
-      border-radius: 20px;
-      background-size: cover;
-      background-position: center;
-      flex-shrink: 0;
-      box-shadow: var(--shadow-sm);
-    }
-    .history-card__content {
-      flex: 1;
-    }
-    .history-card__type {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--primary);
-      margin-bottom: 0.75rem;
-      font-weight: 800;
-    }
-    .history-card__title {
-      font-size: 1.5rem;
-      font-weight: 800;
-      margin-bottom: 0.5rem;
-      font-family: var(--font-display);
-      color: var(--text);
-    }
-    .history-card__meta {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .history-card__text {
-      font-style: italic;
-      line-height: 1.6;
-      color: var(--text);
-      background: var(--bg);
-      padding: 1.25rem;
-      border-radius: 16px;
-      border-left: 4px solid var(--primary);
-    }
+    .empty-box { text-align: center; padding: 80px 0; color: #94a3b8; grid-column: 1/-1; font-weight: 600; }
 
-    .trip-card {
-      background: var(--bg-elevated);
-      border: 1px solid var(--border);
-    }
-    .trip-status {
-      padding: 0.4rem 1rem;
-      border-radius: 30px;
-      font-size: 0.7rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .status-completed { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
-    .status-planning { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
-    .status-cancelled { background: rgba(244, 63, 94, 0.1); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.2); }
-
-    .empty-state {
-      text-align: center;
-      padding: 6rem 2rem;
-      background: var(--bg-elevated);
-      border-radius: 32px;
-      border: 2px dashed var(--border);
-      animation: fadeIn 0.5s ease;
-    }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Grid for Wishlist tab */
-    .wishlist-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .history-subfilters {
-      display: flex;
-      gap: 0.25rem;
-      margin-bottom: 3rem;
-      padding: 0.5rem;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      width: fit-content;
-      max-width: 100%;
-      margin-left: auto;
-      margin-right: auto;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-      position: relative;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-    .history-subfilters::-webkit-scrollbar { display: none; }
-    
-    .subfilter-btn {
-      padding: 0.8rem 1.75rem;
-      border-radius: 18px;
-      border: none;
-      background: transparent;
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 0.85rem;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: relative;
-      z-index: 2;
-    }
-    .subfilter-btn:hover {
-      color: #fff;
-    }
-    .subfilter-btn.is-active {
-      color: #fff;
-      background: var(--primary);
-      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.5);
-      transform: scale(1.05);
-    }
-    
-    .history-card {
-      background: var(--bg-elevated);
-      border-radius: 32px;
-      padding: 2rem;
-      border: 1px solid var(--border);
-      display: flex;
-      gap: 2rem;
-      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: var(--shadow-md);
-      position: relative;
-      overflow: hidden;
-    }
-    .history-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.02) 100%);
-      pointer-events: none;
-    }
-    .history-card:hover {
-      transform: translateY(-8px);
-      border-color: var(--primary);
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
-      background: var(--surface-overlay);
-    }
-    
-    .kind-badge {
-      padding: 6px 14px;
-      border-radius: 10px;
-      font-size: 0.75rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .kind-badge--tour { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .kind-badge--hotel { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .kind-badge--restaurant { background: rgba(244, 63, 94, 0.15); color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
-    .kind-badge--default { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.3); }
+    @media (max-width: 1100px) { .dashboard { grid-template-columns: 1fr; } .sidebar-wrapper { position: static; } .stats-row { flex-direction: column; } }
   </style>
 </head>
 <body>
+  <header id="header-container"></header>
 
-  <header class="site-header" id="header-container"></header>
-
-  <section class="history-hero">
-    <div class="container">
-      <h1>Lịch sử hoạt động</h1>
-      <p class="text-muted">Xem lại hành trình, đánh giá và những khoảnh khắc của bạn cùng WanderViệt.</p>
+  <section class="hero">
+    <h1>WanderViệt<br>Lịch sử & Hoạt động</h1>
+    <div class="hero-search">
+      <input type="text" id="search-input" placeholder="Tìm kiếm nhanh đơn hàng hoặc hoạt động...">
+      <button onclick="renderList()">Tìm kiếm</button>
     </div>
   </section>
 
-  <div class="history-tabs-container">
-    <div class="history-tabs">
-      <div class="history-tab is-active" data-tab="wishlist">❤️ Yêu thích</div>
-      <div class="history-tab" data-tab="trips">🎒 Chuyến đi</div>
-      <div class="history-tab" data-tab="bookings">🏨 Dịch vụ đã đặt</div>
-      <div class="history-tab" data-tab="reviews">⭐ Đánh giá địa điểm</div>
-    </div>
-  </div>
+  <div class="dashboard">
+    <aside class="sidebar-wrapper">
+      <div class="sidebar-card">
+        <div class="sb-label">Danh mục chính</div>
+        <div class="nav-item is-active" data-tab="wishlist">
+          <span>❤️</span> <span>Yêu thích</span> <span class="nav-count" id="count-wishlist">0</span>
+        </div>
+        <div class="nav-item" data-tab="bookings">
+          <span>🏨</span> <span>Đặt chỗ</span> <span class="nav-count" id="count-bookings">0</span>
+          <div class="dot-alert" id="pending-dot"></div>
+        </div>
+        <div class="nav-item" data-tab="trips">
+          <span>🎒</span> <span>Hành trình AI</span> <span class="nav-count" id="count-trips">0</span>
+        </div>
+        <div class="nav-item" data-tab="transactions">
+          <span>💰</span> <span>Giao dịch</span> <span class="nav-count" id="count-txns">0</span>
+        </div>
+        <div class="nav-item" data-tab="activities">
+          <span>🕒</span> <span>Hoạt động</span> <span class="nav-count" id="count-acts">0</span>
+        </div>
 
-  <div class="history-container">
-    <div id="history-subfilters" class="history-subfilters"></div>
-    <div id="history-content">
-      <!-- Content will be injected here -->
-      <div style="text-align: center; padding: 4rem;">
-        <div class="btn-loading" style="width: 40px; height: 40px; margin: 0 auto 1rem;"></div>
-        <p>Đang tải dữ liệu thực tế...</p>
+        <!-- Bộ lọc linh hoạt sẽ hiện ở đây -->
+        <div id="dynamic-filters"></div>
       </div>
-    </div>
+    </aside>
+
+    <main>
+      <div class="content-top">
+        <div class="top-left">
+          <h2 id="tab-title">Yêu thích</h2>
+          <p>Khám phá <strong id="result-count-val">0</strong> kết quả lịch sử của bạn</p>
+        </div>
+        <div class="stats-row">
+          <div class="stat-mini">
+            <span class="stat-val" id="stat-spent">0đ</span>
+            <span class="stat-lb">Tổng chi tiêu</span>
+          </div>
+          <div class="stat-mini">
+            <span class="stat-val" id="stat-trips">0</span>
+            <span class="stat-lb">Chuyến đi</span>
+          </div>
+          <div class="stat-mini">
+            <span class="stat-val" id="stat-places">0</span>
+            <span class="stat-lb">Điểm đến</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="list-area"></div>
+    </main>
   </div>
 
-  <script src="js/SharedUI.js?v=1778494902144"></script>
-  <script src="js/places-data.js"></script>
-  <script>
-    (function() {
-      // Sync theme from documentElement to body for local overrides
-      const syncTheme = () => {
-        const theme = document.documentElement.getAttribute('data-theme') || 'dark';
-        document.body.setAttribute('data-theme', theme);
-      };
-      const themeObserver = new MutationObserver(syncTheme);
-      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-      syncTheme();
+  <footer id="footer-container"></footer>
 
-      const content = document.getElementById('history-content');
-      const tabs = document.querySelectorAll('.history-tab');
-      const subfiltersWrap = document.getElementById('history-subfilters');
-      let currentTab = 'wishlist';
-      let currentSubfilter = 'all';
-      let PLACES = [];
-      const token = localStorage.getItem('wander_token');
-
-      // Data stores for event delegation & filtering
-      const placeStore = {};
-      const tripStore = {};
-      const bookingStore = {};
-      
-      let rawData = {
-        wishlist: [],
-        trips: [],
-        bookings: [],
-        reviews: [],
-        feedbacks: []
-      };
-
-      async function init() {
-        if (!token) {
-          content.innerHTML = '<div class="empty-state"><h2>Vui lòng đăng nhập</h2><p>Bạn cần đăng nhập để xem lịch sử hoạt động.</p><button class="btn btn--primary" onclick="WanderUI.openAuthModal()">Đăng nhập ngay</button></div>';
-          return;
-        }
-
-        try {
-          const res = await fetch('/api/places?t=' + Date.now());
-          const json = await res.json();
-          PLACES = json.success ? json.data : (window.WANDER_PLACES || []);
-        } catch(e) {
-          PLACES = window.WANDER_PLACES || [];
-        }
-
-        // Pre-populate placeStore from static data
-        PLACES.forEach(p => { 
-          if (p.id) placeStore[p.id] = p; 
-          if (p._id) placeStore[p._id] = p;
-        });
-
-        // Auto-select tab from hash or query
-        const urlParams = new URLSearchParams(window.location.search);
-        const openBookingId = urlParams.get('openBooking');
-        const hash = window.location.hash.replace('#', '');
-        
-        if (openBookingId) {
-          currentTab = 'bookings';
-        } else if (hash && ['wishlist', 'trips', 'bookings', 'reviews', 'feedbacks'].includes(hash)) {
-          currentTab = hash;
-        }
-
-        tabs.forEach(t => {
-          t.classList.toggle('is-active', t.getAttribute('data-tab') === currentTab);
-        });
-
-        await loadTabData(currentTab);
-
-        if (openBookingId && currentTab === 'bookings') {
-          setTimeout(() => {
-            if (window.WanderUI && typeof WanderUI.openBookingDetail === 'function') {
-              WanderUI.openBookingDetail(openBookingId);
-            }
-          }, 600);
-        }
-      }
-
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          if (currentTab === tab.getAttribute('data-tab')) return;
-          tabs.forEach(t => t.classList.remove('is-active'));
-          tab.classList.add('is-active');
-          currentTab = tab.getAttribute('data-tab');
-          currentSubfilter = 'all';
-          loadTabData(currentTab);
-        });
-      });
-
-      function renderSubfilters(tab) {
-        let filters = [{ id: 'all', label: '🏷️ Tất cả' }];
-        
-        if (tab === 'wishlist') {
-          filters.push(
-            { id: 'diem-du-lich', label: '🏛️ Tham quan' },
-            { id: 'nha-hang', label: '🥘 Ẩm thực' },
-            { id: 'khach-san', label: '🏨 Lưu trú' },
-            { id: 'giai-tri', label: '🎡 Giải trí' }
-          );
-        } else if (tab === 'trips') {
-          filters.push(
-            { id: 'completed', label: '✅ Đã hoàn thành' },
-            { id: 'missed', label: '🗑️ Bỏ lỡ & Đã xóa' }
-          );
-        } else if (tab === 'bookings') {
-          filters.push(
-            { id: 'tour', label: '🎒 Tour du lịch' },
-            { id: 'nha-hang', label: '🥘 Nhà hàng' },
-            { id: 'khach-san', label: '🏨 Khách sạn' },
-            { id: 'others', label: '✨ Khác' }
-          );
-          // Add a second row for status if possible, or just merge them
-          // For simplicity in this UI, we'll keep it as one row or add a specific "History" filter
-          filters.push(
-            { id: 'sep', label: ' | ', disabled: true },
-            { id: 'completed', label: '🏁 Hoàn thành' },
-            { id: 'cancelled', label: '🚫 Đã hủy' }
-          );
-        } else if (tab === 'reviews') {
-          filters.push(
-            { id: 'high', label: '🌟 Đánh giá tốt' },
-            { id: 'low', label: '⚠️ Cần cải thiện' }
-          );
-        }
-
-        subfiltersWrap.innerHTML = filters.map(f => `
-          <button class="subfilter-btn ${currentSubfilter === f.id ? 'is-active' : ''}" data-filter="${f.id}">${f.label}</button>
-        `).join('');
-
-        subfiltersWrap.querySelectorAll('.subfilter-btn').forEach(btn => {
-          if (btn.dataset.filter === 'sep') {
-            btn.style.cursor = 'default';
-            btn.style.opacity = '0.3';
-            return;
-          }
-          btn.onclick = async () => {
-            subfiltersWrap.querySelectorAll('.subfilter-btn').forEach(b => b.classList.remove('is-active'));
-            btn.classList.add('is-active');
-            currentSubfilter = btn.dataset.filter;
-            await applyFilter();
-          };
-        });
-      }
-
-      async function applyFilter() {
-        if (currentTab === 'wishlist') renderWishlist();
-        else if (currentTab === 'trips') renderTrips(rawData.trips);
-        else if (currentTab === 'bookings') await renderBookings(rawData.bookings);
-        else if (currentTab === 'reviews') renderReviews(rawData.reviews);
-      }
-
-      async function loadTabData(tab) {
-        content.innerHTML = '<div style="text-align: center; padding: 4rem;"><div class="btn-loading" style="width: 40px; height: 40px; margin: 0 auto 1rem;"></div><p>Đang truy xuất dữ liệu...</p></div>';
-        renderSubfilters(tab);
-
-        try {
-          if (tab === 'wishlist') {
-            renderWishlist();
-          } else if (tab === 'trips') {
-            const res = await fetch('/api/planner/my-trips', { headers: { 'x-auth-token': token } });
-            const json = await res.json();
-            // Filter only finished trips: completed, missed, or deleted
-            rawData.trips = (json.data || []).filter(t => t.status === 'completed' || t.status === 'missed' || t.isDeleted);
-            renderTrips(rawData.trips);
-          } else if (tab === 'bookings') {
-            const res = await fetch('/api/bookings/my', { headers: { 'x-auth-token': token } });
-            const json = await res.json();
-            // Filter only finished bookings: completed or cancelled
-            rawData.bookings = (json.data || []).filter(b => b.status === 'completed' || b.status === 'cancelled');
-            rawData.bookings.forEach(b => { bookingStore[b._id] = b; });
-            await renderBookings(rawData.bookings);
-          } else if (tab === 'reviews') {
-            const res = await fetch('/api/places/my-reviews', { headers: { 'x-auth-token': token } });
-            const json = await res.json();
-            rawData.reviews = json.data || [];
-            renderReviews(rawData.reviews);
-          }
-        } catch(e) {
-          content.innerHTML = '<div class="empty-state"><h2>Lỗi tải dữ liệu</h2><p>Không thể kết nối với máy chủ. Vui lòng thử lại sau.</p></div>';
-        }
-      }
-
-      function budgetLabel(b) {
-        if (b === 3 || b === '3' || b === 'cao cấp') return 'Cao cấp';
-        if (b === 2 || b === '2' || b === 'cân bằng') return 'Cân bằng';
-        return 'Tiết kiệm';
-      }
-      function paceVi(p) {
-        if (!p) return 'Vừa phải';
-        const map = { 'thong thả': 'Thong thả', 'vừa phải': 'Cân bằng', 'năng động': 'Năng động', 'cham': 'Thong thả', 'vua': 'Cân bằng', 'nhanh': 'Năng động' };
-        return map[p.toLowerCase()] || p;
-      }
-
-      function renderWishlist() {
-        const wishlistIds = JSON.parse(localStorage.getItem('wander_wishlist') || '[]');
-        let favs = PLACES.filter(p => wishlistIds.includes(p.id));
-        
-        if (currentSubfilter !== 'all') {
-          favs = favs.filter(p => p.kind === currentSubfilter);
-        }
-
-        if (!favs.length) {
-          content.innerHTML = `<div class="empty-state"><h2>Chưa có dữ liệu</h2><p>Không tìm thấy địa điểm yêu thích nào trong mục này.</p></div>`;
-          return;
-        }
-
-        content.innerHTML = '<div class="wishlist-grid">' + favs.map(p => {
-          const verifiedBadge = p.verified ? '<div class="verified-badge"><span class="icon">🛡️</span> Đã kiểm duyệt</div>' : '';
-          const heroImage = (p.images && p.images[0]) || p.image || '';
-          const budgetTxt = budgetLabel(p.budget);
-          const paceTxt = paceVi(p.pace);
-          
-          return `
-            <div class="dest-card animate-in" style="cursor:pointer;" onclick="if(window.WanderUI) WanderUI.openPlaceDetail('${p.id}')">
-              <div class="dest-card-media">
-                <img src="${heroImage}" alt="${p.name}" class="dest-card-img" loading="lazy">
-                ${verifiedBadge}
-              </div>
-              <div class="dest-card-body">
-                <h3 class="dest-card-title" style="color:#fff; margin:0 0 4px; font-size:1.25rem;">${p.name}</h3>
-                <p class="dest-card-meta" style="color:var(--accent); font-size:0.85rem; margin-bottom:12px; font-weight:600;">${p.region} · ${budgetTxt}</p>
-                <div class="dest-card-tags" style="display:flex; gap:8px; margin-bottom:16px;">
-                  <span class="dest-tag" style="background:rgba(56,189,248,0.1); color:var(--accent); padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:700;">${paceTxt}</span>
-                  <span class="dest-tag" style="background:rgba(244,63,94,0.1); color:#f43f5e; padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:700;">${p.favoritesCount || 0} ❤️</span>
-                </div>
-                <div class="dest-card-actions">
-                  <button class="btn btn--primary btn--small" style="width:100%; justify-content:center;">Xem chi tiết</button>
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('') + '</div>';
-      }
-
-      function renderTrips(trips) {
-        let filtered = trips;
-        if (currentSubfilter !== 'all') {
-          filtered = trips.filter(t => {
-            if (currentSubfilter === 'missed') return t.status === 'missed' || t.isDeleted;
-            return t.status === currentSubfilter;
-          });
-        }
-
-        if (!filtered.length) {
-          content.innerHTML = '<div class="empty-state"><h2>Chưa có lịch trình nào</h2><p>Hãy bắt đầu lên kế hoạch cho chuyến đi đầu tiên của bạn.</p></div>';
-          return;
-        }
-
-        filtered.forEach(t => { tripStore[t._id] = t; });
-
-        content.innerHTML = '<div class="history-list">' + filtered.map(t => `
-          <div class="history-card trip-card">
-            <div class="history-card__content">
-              <div style="display:flex; justify-content:space-between; align-items:start;">
-                <div class="history-card__type" style="color:var(--accent);">🎒 Lịch trình du lịch</div>
-                <span class="trip-status status-${t.isDeleted ? 'cancelled' : (t.status === 'completed' ? 'completed' : 'cancelled')}">
-                  ${t.isDeleted ? 'Đã xóa' : (t.status === 'completed' ? 'Đã hoàn thành' : 'Bỏ lỡ')}
-                </span>
-              </div>
-              <h3 class="history-card__title" style="margin: 0.5rem 0;">${t.destination}</h3>
-              <p class="history-card__meta">
-                <span>📅 Khởi hành: ${t.tripDate ? new Date(t.tripDate).toLocaleDateString('vi-VN') : 'Chưa định ngày'}</span>
-                <span>·</span>
-                <span>⏱️ ${t.days} ngày</span>
-              </p>
-              <div class="dest-card-actions" style="margin-top: 1rem;">
-                <button class="btn btn--primary btn--small btn-trip-detail" data-trip-id="${t._id}">Xem lịch trình chi tiết</button>
-              </div>
-            </div>
-          </div>
-        `).join('') + '</div>';
-      }
-
-      async function renderBookings(bookings) {
-        // Ensure all places are in store
-        const missingIds = bookings.filter(b => !placeStore[b.placeId]).map(b => b.placeId);
-        if (missingIds.length > 0) {
-          try {
-            const uniqueIds = [...new Set(missingIds)];
-            // Fetch missing places in parallel
-            await Promise.all(uniqueIds.map(async id => {
-              try {
-                const res = await fetch(`/api/places/${id}`);
-                const json = await res.json();
-                if (json.success) {
-                  placeStore[json.data._id] = json.data;
-                  if (json.data.id) placeStore[json.data.id] = json.data;
-                }
-              } catch(e) {}
-            }));
-          } catch(e) {}
-        }
-
-        let filtered = bookings;
-        if (currentSubfilter !== 'all' && currentSubfilter !== 'all_cat') {
-          if (currentSubfilter === 'tour') {
-            filtered = bookings.filter(b => b.bookingType === 'tour' || (placeStore[b.placeId] && placeStore[b.placeId].isTour));
-          } else if (currentSubfilter === 'completed' || currentSubfilter === 'cancelled') {
-            filtered = bookings.filter(b => b.status === currentSubfilter);
-          } else if (currentSubfilter === 'others') {
-             filtered = bookings.filter(b => {
-                const p = placeStore[b.placeId] || {};
-                return b.bookingType !== 'tour' && !['nha-hang', 'khach-san'].includes(p.kind) && !p.isTour;
-             });
-          } else {
-             filtered = bookings.filter(b => {
-                const p = placeStore[b.placeId] || {};
-                return p.kind === currentSubfilter;
-             });
-          }
-        }
-
-        if (!filtered.length) {
-          content.innerHTML = '<div class="empty-state"><h2>Chưa có dịch vụ nào</h2><p>Không tìm thấy dịch vụ tương ứng trong mục này.</p></div>';
-          return;
-        }
-
-        const STATUS_MAP = {
-          'pending': { label: 'Chờ xử lý', class: 'status-planning' },
-          'confirmed': { label: 'Đã xác nhận', class: 'status-completed' },
-          'completed': { label: 'Hoàn thành', class: 'status-completed' },
-          'cancelled': { label: 'Đã hủy', class: 'status-cancelled' }
-        };
-
-        content.innerHTML = '<div class="history-list">' + filtered.map(b => {
-          const s = STATUS_MAP[b.status] || { label: b.status, class: '' };
-          const bookingId = (b.bookingId || b._id || '').toString().slice(-6).toUpperCase();
-          
-          // Get specific classification from place data
-          const p = placeStore[b.placeId] || {};
-          let kindLabel = (b.bookingType === 'tour' || p.isTour) ? 'Tour du lịch' : 'Dịch vụ đối tác';
-          let kindClass = 'kind-badge--default';
-          let kindIcon = '✨';
-
-          if (p.isTour || b.bookingType === 'tour') {
-            kindLabel = 'Tour du lịch';
-            kindClass = 'kind-badge--tour';
-            kindIcon = '🎒';
-          } else if (p.kind) {
-            const KIND_MAP = {
-              'diem-du-lich': { label: 'Điểm tham quan', class: 'kind-badge--default', icon: '🏛️' },
-              'trai-nghiem': { label: 'Trải nghiệm', class: 'kind-badge--default', icon: '🎨' },
-              'khach-san': { label: 'Khách sạn / Lưu trú', class: 'kind-badge--hotel', icon: '🏨' },
-              'nha-hang': { label: 'Nhà hàng / Ẩm thực', class: 'kind-badge--restaurant', icon: '🥘' },
-              'giai-tri': { label: 'Vui chơi giải trí', class: 'kind-badge--default', icon: '🎡' },
-              'tien-ich': { label: 'Tiện ích', class: 'kind-badge--default', icon: '⚙️' }
-            };
-            const meta = KIND_MAP[p.kind] || { label: kindLabel, class: kindClass, icon: kindIcon };
-            kindLabel = meta.label;
-            kindClass = meta.class;
-            kindIcon = meta.icon;
-          }
-
-          return `
-            <div class="history-card animate-in">
-              <div class="history-card__content">
-                <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:1.5rem;">
-                  <div class="kind-badge ${kindClass}">
-                    <span>${kindIcon}</span> ${kindLabel}
-                  </div>
-                  <span class="trip-status ${s.class}">${s.label}</span>
-                </div>
-                
-                <h3 class="history-card__title" style="margin-bottom:0.5rem; font-size:1.75rem;">${b.placeName || 'Dịch vụ'}</h3>
-                <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem; font-family:monospace; opacity:0.7;">Reference ID: #${bookingId}</p>
-
-                <div class="history-card__meta" style="background:rgba(255,255,255,0.03); padding:1.5rem; border-radius:24px; border:1px solid rgba(255,255,255,0.05); margin-bottom:1.5rem; display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:20px;">
-                  <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width:40px; height:40px; background:rgba(56,189,248,0.1); color:var(--accent); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.25rem;">📅</div>
-                    <div>
-                      <div style="font-size:0.75rem; opacity:0.5; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Ngày sử dụng</div>
-                      <div style="font-weight:800; font-size:1rem;">${new Date(b.useDate).toLocaleDateString('vi-VN', { day: '2-digit', month: 'long', year: 'numeric' })}</div>
-                    </div>
-                  </div>
-                  <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width:40px; height:40px; background:rgba(16,185,129,0.1); color:#10b981; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.25rem;">👥</div>
-                    <div>
-                      <div style="font-size:0.75rem; opacity:0.5; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Số lượng</div>
-                      <div style="font-weight:800; font-size:1rem;">${b.peopleCount || 1} Khách hàng</div>
-                    </div>
-                  </div>
-                  <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="width:40px; height:40px; background:rgba(245,158,11,0.1); color:#f59e0b; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.25rem;">💰</div>
-                    <div>
-                      <div style="font-size:0.75rem; opacity:0.5; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Tổng thanh toán</div>
-                      <div style="font-weight:900; font-size:1.2rem; color:var(--primary);">${new Intl.NumberFormat('vi-VN').format(b.totalPrice)}đ</div>
-                    </div>
-                  </div>
-                </div>
-                
-                ${b.notes ? `
-                  <div class="history-card__text" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); margin:1.5rem 0; padding:1.5rem; border-radius:24px;">
-                    <div style="font-weight:800; color:var(--accent); font-size:0.8rem; margin-bottom:8px; text-transform:uppercase; display:flex; align-items:center; gap:8px;">
-                      <span style="font-size:1.2rem;">💬</span> Ghi chú từ doanh nghiệp
-                    </div>
-                    <div style="line-height:1.7; opacity:0.8; font-style:italic; font-size:1rem;">"${b.notes}"</div>
-                  </div>
-                ` : ''}
-
-                <div class="dest-card-actions" style="margin-top:2rem; gap:15px; display:flex;">
-                  <button class="btn btn--primary btn--small btn-booking-detail" style="flex:2; justify-content:center; padding:1.2rem; font-size:1rem; border-radius:18px;" data-booking-id="${b._id}">Xem chi tiết giao dịch</button>
-                  ${b.status === 'pending' ? `<button class="btn btn--ghost btn--small" style="flex:1; color:#f43f5e; border-color:rgba(244,63,94,0.3); border-radius:18px;" onclick="window.cancelBooking('${b._id}')">Hủy yêu cầu</button>` : ''}
-                </div>
-              </div>
-            </div>
-          `;
-        }).join('') + '</div>';
-      }
-
-      window.cancelBooking = async function(id) {
-        if (!confirm('Bạn có chắc chắn muốn hủy yêu cầu đặt dịch vụ này?')) return;
-        try {
-          const res = await fetch('/api/bookings/' + id + '/cancel', {
-            method: 'PUT',
-            headers: { 'x-auth-token': token }
-          });
-          const json = await res.json();
-          if (json.success) {
-            loadTabData('bookings');
-          } else {
-            alert('Lỗi: ' + json.message);
-          }
-        } catch(e) {
-          alert('Lỗi kết nối máy chủ');
-        }
-      };
-
-      function renderReviews(reviews) {
-        let filtered = reviews;
-        if (currentSubfilter !== 'all') {
-          if (currentSubfilter === 'high') filtered = reviews.filter(r => r.rating >= 4);
-          else filtered = reviews.filter(r => r.rating < 4);
-        }
-
-        if (!filtered.length) {
-          content.innerHTML = '<div class="empty-state"><h2>Chưa có đánh giá nào</h2><p>Không tìm thấy đánh giá tương ứng trong mục này.</p></div>';
-          return;
-        }
-
-        content.innerHTML = '<div class="history-list">' + filtered.map(r => `
-          <div class="history-card">
-            <div class="history-card__media" style="background-image:url('${r.placeImage}')"></div>
-            <div class="history-card__content">
-              <div class="history-card__type">Đánh giá địa điểm</div>
-              <h3 class="history-card__title">${r.placeName}</h3>
-              <p class="history-card__meta">⭐️ ${r.rating}/5 · 📅 ${new Date(r.createdAt).toLocaleDateString('vi-VN')}</p>
-              <div class="history-card__text">"${r.text}"</div>
-              <div class="dest-card-actions" style="margin-top: 1rem;">
-                <button class="btn btn--primary btn--small btn-place-detail" data-place-id="${r.placeId}">Xem chi tiết địa điểm</button>
-              </div>
-            </div>
-          </div>
-        `).join('') + '</div>';
-      }
-
-      function renderFeedbacks(fbs) {
-        let filtered = fbs;
-        if (currentSubfilter !== 'all') {
-          filtered = fbs.filter(f => f.status === currentSubfilter);
-        }
-
-        if (!filtered.length) {
-          content.innerHTML = '<div class="empty-state"><h2>Chưa có phản hồi hệ thống</h2><p>Không tìm thấy phản hồi nào trong mục này.</p></div>';
-          return;
-        }
-
-        content.innerHTML = '<div class="history-list">' + filtered.map(f => `
-          <div class="history-card" style="flex-direction: column;">
-            <div class="history-card__content">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                <div class="history-card__type" style="background:rgba(56,189,248,0.1); padding:4px 12px; border-radius:8px;">Hỗ trợ / Phản hồi</div>
-                <span class="trip-status status-${f.status === 'open' ? 'planning' : 'completed'}">${f.status === 'open' ? 'Đang mở' : (f.status === 'resolved' ? 'Đã giải quyết' : 'Đã đóng')}</span>
-              </div>
-              <p class="history-card__meta">📅 Gửi ngày: ${new Date(f.createdAt).toLocaleDateString('vi-VN')} lúc ${new Date(f.createdAt).toLocaleTimeString('vi-VN')}</p>
-              
-              <div class="chat-thread" style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 1rem; margin-top: 1rem;">
-                <div class="chat-msg user-msg" style="margin-bottom: 1rem; text-align: right;">
-                  <div style="font-weight: 700; color: var(--accent); font-size: 0.85rem; margin-bottom: 4px;">Bạn</div>
-                  <div style="display: inline-block; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 10px 15px; border-radius: 12px 12px 0 12px; max-width: 80%; text-align: left;">
-                    ${f.message}
-                    ${f.image ? `<div style="margin-top:10px;"><img src="${f.image}" style="max-width:100%; border-radius:8px; max-height:200px; border:1px solid rgba(255,255,255,0.1);" /></div>` : ''}
-                  </div>
-                </div>
-                
-                ${(f.replies || []).map(r => `
-                  <div class="chat-msg ${r.senderRole === 'user' ? 'user-msg' : 'admin-msg'}" style="margin-bottom: 1rem; text-align: ${r.senderRole === 'user' ? 'right' : 'left'};">
-                    <div style="font-weight: 700; color: ${r.senderRole === 'user' ? 'var(--accent)' : '#10b981'}; font-size: 0.85rem; margin-bottom: 4px;">${r.senderName}</div>
-                    <div style="display: inline-block; background: ${r.senderRole === 'user' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(16, 185, 129, 0.1)'}; border: 1px solid ${r.senderRole === 'user' ? 'rgba(56, 189, 248, 0.3)' : 'rgba(16, 185, 129, 0.3)'}; padding: 10px 15px; border-radius: ${r.senderRole === 'user' ? '12px 12px 0 12px' : '12px 12px 12px 0'}; max-width: 80%; text-align: left;">
-                      ${r.content}
-                    </div>
-                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">${new Date(r.createdAt).toLocaleString('vi-VN')}</div>
-                  </div>
-                `).join('')}
-              </div>
-
-              <!-- Reply area removed as per requirement: one-way admin announcements -->
-            </div>
-          </div>
-        `).join('') + '</div>';
-      }
-
-      window.sendFeedbackReply = async function(id) {
-        const input = document.getElementById('reply-input-' + id);
-        const contentVal = input.value.trim();
-        if (!contentVal) return;
-        
-        try {
-          const res = await fetch('/api/feedback/' + id + '/reply', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-            body: JSON.stringify({ content: contentVal })
-          });
-          const json = await res.json();
-          if (json.success) {
-            input.value = '';
-            loadTabData('feedbacks'); // reload chat
-          } else {
-            alert('Lỗi: ' + json.message);
-          }
-        } catch(e) {
-          alert('Lỗi kết nối máy chủ');
-        }
-      };
-
-      // Event delegation for detail buttons
-      content.addEventListener('click', function(e) {
-        const placeBtn = e.target.closest('.btn-place-detail');
-        if (placeBtn) {
-          const pid = placeBtn.dataset.placeId;
-          const localData = placeStore[pid] || null;
-          if (window.WanderUI) WanderUI.openPlaceDetail(pid, localData);
-          return;
-        }
-        const bookingBtn = e.target.closest('.btn-booking-detail');
-        if (bookingBtn) {
-          const bid = bookingBtn.dataset.bookingId;
-          const localData = bookingStore[bid] || null;
-          if (window.WanderUI && localData) WanderUI.openBookingDetail(bid, localData);
-          return;
-        }
-        const tripBtn = e.target.closest('.btn-trip-detail');
-        if (tripBtn) {
-          const tid = tripBtn.dataset.tripId;
-          const localData = tripStore[tid] || null;
-          if (window.WanderUI) WanderUI.openItineraryDetail(tid, localData);
-          return;
-        }
-      });
-
-      init();
-    })();
-  </script>
+  <script src="js/SharedUI.js?v=6.0"></script>
+  <script src="js/history.js?v=6.0"></script>
 </body>
 </html>

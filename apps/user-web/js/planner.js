@@ -529,6 +529,11 @@ document.addEventListener('DOMContentLoaded', function () {
       if (json.success) {
         currentItineraryId = json.itineraryId;
         
+        // Record Activity
+        if (window.WanderUI && WanderUI.recordActivity) {
+          WanderUI.recordActivity('itinerary_gen', `Đã tạo lịch trình AI đi ${data.destination}`, { destination: data.destination, days: data.days });
+        }
+        
         // Handle multiple plans if they exist, or simulate for UI testing
         if (json.plans && json.plans.length > 0) {
           planHistory = json.plans;
@@ -763,6 +768,11 @@ document.addEventListener('DOMContentLoaded', function () {
       });
       const data = await res.json();
       if (data.success) {
+        // Record Activity
+        if (window.WanderUI && WanderUI.recordActivity) {
+          WanderUI.recordActivity('save_trip', `Đã lưu lịch trình chuyến đi mới`, { itineraryId: currentItineraryId });
+        }
+
         btnSaveTrip.textContent = "✓ Đã lưu thành công";
         btnSaveTrip.style.background = "#10b981";
         const statusEl = document.getElementById('saveTripStatus');

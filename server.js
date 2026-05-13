@@ -78,6 +78,7 @@ app.use('/api/planner', require('./server/routes/planner'));
 app.use('/api/directions', require('./server/routes/directions'));
 app.use('/api/navi', require('./server/routes/ai-navigation'));
 app.use('/api/notifications', require('./server/routes/notifications'));
+app.use('/api/activities', require('./server/routes/activities'));
 app.use('/api/knowledge', require('./server/routes/knowledge'));
 app.use('/api/social', require('./server/routes/social'));
 app.use('/api/bookings', require('./server/routes/bookings'));

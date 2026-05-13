@@ -115,6 +115,29 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     window.location.href = '/?login=true';
   }
 
+  // ─── Activity Tracking ──────────────────────────────────────────────────
+  async function recordActivity(type, description, metadata = {}) {
+    const token = localStorage.getItem('wander_token');
+    if (!token) return; // Chỉ lưu hoạt động cho người dùng đã đăng nhập
+
+    try {
+      await fetch('/api/activities/record', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token
+        },
+        body: JSON.stringify({ type, description, metadata })
+      });
+    } catch (e) {
+      console.warn('Silent activity record failure:', e);
+    }
+  }
+
+  // ─── Shared UI Helpers ──────────────────────────────────────────────────
+  function showLoading(btn) {
+  }
+
   // ─── Theme ───────────────────────────────────────────────────────────────
   function setTheme(theme, syncWithBackend = false) {
     document.documentElement.setAttribute('data-theme', theme);
@@ -189,7 +212,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     const token = localStorage.getItem('wander_token');
     if (!token || typeof io === 'undefined' || socket) return;
 
-    socket = io({ auth: { token } });
+    socket = io({ 
+        auth: { token },
+        transports: ['websocket', 'polling'],
+        reconnectionAttempts: 5,
+        timeout: 10000
+    });
     socket.on('notification', (notif) => {
       WanderUI.showToast(notif.message || 'Bạn có thông báo mới!', 'info');
       updateNotificationBadge();

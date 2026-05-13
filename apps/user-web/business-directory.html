@@ -211,7 +211,7 @@
     </main>
 
     <footer id="footer-container"></footer>
-    <script src="js/SharedUI.js?v=1778494902144"></script>
+    <script src="js/SharedUI.js?v=1778494999999"></script>
     <script>
         const observer = new MutationObserver(() => {
             const t = document.documentElement.getAttribute('data-theme') || 'dark';
@@ -266,6 +266,17 @@
                 document.querySelectorAll('.side-panel .f-item').forEach(i=>{ if(i.innerText.includes('📍')) i.classList.remove('active'); });
                 if(filterAddr !== 'all') el.classList.add('active');
             }
+            syncFilters();
+        }
+
+        function resetAllFilters() {
+            filterCat = 'all';
+            filterAddr = 'all';
+            filterPrice = 'all';
+            document.getElementById('mainSearch').value = '';
+            document.querySelectorAll('.side-panel .f-item').forEach(i => i.classList.remove('active'));
+            document.querySelector('#cat-list .f-item[onclick*="\'all\'"]')?.classList.add('active');
+            document.querySelector('#price-list .f-item[onclick*="\'all\'"]')?.classList.add('active');
             syncFilters();
         }
 
@@ -328,7 +339,14 @@
 
         function renderSvc(data) {
             if(data.length === 0) {
-                document.getElementById('display-grid').innerHTML = `<div style="grid-column:span 3; padding:100px; text-align:center; color:var(--text-dim);">Không tìm thấy dịch vụ nào phù hợp với bộ lọc.</div>`;
+                document.getElementById('display-grid').innerHTML = `
+                    <div style="grid-column:span 3; padding:100px; text-align:center;">
+                        <div style="font-size: 50px; margin-bottom: 20px;">🔍</div>
+                        <h3 style="color:var(--text-main); margin-bottom: 10px;">Không tìm thấy dịch vụ nào</h3>
+                        <p style="color:var(--text-dim); margin-bottom: 30px;">Thử thay đổi bộ lọc hoặc chọn địa điểm khác nhé.</p>
+                        <button class="btn-search" onclick="resetAllFilters()" style="padding: 12px 30px;">Xóa tất cả bộ lọc</button>
+                    </div>
+                `;
                 return;
             }
             document.getElementById('display-grid').innerHTML = data.map(p => {

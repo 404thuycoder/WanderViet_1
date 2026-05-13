@@ -103,9 +103,17 @@ router.get('/', async (req, res) => {
         lastBizCacheTime = now;
     }
 
-    // Chỉ lấy các địa điểm đã được phê duyệt
-    const places = await Place.find({ status: 'approved' })
-           .select('id name region address meta text budget pace image images verified top favoritesCount ownerId lat lng transportTips priceFrom priceTo ratingAvg reviewCount kind description')
+    // Lọc theo query params
+    let query = { status: 'approved' };
+    if (req.query.isTour === 'true') {
+      query.isTour = true;
+    } else if (req.query.isTour === 'false') {
+      query.isTour = { $ne: true };
+    }
+
+    const places = await Place.find(query)
+           .select('id name region address meta text budget pace image images verified top favoritesCount ownerId lat lng transportTips priceFrom priceTo ratingAvg reviewCount kind description isTour')
+           .limit(req.query.limit ? parseInt(req.query.limit) : 100)
            .lean();
 
     const data = places.map(p => ({

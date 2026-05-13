@@ -148,6 +148,19 @@
   <footer id="footer-container"></footer>
 
   <script src="js/SharedUI.js?v=6.0"></script>
+  <script src="js/places-data.js"></script>
   <script src="js/history.js?v=6.0"></script>
+  <script>
+    (function() {
+      // Sync theme from documentElement to body for local overrides
+      const syncTheme = () => {
+        const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+        document.body.setAttribute('data-theme', theme);
+      };
+      const themeObserver = new MutationObserver(syncTheme);
+      themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+      syncTheme();
+    })();
+  </script>
 </body>
 </html>

@@ -9,6 +9,7 @@ const Conversation = require('../models/Conversation');
 const chatbotDb = require('../models/dbChatbot');
 const fs = require('fs');
 const path = require('path');
+const Place = require('../models/Place');
 
 // Khởi tạo Groq (Bộ não AI siêu tốc)
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -41,10 +42,11 @@ try {
   console.error("Error loading places fallback data:", e);
 }
 
-// --- HELPER: GENERATE RESPONSE METADATA (PROPOSALS, DISCOVERY) ---
-function generateResponseMetadata(message, aiAnswer, locationContext) {
+// --- HELPER: GENERATE RESPONSE METADATA (PROPOSALS, DISCOVERY, TOURS) ---
+async function generateResponseMetadata(message, aiAnswer, locationContext) {
   let proposal = null;
   let discoveryPlaces = null;
+  let suggestedTours = null;
 
   const lowerAnswer = aiAnswer.toLowerCase();
   const lowerUserMsg = message.toLowerCase();
@@ -87,7 +89,48 @@ function generateResponseMetadata(message, aiAnswer, locationContext) {
       }
   }
 
-  return { proposal, discoveryPlaces };
+  // C. Tìm kiếm Tour có sẵn trong Database (Feature 24)
+  try {
+      const tourKeywords = ['tour', 'gói', 'du lịch', 'trọn gói', 'goi', 'du lich', 'tron goi'];
+      const wantsTour = tourKeywords.some(k => lowerUserMsg.includes(k)) || lowerAnswer.includes('tour');
+      
+      if (wantsTour || proposal) {
+          // Cố gắng tìm địa danh trong tin nhắn hoặc câu trả lời nếu proposal.destination không có
+          let searchDest = proposal ? proposal.destination : "";
+          
+          if (!searchDest) {
+              // Tìm từ viết hoa trong tin nhắn người dùng (địa danh thường viết hoa)
+              const userCaps = message.match(/[A-ZÀ-Ỹ][a-zà-ỹ]+(?:\s[A-ZÀ-Ỹ][a-zà-ỹ]+)*/g);
+              if (userCaps && userCaps.length > 0) {
+                  searchDest = userCaps[0];
+              }
+          }
+          
+          if (!searchDest) searchDest = locationContext || "";
+
+          let query = { isTour: true, isDeleted: { $ne: true }, status: 'approved' };
+          
+          if (searchDest && searchDest.length > 2) {
+              query.$or = [
+                  { name: new RegExp(searchDest, 'i') },
+                  { region: new RegExp(searchDest, 'i') },
+                  { text: new RegExp(searchDest, 'i') }
+              ];
+          }
+
+          suggestedTours = await Place.find(query).limit(3).lean();
+          
+          // Nếu không tìm thấy tour đúng địa điểm, lấy tour nổi bật ngẫu nhiên
+          if (!suggestedTours || suggestedTours.length === 0) {
+              suggestedTours = await Place.find({ isTour: true, isDeleted: { $ne: true }, status: 'approved' }).sort({ favoritesCount: -1 }).limit(3).lean();
+          }
+      }
+  } catch (tourErr) {
+      console.error("Error fetching suggested tours:", tourErr);
+  }
+
+  console.log(`[Metadata] Suggested Tours count: ${suggestedTours ? suggestedTours.length : 0}`);
+  return { proposal, discoveryPlaces, suggestedTours };
 }
 
 router.post('/', optionalAuth, async (req, res) => {
@@ -201,13 +244,14 @@ router.post('/', optionalAuth, async (req, res) => {
             await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: knowledgeMatch.answer }).save();
           }
 
-          const meta = generateResponseMetadata(message, knowledgeMatch.answer, locationContext);
+          const meta = await generateResponseMetadata(message, knowledgeMatch.answer, locationContext);
           return res.json({
             success: true,
             answer: knowledgeMatch.answer,
             sessionId: currentSessionId,
             proposal: meta.proposal,
             discoveryPlaces: meta.discoveryPlaces,
+            suggestedTours: meta.suggestedTours,
             source: 'smart-cache-knowledge'
           });
         }
@@ -284,13 +328,14 @@ router.post('/', optionalAuth, async (req, res) => {
                 await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: prevAnswer.text }).save();
               }
 
-              const meta = generateResponseMetadata(message, prevAnswer.text, locationContext);
+              const meta = await generateResponseMetadata(message, prevAnswer.text, locationContext);
               return res.json({
                 success: true,
                 answer: prevAnswer.text,
                 sessionId: currentSessionId,
                 proposal: meta.proposal,
                 discoveryPlaces: meta.discoveryPlaces,
+                suggestedTours: meta.suggestedTours,
                 source: 'smart-cache-history'
               });
             }
@@ -409,12 +454,14 @@ INSTRUCTION:
       'đi đâu', 'chơi gì', 'di dau', 'choi gi', 'muốn đi', 'muon di', 'cho mình đi', 'cho minh di'
     ];
     // Phát hiện thêm các câu đổi ý chung chung như "k thích đại điểm này đổi đi"
-    const isModification = lowerMsg.includes('đổi') || lowerMsg.includes('doi') || lowerMsg.includes('k thích') || lowerMsg.includes('không thích') || lowerMsg.includes('khong thich');
-    const isItineraryRequest = itineraryKeywords.some(k => lowerMsg.includes(k)) || 
-                               (isModification && (lowerMsg.includes('điểm') || lowerMsg.includes('diem') || lowerMsg.includes('chỗ') || lowerMsg.includes('cho') || lowerMsg.includes('này') || lowerMsg.includes('nay'))) ||
-                               (lowerMsg.includes('lịch') && lowerMsg.includes('trình')) ||
-                               (lowerMsg.includes('kế') && lowerMsg.includes('hoạch'));
+    let isModification = lowerMsg.includes('đổi') || lowerMsg.includes('doi') || lowerMsg.includes('k thích') || lowerMsg.includes('không thích') || lowerMsg.includes('khong thich');
+    let isItineraryRequest = itineraryKeywords.some(k => lowerMsg.includes(k)) || 
+                             (lowerMsg.includes('lịch') && lowerMsg.includes('trình')) ||
+                             (lowerMsg.includes('kế') && lowerMsg.includes('hoạch'));
 
+    if (isModification && (lowerMsg.includes('điểm') || lowerMsg.includes('diem') || lowerMsg.includes('chỗ') || lowerMsg.includes('cho') || lowerMsg.includes('này') || lowerMsg.includes('nay'))) {
+      isItineraryRequest = true;
+    }
 
     if (isItineraryRequest) {
       try {
@@ -629,7 +676,7 @@ Trả về CHỈ JSON theo format:
         console.warn("⚠️ Chatbot DB not ready (readyState: " + chatbotDb.readyState + "). Message not saved.");
       }
 
-      const finalMeta = generateResponseMetadata(message, aiAnswer, locationContext);
+      const finalMeta = await generateResponseMetadata(message, aiAnswer, locationContext);
 
       res.json({
         success: true,
@@ -638,6 +685,7 @@ Trả về CHỈ JSON theo format:
         messageId: res.locals.messageId || null,
         proposal: finalMeta.proposal,
         discoveryPlaces: finalMeta.discoveryPlaces,
+        suggestedTours: finalMeta.suggestedTours,
         source: 'wander-soul-gen3-ultimate'
       });
       

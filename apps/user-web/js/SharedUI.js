@@ -2106,6 +2106,18 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         line-height: 1;
         top: 2px;
       }
+      .chat-tour-card {
+        min-width: 220px; max-width: 220px; border-radius: 20px;
+        background: #1e293b; border: 1px solid rgba(255,255,255,0.05);
+        overflow: hidden; flex-shrink: 0; transition: all 0.3s ease; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      }
+      .chat-tour-card:hover { transform: translateY(-4px); border-color: rgba(56,189,248,0.4); box-shadow: 0 15px 30px rgba(56,189,248,0.2); }
+      .chat-tour-img { width: 100%; height: 130px; background-size: cover; background-position: center; position: relative; }
+      .chat-tour-badge { position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #f43f5e, #e11d48); color: #fff; font-size: 0.65rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; box-shadow: 0 4px 10px rgba(244,63,94,0.3); }
+      .chat-tour-info { padding: 12px; }
+      .chat-tour-name { font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .chat-tour-price { color: #10b981; font-weight: 800; font-size: 0.95rem; margin-bottom: 8px; }
+      .chat-tour-meta { display: flex; justify-content: space-between; font-size: 0.7rem; color: #94a3b8; }
     `;
     document.head.appendChild(style);
   })();
@@ -2716,6 +2728,11 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             if (resData.discoveryPlaces && resData.discoveryPlaces.length > 0) {
                 renderDiscoveryCarousel(resData.discoveryPlaces);
             }
+
+            if (resData.suggestedTours && resData.suggestedTours.length > 0) {
+                console.log("Rendering Tour Carousel with", resData.suggestedTours.length, "tours");
+                renderTourCarousel(resData.suggestedTours);
+            }
         } else {
             console.warn("Chatbot: API returned failure or invalid data", resData);
             const errMsg = (resData && typeof resData === 'string') ? resData : (resData?.answer || 'Trợ lý đang bận, thử lại sau nhé.');
@@ -2966,17 +2983,18 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     function renderDiscoveryCarousel(places = []) {
         const container = document.createElement('div');
-        container.style.cssText = `display:flex; gap:12px; margin:12px 0; overflow-x:auto; padding-bottom:10px; scroll-snap-type:x mandatory;`;
+        container.style.cssText = `display:flex; gap:12px; margin:12px 0; overflow-x:auto; padding-bottom:10px; scroll-snap-type:x mandatory; flex-shrink: 0; min-height: 190px;`;
         container.classList.add('no-scrollbar');
 
         places.forEach(p => {
             const card = document.createElement('div');
             card.className = 'chat-discovery-card';
+            card.style.cssText = `height: 180px; min-height: 180px; min-width: 150px; max-width: 150px; border-radius: 12px; background: #1e293b; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; flex-shrink: 0; display: flex; flex-direction: column; scroll-snap-align: start; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 5px;`;
             card.innerHTML = `
-                <div class="chat-discovery-img" style="background-image:url('${p.image || 'assets/img/hero_nature.jpg'}')"></div>
-                <div class="chat-discovery-info">
-                    <div class="chat-discovery-name">${p.name}</div>
-                    <div class="chat-discovery-loc">📍 ${p.region || 'Việt Nam'}</div>
+                <div class="chat-discovery-img" style="width: 100%; height: 90px; min-height: 90px; flex-shrink: 0; background-image:url('${p.image || 'assets/img/hero_nature.jpg'}'); background-size: cover; background-position: center;"></div>
+                <div class="chat-discovery-info" style="padding: 10px; flex: 1; display: flex; flex-direction: column;">
+                    <div class="chat-discovery-name" style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3;">${p.name}</div>
+                    <div class="chat-discovery-loc" style="font-size: 0.7rem; color: #94a3b8; margin-top: auto;">📍 ${p.region || 'Việt Nam'}</div>
                 </div>
             `;
             card.onclick = () => {
@@ -2992,6 +3010,46 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         });
         log.appendChild(container);
           scrollToBottom();
+    }
+
+    function renderTourCarousel(tours = []) {
+        const container = document.createElement('div');
+        container.style.cssText = `display:flex; gap:12px; margin:15px 0; overflow-x:auto; scroll-snap-type: x mandatory; padding-bottom:10px; scrollbar-width:none; -ms-overflow-style:none; flex-shrink: 0; min-height: 260px;`;
+        
+        tours.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'chat-tour-card';
+            card.style.cssText = `height: 250px; min-height: 250px; scroll-snap-align: start; flex-shrink: 0; cursor: pointer; min-width: 220px; max-width: 220px; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2);`;
+            
+            card.innerHTML = `
+                <div class="chat-tour-img" style="width: 100%; height: 130px; min-height: 130px; flex-shrink: 0; background-image:url('${t.images?.[0] || t.image || 'assets/img/hero_nature.jpg'}'); background-size: cover; background-position: center; position: relative;">
+                    <div class="chat-tour-badge" style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #f43f5e, #e11d48); color: #fff; font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; box-shadow: 0 4px 10px rgba(244,63,94,0.3);">TOUR</div>
+                </div>
+                <div class="chat-tour-info" style="padding: 12px; flex: 1; display: flex; flex-direction: column;">
+                    <div class="chat-tour-name" style="font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${t.name}</div>
+                    <div class="chat-tour-price" style="color: #10b981; font-weight: 800; font-size: 0.95rem; margin-bottom: auto;">${new Intl.NumberFormat('vi-VN').format(t.priceFrom || 0)}đ</div>
+                    <div class="chat-tour-meta" style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #94a3b8; margin-top: 8px;">
+                        <span>⭐ ${t.ratingAvg || '5.0'}</span>
+                        <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; text-align: right;">📍 ${t.region || 'Việt Nam'}</span>
+                    </div>
+                </div>
+            `;
+            card.onclick = () => {
+                if (window.WanderUI && window.WanderUI.showPlaceDetail) {
+                    window.WanderUI.showPlaceDetail(t._id || t.id);
+                } else {
+                    window.location.href = `/place-detail.html?id=${t._id || t.id}`;
+                }
+            };
+            container.appendChild(card);
+        });
+        
+        const style = document.createElement('style');
+        style.textContent = `.chat-tour-card::-webkit-scrollbar { display: none; }`;
+        document.head.appendChild(style);
+        
+        log.appendChild(container);
+        scrollToBottom();
     }
 
     function renderProposalOptions(proposals) {
@@ -3294,6 +3352,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       renderProposalOptions: renderProposalOptions,
       renderItineraryCard: renderItineraryCard,
       renderDiscoveryCarousel: renderDiscoveryCarousel,
+      renderTourCarousel: renderTourCarousel,
       sendMessage: async (text) => {
         if (!text) return;
         
@@ -3314,6 +3373,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         if (data.itineraryCard) renderItineraryCard(data.itineraryCard);
         if (data.proposals) renderProposalOptions(data.proposals);
         if (data.discoveryPlaces) renderDiscoveryCarousel(data.discoveryPlaces);
+        if (data.suggestedTours) renderTourCarousel(data.suggestedTours);
       }
     };
   }

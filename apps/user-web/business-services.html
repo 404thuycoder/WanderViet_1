@@ -492,6 +492,11 @@
     document.getElementById('bk-error').style.display='none';
     document.getElementById('booking-modal').style.display='flex';
 
+    // Log activity
+    if (window.WanderUI && WanderUI.logBusinessActivity) {
+      WanderUI.logBusinessActivity(placeId, 'view_menu', { label: 'Xem chi tiết để đặt dịch vụ: ' + place.name });
+    }
+
     // Render Reviews
     renderModalReviews(place);
     toggleBkReviewForm(false);
@@ -665,6 +670,11 @@
     document.getElementById('chat-drawer').style.display='block';
     document.getElementById('chat-input').focus();
     loadChatHistory(bizId);
+
+    // Log interaction
+    if (window.WanderUI && WanderUI.logBusinessActivity) {
+       WanderUI.logBusinessActivity(_chatBizId, 'help_request', { label: 'Yêu cầu hỗ trợ/tư vấn trực tiếp' });
+    }
   };
 
   window.closeChatDrawer = function(){

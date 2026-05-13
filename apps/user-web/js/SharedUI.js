@@ -134,9 +134,30 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     }
   }
 
-  // ─── Shared UI Helpers ──────────────────────────────────────────────────
-  function showLoading(btn) {
+  // ─── Business Activity Tracking ──────────────────────────────────────────
+  async function logBusinessActivity(placeId, type, details = {}) {
+    if (!placeId) return;
+    try {
+      const user = JSON.parse(localStorage.getItem('wander_user') || '{}');
+      const token = localStorage.getItem('wander_token');
+      
+      const res = await fetch('/api/business/activities/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          placeId,
+          type,
+          details,
+          userId: user._id || null,
+          userName: user.displayName || user.name || 'Khách vãng lai'
+        })
+      });
+      return await res.json();
+    } catch (e) {
+      console.warn('[Activity Log] Error:', e);
+    }
   }
+  window.WanderUI.logBusinessActivity = logBusinessActivity;
 
   // ─── Theme ───────────────────────────────────────────────────────────────
   function setTheme(theme, syncWithBackend = false) {

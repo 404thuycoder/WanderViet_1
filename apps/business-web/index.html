@@ -199,6 +199,27 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
 .bk-search input { background: rgba(255, 255, 255, 0.03) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; color: #fff !important; }
 .btn-export { background: rgba(255, 255, 255, 0.05) !important; color: #fff !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; }
 
+/* Activity Hub Filters */
+.hp-act-filter {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 16px;
+  border-radius: 12px;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  white-space: nowrap;
+}
+.hp-act-filter:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.hp-act-filter.active {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: #6366f1;
+  color: #6366f1;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+}
+
 </style>
   <!-- UI Upgrade v2.0 — Visual enhancements only -->
   <link rel="stylesheet" href="ui-upgrade.css?v=2.0" />

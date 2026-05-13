@@ -192,6 +192,25 @@
     
     .hp-rank-badge { width: 22px; height: 22px; border-radius: 6px; background: rgba(99,102,241,0.15); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; }
     .hp-rank-badge.top { background: #f59e0b; color: #000; }
+
+    /* Unified Activity Hub */
+    .hp-activity-hub { background: rgba(255,255,255,0.03); border-radius: 28px; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; backdrop-filter: blur(20px); margin-bottom: 40px; }
+    .hp-hub-head { padding: 28px 28px 10px; }
+    .hp-hub-title { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+    .hp-hub-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .hp-hub-tab { 
+      padding: 10px 18px; border-radius: 50px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); 
+      color: #94a3b8; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s;
+    }
+    .hp-hub-tab:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .hp-hub-tab.active { background: #6366f1; color: #fff; border-color: #6366f1; box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+    .hp-hub-body { padding: 0 0 28px; }
+    
+    /* Catalog Filter */
+    .hp-catalog-tabs { display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+    .hp-catalog-tab { background: none; border: none; color: #94a3b8; font-size: 14px; font-weight: 700; cursor: pointer; position: relative; padding: 8px 4px; transition: color 0.3s; }
+    .hp-catalog-tab.active { color: #fff; }
+    .hp-catalog-tab.active::after { content: ''; position: absolute; bottom: -8px; left: 0; right: 0; height: 2px; background: #6366f1; border-radius: 2px; box-shadow: 0 0 10px #6366f1; }
     `;
 
     // ── Main Content HTML ────────────────────────────────────────
@@ -432,15 +451,21 @@
                 </div>
             </div>
 
-            <!-- Full Width Data Table -->
-            <div style="margin-bottom: 40px;">
-                <div class="hp-card">
-                    <div class="hp-card-head" style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 20px;">
-                        <div class="hp-card-title">📑 Đơn hàng gần đây</div>
-                        <span class="hp-card-link" onclick="window.navigateToView('bookings')">Xem tất cả đơn hàng →</span>
+            <!-- Unified Activity Hub -->
+            <div class="hp-activity-hub">
+                <div class="hp-hub-head">
+                    <div class="hp-hub-title">👤 Hoạt động người dùng</div>
+                    <div class="hp-hub-tabs">
+                        <button class="hp-hub-tab active" onclick="window.switchActivityTab(this, 'orders')">📦 Đơn hàng gần đây</button>
+                        <button class="hp-hub-tab" onclick="window.switchActivityTab(this, 'checkin')">📍 Check-in Trực tiếp</button>
+                        <button class="hp-hub-tab" onclick="window.switchActivityTab(this, 'interactions')">⚡ WiFi & Menu</button>
+                        <button class="hp-hub-tab" onclick="window.switchActivityTab(this, 'feedback')">⭐ Đánh giá mới</button>
+                        <button class="hp-hub-tab" onclick="window.switchActivityTab(this, 'support')">🆘 Hỗ trợ nhanh</button>
                     </div>
+                </div>
+                <div class="hp-hub-body" id="hub-content-area">
                     <div style="overflow-x: auto;">
-                        <table class="hp-table" id="bookings-table">
+                        <table class="hp-table">
                             <thead>
                                 <tr>
                                     <th>Mã đơn</th>
@@ -506,11 +531,17 @@
                     <!-- Dịch vụ nổi bật -->
                     <div class="hp-card" id="featured-services-card">
                         <div class="hp-card-head">
-                            <div class="hp-card-title">🌟 Dịch vụ nổi bật</div>
-                            <span class="hp-card-link" onclick="window.navigateToView('services')">Quản lý →</span>
+                            <div class="hp-card-title">🌟 Quản lý Dịch vụ</div>
+                            <span class="hp-card-link" onclick="window.navigateToView('services')">Chi tiết →</span>
                         </div>
                         <div class="hp-card-body">
-                            <div class="hp-svcs" style="grid-template-columns: 1fr; gap: 16px;">
+                            <div class="hp-catalog-tabs">
+                                <button class="hp-catalog-tab active" onclick="window.filterOverviewCatalog(this, 'all')">Tất cả</button>
+                                <button class="hp-catalog-tab" onclick="window.filterOverviewCatalog(this, 'nha-hang')">Ẩm thực</button>
+                                <button class="hp-catalog-tab" onclick="window.filterOverviewCatalog(this, 'khach-san')">Lưu trú</button>
+                                <button class="hp-catalog-tab" onclick="window.filterOverviewCatalog(this, 'trai-nghiem')">Tour</button>
+                            </div>
+                            <div class="hp-svcs" id="overview-catalog-grid" style="grid-template-columns: 1fr; gap: 16px;">
                                 ${svcs.slice(0, 3).map(s => `
                                     <div class="hp-svc" onclick="window.navigateToView('services')">
                                         <img src="${s.image}" class="hp-svc-img" style="width:60px; height:60px;">
@@ -1149,7 +1180,8 @@
         const container = document.getElementById('activities-container');
         if (!container) return;
 
-        window.apiFetch(`/api/business/dashboard/activities?_t=${Date.now()}`)
+        const category = window._currentActivityCategory || 'all';
+        window.apiFetch(`/api/business/dashboard/activities?category=${category}&_t=${Date.now()}`)
         .then(json => {
             let list = json.success && json.data ? json.data : [];
             
@@ -1270,6 +1302,149 @@
             container.innerHTML = '<div style="text-align:center;padding:1rem;color:#ef4444;font-size:12px">Lỗi tải đánh giá.</div>';
         });
     }
+
+    window.switchActivityTab = function(btn, type) {
+        document.querySelectorAll('.hp-hub-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        window._currentActivityType = type; // Store globally
+        window._currentActivityCategory = 'all'; // Reset category when switching main tab
+
+        const area = document.getElementById('hub-content-area');
+        if (!area) return;
+
+        // Render Category Filter Bar for live tabs and orders
+        const isLiveTab = ['checkin', 'interactions', 'support'].includes(type);
+        const isOrdersTab = type === 'orders';
+        
+        const filterBarHtml = (isLiveTab || isOrdersTab) ? `
+            <div class="hp-activity-filters" style="display:flex; gap:10px; padding:15px 20px 0; overflow-x:auto;">
+                <button class="hp-act-filter active" onclick="window.switchActivityCategory(this, 'all')">🌐 Tất cả</button>
+                <button class="hp-act-filter" onclick="window.switchActivityCategory(this, 'dining')">🍴 Ẩm thực</button>
+                <button class="hp-act-filter" onclick="window.switchActivityCategory(this, 'stay')">🏨 Khách sạn</button>
+                <button class="hp-act-filter" onclick="window.switchActivityCategory(this, 'tour')">🗺️ Tour</button>
+                <button class="hp-act-filter" onclick="window.switchActivityCategory(this, 'facility')">⚙️ Tiện ích</button>
+            </div>
+        ` : '';
+
+        if (isOrdersTab) {
+            area.innerHTML = `
+                ${filterBarHtml}
+                <div style="overflow-x: auto; padding: 10px 0;">
+                    <table class="hp-table">
+                        <thead>
+                            <tr><th>Mã đơn</th><th>Khách hàng</th><th>Dịch vụ</th><th>Ngày SD</th><th>Thanh toán</th><th>Trạng thái</th><th style="text-align:right;">Số tiền</th></tr>
+                        </thead>
+                        <tbody id="activities-container">
+                            <tr><td colspan="7" style="text-align:center; padding:3rem; color:var(--text-muted)">Đang tải đơn hàng...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            loadDashboardActivities();
+        } else if (isLiveTab) {
+            area.innerHTML = `${filterBarHtml}<div id="live-activity-feed" style="padding: 10px 20px 20px;"></div>`;
+            const activityTypes = {
+                'checkin': 'check_in',
+                'interactions': ['wifi_connect', 'view_menu', 'map_view'],
+                'support': 'help_request'
+            };
+            loadLiveActivities(activityTypes[type]);
+        } else if (type === 'feedback') {
+            area.innerHTML = `<div id="hp-reviews-list-full" style="padding: 0 28px;"></div>`;
+            loadRealReviews('hp-reviews-list-full');
+        }
+    };
+
+    window.switchActivityCategory = function(btn, category) {
+        document.querySelectorAll('.hp-act-filter').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        window._currentActivityCategory = category;
+        
+        if (window._currentActivityType === 'orders') {
+            loadDashboardActivities();
+        } else {
+            const activityTypes = {
+                'checkin': 'check_in',
+                'interactions': ['wifi_connect', 'view_menu', 'map_view'],
+                'support': 'help_request'
+            };
+            loadLiveActivities(activityTypes[window._currentActivityType]);
+        }
+    };
+
+    function loadLiveActivities(types) {
+        const feed = document.getElementById('live-activity-feed');
+        if (!feed) return;
+        feed.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted)">Đang tải luồng hoạt động...</div>';
+
+        const category = window._currentActivityCategory || 'all';
+        window.apiFetch(`/api/business/activities/live?category=${category}`)
+        .then(json => {
+            if (json.success && json.data) {
+                let filtered = json.data;
+                if (types) {
+                    const typeArr = Array.isArray(types) ? types : [types];
+                    filtered = json.data.filter(a => typeArr.includes(a.type));
+                }
+
+                if (filtered.length === 0) {
+                    feed.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted)">Chưa có hoạt động nào trong mục này.</div>';
+                    return;
+                }
+
+                feed.innerHTML = filtered.map(a => {
+                    const icons = {
+                        'check_in': '📍',
+                        'view_menu': '🍽️',
+                        'wifi_connect': '📶',
+                        'map_view': '🗺️',
+                        'order': '📦',
+                        'help_request': '🆘',
+                        'review': '⭐'
+                    };
+                    return `
+                        <div class="hp-list-item">
+                            <div class="hp-list-av" style="background:rgba(255,255,255,0.05); font-size: 20px;">${icons[a.type] || '⚡'}</div>
+                            <div style="flex:1">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div class="hp-list-text">
+                                        ${a.userName} 
+                                        <span style="font-size:11px; font-weight:700; color:#6366f1; background:rgba(99,102,241,0.1); padding:2px 8px; border-radius:10px; margin-left:6px">${a.placeName || 'Dịch vụ'}</span>
+                                    </div>
+                                    <div style="font-size:10px; color:var(--text-muted)">${timeSince(a.createdAt)}</div>
+                                </div>
+                                <div class="hp-list-sub">${a.details && (a.details.label || a.details.message || a.details.comment) ? (a.details.label || a.details.message || a.details.comment) : (a.type === 'check_in' ? 'Check-in tại điểm' : 'Hệ thống WanderViet')}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        });
+    }
+
+    window.filterOverviewCatalog = function(btn, category) {
+        document.querySelectorAll('.hp-catalog-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+
+        const svcs = getServices();
+        const filtered = category === 'all' ? svcs : svcs.filter(s => 
+            s.businessCategory === category || s.kind === category
+        );
+        
+        const grid = document.getElementById('overview-catalog-grid');
+        if (!grid) return;
+
+        grid.innerHTML = filtered.slice(0, 4).map(s => `
+            <div class="hp-svc" onclick="window.navigateToView('services')">
+                <img src="${s.image}" class="hp-svc-img" style="width:60px; height:60px;">
+                <div class="hp-svc-info">
+                    <div class="hp-svc-name">${s.name}</div>
+                    <div class="hp-svc-meta">⭐ ${s.rating} • ${s.bookings} lượt đặt</div>
+                    <div style="font-size:14px;font-weight:800;color:#10b981;margin-top:6px">${formatMoney(s.price)}</div>
+                </div>
+            </div>
+        `).join('') || '<div style="text-align:center; padding:2rem; color:var(--text-muted); font-size:13px;">Chưa có dịch vụ thuộc nhóm này.</div>';
+    };
 
 })();
 

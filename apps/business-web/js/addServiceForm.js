@@ -111,16 +111,27 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                 <div class="svc-form-group">
                   <label class="svc-form-label">Phân loại *</label>
                   <select id="svc-kind" class="svc-form-input">
-                    <option value="trai-nghiem">Trải nghiệm / Tour</option>
+                    <option value="trai-nghiem">Trải nghiệm / Điểm đến</option>
                     <option value="khach-san">Khách sạn / Villa</option>
-                    <option value="nha-hang">Nhà hàng / Ẩm thực</option>
+                    <option value="nha-hang">Nhà hàng / Quán ăn</option>
                     <option value="giai-tri">Giải trí / Sự kiện</option>
+                    <option value="tien-ich">Tiện ích du lịch</option>
                   </select>
                 </div>
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Giá khởi điểm (VND) *</label>
-                  <input type="number" id="svc-price" class="svc-form-input" placeholder="3200000" required>
+                  <label class="svc-form-label">Nhóm quản lý *</label>
+                  <select id="svc-businessCategory" class="svc-form-input">
+                    <option value="dining">Ẩm thực (Dining)</option>
+                    <option value="stay">Lưu trú (Stay)</option>
+                    <option value="tour">Tour & Trải nghiệm</option>
+                    <option value="facility">Tiện ích & Cơ sở vật chất</option>
+                    <option value="other">Khác</option>
+                  </select>
                 </div>
+              </div>
+              <div class="svc-form-group" style="margin-top: 20px;">
+                <label class="svc-form-label">Giá khởi điểm (VND) *</label>
+                <input type="number" id="svc-price" class="svc-form-input" placeholder="3200000" required>
               </div>
             </div>
 
@@ -281,6 +292,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
       description: document.getElementById('svc-desc').value,
       videoUrl: document.getElementById('svc-video').value,
       images: document.getElementById('svc-imgs').value.split(',').map(s => s.trim()).filter(Boolean),
+      businessCategory: document.getElementById('svc-businessCategory').value,
       isTour: chkTour.checked,
       tourDuration: document.getElementById('svc-duration').value,
       tourDifficulty: document.getElementById('svc-diff').value,

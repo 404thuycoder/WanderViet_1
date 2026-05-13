@@ -5,6 +5,7 @@ const bookingSchema = new mongoose.Schema({
   bookingType:    { type: String, enum: ['service', 'tour'], default: 'service' },
   placeId:        { type: String, required: true },
   placeName:      { type: String },
+  businessCategory:{ type: String, enum: ['dining', 'stay', 'tour', 'facility', 'other'], default: 'other' },
   userId:         { type: String },
   customerName:   { type: String, required: true },
   customerEmail:  { type: String },

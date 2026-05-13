@@ -12,6 +12,7 @@ const BusinessAccount = require('../models/BusinessAccount');
 const BusinessMessage = require('../models/BusinessMessage');
 const Booking = require('../models/Booking');
 const AIInsight = require('../models/AIInsight');
+const BusinessActivity = require('../models/BusinessActivity');
 const { syncBusinessXP } = require('../utils/rankUtils');
 
 const safeParseArray = (req, field, forceObjectArray = false) => {
@@ -88,6 +89,67 @@ router.get('/analytics', businessAuth, async (req, res) => {
   }
 });
 
+// ── NEW: Dashboard Comprehensive Stats ──────────────────────────
+router.get('/dashboard/stats', businessAuth, async (req, res) => {
+  try {
+    const ownerId = req.user.id;
+    const BusinessActivity = getModel('BusinessActivity');
+    
+    // 1. Get Totals from Places
+    const places = await Place.find({ ownerId });
+    const totalServices = places.length;
+    
+    // 2. Get Bookings Stats
+    const bookings = await Booking.find({ ownerId });
+    const totalBookings = bookings.length;
+    const totalRevenue = bookings.reduce((sum, b) => sum + (b.totalPrice || 0), 0);
+    const successfulBookings = bookings.filter(b => b.status === 'completed' || b.status === 'confirmed').length;
+
+    // 3. Get Activity Stats (Last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const activities = await BusinessActivity.find({ 
+      ownerId, 
+      createdAt: { $gte: thirtyDaysAgo } 
+    }).lean();
+
+    const totalInteractions = activities.length;
+    const views = activities.filter(a => ['view_menu', 'map_view'].includes(a.type)).length;
+    const checkins = activities.filter(a => a.type === 'check_in').length;
+    const helpRequests = activities.filter(a => a.type === 'help_request').length;
+    
+    // Unique users
+    const activeUsers = new Set(activities.map(a => a.userId).filter(id => id)).size;
+
+    // Conversion rate
+    const conversionRate = views > 0 ? ((totalBookings / views) * 100).toFixed(1) : 0;
+
+    res.json({
+      success: true,
+      data: {
+        summary: {
+          totalServices,
+          totalBookings,
+          totalRevenue,
+          successfulBookings,
+          activeUsers
+        },
+        engagement: {
+          totalInteractions,
+          views,
+          checkins,
+          helpRequests,
+          conversionRate
+        },
+        recentActivities: activities.slice(0, 10)
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 // Middleware to verify business role
 // 1. Get places owned by this specific business
 router.get('/places', businessAuth, async (req, res) => {
@@ -131,8 +193,13 @@ router.get('/stats', businessAuth, async (req, res) => {
     const pendingBookings = allBookings.filter(b => b.status === 'pending').length;
     const lowReviews = places.reduce((sum, p) => sum + (p.reviews ? p.reviews.filter(r => r.rating <= 2).length : 0), 0);
 
-    // General Stats
-    const totalViews = places.reduce((sum, p) => sum + (p.favoritesCount || 0), 0); // Simulated views via favorites
+    // General Stats - NOW USING REAL ACTIVITY DATA
+    const BusinessActivity = getModel('BusinessActivity');
+    const totalViews = await BusinessActivity.countDocuments({ 
+      ownerId: req.user.id, 
+      type: { $in: ['view_menu', 'map_view', 'view_detail'] } 
+    });
+    
     const totalReviews = places.reduce((sum, p) => sum + (p.reviewCount || 0), 0);
     const avgRating = places.length > 0 ? (places.reduce((sum, p) => sum + parseFloat(p.ratingAvg || 0), 0) / places.length).toFixed(1) : '0.0';
 
@@ -240,10 +307,16 @@ router.get('/stats', businessAuth, async (req, res) => {
 // 1c. Get recent activities (Now returns Recent Bookings for Data Table)
 router.get('/dashboard/activities', businessAuth, async (req, res) => {
   try {
+    const { category } = req.query;
+    const query = { ownerId: req.user.id };
+    if (category && category !== 'all') {
+      query.businessCategory = category;
+    }
+
     const BookingModel = getModel('Booking');
-    const bookings = await BookingModel.find({ ownerId: req.user.id })
+    const bookings = await BookingModel.find(query)
                                        .sort({ createdAt: -1 })
-                                       .limit(8)
+                                       .limit(10)
                                        .lean();
 
     const recentBookings = bookings.map(b => ({
@@ -766,6 +839,69 @@ router.post('/:bizId/chat', async (req, res) => {
     });
     await msg.save();
     res.json({ success: true, data: msg });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// 10. GET /api/business/activities/live — Fetch real-time activities
+router.get('/activities/live', businessAuth, async (req, res) => {
+  try {
+    const { category } = req.query;
+    const query = { ownerId: req.user.id };
+    if (category && category !== 'all') {
+      query.businessCategory = category;
+    }
+
+    const activities = await BusinessActivity.find(query)
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .lean();
+    res.json({ success: true, data: activities });
+  } catch (err) {
+    console.error('[API Business Live Error]:', err);
+    res.status(500).json({ success: false, message: 'Server error: ' + err.message });
+  }
+});
+
+// 11. POST /api/business/activities/log — Log a customer activity (called by user-web)
+router.post('/activities/log', async (req, res) => {
+  try {
+    const { placeId, type, details, userId, userName } = req.body;
+    // Handle both ObjectId and custom string id
+    const place = await Place.findOne({ $or: [{ _id: mongoose.isValidObjectId(placeId) ? placeId : null }, { id: placeId }] });
+    if (!place) return res.status(404).json({ success: false, message: 'Place not found' });
+    
+    const newActivity = new BusinessActivity({
+      placeId,
+      placeName: place.name,
+      businessCategory: place.businessCategory || 'other',
+      ownerId: place.ownerId,
+      userId,
+      userName: userName || 'Khách vãng lai',
+      type,
+      details
+    });
+    
+    await newActivity.save();
+    res.json({ success: true, data: newActivity });
+  } catch (err) {
+    console.error('[API Business Log Error]:', err);
+    res.status(500).json({ success: false, message: 'Server error: ' + err.message });
+  }
+});
+
+// 12. PATCH /api/business/places/:id/category — Update service classification
+router.patch('/places/:id/category', businessAuth, async (req, res) => {
+  try {
+    const { businessCategory } = req.body;
+    const place = await Place.findOneAndUpdate(
+      { id: req.params.id, ownerId: req.user.id },
+      { businessCategory },
+      { new: true }
+    );
+    if (!place) return res.status(404).json({ success: false, message: 'Place not found' });
+    res.json({ success: true, data: place });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

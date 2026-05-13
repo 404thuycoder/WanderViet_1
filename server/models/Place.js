@@ -4,6 +4,7 @@ const placeSchema = new mongoose.Schema({
   id:            { type: String, unique: true, sparse: true },
   name:          { type: String, required: true },
   kind:          { type: String, enum: ['diem-du-lich', 'trai-nghiem', 'khach-san', 'nha-hang', 'giai-tri', 'tien-ich'], default: 'diem-du-lich' },
+  businessCategory: { type: String, enum: ['dining', 'stay', 'tour', 'facility', 'other'], default: 'other' },
   // Tour-specific fields
   isTour:        { type: Boolean, default: false },
   isUtility:     { type: Boolean, default: false },

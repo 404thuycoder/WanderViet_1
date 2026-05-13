@@ -7,6 +7,7 @@
     const state = {
         services: [],
         filter: 'all',
+        kindFilter: 'all',
         search: '',
         editingId: null
     };
@@ -113,6 +114,22 @@
             const statusMap = { active: 'approved', pending: 'pending', paused: 'rejected' };
             list = list.filter(s => s.status === (statusMap[state.filter] || state.filter));
         }
+        if (state.kindFilter !== 'all') {
+            const k = state.kindFilter;
+            list = list.filter(s => {
+                // Check businessCategory (new)
+                if (s.businessCategory === k) return true;
+                
+                // Mapping legacy 'kind' to new filters
+                if (k === 'dining' && s.kind === 'nha-hang') return true;
+                if (k === 'stay' && s.kind === 'khach-san') return true;
+                if (k === 'tour' && (s.kind === 'trai-nghiem' || s.kind === 'diem-du-lich' || s.isTour)) return true;
+                if (k === 'facility' && s.kind === 'tien-ich') return true;
+                
+                // Direct kind match fallback
+                return s.kind === k;
+            });
+        }
         if (state.search) {
             const q = state.search.toLowerCase();
             list = list.filter(s =>
@@ -130,10 +147,12 @@
         return `<span class="sm-badge ${cls}">${label}</span>`;
     }
 
-    function typeLabel(kind, isTour) {
-        if (isTour) return '🗺️ Tour';
-        const map = { 'khach-san': '🏨 Khách sạn', 'nha-hang': '🍽️ Nhà hàng', 'giai-tri': '🎡 Giải trí' };
-        return map[kind] || '📍 Địa điểm';
+    function typeLabel(s) {
+        if (s.businessCategory === 'tour' || s.isTour) return '🗺️ Tour';
+        if (s.businessCategory === 'dining' || s.kind === 'nha-hang') return '🍽️ Ẩm thực';
+        if (s.businessCategory === 'stay' || s.kind === 'khach-san') return '🏨 Lưu trú';
+        if (s.kind === 'giai-tri') return '🎡 Giải trí';
+        return '📍 Dịch vụ';
     }
 
     function renderGrid() {
@@ -157,7 +176,7 @@
                 <div class="sm-card-body">
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
                         ${badge(s.status)}
-                        <span style="font-size:12px;color:#64748b;font-weight:800;background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:12px">${typeLabel(s.kind, s.isTour)}</span>
+                        <span style="font-size:12px;color:#64748b;font-weight:800;background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:12px">${typeLabel(s)}</span>
                     </div>
                     <h3 class="sm-card-title">${s.name}</h3>
                     <div class="sm-card-loc">📍 ${s.region || 'Chưa cập nhật'}</div>
@@ -209,6 +228,7 @@
             document.getElementById('sm-form-description').value = svc.description || '';
             document.getElementById('sm-form-highlights').value = svc.highlights || '';
             document.getElementById('sm-form-policy').value = svc.policy || '';
+            document.getElementById('sm-form-businessCategory').value = svc.businessCategory || 'other';
             document.getElementById('sm-form-isTour').checked = !!svc.isTour;
             
             document.getElementById('sm-modal-wrapper').classList.add('active');
@@ -220,6 +240,7 @@
             const formIds = ['sm-form-name','sm-form-region','sm-form-address','sm-form-priceFrom','sm-form-image','sm-form-description', 'sm-form-highlights', 'sm-form-policy'];
             formIds.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
             document.getElementById('sm-form-kind').value = 'diem-du-lich';
+            document.getElementById('sm-form-businessCategory').value = 'other';
             document.getElementById('sm-form-isTour').checked = false;
             document.getElementById('sm-modal-wrapper').classList.add('active');
         },
@@ -249,6 +270,7 @@
             payload.append('priceFrom', Number(document.getElementById('sm-form-priceFrom').value) || 0);
             payload.append('image', document.getElementById('sm-form-image').value.trim());
             payload.append('description', document.getElementById('sm-form-description').value.trim());
+            payload.append('businessCategory', document.getElementById('sm-form-businessCategory').value);
             payload.append('isTour', document.getElementById('sm-form-isTour').checked);
             
             const highlightsText = document.getElementById('sm-form-highlights').value.trim();
@@ -329,14 +351,23 @@
                 </div>
                 <button class="sm-btn-primary" onclick="window.smActions.add()">+ Thêm dịch vụ mới</button>
             </div>
-            <div class="sm-filters">
-                <div class="sm-tabs" id="sm-tabs">
-                    <div class="sm-tab active" data-filter="all">Tất cả</div>
-                    <div class="sm-tab" data-filter="active">Đang hoạt động</div>
-                    <div class="sm-tab" data-filter="pending">Chờ duyệt</div>
-                    <div class="sm-tab" data-filter="paused">Bị từ chối</div>
+            <div class="sm-filters" style="flex-direction:column; align-items:flex-start; gap:20px;">
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center; flex-wrap:wrap; gap:16px;">
+                    <div class="sm-tabs" id="sm-tabs">
+                        <div class="sm-tab active" data-filter="all">Tất cả trạng thái</div>
+                        <div class="sm-tab" data-filter="active">Đang hoạt động</div>
+                        <div class="sm-tab" data-filter="pending">Chờ duyệt</div>
+                        <div class="sm-tab" data-filter="paused">Bị từ chối</div>
+                    </div>
+                    <input type="text" class="sm-search" id="sm-search-input" placeholder="🔍 Tìm kiếm tên, địa điểm...">
                 </div>
-                <input type="text" class="sm-search" id="sm-search-input" placeholder="🔍 Tìm kiếm tên, địa điểm...">
+                <div class="sm-tabs" id="sm-kind-tabs" style="background:transparent; padding:0; gap:12px;">
+                    <div class="sm-tab active" data-kind="all" style="border:1px solid rgba(255,255,255,0.1)">🌐 Tất cả loại hình</div>
+                    <div class="sm-tab" data-kind="dining" style="border:1px solid rgba(255,255,255,0.1)">🍽️ Ẩm thực / Nhà hàng</div>
+                    <div class="sm-tab" data-kind="stay" style="border:1px solid rgba(255,255,255,0.1)">🏨 Khách sạn / Stay</div>
+                    <div class="sm-tab" data-kind="tour" style="border:1px solid rgba(255,255,255,0.1)">🗺️ Tour / Trải nghiệm</div>
+                    <div class="sm-tab" data-kind="facility" style="border:1px solid rgba(255,255,255,0.1)">⚙️ Tiện ích</div>
+                </div>
             </div>
             <div class="sm-grid" id="sm-grid"></div>
 
@@ -357,6 +388,16 @@
                                 <option value="nha-hang">🥘 Ẩm thực & Giải trí</option>
                                 <option value="giai-tri">🎡 Giải trí</option>
                                 <option value="tien-ich">⚙️ Tiện ích</option>
+                            </select>
+                        </div>
+                        <div class="sm-form-group">
+                            <label class="sm-form-label">Nhóm quản lý (Category)</label>
+                            <select id="sm-form-businessCategory" class="sm-form-control">
+                                <option value="dining">🍽️ Ẩm thực (Dining)</option>
+                                <option value="stay">🏨 Lưu trú (Stay)</option>
+                                <option value="tour">🗺️ Tour & Trải nghiệm</option>
+                                <option value="facility">⚙️ Tiện ích & Cơ sở vật chất</option>
+                                <option value="other">📦 Khác</option>
                             </select>
                         </div>
                         <div class="sm-form-group" style="flex-direction:row; align-items:center; gap:10px; margin-top:25px">
@@ -413,11 +454,20 @@
             state.search = e.target.value; renderGrid();
         }, 250));
 
-        document.querySelectorAll('.sm-tab').forEach(tab => {
+        document.querySelectorAll('#sm-tabs .sm-tab').forEach(tab => {
             tab.addEventListener('click', () => {
-                document.querySelectorAll('.sm-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('#sm-tabs .sm-tab').forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 state.filter = tab.dataset.filter;
+                renderGrid();
+            });
+        });
+
+        document.querySelectorAll('#sm-kind-tabs .sm-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('#sm-kind-tabs .sm-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                state.kindFilter = tab.dataset.kind;
                 renderGrid();
             });
         });

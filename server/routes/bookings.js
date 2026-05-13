@@ -48,6 +48,25 @@ router.post('/', auth, async (req, res) => {
 
     await newBooking.save();
 
+    // Log Activity for Business
+    try {
+      const BusinessActivity = mongoose.models.BusinessActivity || require('../models/BusinessActivity');
+      await new BusinessActivity({
+        placeId: newBooking.placeId,
+        ownerId: newBooking.ownerId,
+        userId: newBooking.userId,
+        userName: newBooking.customerName || 'Khách hàng',
+        type: 'order',
+        details: { 
+          label: `Vừa đặt ${newBooking.bookingType === 'tour' ? 'Tour' : 'Dịch vụ'}: ${newBooking.placeName}`,
+          bookingId: newBooking.bookingId,
+          totalPrice: newBooking.totalPrice
+        }
+      }).save();
+    } catch (actErr) {
+      console.warn('[BookingActivityLog] Failed:', actErr.message);
+    }
+
     // Nếu không phải "liên hệ" → tạo transaction pending
     const isOnlinePay = ['transfer', 'qr', 'momo', 'zalopay', 'e-wallet', 'card'].includes(paymentMethod);
     if (isOnlinePay && totalPrice > 0) {

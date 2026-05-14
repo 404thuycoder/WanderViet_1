@@ -142,7 +142,7 @@ router.get('/place/:id', async (req, res) => {
     
     // Memory fallback if DB lookup fails or record missing
     if (!place) {
-      const placesData = getPlacesFallback();
+      const placesData = getPlacesFallback(); // Helper to load from places-data.js
       place = placesData.find(p => p.id === id || p.slug === id || p._id === id);
     }
     

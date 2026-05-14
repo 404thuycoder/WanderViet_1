@@ -228,9 +228,16 @@
     <!-- Business Services Section -->
     <section id="business-services" class="section" style="background: var(--bg); border-top: 1px solid var(--border);">
       <div class="container">
-        <div class="section-header">
+        <header class="section-head">
           <h2 class="section-title">🏨 Dịch vụ từ Đối tác</h2>
           <p class="section-desc">Khám phá các tour du lịch và dịch vụ cao cấp từ cộng đồng doanh nghiệp WanderViệt.</p>
+        </header>
+
+        <div class="filter-bar" id="biz-services-filter" role="group" aria-label="Lọc dịch vụ đối tác" style="justify-content: center; gap: 0.75rem; margin-bottom: 3rem; margin-top: 1rem;">
+          <button type="button" class="filter-btn is-active" data-biz-filter="all">🌐 Tất cả</button>
+          <button type="button" class="filter-btn" data-biz-filter="tour">🗺️ Tours</button>
+          <button type="button" class="filter-btn" data-biz-filter="khach-san">🏨 Khách sạn</button>
+          <button type="button" class="filter-btn" data-biz-filter="nha-hang">🍲 Nhà hàng & Ẩm thực</button>
         </div>
         <div class="dest-grid" id="biz-services-grid" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 32px;">
           <!-- Will be populated by JS -->

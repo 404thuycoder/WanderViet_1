@@ -3221,7 +3221,9 @@
 
 
   // --- Business Services (Partner Tours) ---
-  function renderBusinessServices() {
+  var currentBizFilter = 'all';
+
+  function renderBusinessServices(filter = 'all') {
     const grid = document.getElementById('biz-services-grid');
     if (!grid) return;
     if (window.location.pathname.includes('business-services.html')) return;
@@ -3234,11 +3236,23 @@
           return;
         }
 
-        const bizPlaces = json.data.filter(p => p.ownerId);
+        let bizPlaces = json.data.filter(p => p.ownerId);
         window._allBizPlaces = bizPlaces;
 
+        // Apply filtering
+        if (filter !== 'all') {
+            bizPlaces = bizPlaces.filter(p => {
+                if (filter === 'tour') return p.isTour || p.kind === 'trai-nghiem';
+                if (filter === 'khach-san') return p.kind === 'khach-san';
+                if (filter === 'nha-hang') return p.kind === 'nha-hang';
+                return true;
+            });
+        }
+
         if (bizPlaces.length === 0) {
-          grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:4rem;color:#94a3b8;">Hiện chưa có dịch vụ nào từ đối tác.</p>';
+          grid.innerHTML = `<p style="grid-column:1/-1;text-align:center;padding:4rem;color:#94a3b8;">
+            ${filter === 'all' ? 'Hiện chưa có dịch vụ nào từ đối tác.' : 'Không tìm thấy dịch vụ nào trong mục này.'}
+          </p>`;
           return;
         }
 
@@ -3289,6 +3303,34 @@
         grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;padding:2rem;">Lỗi kết nối máy chủ</p>';
       });
   }
+
+  // Handle Biz Filter clicks
+  function initBizFilters() {
+      const filterBtns = document.querySelectorAll('[data-biz-filter]');
+      if (filterBtns.length === 0) return;
+
+      filterBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+              const filter = this.getAttribute('data-biz-filter');
+              
+              // UI update
+              filterBtns.forEach(b => b.classList.remove('is-active'));
+              this.classList.add('is-active');
+              
+              currentBizFilter = filter;
+              renderBusinessServices(filter);
+              
+              // Optional: Record activity
+              if (window.WanderUI && WanderUI.recordActivity) {
+                WanderUI.recordActivity('filter_biz', `Lọc dịch vụ đối tác: ${filter}`, { category: filter });
+              }
+          });
+      });
+  }
+
+  // Call initialization
+  initBizFilters();
+  renderBusinessServices();
 
   window.openChatWithBusiness = function(ownerId, placeName) {
     // This will toggle the existing chatbot and send a special message or context

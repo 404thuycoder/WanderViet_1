@@ -897,7 +897,7 @@
         .t-title { font-size: 1.6rem; font-weight: 800; margin: 0 0 16px; font-family: 'Plus Jakarta Sans'; }
         .t-desc { font-size: 1.1rem; color: var(--text-dim); line-height: 2; }
 
-                /* BIZ CARD */
+        /* BIZ CARD */
         .biz-card { 
             display: flex; align-items: center; gap: 24px; padding: 28px; 
             background: rgba(255,255,255,0.02); border-radius: 32px; margin-top: 48px; 
@@ -917,11 +917,7 @@
         }
         .btn-elite:hover { transform: translateY(-6px) scale(1.02); box-shadow: 0 30px 60px rgba(99, 102, 241, 0.5); }
 
-        @media (max-width: 480px) {
-            .hero-actions {
-                flex-wrap: wrap;
-            }
-        }
+        /* MODAL */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(12px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
         .modal-content { 
             background: rgba(255, 255, 255, 0.95); width: 100%; max-width: 420px; border-radius: 40px; 
@@ -1144,7 +1140,7 @@
         .review-stats { display: flex; gap: 40px; align-items: center; margin-bottom: 40px; flex-wrap: wrap; }
         .review-score-big { 
             font-size: 4rem; font-weight: 800; color: var(--text-main); line-height: 1;
-            background: linear-gradient(135deg, var(--text-main), var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background: linear-gradient(135deg, var(--text-main), var(--primary)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
         }
         .dist-bars { flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 8px; }
         .dist-row { display: flex; align-items: center; gap: 12px; }
@@ -1524,8 +1520,6 @@
                             <div style="font-size:1.8rem; font-weight:800; color:#10b981;" id="review-positive">0%</div>
                             <div style="font-size:11px; color:#10b981; font-weight:700; margin-top:4px;">Hài lòng</div>
                         </div>
-                    </div>
-                </div>
                     </div>
                 </div>
 
@@ -2127,6 +2121,11 @@
                     if (btn) btn.style.display = 'inline-flex';
                 }
 
+
+                // ── Base Info ──────────────────────────────────────────
+                // Additional Details
+
+
                 // ── Gallery ────────────────────────────────────────────
                 // Support both p.images (legacy) and p.gallery (new schema)
                 let galleryImgs = [];
@@ -2298,55 +2297,12 @@
                     window.nearbyData = p.nearbyPlaces;
                     filterNearby('restaurant');
                 }
-
-                // ── Pay at counter ─────────────────────────────────────
-                if (!p.isTour || (p.tourDuration && !p.tourDuration.includes('ngày'))) {
-                    const counterEl = document.getElementById('pay-counter');
-                    if (counterEl) counterEl.style.display = 'block';
-                }
-
-                // ── Pricing Labels ─────────────────────────────────────
-                const priceLabelEl = document.getElementById('price-label');
-                const priceUnitEl = document.getElementById('p-price-unit');
-                if (isTour) {
-                    priceLabelEl.innerText = 'GIÁ TRẢI NGHIỆM';
-                    priceUnitEl.innerText = '/ người';
-                } else if (isHotel) {
-                    priceLabelEl.innerText = 'GIÁ PHÒNG';
-                    priceUnitEl.innerText = '/ đêm';
-                } else if (isDining) {
-                    priceLabelEl.innerText = 'GIÁ THỰC ĐƠN';
-                    priceUnitEl.innerText = '/ khách';
-                }
-
-                // ── Safety Tips ────────────────────────────────────────
-                const safetyTips = p.safetyTips && p.safetyTips.length > 0 ? p.safetyTips : [
-                    { category: 'general', title: 'Giữ gìn vệ sinh', description: 'Vui lòng không xả rác và giữ gìn cảnh quan chung của địa điểm.', severity: 'low' },
-                    { category: 'safety', title: 'Bảo quản tài sản', description: 'Luôn để mắt tới tư trang cá nhân, đặc biệt là ở những khu vực đông người.', severity: 'medium' }
-                ];
-                if (safetyTips.length > 0) {
-                    document.getElementById('safety-sec').style.display = 'block';
-                    document.getElementById('safety-grid').innerHTML = safetyTips.map(tip => {
-                        const icon = { weather: '☁️', safety: '🛡️', scam: '⚠️', health: '🩺', general: '💡' }[tip.category] || '💡';
-                        const color = { low: '#10b981', medium: '#f59e0b', high: '#ef4444' }[tip.severity] || '#f1f5f9';
-                        return `
-                        <div style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-left:4px solid ${color}; border-radius:16px; padding:20px; transition:0.3s">
-                            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                                <span style="font-size:1.5rem;">${icon}</span>
-                                <b style="color:var(--text-main); font-size:1.1rem;">${tip.title}</b>
-                            </div>
-                            <p style="color:var(--text-dim); font-size:14px; line-height:1.6; margin:0;">${tip.description}</p>
-                        </div>`;
-                    }).join('');
-                }
-
                 // ── Experiences ────────────────────────────────────────
                 if (p.experiences && p.experiences.length > 0) {
                     document.getElementById('experience-sec').style.display = 'block';
                     document.getElementById('experience-grid').innerHTML = p.experiences.map(exp => `
                         <div class="experience-card">
                             <div class="experience-icon">${exp.icon || '✨'}</div>
-<<<<<<< Updated upstream
                             <div class="experience-title">${exp.title || ''}</div>
                             <div class="experience-desc">${exp.description || ''}</div>
                             <div class="experience-meta">
@@ -2357,7 +2313,9 @@
                         </div>`).join('');
                 }
 
-          // ── Render Reviews ─────────────────────────────────────────────
+                // Continued load logic
+
+        // ── Render Reviews ─────────────────────────────────────────────
         function renderReviews(reviews, p) {
             const list = document.getElementById('reviews-list');
             const avgEl = document.getElementById('review-avg');
@@ -2520,27 +2478,81 @@
             `).join('');
         }
 
+                // Safety Tips Section
+                if (p.safetyTips && p.safetyTips.length > 0) {
+                    const safetySec = document.createElement('div');
+                    safetySec.className = 'bento-card';
+                    safetySec.id = 'safety-sec';
+                    safetySec.innerHTML = `
+                        <span class="card-label">AN TOA?N & S_oC KHOE'</span>
+                        <h3 class="card-title" style="margin-bottom:32px; font-size:2rem;">L_u A an toAn</h3>
+                        <div style="display:flex; flex-direction:column; gap:16px;">
+                            ${p.safetyTips.map(tip => `
+                                <div class="safety-item" style="background:${tip.severity === 'high' ? 'rgba(239,68,68,0.2)' : tip.severity === 'medium' ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)'}; border:1px solid ${tip.severity === 'high' ? 'rgba(239,68,68,0.3)' : tip.severity === 'medium' ? 'rgba(245,158,11,0.3)' : 'rgba(16,185,129,0.3)'}; border-radius:16px; padding:20px;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                        <b style="color:var(--text-main); font-size:1.1rem;">${tip.title}</b>
+                                        <span style="padding:4px 12px; border-radius:100px; font-size:0.75rem; font-weight:700; background:${tip.severity === 'high' ? 'rgba(239,68,68,0.2)' : tip.severity === 'medium' ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)'}; color:${tip.severity === 'high' ? '#ef4444' : tip.severity === 'medium' ? '#f59e0b' : '#10b981'};">${tip.severity.toUpperCase()}</span>
+                                    </div>
+                                    <div style="color:var(--text-dim); line-height:1.6;">${tip.description}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${p.whatToBring && p.whatToBring.length > 0 ? `
+                            <div style="margin-top:24px;">
+                                <div style="font-weight:700; color:var(--text-main); margin-bottom:12px;">🎒 Nên mang theo:</div>
+                                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                    ${p.whatToBring.map(item => `<span style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); border-radius:100px; padding:8px 16px; font-size:0.85rem; color:var(--text-main);">${item}</span>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                        ${p.whatNotToDo && p.whatNotToDo.length > 0 ? `
+                            <div style="margin-top:16px;">
+                                <div style="font-weight:700; color:var(--text-main); margin-bottom:12px;">🚫 Không nên:</div>
+                                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                                    ${p.whatNotToDo.map(item => `<span style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); border-radius:100px; padding:8px 16px; font-size:0.85rem; color:var(--text-main);">${item}</span>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                    `;
+                    document.querySelector('.left-col').insertBefore(safetySec, document.getElementById('reviews-sec'));
+                }
 
-
-                // ── FAQ ───────────────────────────────────────────────
-                if (p.faqs && p.faqs.length > 0 && !document.getElementById('faq-sec')) {
+                // FAQ Section
+                if (p.faqs && p.faqs.length > 0) {
                     const faqSec = document.createElement('div');
-                    faqSec.className = 'bento-card'; faqSec.id = 'faq-sec';
+                    faqSec.className = 'bento-card';
+                    faqSec.id = 'faq-sec';
                     faqSec.innerHTML = `
                         <span class="card-label">CÂU HỎI THƯỜNG GẶP</span>
-                        <h3 class="card-title" style="margin-bottom:32px;font-size:2rem">Thắc mắc phổ biến</h3>
-                        <div style="display:flex;flex-direction:column;gap:12px">
-                            ${p.faqs.map((faq,i) => `
-                                <div style="background:rgba(255,255,255,0.02);border:1px solid var(--glass-border);border-radius:16px;overflow:hidden">
-                                    <button onclick="toggleFAQ(${i})" style="width:100%;padding:20px;background:none;border:none;text-align:left;cursor:pointer;display:flex;align-items:center;gap:12px;color:var(--text-main);font-weight:700;font-size:1rem">
-                                        <span style="flex:1">${faq.question}</span><span class="faq-icon" style="transition:transform 0.3s">▼</span>
+                        <h3 class="card-title" style="margin-bottom:32px; font-size:2rem;">Thắc mắc phổ biến</h3>
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            ${p.faqs.map((faq, index) => `
+                                <div class="faq-item" style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:16px; overflow:hidden;">
+                                    <button class="faq-question" onclick="toggleFAQ(${index})" style="width:100%; padding:20px; background:none; border:none; text-align:left; cursor:pointer; display:flex; align-items:center; gap:12px; color:var(--text-main); font-weight:700; font-size:1rem;">
+                                        <span style="flex:1;">${faq.question}</span>
+                                        <span class="faq-icon" style="transition:transform 0.3s;">▼</span>
                                     </button>
-                                    <div class="faq-answer" id="faq-answer-${i}" style="display:none;padding:0 20px 20px;color:var(--text-dim);line-height:1.6;border-top:1px solid rgba(255,255,255,0.05)">${faq.answer}</div>
-                                </div>`).join('')}
-                        </div>`;
-                    const reviewsSec = document.getElementById('reviews-sec');
-                    if (reviewsSec) reviewsSec.parentNode.insertBefore(faqSec, reviewsSec);
+                                    <div class="faq-answer" id="faq-answer-${index}" style="display:none; padding:0 20px 20px; color:var(--text-dim); line-height:1.6; border-top:1px solid rgba(255,255,255,0.05);">
+                                        ${faq.answer}
+                                        <div style="margin-top:12px; display:flex; align-items:center; gap:8px;">
+                                            <button onclick="voteFAQ('${faq._id || index}')" style="background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:8px; padding:6px 12px; color:var(--text-dim); font-size:0.8rem; cursor:pointer; transition:all 0.3s;">👍 Hữu ích (${faq.helpfulCount || 0})</button>
+                                            <span style="font-size:0.75rem; color:var(--text-dim); opacity:0.6;">${faq.createdBy === 'ai' ? '🤖 AI-generated' : ''}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    document.querySelector('.left-col').insertBefore(faqSec, document.getElementById('reviews-sec'));
                 }
+
+                // Views & Followers Count
+                document.getElementById('p-views-count').innerText = p.viewsCount || 0;
+                document.getElementById('p-followers-count').innerText = p.followersCount || 0;
+
+                // Load community posts (API endpoint not yet implemented)
+                // loadCommunityPosts();
+
 
                 // ── Itineraries ───────────────────────────────────────
                 window.suggestedItineraries = p.suggestedItineraries || [];
@@ -2585,58 +2597,7 @@
             }
         }
 
-        // ── Render Reviews ─────────────────────────────────────────────
-        function renderReviews(reviews, p) {
-            const list = document.getElementById('reviews-list');
-            const avgEl = document.getElementById('review-avg');
-            const totalEl = document.getElementById('review-total');
-            const posEl = document.getElementById('review-positive');
-            if (!list) return;
 
-            const total = reviews.length;
-            if (total === 0) {
-                list.innerHTML = '<p style="color:var(--text-dim);text-align:center;padding:32px 0">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>';
-                if (avgEl) avgEl.innerText = parseFloat(p.ratingAvg || 5.0).toFixed(1);
-                if (totalEl) totalEl.innerText = '0';
-                if (posEl) posEl.innerText = '0%';
-                return;
-            }
-
-            const avgRating = reviews.reduce((s,r) => s + (r.rating||5), 0) / total;
-            const positiveCount = reviews.filter(r => (r.rating||5) >= 4).length;
-            if (avgEl) avgEl.innerText = avgRating.toFixed(1);
-            if (totalEl) totalEl.innerText = total;
-            if (posEl) posEl.innerText = Math.round(positiveCount/total*100) + '%';
-            document.getElementById('p-rate').innerText = avgRating.toFixed(1);
-            document.getElementById('p-review-count').innerText = `(${total} đánh giá)`;
-
-            list.innerHTML = reviews.map(r => {
-                const stars = '⭐'.repeat(Math.min(5, Math.max(1, r.rating || 5)));
-                const initials = (r.userName || 'K').charAt(0).toUpperCase();
-                const date = r.createdAt ? new Date(r.createdAt).toLocaleDateString('vi-VN') : '';
-                const sentiment = r.rating >= 4 ? 'positive' : r.rating === 3 ? 'neutral' : 'negative';
-                return `
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="review-avatar">${initials}</div>
-                        <div class="review-user-info">
-                            <div class="review-user-name">
-                                ${r.userName || 'Khách hàng'}
-                                ${r.verified ? '<span class="review-verified">✓ Đã xác minh</span>' : ''}
-                                <span class="review-sentiment ${sentiment}" style="margin-left:auto">${sentiment==='positive'?'Tích cực':sentiment==='neutral'?'Trung lập':'Tiêu cực'}</span>
-                            </div>
-                            <div class="review-date">${date}</div>
-                        </div>
-                    </div>
-                    <div class="review-rating"><span>${stars}</span></div>
-                    <div class="review-text">${r.text || ''}</div>
-                    ${r.images && r.images.length ? `<div class="review-images">${r.images.map(img=>`<img src="${img}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=300&q=80'" alt="review">`).join('')}</div>` : ''}
-                    <div class="review-actions">
-                        <span class="review-action" onclick="this.innerHTML='👍 '+((parseInt(this.innerHTML.match(/\d+/)?.[0]||0))+1)+' Hữu ích'">👍 ${r.helpfulCount||0} Hữu ích</span>
-                    </div>
-                </div>`;
-            }).join('');
-        }
         // Map & Nearby Functions
 
         function filterNearby(type) {
@@ -2906,371 +2867,6 @@
                     postsContainer.innerHTML = json.data.map(post => `
                         <div style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:16px; padding:20px;">
                             <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-                                <img src="${post.userId?.avatar || 'https://ui-avatars.com/api/?name=User'}" 
-                                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=User'"
-                                     style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
-                                <div>
-                                    <div style="font-weight:700; color:var(--text-main);">${post.userId?.displayName || post.userId?.name || 'Người dùng'}</div>
-                                    <div style="font-size:12px; color:var(--text-dim);">${new Date(post.createdAt).toLocaleDateString('vi-VN')}</div>
-                                </div>
-                            </div>
-                            <p style="color:var(--text-dim); line-height:1.6; margin-bottom:12px;">${post.content}</p>
-                            ${post.image ? `<img src="${post.image}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=800&q=80'" style="width:100%; max-height:300px; object-fit:cover; border-radius:12px; margin-bottom:12px;">` : ''}
-                            <div style="display:flex; gap:16px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.05);">
-                                <button onclick="likePost('${post._id}')" style="background:none; border:none; color:var(--text-dim); font-size:13px; cursor:pointer; transition:color 0.3s;">❤️ ${post.likesCount || 0}</button>
-                                <button style="background:none; border:none; color:var(--text-dim); font-size:13px; cursor:pointer; transition:color 0.3s;">💬 Bình luận</button>
-=======
-                            <div class="experience-title">${exp.title}</div>
-                            <div class="experience-desc">${exp.description}</div>
-                            <div class="experience-meta">
-                                <span class="experience-difficulty ${exp.difficulty}">${exp.difficulty}</span>
-                                <span>⏱️ ${exp.duration}</span>
-                                <span>💰 ${exp.priceEstimate ? exp.priceEstimate.toLocaleString() + ' ₫' : '...'}</span>
->>>>>>> Stashed changes
-                            </div>
-                        </div>
-                    `).join('');
-                }
-<<<<<<< Updated upstream
-            } catch(e) {
-                console.error('Load community posts error:', e);
-            }
-        }
-
-        async function likePost(postId) {
-            if (!localStorage.getItem('wander_token')) return window.WanderUI.openAuthModal();
-            try {
-                const res = await fetch(`/api/social/posts/${postId}/like`, {
-                    method: 'POST',
-                    headers: { 'x-auth-token': localStorage.getItem('wander_token') }
-                });
-                const json = await res.json();
-                if (json.success) {
-                    loadCommunityPosts();
-                }
-            } catch(e) {
-                console.error('Like post error:', e);
-            }
-=======
-
-                // Cost Estimation Section
-                if (p.costEstimation) {
-                    const costSec = document.createElement('div');
-                    costSec.className = 'bento-card';
-                    costSec.id = 'cost-estimation-sec';
-                    costSec.innerHTML = `
-                        <span class="card-label">ƯỚC TÍNH CHI PHÍ</span>
-                        <h3 class="card-title" style="margin-bottom:32px; font-size:2rem;">Lên ngân sách chuyến đi</h3>
-                        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:24px;">
-                            <div class="cost-tier" style="background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.2); border-radius:20px; padding:24px;">
-                                <div style="font-size:1.2rem; font-weight:700; color:#10b981; margin-bottom:16px;">💰 Tiết kiệm</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Vé: ${p.costEstimation.budget?.ticket?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Ăn uống: ${p.costEstimation.budget?.food?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Di chuyển: ${p.costEstimation.budget?.transport?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Lưu trú: ${p.costEstimation.budget?.accommodation?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:16px;">Hoạt động: ${p.costEstimation.budget?.activities?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:1.5rem; font-weight:800; color:#10b981; border-top:1px solid rgba(16,185,129,0.2); padding-top:16px;">Tổng: ${p.costEstimation.budget?.total?.toLocaleString() || 0} ₫</div>
-                            </div>
-                            <div class="cost-tier" style="background:rgba(245,158,11,0.05); border:1px solid rgba(245,158,11,0.2); border-radius:20px; padding:24px;">
-                                <div style="font-size:1.2rem; font-weight:700; color:#f59e0b; margin-bottom:16px;">⭐ Trung bình</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Vé: ${p.costEstimation.standard?.ticket?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Ăn uống: ${p.costEstimation.standard?.food?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Di chuyển: ${p.costEstimation.standard?.transport?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Lưu trú: ${p.costEstimation.standard?.accommodation?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:16px;">Hoạt động: ${p.costEstimation.standard?.activities?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:1.5rem; font-weight:800; color:#f59e0b; border-top:1px solid rgba(245,158,11,0.2); padding-top:16px;">Tổng: ${p.costEstimation.standard?.total?.toLocaleString() || 0} ₫</div>
-                            </div>
-                            <div class="cost-tier" style="background:rgba(99,102,241,0.05); border:1px solid rgba(99,102,241,0.2); border-radius:20px; padding:24px;">
-                                <div style="font-size:1.2rem; font-weight:700; color:var(--primary); margin-bottom:16px;">✨ Sang trọng</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Vé: ${p.costEstimation.luxury?.ticket?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Ăn uống: ${p.costEstimation.luxury?.food?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Di chuyển: ${p.costEstimation.luxury?.transport?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:12px;">Lưu trú: ${p.costEstimation.luxury?.accommodation?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:0.9rem; color:var(--text-dim); margin-bottom:16px;">Hoạt động: ${p.costEstimation.luxury?.activities?.toLocaleString() || 0} ₫</div>
-                                <div style="font-size:1.5rem; font-weight:800; color:var(--primary); border-top:1px solid rgba(99,102,241,0.2); padding-top:16px;">Tổng: ${p.costEstimation.luxury?.total?.toLocaleString() || 0} ₫</div>
-                            </div>
-                        </div>
-                    `;
-                    document.querySelector('.left-col').insertBefore(costSec, document.getElementById('map-sec'));
-                }
-
-                // Safety Tips Section
-                if (p.safetyTips && p.safetyTips.length > 0) {
-                    const safetySec = document.createElement('div');
-                    safetySec.className = 'bento-card';
-                    safetySec.id = 'safety-tips-sec';
-                    safetySec.innerHTML = `
-                        <span class="card-label">LƯU Ý AN TOÀN</span>
-                        <h3 class="card-title" style="margin-bottom:32px; font-size:2rem;">Thông tin quan trọng</h3>
-                        <div style="display:flex; flex-direction:column; gap:16px;">
-                            ${p.safetyTips.map(tip => `
-                                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:16px; padding:20px; border-left:4px solid ${tip.severity === 'high' ? '#ef4444' : tip.severity === 'medium' ? '#f59e0b' : '#10b981'};">
-                                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
-                                        <span style="font-size:1.2rem;">${tip.category === 'weather' ? '🌤️' : tip.category === 'safety' ? '🛡️' : tip.category === 'scam' ? '⚠️' : tip.category === 'health' ? '🏥' : 'ℹ️'}</span>
-                                        <span style="font-weight:700; color:var(--text-main);">${tip.title}</span>
-                                        <span style="margin-left:auto; font-size:0.75rem; padding:4px 12px; border-radius:100px; font-weight:700; background:${tip.severity === 'high' ? 'rgba(239,68,68,0.2)' : tip.severity === 'medium' ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)'}; color:${tip.severity === 'high' ? '#ef4444' : tip.severity === 'medium' ? '#f59e0b' : '#10b981'};">${tip.severity.toUpperCase()}</span>
-                                    </div>
-                                    <div style="color:var(--text-dim); line-height:1.6;">${tip.description}</div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        ${p.whatToBring && p.whatToBring.length > 0 ? `
-                            <div style="margin-top:24px;">
-                                <div style="font-weight:700; color:var(--text-main); margin-bottom:12px;">🎒 Nên mang theo:</div>
-                                <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                                    ${p.whatToBring.map(item => `<span style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); border-radius:100px; padding:8px 16px; font-size:0.85rem; color:var(--text-main);">${item}</span>`).join('')}
-                                </div>
-                            </div>
-                        ` : ''}
-                        ${p.whatNotToDo && p.whatNotToDo.length > 0 ? `
-                            <div style="margin-top:16px;">
-                                <div style="font-weight:700; color:var(--text-main); margin-bottom:12px;">🚫 Không nên:</div>
-                                <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                                    ${p.whatNotToDo.map(item => `<span style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); border-radius:100px; padding:8px 16px; font-size:0.85rem; color:var(--text-main);">${item}</span>`).join('')}
-                                </div>
-                            </div>
-                        ` : ''}
-                    `;
-                    document.querySelector('.left-col').insertBefore(safetySec, document.getElementById('reviews-sec'));
-                }
-
-                // FAQ Section
-                if (p.faqs && p.faqs.length > 0) {
-                    const faqSec = document.createElement('div');
-                    faqSec.className = 'bento-card';
-                    faqSec.id = 'faq-sec';
-                    faqSec.innerHTML = `
-                        <span class="card-label">CÂU HỎI THƯỜNG GẶP</span>
-                        <h3 class="card-title" style="margin-bottom:32px; font-size:2rem;">Thắc mắc phổ biến</h3>
-                        <div style="display:flex; flex-direction:column; gap:12px;">
-                            ${p.faqs.map((faq, index) => `
-                                <div class="faq-item" style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:16px; overflow:hidden;">
-                                    <button class="faq-question" onclick="toggleFAQ(${index})" style="width:100%; padding:20px; background:none; border:none; text-align:left; cursor:pointer; display:flex; align-items:center; gap:12px; color:var(--text-main); font-weight:700; font-size:1rem;">
-                                        <span style="flex:1;">${faq.question}</span>
-                                        <span class="faq-icon" style="transition:transform 0.3s;">▼</span>
-                                    </button>
-                                    <div class="faq-answer" id="faq-answer-${index}" style="display:none; padding:0 20px 20px; color:var(--text-dim); line-height:1.6; border-top:1px solid rgba(255,255,255,0.05);">
-                                        ${faq.answer}
-                                        <div style="margin-top:12px; display:flex; align-items:center; gap:8px;">
-                                            <button onclick="voteFAQ('${faq._id || index}')" style="background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:8px; padding:6px 12px; color:var(--text-dim); font-size:0.8rem; cursor:pointer; transition:all 0.3s;">👍 Hữu ích (${faq.helpfulCount || 0})</button>
-                                            <span style="font-size:0.75rem; color:var(--text-dim); opacity:0.6;">${faq.createdBy === 'ai' ? '🤖 AI-generated' : ''}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                    document.querySelector('.left-col').insertBefore(faqSec, document.getElementById('reviews-sec'));
-                }
-
-                // Views & Followers Count
-                document.getElementById('p-views-count').innerText = p.viewsCount || 0;
-                document.getElementById('p-followers-count').innerText = p.followersCount || 0;
-
-                // Load community posts (API endpoint not yet implemented)
-                // loadCommunityPosts();
-            } catch(e) { console.error('Load failed:', e); }
->>>>>>> Stashed changes
-        }
-
-        // Map & Nearby Functions
-        function filterNearby(type) {
-            document.querySelectorAll('.nearby-filter').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.nearby-filter[data-type="${type}"]`).classList.add('active');
-            
-            if (!window.nearbyData) return;
-            
-            const filtered = window.nearbyData.filter(n => n.type === type);
-            const grid = document.getElementById('nearby-grid');
-            grid.innerHTML = filtered.map(n => `
-                <div class="nearby-card">
-                    <img src="${n.image || 'https://via.placeholder.com/250x120'}" class="nearby-img" alt="${n.name}">
-                    <div class="nearby-name">${n.name}</div>
-                    <div class="nearby-type">${n.type}</div>
-                    <div class="nearby-distance">📍 ${n.distanceText || n.distance + 'm'} • ${n.travelTime || ''}</div>
-                    ${n.rating ? `<div style="margin-top:8px; color:#fbbf24;">⭐ ${n.rating}</div>` : ''}
-                </div>
-            `).join('');
-        }
-
-        function viewMap() {
-            const mapSec = document.getElementById('map-sec');
-            mapSec.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // FAQ Functions
-        function toggleFAQ(index) {
-            const answer = document.getElementById(`faq-answer-${index}`);
-            const icon = answer.previousElementSibling.querySelector('.faq-icon');
-            if (answer.style.display === 'none') {
-                answer.style.display = 'block';
-                icon.style.transform = 'rotate(180deg)';
-            } else {
-                answer.style.display = 'none';
-                icon.style.transform = 'rotate(0deg)';
-            }
-        }
-
-        async function voteFAQ(faqId) {
-            try {
-                const res = await fetch(`/api/places/${pid}/faqs/${faqId}/vote`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') }
-                });
-                const json = await res.json();
-                if (json.success) {
-                    window.WanderUI.showToast('Cảm ơn phản hồi của bạn!', 'success');
-                }
-            } catch(e) {
-                console.error('FAQ vote error:', e);
-            }
-        }
-
-        // AI Chat Functions
-        function openAIChat() {
-            const aiSec = document.getElementById('ai-assistant-sec');
-            aiSec.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        async function sendAIMessage() {
-            const input = document.getElementById('ai-input');
-            const message = input.value.trim();
-            if (!message) return;
-            
-            const messagesContainer = document.getElementById('ai-chat-messages');
-            messagesContainer.innerHTML += `
-                <div class="ai-message">
-                    <div class="ai-avatar" style="background:linear-gradient(135deg, #f59e0b, #d97706);">👤</div>
-                    <div class="ai-content">
-                        <p>${message}</p>
-                    </div>
-                </div>
-            `;
-            input.value = '';
-            
-            // Simulate AI response
-            setTimeout(() => {
-                messagesContainer.innerHTML += `
-                    <div class="ai-message">
-                        <div class="ai-avatar">🤖</div>
-                        <div class="ai-content">
-                            <p>Dựa trên thông tin về địa điểm này, tôi xin gợi ý: ${message.includes('thời gian') ? 'Thời gian đẹp nhất để ghé thăm là vào buổi sáng sớm hoặc chiều muộn để tránh nắng gắt và đông đúc.' : message.includes('giá') ? 'Chi phí trung bình cho chuyến đi này dao động từ tiết kiệm đến sang trọng tùy theo lựa chọn của bạn.' : 'Địa điểm này có nhiều trải nghiệm thú vị đang chờ bạn khám phá!'}</p>
-                        </div>
-                    </div>
-                `;
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            }, 1000);
-        }
-
-        function quickAIAction(action) {
-            const input = document.getElementById('ai-input');
-            const questions = {
-                'best-time': 'Thời gian nào trong ngày là đẹp nhất để ghé thăm?',
-                'outfit': 'Tôi nên mặc gì khi đến đây?',
-                'itinerary': 'Lên lịch trình 1 ngày cho tôi',
-                'cost': 'Ước tính chi phí cho chuyến đi này'
-            };
-            input.value = questions[action];
-            sendAIMessage();
-        }
-
-        // Itinerary Functions
-        function filterItinerary(days) {
-            document.querySelectorAll('.itinerary-filter').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.itinerary-filter[data-days="${days}"]`).classList.add('active');
-            // Load itinerary based on days
-        }
-
-        function filterItineraryType(type) {
-            document.querySelectorAll('.itinerary-type').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.itinerary-type[data-type="${type}"]`).classList.add('active');
-            // Load itinerary based on type
-        }
-
-        function saveToItinerary() {
-            if (!localStorage.getItem('wander_token')) return window.WanderUI.openAuthModal();
-            window.WanderUI.showToast('Đã lưu vào lịch trình!', 'success');
-        }
-
-        // Share Function
-        function sharePlace() {
-            if (navigator.share) {
-                navigator.share({
-                    title: document.getElementById('p-title').innerText,
-                    text: document.getElementById('p-desc').innerText,
-                    url: window.location.href
-                });
-            } else {
-                navigator.clipboard.writeText(window.location.href);
-                window.WanderUI.showToast('Đã copy link!', 'success');
-            }
-        }
-
-        // Read More Toggle
-        function toggleReadMore() {
-            const descContainer = document.getElementById('p-desc-container');
-            const btn = document.getElementById('read-more-btn');
-            
-            if (descContainer.style.maxHeight === '300px') {
-                descContainer.style.maxHeight = 'none';
-                descContainer.style.overflow = 'visible';
-                btn.innerText = 'Thu gọn ▲';
-            } else {
-                descContainer.style.maxHeight = '300px';
-                descContainer.style.overflow = 'hidden';
-                btn.innerText = 'Đọc thêm ▼';
-            }
-        }
-
-        // Community/Social Functions
-        let communityImageFile = null;
-
-        function handleCommunityImageUpload(event) {
-            communityImageFile = event.target.files[0];
-            window.WanderUI.showToast('Đã chọn ảnh', 'success');
-        }
-
-        async function submitCommunityPost() {
-            if (!localStorage.getItem('wander_token')) return window.WanderUI.openAuthModal();
-            
-            const text = document.getElementById('community-post-input').value.trim();
-            if (!text && !communityImageFile) return window.WanderUI.showToast('Vui lòng nhập nội dung hoặc thêm ảnh', 'error');
-            
-            try {
-                const formData = new FormData();
-                formData.append('placeId', pid);
-                formData.append('content', text);
-                if (communityImageFile) formData.append('image', communityImageFile);
-                
-                const res = await fetch('/api/social/posts', {
-                    method: 'POST',
-                    headers: { 'x-auth-token': localStorage.getItem('wander_token') },
-                    body: formData
-                });
-                
-                const json = await res.json();
-                if (json.success) {
-                    window.WanderUI.showToast('Đã đăng bài thành công!', 'success');
-                    document.getElementById('community-post-input').value = '';
-                    communityImageFile = null;
-                    loadCommunityPosts();
-                } else {
-                    window.WanderUI.showToast(json.message || 'Lỗi đăng bài', 'error');
-                }
-            } catch(e) {
-                window.WanderUI.showToast('Lỗi kết nối', 'error');
-            }
-        }
-
-        async function loadCommunityPosts() {
-            try {
-                const res = await fetch(`/api/social/posts?placeId=${pid}`);
-                const json = await res.json();
-                if (json.success && json.data) {
-                    const postsContainer = document.getElementById('community-posts');
-                    postsContainer.innerHTML = json.data.map(post => `
-                        <div style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:16px; padding:20px;">
-                            <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
                                 <img src="${post.userId?.avatar || 'https://ui-avatars.com/api/?name=User'}" style="width:40px; height:40px; border-radius:50%; object-fit:cover;">
                                 <div>
                                     <div style="font-weight:700; color:var(--text-main);">${post.userId?.displayName || post.userId?.name || 'Người dùng'}</div>
@@ -3394,7 +2990,7 @@
             btn.disabled = false;
         }
 
-<<<<<<< Updated upstream
+
 
         // ============================================
         // PACKAGE SELECTOR LOGIC
@@ -3488,7 +3084,7 @@
                 document.getElementById('urgency-sub').textContent = 'Đặt sớm để đảm bảo chỗ với giá này';
             }
         }
-=======
+
         // Theme Toggle Logic
         const themeToggle = document.getElementById('theme-toggle');
         const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -3503,7 +3099,7 @@
             themeToggle.textContent = isLight ? '☀️' : '🌙';
             localStorage.setItem('theme', isLight ? 'light' : 'dark');
         });
->>>>>>> Stashed changes
+
 
         window.onload = load;
 

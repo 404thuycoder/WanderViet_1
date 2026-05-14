@@ -269,20 +269,20 @@
 
           <!-- STEP 3: COMPARISON LIBRARY (NEW PATH) -->
           <div id="stepCompare" class="planner-path-compare" style="display:none; flex-direction:column; height: 100%;">
-            <div class="compare-library-header" style="padding: 1.5rem; background: var(--bg-elevated); border-radius: 1rem; margin-bottom: 1rem;">
-              <div class="wizard-step-info" style="color:var(--accent); font-weight:700; margin-bottom:0.5rem;">Thư viện đối chiếu</div>
-              <h3 style="margin:0; font-size:1.5rem;" id="compareHeaderTitle">⚖️ So sánh lịch trình</h3>
-              <p style="color:var(--text-muted); font-size:0.9rem; margin-top:0.5rem;" id="compareHeaderSub">Chọn một lịch trình đã lưu để đối chiếu với bản hiện tại</p>
-              
-              <div class="compare-type-toggle" style="margin-top: 1rem;">
-                <button type="button" class="compare-type-btn active" data-type="itinerary" onclick="switchCompareType('itinerary')">📅 Lịch trình</button>
-                <button type="button" class="compare-type-btn" data-type="tour" onclick="switchCompareType('tour')">🚀 Tour du lịch</button>
+            <div class="compare-library-header" style="padding: 1rem 1.5rem; background: var(--bg-elevated); border-radius: 1rem; margin-bottom: 0.75rem; border: 1px solid var(--border);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <h3 style="margin:0; font-size:1.25rem;" id="compareHeaderTitle">⚖️ So sánh</h3>
+                <div class="compare-type-toggle" style="margin: 0; width: auto; min-width: 180px;">
+                  <button type="button" class="compare-type-btn active" data-type="itinerary" onclick="switchCompareType('itinerary')">Lịch trình</button>
+                  <button type="button" class="compare-type-btn" data-type="tour" onclick="switchCompareType('tour')">Tour</button>
+                </div>
               </div>
+              <p style="color:var(--text-muted); font-size:0.8rem; margin:0;" id="compareHeaderSub">Chọn các bản để đối chiếu với nhau</p>
             </div>
             
-            <div class="compare-filter-bar" style="display: flex; gap: 0.5rem; padding: 0 1.5rem; margin-bottom: 1rem; overflow-x: auto;">
+            <div class="compare-filter-bar" style="display: flex; gap: 0.4rem; padding: 0 0.5rem; margin-bottom: 0.75rem; overflow-x: auto; scrollbar-width: none;">
               <button class="filter-tab active" data-status="all" onclick="filterComparisonTrips('all')">Tất cả</button>
-              <button class="filter-tab" data-status="planning" onclick="filterComparisonTrips('planning')">Đang lên lịch</button>
+              <button class="filter-tab" data-status="planning" onclick="filterComparisonTrips('planning')">Đang lên</button>
               <button class="filter-tab" data-status="completed" onclick="filterComparisonTrips('completed')">Đã đi</button>
               <button class="filter-tab" data-status="missed" onclick="filterComparisonTrips('missed')">Bỏ lỡ</button>
               <button class="filter-tab" data-status="deleted" onclick="filterComparisonTrips('deleted')">Đã xóa</button>
@@ -296,9 +296,8 @@
               <!-- Tours will be rendered here -->
             </div>
             
-            <div class="compare-help-note" style="padding:1rem; background:rgba(59,130,246,0.05); border-radius:0.75rem; margin-top:1rem; font-size:0.85rem; color:var(--text-muted);">
-              <p>✨ Bạn có thể so sánh bản hiện tại với bất kỳ bản lưu nào trong quá khứ.</p>
-            </div>
+            <div id="itineraryCompareAction" class="compare-action-sticky"></div>
+            <div id="tourCompareAction" class="compare-action-sticky" style="display:none;"></div>
           </div>
 
         </div><!-- end .planner-form-body -->
@@ -749,9 +748,14 @@
       const title = document.getElementById('compareHeaderTitle');
       const sub = document.getElementById('compareHeaderSub');
 
+      const itineraryAction = document.getElementById('itineraryCompareAction');
+      const tourAction = document.getElementById('tourCompareAction');
+
       if (type === 'itinerary') {
         tripList.style.display = 'block';
         tourList.style.display = 'none';
+        itineraryAction.style.display = 'block';
+        tourAction.style.display = 'none';
         filterBar.style.display = 'flex';
         title.textContent = '⚖️ So sánh lịch trình';
         sub.textContent = 'Chọn một lịch trình đã lưu để đối chiếu với bản hiện tại';
@@ -759,6 +763,8 @@
       } else {
         tripList.style.display = 'none';
         tourList.style.display = 'block';
+        itineraryAction.style.display = 'none';
+        tourAction.style.display = 'block';
         filterBar.style.display = 'none';
         title.textContent = '🚀 So sánh Tour';
         sub.textContent = 'Chọn các tour có sẵn để phân tích chi phí & tiện ích';
@@ -784,20 +790,27 @@
               </div>
               <div class="trip-info">
                 <strong>📦 ${tour.name}</strong>
-                <p>📍 ${tour.region} - 💰 ${new Intl.NumberFormat('vi-VN').format(tour.priceFrom || 0)}đ</p>
+                <p>📍 ${tour.region || 'Việt Nam'} - 💰 ${new Intl.NumberFormat('vi-VN').format(tour.priceFrom || 0)}đ</p>
               </div>
             </div>
-          `).join('');
+          `).join('') + `
+            <div class="compare-help-note" style="margin-top: 1rem; border:none; background:transparent; padding:0.5rem; opacity:0.6;">
+               <p>✨ Bạn có thể chọn tối đa 3 tour để đối chiếu chi phí và tiện ích.</p>
+            </div>
+          `;
           
-          list.insertAdjacentHTML('beforeend', `
-            <div id="tourCompareActionArea" style="margin-top: 1.5rem; display: block; background: var(--bg-elevated); padding: 1rem; border-top: 1px solid var(--border); position: sticky; bottom: 0;">
-              <button id="btnStartTourCompare" class="planner-btn" style="background: var(--accent); width:100%;" ${selectedTourIds.length < 2 ? 'disabled' : ''} onclick="startTourComparison()">
+          const actionBox = document.getElementById('tourCompareAction');
+          if (actionBox) {
+            actionBox.innerHTML = `
+              <button id="btnStartTourCompare" class="planner-btn" style="background: ${selectedTourIds.length < 2 ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #3b82f6, #2563eb)'}; width:100%; border:none; box-shadow: ${selectedTourIds.length < 2 ? 'none' : '0 8px 20px rgba(37, 99, 235, 0.4)'};" ${selectedTourIds.length < 2 ? 'disabled' : ''} onclick="startTourComparison()">
                 🚀 So sánh <span id="tourCompareCount">${selectedTourIds.length}</span> Tour du lịch
               </button>
-            </div>
-          `);
+            `;
+          }
         } else {
           list.innerHTML = '<p style="color:var(--text-muted); text-align:center; padding:2rem;">Hiện chưa có tour nào khả dụng.</p>';
+          const actionBox = document.getElementById('tourCompareAction');
+          if (actionBox) actionBox.innerHTML = '';
         }
       } catch (e) {
         list.innerHTML = '<p style="color:#f43f5e; text-align:center; padding:2rem;">Không thể tải danh sách tour.</p>';
@@ -823,7 +836,11 @@
       
       const btn = document.getElementById('btnStartTourCompare');
       const count = document.getElementById('tourCompareCount');
-      if (btn) btn.disabled = selectedTourIds.length < 2;
+      if (btn) {
+        btn.disabled = selectedTourIds.length < 2;
+        btn.style.background = selectedTourIds.length < 2 ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #3b82f6, #2563eb)';
+        btn.style.boxShadow = selectedTourIds.length < 2 ? 'none' : '0 8px 20px rgba(37, 99, 235, 0.4)';
+      }
       if (count) count.textContent = selectedTourIds.length;
     };
 
@@ -835,20 +852,37 @@
       if (loader) loader.style.display = 'flex';
       
       try {
-        const promises = selectedTourIds.map(id => fetch(`/api/places/${id}`).then(r => r.json()));
+        const promises = selectedTourIds.map(id => 
+          fetch(`/api/places/${id}`)
+            .then(r => r.json())
+            .catch(err => ({ success: false, error: err.message }))
+        );
         const results = await Promise.all(promises);
-        const tourData = results.map(r => r.data);
+        const tourData = results.filter(r => r.success && r.data).map(r => r.data);
         
+        if (tourData.length < 1) {
+          if (window.WanderToast) WanderToast.error("Không thể tải thông tin các tour đã chọn.");
+          return;
+        }
+
         // Prepare data for rendering
         const plans = tourData.map(t => ({
-          tripSummary: t.description || t.text,
+          tripSummary: t.description || t.text || 'Không có mô tả chi tiết.',
           estimatedCost: new Intl.NumberFormat('vi-VN').format(t.priceFrom || 0),
           highlights: t.highlights || [],
           rating: t.rating || 4.8
         }));
-        const names = tourData.map(t => t.name);
+        const names = tourData.map(t => t.name || 'Tour chưa rõ tên');
         
         showComparisonView(plans, names, 'tour');
+
+        // Hiện vùng kết quả
+        const resultContainer = document.getElementById('timelineResult');
+        const placeholder = document.getElementById('resultPlaceholder');
+        if (placeholder) placeholder.style.display = 'none';
+        if (resultContainer) resultContainer.style.display = 'block';
+
+        resultContainer.scrollIntoView({ behavior: 'smooth' });
       } catch (e) {
         console.error("Tour comparison error:", e);
       } finally {
@@ -922,23 +956,28 @@
               </div>
             </div>
           `;
-        }).join('');
+        }).join('') + `
+          <div class="compare-help-note" style="margin-top: 1rem; border:none; background:transparent; padding:0.5rem; opacity:0.6;">
+             <p>✨ Bạn có thể chọn tối đa 3 bản để AI phân tích chuyên sâu.</p>
+          </div>
+        `;
         
-        // Thêm nút kích hoạt so sánh ở dưới cùng danh sách
-        list.insertAdjacentHTML('beforeend', `
-          <div id="compareActionArea" style="margin-top: 1.5rem; display: block; background: var(--bg-elevated); padding: 1rem; border-top: 1px solid var(--border); position: sticky; bottom: 0;">
-            <button id="btnStartMultiCompare" class="planner-btn" style="background: var(--accent); width:100%;" ${selectedTripIds.length < 2 ? 'disabled' : ''}>
+        const actionBox = document.getElementById('itineraryCompareAction');
+        if (actionBox) {
+          actionBox.innerHTML = `
+            <button id="btnStartMultiCompare" class="planner-btn" style="background: ${selectedTripIds.length < 2 ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #3b82f6, #2563eb)'}; width:100%; border:none; box-shadow: ${selectedTripIds.length < 2 ? 'none' : '0 8px 20px rgba(37, 99, 235, 0.4)'};" ${selectedTripIds.length < 2 ? 'disabled' : ''}>
               🚀 So sánh <span id="compareCount">${selectedTripIds.length}</span> lịch trình
             </button>
-            ${selectedTripIds.length < 2 ? '<p style="font-size:0.7rem; color:var(--text-muted); text-align:center; margin-top:0.5rem;">Chọn ít nhất 2 bản để so sánh</p>' : ''}
-          </div>
-        `);
-        
-        const btn = document.getElementById('btnStartMultiCompare');
-        if (btn) btn.onclick = startMultiCompare;
+            ${selectedTripIds.length < 2 ? '<p style="font-size:0.7rem; color:var(--text-muted); text-align:center; margin-top:0.75rem; font-weight:600;">Chọn ít nhất 2 bản để so sánh</p>' : ''}
+          `;
+          const btn = document.getElementById('btnStartMultiCompare');
+          if (btn) btn.onclick = startMultiCompare;
+        }
       } else {
         const labels = { all: 'tất cả', planning: 'Đang lên lịch', completed: 'Đã đi', missed: 'Bỏ lỡ', deleted: 'Đã xóa' };
         list.innerHTML = `<p style="color:var(--text-muted); text-align:center; padding:2rem;">Bạn chưa có lịch trình nào ở trạng thái ${labels[status]}.</p>`;
+        const actionBox = document.getElementById('itineraryCompareAction');
+        if (actionBox) actionBox.innerHTML = '';
       }
     }
 
@@ -964,11 +1003,14 @@
       if (countEl) countEl.textContent = selectedTripIds.length;
       if (btn) {
         btn.disabled = selectedTripIds.length < 2;
+        btn.style.background = selectedTripIds.length < 2 ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #3b82f6, #2563eb)';
+        btn.style.boxShadow = selectedTripIds.length < 2 ? 'none' : '0 8px 20px rgba(37, 99, 235, 0.4)';
+        
         // Cập nhật hint text
         let hint = btn.nextElementSibling;
         if (selectedTripIds.length < 2) {
           if (!hint || hint.tagName !== 'P') {
-            btn.insertAdjacentHTML('afterend', '<p style="font-size:0.7rem; color:var(--text-muted); text-align:center; margin-top:0.5rem;">Chọn ít nhất 2 bản để so sánh</p>');
+            btn.insertAdjacentHTML('afterend', '<p style="font-size:0.7rem; color:var(--text-muted); text-align:center; margin-top:0.75rem; font-weight:600;">Chọn ít nhất 2 bản để so sánh</p>');
           }
         } else {
           if (hint && hint.tagName === 'P') hint.remove();
@@ -1034,7 +1076,7 @@
          if (placeholder) placeholder.style.display = 'none';
          if (resultContainer) resultContainer.style.display = 'block';
 
-         document.getElementById('itineraryResults')?.scrollIntoView({ behavior: 'smooth' });
+         resultContainer.scrollIntoView({ behavior: 'smooth' });
          
        } catch (e) {
          console.error("Multi-Compare Error:", e);
@@ -1049,7 +1091,9 @@
     };
 
     btnModeCompare?.addEventListener('click', () => {
-      openTripPicker();
+      if (typeof window.switchCompareType === 'function') {
+        window.switchCompareType('itinerary');
+      }
     });
 
     window.WanderPlanner.triggerComparison = async function(savedTripId) {
@@ -1085,7 +1129,7 @@
              }, 500);
            }
            
-           document.getElementById('itineraryResults')?.scrollIntoView({ behavior: 'smooth' });
+           document.getElementById('timelineResult')?.scrollIntoView({ behavior: 'smooth' });
          }
        } catch (e) {
          console.error("Comparison Error:", e);

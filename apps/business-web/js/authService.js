@@ -1,11 +1,11 @@
-﻿// Dịch vụ xác thực gọi API thật tới Node.js Backend
+// Dịch vụ xác thực gọi API thật tới Node.js Backend
 
 const API_URL = '/api/auth';
 
 export const authService = {
   async login(email, password) {
     try {
-      const response = await fetch(`${API_URL}/login`, {
+      const response = await fetch(`${API_URL}/business/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -31,7 +31,7 @@ export const authService = {
 
   async register(name, email, password) {
     try {
-      const response = await fetch(`${API_URL}/register`, {
+      const response = await fetch(`${API_URL}/business/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, role: 'business' })

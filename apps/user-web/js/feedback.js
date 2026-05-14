@@ -226,7 +226,7 @@ const FeedbackHub = {
                     <div class="message-meta">Bạn • ${new Date(thread.createdAt).toLocaleString('vi-VN')}</div>
                     <div class="message-bubble">
                         ${thread.message}
-                        ${thread.image ? `<img src="${thread.image}" class="message-image" onclick="window.WanderUI.viewImage('${thread.image}')">` : ''}
+                        ${thread.image ? `<img src="${thread.image}" class="message-image" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=500&q=80'" onclick="window.WanderUI.viewImage('${thread.image}')">` : ''}
                     </div>
                 </div>
 
@@ -239,7 +239,7 @@ const FeedbackHub = {
                             <div class="message-meta">${senderLabel} • ${new Date(r.createdAt).toLocaleString('vi-VN')}</div>
                             <div class="message-bubble">
                                 ${r.content}
-                                ${r.image ? `<img src="${r.image}" class="message-image" onclick="window.WanderUI.viewImage('${r.image}')">` : ''}
+                                ${r.image ? `<img src="${r.image}" class="message-image" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=500&q=80'" onclick="window.WanderUI.viewImage('${r.image}')">` : ''}
                             </div>
                         </div>
                     `;

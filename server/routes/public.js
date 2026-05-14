@@ -6,6 +6,26 @@ const User = require('../models/User');
 const Place = require('../models/Place');
 const Feedback = require('../models/Feedback');
 const BusinessAccount = require('../models/BusinessAccount');
+const fs = require('fs');
+const path = require('path');
+
+// Memory Cache for static fallback data
+let staticPlacesCache = null;
+function getPlacesFallback() {
+  if (staticPlacesCache) return staticPlacesCache;
+  try {
+    const filePath = path.join(__dirname, '../../apps/user-web/js/places-data.js');
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const arrayMatch = content.match(/window\.WANDER_PLACES\s*=\s*(\[[\s\S]*\]);/);
+    if (arrayMatch) {
+      staticPlacesCache = new Function('return ' + arrayMatch[1])();
+      return staticPlacesCache;
+    }
+  } catch (e) {
+    console.error("Error loading places fallback data in public.js:", e);
+  }
+  return [];
+}
 
 // Helper: build safe $or query that avoids CastError for non-ObjectId strings
 function buildIdQuery(id) {
@@ -113,9 +133,18 @@ router.get('/business/:id/full', async (req, res) => {
 // GET /api/public/place/:id - Chi tiết điểm du lịch/dịch vụ
 router.get('/place/:id', async (req, res) => {
   try {
-    const placeQ = [{ id: req.params.id }];
-    if (mongoose.Types.ObjectId.isValid(req.params.id)) placeQ.push({ _id: req.params.id });
-    const place = await Place.findOne({ $or: placeQ });
+    const id = req.params.id;
+    const placeQ = [{ id: id }, { slug: id }];
+    if (mongoose.Types.ObjectId.isValid(id)) placeQ.push({ _id: id });
+    
+    let place = await Place.findOne({ $or: placeQ }).lean();
+    let isFromDB = !!place;
+    
+    // Memory fallback if DB lookup fails or record missing
+    if (!place) {
+      const placesData = getPlacesFallback();
+      place = placesData.find(p => p.id === id || p.slug === id || p._id === id);
+    }
     
     if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
 
@@ -123,10 +152,18 @@ router.get('/place/:id', async (req, res) => {
     let owner = null;
     if (place.ownerId) {
       owner = await BusinessAccount.findOne(buildIdQuery(place.ownerId))
-        .select('name displayName avatar isVerified customId');
+        .select('name displayName avatar isVerified customId contactPhone contactEmail');
     }
 
-    res.json({ success: true, data: { ...place._doc, owner } });
+    // Dùng place._doc nếu là Mongoose document, hoặc plain object nếu là fallback
+    const placeData = isFromDB ? (place._doc || place) : place;
+
+    // Tăng viewsCount
+    if (isFromDB && mongoose.Types.ObjectId.isValid(id)) {
+      Place.findByIdAndUpdate(id, { $inc: { viewsCount: 1 } }).exec();
+    }
+
+    res.json({ success: true, data: { ...placeData, owner } });
   } catch (err) {
     console.error('[public/place]', err);
     res.status(500).json({ success: false, message: err.message });

@@ -14,6 +14,41 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   };
 
+  // ─── Global Loading System ───────────────────────────────────────────────
+  let loaderCount = 0;
+  function showLoading(message = 'Đang xử lý...') {
+    loaderCount++;
+    let loader = document.getElementById('wv-global-loader');
+    if (!loader) {
+      loader = document.createElement('div');
+      loader.id = 'wv-global-loader';
+      loader.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(6,9,18,0.7);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.3s;';
+      loader.innerHTML = `
+        <div class="wv-loader-spinner" style="width:48px;height:48px;border:4px solid rgba(99,102,241,0.2);border-top-color:#6366f1;border-radius:50%;animation:wv-spin 1s linear infinite;"></div>
+        <div id="wv-loader-text" style="margin-top:1.5rem;color:#fff;font-weight:600;font-size:0.95rem;letter-spacing:0.5px;">${message}</div>
+        <style>@keyframes wv-spin { to { transform: rotate(360deg); } }</style>
+      `;
+      document.body.appendChild(loader);
+    } else {
+      document.getElementById('wv-loader-text').innerText = message;
+      loader.style.display = 'flex';
+      loader.style.opacity = '1';
+    }
+  }
+
+  function hideLoading() {
+    loaderCount = Math.max(0, loaderCount - 1);
+    if (loaderCount === 0) {
+      const loader = document.getElementById('wv-global-loader');
+      if (loader) {
+        loader.style.opacity = '0';
+        setTimeout(() => { if (loaderCount === 0) loader.style.display = 'none'; }, 300);
+      }
+    }
+  }
+  window.WanderUI.showLoading = showLoading;
+  window.WanderUI.hideLoading = hideLoading;
+
   // ─── Global Fetch Interceptor for Suspension ─────────────────────────────
   const originalFetch = window.fetch;
   function openModal(name) {
@@ -67,25 +102,39 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       } catch (e) { }
     }
 
-    const response = await originalFetch.apply(this, args);
+    try {
+      const response = await originalFetch.apply(this, args);
 
-    if (response.status === 403 || response.status === 401) {
-      try {
-        const clone = response.clone();
-        const data = await clone.json();
+      if (response.status === 403 || response.status === 401) {
+        try {
+          const clone = response.clone();
+          const data = await clone.json();
 
-        if (response.status === 403 && data && data.message && data.message.includes('bị khóa')) {
-          showSuspendedModal();
+          if (response.status === 403 && data && data.message && data.message.includes('bị khóa')) {
+            showSuspendedModal();
+          }
+
+          if (response.status === 401 && !url.includes('/login') && !url.includes('/register')) {
+            localStorage.removeItem('wander_token');
+            localStorage.removeItem('wander_admin_token');
+          }
+        } catch (e) { /* ignore parse error */ }
+      }
+
+      if (!response.ok && !url.includes('/api/auth/me')) {
+        console.error(`[Fetch Error] ${response.status} ${url}`);
+        // Optionally show a toast for specific critical errors
+        if (response.status >= 500) {
+          window.WanderUI.showToast('Lỗi máy chủ, vui lòng thử lại sau', 'error');
         }
+      }
 
-        if (response.status === 401 && !url.includes('/login') && !url.includes('/register')) {
-          localStorage.removeItem('wander_token');
-          localStorage.removeItem('wander_admin_token');
-        }
-      } catch (e) { /* ignore parse error */ }
+      return response;
+    } catch (err) {
+      console.error(`[Fetch Network Error] ${url}`, err);
+      window.WanderUI.showToast('Lỗi kết nối mạng', 'error');
+      throw err;
     }
-
-    return response;
   };
 
   function showSuspendedModal() {

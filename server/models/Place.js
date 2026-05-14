@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const placeSchema = new mongoose.Schema({
   id:            { type: String, unique: true, sparse: true },
   name:          { type: String, required: true },
+  slug:          { type: String, unique: true, sparse: true }, // SEO-friendly URL
   kind:          { type: String, enum: ['diem-du-lich', 'trai-nghiem', 'khach-san', 'nha-hang', 'giai-tri', 'tien-ich'], default: 'diem-du-lich' },
   businessCategory: { type: String, enum: ['dining', 'stay', 'tour', 'facility', 'other'], default: 'other' },
   // Tour-specific fields
@@ -14,6 +15,8 @@ const placeSchema = new mongoose.Schema({
   tourDifficulty:{ type: String, enum: ['easy','medium','hard'], default: 'easy' },
   tourItinerary: [{ day: Number, title: String, detail: String }], // Lịch trình theo ngày
   region:        { type: String, default: '' },
+  country:       { type: String, default: 'Việt Nam' },
+  city:          { type: String, default: '' },
   address:       { type: String, default: '' },
   description:   { type: String, default: '' },
   overview:      { type: String, default: '' },
@@ -39,6 +42,7 @@ const placeSchema = new mongoose.Schema({
   // Business-specific fields
   priceFrom:     { type: Number, default: null },
   priceTo:       { type: Number, default: null },
+  averagePrice:  { type: Number, default: null }, // Giá trung bình
   openTime:      { type: String, default: '' },
   closeTime:     { type: String, default: '' },
   openDays:      { type: String, default: '' },
@@ -47,10 +51,155 @@ const placeSchema = new mongoose.Schema({
   contactEmail:  { type: String, default: '' },
   website:       { type: String, default: '' },
 
+  // NEW: Quick Info fields
+  gpsCoordinates: {
+    lat: { type: Number, default: null },
+    lng: { type: Number, default: null }
+  },
+  visitDuration: { type: String, default: '' }, // Thời gian tham quan trung bình (VD: "2-3 giờ")
+  crowdLevel:    { type: String, enum: ['low', 'medium', 'high'], default: 'medium' }, // Độ đông đúc
+  costLevel:     { type: String, enum: ['budget', 'standard', 'luxury'], default: 'standard' }, // Mức chi phí
+  suitability:   [String], // Gia đình, Couple, Solo, Group
+  bestTimeToVisit: { type: String, default: '' }, // Thời gian đẹp nhất trong ngày
+  bestSeason:    { type: String, default: '' }, // Mùa đẹp nhất
+  weatherTags:   [String], // Sunny, Rainy, Cool, Hot
+  internetQuality: { type: String, enum: ['poor', 'fair', 'good', 'excellent'], default: 'fair' },
+  parking:       { type: String, enum: ['none', 'street', 'lot', 'valet'], default: 'none' },
+  accessibility:  {
+    wheelchairAccessible: { type: Boolean, default: false },
+    elevator: { type: Boolean, default: false },
+    accessibleRestrooms: { type: Boolean, default: false },
+    notes: { type: String, default: '' }
+  },
+  capacity:      { type: Number, default: null }, // Sức chứa
+
+  // NEW: Gallery/Media System
+  gallery: [{
+    url: String,
+    type: { type: String, enum: ['image', 'video', '360', 'reel'], default: 'image' },
+    category: { type: String, enum: ['food', 'nature', 'hotel', 'nightlife', 'beach', 'adventure', 'general'], default: 'general' },
+    caption: String,
+    uploadedBy: { type: String, default: 'business' }, // 'business' or 'user'
+    likes: { type: Number, default: 0 },
+    isCover: { type: Boolean, default: false },
+    aiDetectedScene: [String], // AI auto-detected scenes
+    createdAt: { type: Date, default: Date.now }
+  }],
+  coverImage:    { type: String, default: '' },
+  videoUrl:      { type: String, default: '' },
+  reelUrls:      [String], // Short video URLs
+
+  // NEW: Experience System
+  experiences: [{
+    title: String,
+    description: String,
+    icon: String, // Emoji or icon name
+    difficulty: { type: String, enum: ['easy', 'medium', 'hard'], default: 'easy' },
+    duration: String,
+    priceEstimate: Number,
+    bestTime: String,
+    requirements: [String],
+    highlights: [String]
+  }],
+
+  // NEW: Enhanced Itinerary System
+  suggestedItineraries: [{
+    name: String,
+    duration: String, // "1 day", "2 days", "3 days"
+    type: { type: String, enum: ['couple', 'family', 'solo', 'group', 'budget', 'luxury'], default: 'general' },
+    timeline: [{
+      time: String,
+      activity: String,
+      location: String,
+      duration: String,
+      cost: Number,
+      tips: String
+    }],
+    totalCostEstimate: Number,
+    aiGenerated: { type: Boolean, default: false }
+  }],
+
+  // NEW: FAQ System
+  faqs: [{
+    question: String,
+    answer: String,
+    helpfulCount: { type: Number, default: 0 },
+    createdBy: { type: String, default: 'business' }, // 'business' or 'ai'
+    createdAt: { type: Date, default: Date.now }
+  }],
+
+  // NEW: Safety & Tips System
+  safetyTips: [{
+    category: { type: String, enum: ['weather', 'safety', 'scam', 'health', 'general'], default: 'general' },
+    title: String,
+    description: String,
+    severity: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' }
+  }],
+  whatToBring:   [String],
+  whatNotToDo:   [String],
+
+  // NEW: Nearby Places System
+  nearbyPlaces: [{
+    placeId: String,
+    name: String,
+    type: { type: String, enum: ['restaurant', 'hotel', 'cafe', 'attraction', 'transport'], default: 'attraction' },
+    distance: Number, // in meters
+    distanceText: String, // "500m", "1km"
+    travelTime: String, // "5 min walk", "10 min drive"
+    rating: Number
+  }],
+
+  // NEW: Cost Estimation System
+  costEstimation: {
+    budget: {
+      ticket: Number,
+      food: Number,
+      transport: Number,
+      accommodation: Number,
+      activities: Number,
+      total: Number
+    },
+    standard: {
+      ticket: Number,
+      food: Number,
+      transport: Number,
+      accommodation: Number,
+      activities: Number,
+      total: Number
+    },
+    luxury: {
+      ticket: Number,
+      food: Number,
+      transport: Number,
+      accommodation: Number,
+      activities: Number,
+      total: Number
+    }
+  },
+
+  // NEW: SEO System
+  seo: {
+    metaTitle: String,
+    metaDescription: String,
+    keywords: [String],
+    openGraphImage: String,
+    schemaMarkup: String, // JSON-LD schema
+    seoScore: { type: Number, default: 0 } // 0-100
+  },
+
+  // NEW: AI-generated content
+  aiSummary:     String, // AI-generated summary
+  aiVibe:        String, // AI-detected vibe/mood
+  aiTags:        [String], // AI-generated tags
+
+  // NEW: Engagement metrics
+  viewsCount:    { type: Number, default: 0 },
+  followersCount: { type: Number, default: 0 },
+  trendingScore: { type: Number, default: 0 }, // Calculated based on views, engagement, recency
+
   // Source info
   sourceName:    { type: String, default: '' },
   sourceUrl:     { type: String, default: '' },
-  videoUrl:      { type: String, default: '' }, // Thêm trường này
   transportTips: { type: String, default: '' },
 
   // Nested details (kept for backward compat)
@@ -86,14 +235,20 @@ const placeSchema = new mongoose.Schema({
     userName:  { type: String, default: 'Khách' },
     rating:    { type: Number, min: 1, max: 5 },
     text:      String,
+    images:    [String], // Review images
+    verified:  { type: Boolean, default: false }, // Verified traveler
+    helpfulCount: { type: Number, default: 0 },
+    sentiment: { type: String, enum: ['positive', 'neutral', 'negative'], default: 'neutral' }, // AI-detected sentiment
+    spamDetected: { type: Boolean, default: false }, // AI spam detection
     createdAt: { type: Date, default: Date.now }
   }],
 
-  // Geographic
+  // Geographic (legacy, kept for compatibility)
   lat: { type: Number, default: null },
   lng: { type: Number, default: null },
 
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 // Indexes for fast lookup

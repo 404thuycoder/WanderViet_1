@@ -75,7 +75,250 @@ router.get('/:id', async (req, res) => {
       if (biz) place.ownerName = biz.displayName || biz.name;
     }
 
+    // Increment views count
+    await Place.findByIdAndUpdate(place._id, { $inc: { viewsCount: 1 } });
+
     res.json({ success: true, data: place });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// API để tạo địa điểm mới với đầy đủ thông tin (cho Business)
+router.post('/', auth, async (req, res) => {
+  try {
+    const {
+      name, slug, kind, region, country, city, address, description, overview,
+      highlights, experience, image, images, tags, interests, habits, budget, pace,
+      priceFrom, priceTo, averagePrice, openTime, closeTime, openDays, amenities,
+      contactPhone, contactEmail, website, visitDuration, crowdLevel, costLevel,
+      suitability, bestTimeToVisit, bestSeason, weatherTags, internetQuality,
+      parking, accessibility, capacity, gallery, coverImage, videoUrl, reelUrls,
+      experiences, suggestedItineraries, faqs, safetyTips, whatToBring, whatNotToDo,
+      nearbyPlaces, costEstimation, seo, aiSummary, aiVibe, aiTags
+    } = req.body;
+
+    const newPlace = new Place({
+      id: Date.now().toString(),
+      name,
+      slug: slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      kind,
+      region,
+      country: country || 'Việt Nam',
+      city,
+      address,
+      description,
+      overview,
+      highlights,
+      experience,
+      image,
+      images,
+      tags,
+      interests,
+      habits,
+      budget,
+      pace,
+      ownerId: req.user.id,
+      status: 'pending',
+      source: 'partner',
+      priceFrom,
+      priceTo,
+      averagePrice,
+      openTime,
+      closeTime,
+      openDays,
+      amenities,
+      contactPhone,
+      contactEmail,
+      website,
+      visitDuration,
+      crowdLevel,
+      costLevel,
+      suitability,
+      bestTimeToVisit,
+      bestSeason,
+      weatherTags,
+      internetQuality,
+      parking,
+      accessibility,
+      capacity,
+      gallery,
+      coverImage,
+      videoUrl,
+      reelUrls,
+      experiences,
+      suggestedItineraries,
+      faqs,
+      safetyTips,
+      whatToBring,
+      whatNotToDo,
+      nearbyPlaces,
+      costEstimation,
+      seo,
+      aiSummary,
+      aiVibe,
+      aiTags
+    });
+
+    await newPlace.save();
+    res.json({ success: true, data: newPlace });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// API để cập nhật địa điểm (cho Business)
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const place = await Place.findOne({ id: id });
+
+    if (!place) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+    }
+
+    // Check ownership
+    if (place.ownerId !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Bạn không có quyền sửa địa điểm này' });
+    }
+
+    const updateData = req.body;
+    updateData.updatedAt = new Date();
+
+    const updatedPlace = await Place.findOneAndUpdate(
+      { id: id },
+      { $set: updateData },
+      { new: true }
+    );
+
+    res.json({ success: true, data: updatedPlace });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// API để upload ảnh vào gallery
+router.post('/:id/gallery', auth, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { url, type, category, caption } = req.body;
+
+    const place = await Place.findOne({ id: id });
+    if (!place) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+    }
+
+    if (place.ownerId !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Bạn không có quyền thêm ảnh' });
+    }
+
+    const newGalleryItem = {
+      url,
+      type: type || 'image',
+      category: category || 'general',
+      caption,
+      uploadedBy: 'business',
+      likes: 0,
+      isCover: false,
+      createdAt: new Date()
+    };
+
+    place.gallery.push(newGalleryItem);
+    await place.save();
+
+    res.json({ success: true, data: newGalleryItem });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// API để thêm trải nghiệm
+router.post('/:id/experiences', auth, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { title, description, icon, difficulty, duration, priceEstimate, bestTime, requirements, highlights } = req.body;
+
+    const place = await Place.findOne({ id: id });
+    if (!place) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+    }
+
+    if (place.ownerId !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Bạn không có quyền thêm trải nghiệm' });
+    }
+
+    const newExperience = {
+      title,
+      description,
+      icon,
+      difficulty: difficulty || 'easy',
+      duration,
+      priceEstimate,
+      bestTime,
+      requirements,
+      highlights
+    };
+
+    place.experiences.push(newExperience);
+    await place.save();
+
+    res.json({ success: true, data: newExperience });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// API để thêm FAQ
+router.post('/:id/faqs', auth, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { question, answer } = req.body;
+
+    const place = await Place.findOne({ id: id });
+    if (!place) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+    }
+
+    if (place.ownerId !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Bạn không có quyền thêm FAQ' });
+    }
+
+    const newFAQ = {
+      question,
+      answer,
+      helpfulCount: 0,
+      createdBy: 'business',
+      createdAt: new Date()
+    };
+
+    place.faqs.push(newFAQ);
+    await place.save();
+
+    res.json({ success: true, data: newFAQ });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// API để vote FAQ hữu ích
+router.post('/:id/faqs/:faqId/vote', auth, async (req, res) => {
+  try {
+    const { id, faqId } = req.params;
+
+    const place = await Place.findOne({ id: id });
+    if (!place) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+    }
+
+    const faq = place.faqs.id(faqId);
+    if (!faq) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy FAQ' });
+    }
+
+    faq.helpfulCount += 1;
+    await place.save();
+
+    res.json({ success: true, helpfulCount: faq.helpfulCount });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

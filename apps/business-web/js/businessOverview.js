@@ -53,18 +53,21 @@
     .hp-qbtn.primary:hover { opacity: 0.9; box-shadow: 0 12px 30px rgba(99,102,241,0.4); }
 
     /* KPI Cards */
-    .hp-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 40px; }
-    .hp-kpi { 
-      background: rgba(255,255,255,0.03); padding: 28px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.08); 
-      display: flex; flex-direction: column; gap: 16px; backdrop-filter: blur(20px); transition: all .4s;
+    .hp-kpis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 20px; margin-bottom: 40px; }
+    .hp-kpi {
+      background: rgba(255,255,255,0.03); padding: 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.08);
+      display: flex; flex-direction: column; gap: 12px; backdrop-filter: blur(20px); transition: all .4s;
     }
     .hp-kpi:hover { transform: translateY(-5px); border-color: rgba(99,102,241,0.3); background: rgba(255,255,255,0.05); }
-    .hp-kpi-icon { 
-      width: 54px; height: 54px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; 
+    .hp-kpi-icon {
+      width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 22px;
       background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
     }
-    .hp-kpi-val { font-size: 32px; font-weight: 900; color: #fff; line-height: 1; letter-spacing: -1px; }
-    .hp-kpi-lbl { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+    .hp-kpi-val { font-size: 28px; font-weight: 900; color: #fff; line-height: 1; letter-spacing: -1px; }
+    .hp-kpi-lbl { font-size: 10px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; }
+    .hp-kpi-trend { font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 4px; }
+    .hp-kpi-trend.up { color: #10b981; }
+    .hp-kpi-trend.down { color: #ef4444; }
 
     /* Chart Section */
     .hp-chart-card { background: rgba(255,255,255,0.03); border-radius: 28px; padding: 32px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 40px; backdrop-filter: blur(20px); }
@@ -249,33 +252,51 @@
             <!-- KPI Cards -->
             <div class="hp-kpis" id="dashboard-kpis">
                 <div class="hp-kpi">
-                    <div class="hp-kpi-icon">💰</div>
+                    <div class="hp-kpi-icon">�️</div>
                     <div>
-                        <div class="hp-kpi-lbl">Tổng Doanh Thu</div>
-                        <div class="hp-kpi-val" id="stat-revenue" style="color:#10b981">...</div>
-                        <div id="trend-revenue" style="font-size:11px; margin-top:6px; font-weight:600; color:#94a3b8">...</div>
+                        <div class="hp-kpi-lbl">Lượt xem</div>
+                        <div class="hp-kpi-val" id="stat-views" style="color:#6366f1">...</div>
+                        <div class="hp-kpi-trend up" id="trend-views">↑ 12%</div>
                     </div>
                 </div>
                 <div class="hp-kpi">
-                    <div class="hp-kpi-icon">📈</div>
+                    <div class="hp-kpi-icon">👥</div>
                     <div>
-                        <div class="hp-kpi-lbl">Tổng Đơn Hàng</div>
-                        <div class="hp-kpi-val" id="stat-bookings" style="color:#6366f1">...</div>
-                        <div id="trend-bookings" style="font-size:11px; margin-top:6px; font-weight:600; color:#94a3b8">...</div>
+                        <div class="hp-kpi-lbl">Theo dõi</div>
+                        <div class="hp-kpi-val" id="stat-followers" style="color:#a855f7">...</div>
+                        <div class="hp-kpi-trend up" id="trend-followers">↑ 8%</div>
+                    </div>
+                </div>
+                <div class="hp-kpi">
+                    <div class="hp-kpi-icon">�</div>
+                    <div>
+                        <div class="hp-kpi-lbl">Đặt chỗ</div>
+                        <div class="hp-kpi-val" id="stat-bookings" style="color:#10b981">...</div>
+                        <div class="hp-kpi-trend up" id="trend-bookings">↑ 15%</div>
                     </div>
                 </div>
                 <div class="hp-kpi">
                     <div class="hp-kpi-icon">💬</div>
                     <div>
-                        <div class="hp-kpi-lbl">Tin nhắn chưa đọc</div>
-                        <div class="hp-kpi-val" id="stat-messages" style="color:#f59e0b">...</div>
+                        <div class="hp-kpi-lbl">Tương tác</div>
+                        <div class="hp-kpi-val" id="stat-engagement" style="color:#f59e0b">...</div>
+                        <div class="hp-kpi-trend up" id="trend-engagement">↑ 20%</div>
                     </div>
                 </div>
                 <div class="hp-kpi">
-                    <div class="hp-kpi-icon">🏨</div>
+                    <div class="hp-kpi-icon">�</div>
                     <div>
-                        <div class="hp-kpi-lbl">Dịch vụ hoạt động</div>
-                        <div class="hp-kpi-val" id="stat-services" style="color:#a855f7">...</div>
+                        <div class="hp-kpi-lbl">Trending Score</div>
+                        <div class="hp-kpi-val" id="stat-trending" style="color:#ef4444">...</div>
+                        <div class="hp-kpi-trend up" id="trend-trending">↑ 5%</div>
+                    </div>
+                </div>
+                <div class="hp-kpi">
+                    <div class="hp-kpi-icon">⭐</div>
+                    <div>
+                        <div class="hp-kpi-lbl">Đánh giá</div>
+                        <div class="hp-kpi-val" id="stat-reviews" style="color:#3b82f6">...</div>
+                        <div class="hp-kpi-trend" id="trend-reviews">4.8/5</div>
                     </div>
                 </div>
             </div>
@@ -910,26 +931,59 @@
         .then(json => {
             if (json.success && json.data) {
                 const d = json.data;
-                const revEl = document.getElementById('stat-revenue');
-                const bookEl = document.getElementById('stat-bookings');
-                const msgEl = document.getElementById('stat-messages');
-                const svcEl = document.getElementById('stat-services');
-                
-                const trendRevEl = document.getElementById('trend-revenue');
-                const trendBookEl = document.getElementById('trend-bookings');
 
-                if (revEl) revEl.textContent = formatMoney(d.revenueTotal);
-                if (bookEl) bookEl.textContent = d.totalBookings;
-                if (msgEl) msgEl.textContent = d.actionableAlerts.unreadMessages;
-                if (svcEl) svcEl.textContent = d.activeServices;
+                // New KPIs
+                const viewsEl = document.getElementById('stat-views');
+                const followersEl = document.getElementById('stat-followers');
+                const bookingsEl = document.getElementById('stat-bookings');
+                const engagementEl = document.getElementById('stat-engagement');
+                const trendingEl = document.getElementById('stat-trending');
+                const reviewsEl = document.getElementById('stat-reviews');
 
-                if (trendRevEl) {
-                    const isUp = d.trends.revenue >= 0;
-                    trendRevEl.innerHTML = `<span style="color:${isUp ? '#10b981' : '#ef4444'}">${isUp ? '▲' : '▼'} ${Math.abs(d.trends.revenue)}%</span> vs kỳ trước`;
+                // Trends
+                const trendViewsEl = document.getElementById('trend-views');
+                const trendFollowersEl = document.getElementById('trend-followers');
+                const trendBookingsEl = document.getElementById('trend-bookings');
+                const trendEngagementEl = document.getElementById('trend-engagement');
+                const trendTrendingEl = document.getElementById('trend-trending');
+                const trendReviewsEl = document.getElementById('trend-reviews');
+
+                // Populate new KPIs
+                if (viewsEl) viewsEl.textContent = (d.totalViews || 0).toLocaleString();
+                if (followersEl) followersEl.textContent = (d.totalFollowers || 0).toLocaleString();
+                if (bookingsEl) bookingsEl.textContent = (d.totalBookings || 0).toLocaleString();
+                if (engagementEl) engagementEl.textContent = (d.totalEngagement || 0).toLocaleString();
+                if (trendingEl) trendingEl.textContent = (d.trendingScore || 0).toFixed(1);
+                if (reviewsEl) reviewsEl.textContent = (d.totalReviews || 0).toLocaleString();
+
+                // Populate trends
+                if (trendViewsEl) {
+                    const isUp = d.trends.views >= 0;
+                    trendViewsEl.className = `hp-kpi-trend ${isUp ? 'up' : 'down'}`;
+                    trendViewsEl.textContent = `${isUp ? '↑' : '↓'} ${Math.abs(d.trends.views || 0)}%`;
                 }
-                if (trendBookEl) {
+                if (trendFollowersEl) {
+                    const isUp = d.trends.followers >= 0;
+                    trendFollowersEl.className = `hp-kpi-trend ${isUp ? 'up' : 'down'}`;
+                    trendFollowersEl.textContent = `${isUp ? '↑' : '↓'} ${Math.abs(d.trends.followers || 0)}%`;
+                }
+                if (trendBookingsEl) {
                     const isUp = d.trends.bookings >= 0;
-                    trendBookEl.innerHTML = `<span style="color:${isUp ? '#10b981' : '#ef4444'}">${isUp ? '▲' : '▼'} ${Math.abs(d.trends.bookings)}%</span> vs kỳ trước`;
+                    trendBookingsEl.className = `hp-kpi-trend ${isUp ? 'up' : 'down'}`;
+                    trendBookingsEl.textContent = `${isUp ? '↑' : '↓'} ${Math.abs(d.trends.bookings || 0)}%`;
+                }
+                if (trendEngagementEl) {
+                    const isUp = d.trends.engagement >= 0;
+                    trendEngagementEl.className = `hp-kpi-trend ${isUp ? 'up' : 'down'}`;
+                    trendEngagementEl.textContent = `${isUp ? '↑' : '↓'} ${Math.abs(d.trends.engagement || 0)}%`;
+                }
+                if (trendTrendingEl) {
+                    const isUp = d.trends.trending >= 0;
+                    trendTrendingEl.className = `hp-kpi-trend ${isUp ? 'up' : 'down'}`;
+                    trendTrendingEl.textContent = `${isUp ? '↑' : '↓'} ${Math.abs(d.trends.trending || 0)}%`;
+                }
+                if (trendReviewsEl) {
+                    trendReviewsEl.textContent = `${(d.avgRating || 0).toFixed(1)}/5`;
                 }
 
                 // Render Smart Alerts

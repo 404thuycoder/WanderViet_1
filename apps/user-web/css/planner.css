@@ -160,7 +160,13 @@ a {
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-.mode-toggle-btn:hover:not(.active) {
+.compare-type-btn.active {
+  background: #3b82f6;
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.compare-type-btn:hover:not(.active) {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text);
 }
@@ -1976,45 +1982,50 @@ a {
 
 .saved-trip-item-v2 {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  padding: 1.25rem;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
-  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  margin-bottom: 0.75rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
 .saved-trip-item-v2:hover {
-  transform: translateY(-2px);
-  border-color: #3b82f6;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  transform: translateX(5px);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(59, 130, 246, 0.4);
 }
 
 .saved-trip-item-v2 .trip-info strong {
   display: block;
-  font-size: 1rem;
-  color: #1e293b;
-  margin-bottom: 0.25rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.2rem;
 }
 
 .saved-trip-item-v2 .trip-info p {
   margin: 0;
-  font-size: 0.8rem;
-  color: #64748b;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  opacity: 0.8;
 }
 
 .btn-select-trip {
-  background: #3b82f6;
+  background: var(--accent);
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-weight: 600;
-  font-size: 0.85rem;
+  padding: 0.4rem 0.875rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+  font-size: 0.8rem;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .loading-spinner-small {
@@ -2032,9 +2043,19 @@ a {
 
 /* Selection Styles for Multi-Compare */
 .selected-for-compare {
-  border-color: #10b981 !important;
-  background: rgba(16, 185, 129, 0.05) !important;
-  box-shadow: 0 0 15px rgba(16, 185, 129, 0.1) !important;
+  border-color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.1) !important;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.15) !important;
+}
+
+.selected-for-compare::after {
+  content: '✓';
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  color: #60a5fa;
+  font-weight: 900;
+  font-size: 0.8rem;
 }
 
 .trip-selection-check {
@@ -2068,28 +2089,30 @@ a {
 
 /* Filter Tabs for Comparison Library */
 .filter-tab {
-  padding: 0.5rem 1rem;
-  border: 1.5px solid var(--border);
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 1.25rem;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
   color: var(--text-muted);
-  border-radius: 20px;
-  font-size: 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
 }
 
 .filter-tab:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
   color: var(--text);
 }
 
 .filter-tab.active {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-color: #3b82f6;
   color: white;
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
 }
 
 .trip-badge-mini {
@@ -2198,6 +2221,35 @@ a {
 }
 
 .compare-type-btn.active {
-  background: var(--accent);
+  background: #3b82f6;
   color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.compare-action-sticky {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.compare-action-sticky button {
+  padding: 0.6rem !important;
+  font-size: 0.9rem !important;
+}
+
+.compare-help-note {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: 1rem;
+  border-left: 4px solid #3b82f6;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }

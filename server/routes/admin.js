@@ -1570,6 +1570,243 @@ router.delete('/social/stories/:id', adminTokenAuth, adminAuth, async (req, res)
 });
 
 // ─────────────────────────────────────────────
+//  QUẢN LÝ ĐỊA ĐIỂM (PLACE MODERATION)
+// ─────────────────────────────────────────────
+
+// Lấy danh sách địa điểm chờ duyệt
+router.get('/places/pending', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const places = await Place.find({ status: 'pending' })
+      .populate('ownerId', 'name displayName email avatar')
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .lean();
+    res.json({ success: true, data: places });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Phê duyệt địa điểm
+router.put('/places/:id/approve', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const place = await Place.findById(req.params.id);
+    if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+
+    place.status = 'approved';
+    place.verified = true;
+    await place.save();
+
+    // Gửi thông báo cho doanh nghiệp
+    if (place.ownerId) {
+      const notifData = {
+        recipientId: place.ownerId.toString(),
+        type: 'success',
+        title: 'Địa điểm đã được duyệt',
+        message: `Địa điểm "${place.name}" của bạn đã được phê duyệt và hiển thị trên hệ thống.`,
+        link: `/business/services/${place.id}`
+      };
+      await Notification.create(notifData);
+      sendNotification(place.ownerId.toString(), notifData);
+    }
+
+    await logAction(req.user.email, req.user.role, 'PLACE_APPROVED', { placeId: place.id, placeName: place.name }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, message: 'Đã phê duyệt địa điểm', data: place });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Từ chối địa điểm
+router.put('/places/:id/reject', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const place = await Place.findById(req.params.id);
+    if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+
+    place.status = 'rejected';
+    place.rejectionReason = reason || 'Không đáp ứng tiêu chuẩn';
+    await place.save();
+
+    // Gửi thông báo cho doanh nghiệp
+    if (place.ownerId) {
+      const notifData = {
+        recipientId: place.ownerId.toString(),
+        type: 'warning',
+        title: 'Địa điểm bị từ chối',
+        message: `Địa điểm "${place.name}" của bạn đã bị từ chối. Lý do: ${reason || 'Không đáp ứng tiêu chuẩn'}`,
+        link: '/business/services'
+      };
+      await Notification.create(notifData);
+      sendNotification(place.ownerId.toString(), notifData);
+    }
+
+    await logAction(req.user.email, req.user.role, 'PLACE_REJECTED', { placeId: place.id, placeName: place.name, reason }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, message: 'Đã từ chối địa điểm', data: place });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Phát hiện ảnh giả mạo (AI Detection)
+router.post('/places/:id/detect-fake-images', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const place = await Place.findById(req.params.id);
+    if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+
+    const images = place.images || [place.image].filter(Boolean);
+    const suspiciousImages = [];
+
+    // Simple heuristic detection (can be enhanced with AI)
+    for (const img of images) {
+      // Check for common placeholder URLs
+      if (img.includes('placeholder') || img.includes('via.placeholder')) {
+        suspiciousImages.push({ url: img, reason: 'Placeholder image detected' });
+      }
+      // Check for very small images
+      if (img.includes('width=') || img.includes('height=')) {
+        suspiciousImages.push({ url: img, reason: 'Low resolution image' });
+      }
+    }
+
+    res.json({ 
+      success: true, 
+      data: { 
+        totalImages: images.length,
+        suspiciousImages,
+        isSuspicious: suspiciousImages.length > 0
+      } 
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Phát hiện đánh giá spam
+router.post('/places/:id/detect-spam-reviews', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const place = await Place.findById(req.params.id);
+    if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+
+    const reviews = place.reviews || [];
+    const spamReviews = [];
+
+    // Spam detection heuristics
+    for (const review of reviews) {
+      let spamScore = 0;
+      const reasons = [];
+
+      // Check for very short reviews
+      if (review.text && review.text.length < 10) {
+        spamScore += 30;
+        reasons.push('Quá ngắn');
+      }
+
+      // Check for excessive punctuation
+      if (review.text && (review.text.match(/!/g) || []).length > 5) {
+        spamScore += 20;
+        reasons.push('Nhiều dấu câu');
+      }
+
+      // Check for repeated characters
+      if (review.text && /(.)\1{4,}/.test(review.text)) {
+        spamScore += 40;
+        reasons.push('Lặp ký tự');
+      }
+
+      // Check for generic templates
+      const genericPhrases = ['tốt lắm', 'rất hay', 'khá tốt', 'ổn áp'];
+      if (review.text && genericPhrases.some(phrase => review.text.toLowerCase().includes(phrase))) {
+        spamScore += 10;
+        reasons.push('Mẫu chung');
+      }
+
+      if (spamScore >= 50) {
+        spamReviews.push({
+          reviewId: review._id,
+          userId: review.userId,
+          text: review.text,
+          spamScore,
+          reasons
+        });
+      }
+    }
+
+    res.json({ 
+      success: true, 
+      data: { 
+        totalReviews: reviews.length,
+        spamReviews,
+        spamCount: spamReviews.length
+      } 
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Phát hiện địa điểm trùng lặp
+router.post('/places/detect-duplicates', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const { name, address } = req.body;
+    if (!name) return res.status(400).json({ success: false, message: 'Cần cung cấp tên địa điểm' });
+
+    // Find potential duplicates using text search
+    const duplicates = await Place.find({
+      $or: [
+        { name: { $regex: name, $options: 'i' } },
+        { address: address ? { $regex: address, $options: 'i' } : null }
+      ],
+      status: { $ne: 'rejected' }
+    }).limit(20).lean();
+
+    // Calculate similarity scores
+    const scoredDuplicates = duplicates.map(dup => {
+      let score = 0;
+      if (dup.name.toLowerCase() === name.toLowerCase()) score += 100;
+      else if (dup.name.toLowerCase().includes(name.toLowerCase()) || name.toLowerCase().includes(dup.name.toLowerCase())) score += 70;
+      
+      if (address && dup.address && dup.address.toLowerCase() === address.toLowerCase()) score += 50;
+      else if (address && dup.address && dup.address.toLowerCase().includes(address.toLowerCase())) score += 30;
+
+      return { ...dup, similarityScore: score };
+    }).filter(d => d.similarityScore > 50).sort((a, b) => b.similarityScore - a.similarityScore);
+
+    res.json({ 
+      success: true, 
+      data: { 
+        duplicates: scoredDuplicates,
+        count: scoredDuplicates.length
+      } 
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Xóa đánh giá spam
+router.delete('/places/:placeId/reviews/:reviewId', adminTokenAuth, adminAuth, async (req, res) => {
+  try {
+    const place = await Place.findById(req.params.placeId);
+    if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+
+    place.reviews = place.reviews.filter(r => r._id.toString() !== req.params.reviewId);
+    place.reviewCount = place.reviews.length;
+    if (place.reviews.length > 0) {
+      place.ratingAvg = (place.reviews.reduce((acc, curr) => acc + curr.rating, 0) / place.reviews.length).toFixed(1);
+    } else {
+      place.ratingAvg = '0';
+    }
+    await place.save();
+
+    await logAction(req.user.email, req.user.role, 'REVIEW_DELETED', { placeId: place.id, reviewId: req.params.reviewId }, req.ip, req.headers['user-agent']);
+    res.json({ success: true, message: 'Đã xóa đánh giá' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────
 //  QUẢN LÝ GIAO DỊCH & ĐẶT CHỖ (TRANSACTIONS)
 // ─────────────────────────────────────────────
 

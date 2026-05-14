@@ -19,13 +19,13 @@ app.use(express.json());
 app.use(cors());
 
 // Route files
-const auth = require('./routes/auth.routes');
-const services = require('./routes/service.routes');
-const bookings = require('./routes/booking.routes');
-const reviews = require('./routes/review.routes');
-const messages = require('./routes/message.routes');
-const preferences = require('./routes/preference.routes');
-const dashboard = require('./routes/dashboard.routes');
+const auth = require('./routes/auth').router;
+const services = require('./routes/business');
+const bookings = require('./routes/bookings');
+const reviews = require('./routes/feedback');
+const messages = require('./routes/chat');
+const preferences = require('./routes/planner');
+const dashboard = require('./routes/admin');
 
 // Mount routers
 app.use('/api/auth', auth);

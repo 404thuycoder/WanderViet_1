@@ -2071,19 +2071,34 @@
                 startSocialProof();
 
                 // ── Quick Info ─────────────────────────────────────────
-                const setEl = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val || '...'; };
+                const setEl = (id, val) => { 
+                    const el = document.getElementById(id); 
+                    if(el) {
+                        if (val && val !== '...' && val !== '') {
+                            el.innerText = val;
+                            if (el.parentElement) el.parentElement.style.display = 'flex';
+                        } else {
+                            if (el.parentElement && el.parentElement.classList.contains('qi-item')) {
+                                el.parentElement.style.display = 'none';
+                            } else {
+                                el.innerText = '...';
+                            }
+                        }
+                    } 
+                };
+                
                 setEl('q-address', p.address);
                 setEl('q-hours', (p.openTime && p.closeTime) ? `${p.openTime} - ${p.closeTime}` : (p.openDays || null));
                 setEl('q-price', (p.priceFrom && p.priceTo) ? `${p.priceFrom.toLocaleString()} - ${p.priceTo.toLocaleString()} ₫` : (basePrice ? basePrice.toLocaleString() + ' ₫' : null));
-                setEl('q-duration', p.visitDuration || p.tourDuration);
+                setEl('q-duration', p.visitDuration || p.tourDuration || null);
                 setEl('q-crowd', p.crowdLevel ? ({low:'Thấp',medium:'Trung bình',high:'Cao'}[p.crowdLevel]) : null);
                 setEl('q-cost-level', p.costLevel ? ({budget:'Tiết kiệm',standard:'Trung bình',luxury:'Sang trọng'}[p.costLevel]) : null);
                 setEl('q-suitability', p.suitability && p.suitability.length ? p.suitability.join(', ') : null);
-                setEl('q-best-time', p.bestTimeToVisit);
-                setEl('q-season', p.bestSeason);
+                setEl('q-best-time', p.bestTimeToVisit || null);
+                setEl('q-season', p.bestSeason || null);
                 setEl('q-internet', p.internetQuality ? ({poor:'Kém',fair:'Trung bình',good:'Tốt',excellent:'Rất tốt'}[p.internetQuality]) : null);
                 setEl('q-parking', p.parking ? ({none:'Không có',street:'Vỉa hè',lot:'Bãi đỗ xe',valet:'Valet'}[p.parking]) : null);
-                setEl('q-accessibility', p.accessibility ? (p.accessibility.wheelchairAccessible ? 'Có hỗ trợ' : 'Không có') : null);
+                setEl('q-accessibility', p.accessibility && p.accessibility.wheelchairAccessible ? 'Có hỗ trợ' : null);
 
                 // ── Favorite check ─────────────────────────────────────
                 const token = localStorage.getItem('wander_token');
@@ -2223,10 +2238,10 @@
                     html += `<div class="rules-list">
                         <div class="rule-item"><span class="rule-icon">🕒</span><div class="rule-text"><b>Nhận phòng:</b> Từ ${p.openTime || '14:00'}</div></div>
                         <div class="rule-item"><span class="rule-icon">🕒</span><div class="rule-text"><b>Trả phòng:</b> Trước ${p.closeTime || '12:00'}</div></div>
-                        <div class="rule-item"><span class="rule-icon">🚭</span><div class="rule-text"><b>Hút thuốc:</b> Không cho phép trong phòng</div></div>
-                        <div class="rule-item"><span class="rule-icon">🐾</span><div class="rule-text"><b>Thú cưng:</b> Vui lòng liên hệ trước</div></div>
-                        <div class="rule-item"><span class="rule-icon">💳</span><div class="rule-text"><b>Thanh toán:</b> Tiền mặt hoặc Thẻ</div></div>
-                        <div class="rule-item"><span class="rule-icon">🛡️</span><div class="rule-text"><b>Bảo mật:</b> Camera 24/7 tại khu vực chung</div></div>
+                        <div class="rule-item"><span class="rule-icon">🚭</span><div class="rule-text"><b>Hút thuốc:</b> ${p.amenities && p.amenities.includes('Phòng không hút thuốc') ? 'Không cho phép' : 'Được phép'}</div></div>
+                        <div class="rule-item"><span class="rule-icon">🐾</span><div class="rule-text"><b>Thú cưng:</b> ${p.amenities && p.amenities.includes('Thân thiện thú cưng') ? 'Được phép mang theo' : 'Không cho phép'}</div></div>
+                        <div class="rule-item"><span class="rule-icon">💳</span><div class="rule-text"><b>Thanh toán:</b> ${p.amenities && p.amenities.includes('Thanh toán thẻ') ? 'Tiền mặt hoặc Thẻ' : 'Chỉ nhận tiền mặt'}</div></div>
+                        <div class="rule-item"><span class="rule-icon">🛡️</span><div class="rule-text"><b>Bảo mật:</b> ${p.amenities && p.amenities.includes('Camera an ninh') ? 'Camera 24/7' : 'An ninh tiêu chuẩn'}</div></div>
                     </div>`;
                     
                     catSpecContent.innerHTML = html;
@@ -2416,57 +2431,71 @@
             const isDining = place.kind === 'nha-hang' || place.businessCategory === 'dining';
 
             let facilities = [];
-            if (isHotel) {
-                facilities = [
-                    { icon: '♿', label: 'Lối đi xe lăn' },
-                    { icon: '🛗', label: 'Thang máy' },
-                    { icon: '🅿️', label: 'Bãi đậu xe' },
-                    { icon: '🐾', label: 'Thân thiện thú cưng' },
-                    { icon: '🚭', label: 'Phòng không hút thuốc' },
-                    { icon: '🏊', label: 'Hồ bơi' },
-                    { icon: '💆', label: 'Dịch vụ Spa' },
-                    { icon: '🏋️', label: 'Phòng Gym' },
-                    { icon: '🍳', label: 'Buffet sáng' },
-                    { icon: '🛎️', label: 'Lễ tân 24/7' },
-                    { icon: '🔒', label: 'Két an toàn' },
-                    { icon: '🌐', label: 'Wifi miễn phí' },
-                ];
-            } else if (isTour) {
-                facilities = [
-                    { icon: '🎒', label: 'Hành lý tối đa 15kg' },
-                    { icon: '🚌', label: 'Xe đưa đón' },
-                    { icon: '🎤', label: 'HDV tiếng Việt' },
-                    { icon: '🍱', label: 'Bữa ăn bao gồm' },
-                    { icon: '🩺', label: 'Bảo hiểm du lịch' },
-                    { icon: '📱', label: 'Ứng dụng hỗ trợ' },
-                    { icon: '🏨', label: 'Khách sạn 3-4 sao' },
-                    { icon: '🎫', label: 'Vé tham quan bao gồm' },
-                ];
-            } else if (isDining) {
-                facilities = [
-                    { icon: '♿', label: 'Tiếp cận xe lăn' },
-                    { icon: '🌐', label: 'Wifi miễn phí' },
-                    { icon: '🅿️', label: 'Bãi đậu xe' },
-                    { icon: '❄️', label: 'Máy lạnh' },
-                    { icon: '👶', label: 'Ghế trẻ em' },
-                    { icon: '📦', label: 'Phục vụ mang về' },
-                    { icon: '💳', label: 'Nhận thẻ tín dụng' },
-                    { icon: '🍺', label: 'Có phục vụ đồ uống' },
-                ];
-            } else {
-                facilities = [
-                    { icon: '♿', label: 'Tiếp cận cho người khuyết tật' },
-                    { icon: '🅿️', label: 'Bãi đậu xe' },
-                    { icon: '🚻', label: 'Nhà vệ sinh công cộng' },
-                    { icon: '🌐', label: 'Wifi công cộng' },
-                    { icon: '🗺️', label: 'Bản đồ miễn phí' },
-                    { icon: '🛍️', label: 'Khu mua sắm lân cận' },
-                ];
-            }
+            
+            // Icon Mapping Dictionary
+            const iconMap = {
+                'Lối đi xe lăn': '♿', 'Thang máy': '🛗', 'Bãi đậu xe': '🅿️',
+                'Thân thiện thú cưng': '🐾', 'Phòng không hút thuốc': '🚭',
+                'Hồ bơi': '🏊', 'Dịch vụ Spa': '💆', 'Phòng Gym': '🏋️',
+                'Buffet sáng': '🍳', 'Lễ tân 24/7': '🛎️', 'Két an toàn': '🔒',
+                'Wifi miễn phí': '🌐', 'Thanh toán thẻ': '💳',
+                'Camera an ninh': '🛡️', 'Nhà hàng & Bar': '🍷', 'Đưa đón sân bay': '🚐',
+                'Hỗ bơi ngoài trời': '🏊'
+            };
 
             // Override with backend data if available
-            if (place.facilities && place.facilities.length > 0) {
+            if (place.amenities && place.amenities.length > 0) {
+                facilities = place.amenities.map(a => ({ icon: iconMap[a] || '✨', label: a }));
+            } else if (place.facilities && place.facilities.length > 0) {
                 facilities = place.facilities.map(f => ({ icon: f.icon || '✅', label: f.name || f }));
+            } else {
+                if (isHotel) {
+                    facilities = [
+                        { icon: '♿', label: 'Lối đi xe lăn' },
+                        { icon: '🛗', label: 'Thang máy' },
+                        { icon: '🅿️', label: 'Bãi đậu xe' },
+                        { icon: '🐾', label: 'Thân thiện thú cưng' },
+                        { icon: '🚭', label: 'Phòng không hút thuốc' },
+                        { icon: '🏊', label: 'Hồ bơi' },
+                        { icon: '💆', label: 'Dịch vụ Spa' },
+                        { icon: '🏋️', label: 'Phòng Gym' },
+                        { icon: '🍳', label: 'Buffet sáng' },
+                        { icon: '🛎️', label: 'Lễ tân 24/7' },
+                        { icon: '🔒', label: 'Két an toàn' },
+                        { icon: '🌐', label: 'Wifi miễn phí' },
+                    ];
+                } else if (isTour) {
+                    facilities = [
+                        { icon: '🎒', label: 'Hành lý tối đa 15kg' },
+                        { icon: '🚌', label: 'Xe đưa đón' },
+                        { icon: '🎤', label: 'HDV tiếng Việt' },
+                        { icon: '🍱', label: 'Bữa ăn bao gồm' },
+                        { icon: '🩺', label: 'Bảo hiểm du lịch' },
+                        { icon: '📱', label: 'Ứng dụng hỗ trợ' },
+                        { icon: '🏨', label: 'Khách sạn 3-4 sao' },
+                        { icon: '🎫', label: 'Vé tham quan bao gồm' },
+                    ];
+                } else if (isDining) {
+                    facilities = [
+                        { icon: '♿', label: 'Tiếp cận xe lăn' },
+                        { icon: '🌐', label: 'Wifi miễn phí' },
+                        { icon: '🅿️', label: 'Bãi đậu xe' },
+                        { icon: '❄️', label: 'Máy lạnh' },
+                        { icon: '👶', label: 'Ghế trẻ em' },
+                        { icon: '📦', label: 'Phục vụ mang về' },
+                        { icon: '💳', label: 'Nhận thẻ tín dụng' },
+                        { icon: '🍺', label: 'Có phục vụ đồ uống' },
+                    ];
+                } else {
+                    facilities = [
+                        { icon: '♿', label: 'Tiếp cận cho người khuyết tật' },
+                        { icon: '🅿️', label: 'Bãi đậu xe' },
+                        { icon: '🚻', label: 'Nhà vệ sinh công cộng' },
+                        { icon: '🌐', label: 'Wifi công cộng' },
+                        { icon: '🗺️', label: 'Bản đồ miễn phí' },
+                        { icon: '🛍️', label: 'Khu mua sắm lân cận' },
+                    ];
+                }
             }
 
             sec.style.display = 'block';

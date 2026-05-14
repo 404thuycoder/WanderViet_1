@@ -538,6 +538,7 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
 <script src="/js/profileManagement.js?v=5"></script>
 <script src="/js/paymentManagement.js?v=5"></script>
 <script src="/js/SharedUI.js?v=999"></script>
+<script src="/js/addServiceForm.js?v=3"></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', async function() {
@@ -586,6 +587,10 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
     const dateRangeEl = document.getElementById('date-range');
     if (dateRangeEl) {
       dateRangeEl.textContent = `📅 ${formatDate(firstDay)} – ${formatDate(lastDay)}`;
+    }
+
+    if (typeof initAddServiceForm === 'function') {
+      initAddServiceForm('modal-root');
     }
   });
 </script>
@@ -698,6 +703,7 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
   body.light-mode #theme-btn-light { background: #fff !important; color: #0f172a !important; border-color: #00e5ff !important; box-shadow: 0 10px 20px rgba(0,229,255,0.1) !important; }
 </style>
 
+  <div id="modal-root"></div>
   <script>
     document.addEventListener('click', () => {
       document.querySelectorAll('.switcher-dropdown').forEach(dd => dd.classList.remove('is-active'));

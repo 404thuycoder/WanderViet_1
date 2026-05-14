@@ -83,6 +83,74 @@
  
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
+    .spinner-small { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: svc-spin 0.8s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
+    @keyframes svc-spin { to { transform: rotate(360deg); } }
+
+    .preview-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .preview-item { position: relative; width: 80px; height: 80px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #1e293b; }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-item .remove-btn { position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; background: rgba(0,0,0,0.5); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; border: none; }
+    .preview-item .remove-btn:hover { background: #ef4444; }
+
+    /* Amenities Grid UI */
+    .amenities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 12px; }
+    .amenity-card { display: block; cursor: pointer; height: 100%; }
+    .amenity-card input { display: none; }
+    .amenity-card-content {
+      display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px; transition: all 0.3s; height: 100%;
+    }
+    .amenity-card:hover .amenity-card-content { background: rgba(255,255,255,0.06); }
+    .amenity-card input:checked + .amenity-card-content {
+      background: rgba(99,102,241,0.1); border-color: #6366f1;
+      box-shadow: 0 4px 15px rgba(99,102,241,0.15);
+    }
+    .amenity-icon {
+      font-size: 18px; display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 10px;
+      transition: all 0.3s;
+    }
+    .amenity-card input:checked + .amenity-card-content .amenity-icon {
+      background: #6366f1; color: #fff; transform: scale(1.1);
+    }
+    .amenity-name { font-size: 13px; font-weight: 600; color: #cbd5e1; transition: all 0.3s; }
+    .amenity-card input:checked + .amenity-card-content .amenity-name { color: #fff; }
+
+    .premium-upload-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 40px 20px;
+      background: rgba(99, 102, 241, 0.05);
+      border: 2px dashed rgba(99, 102, 241, 0.2);
+      border-radius: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+      margin-top: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .premium-upload-box:hover {
+      background: rgba(99, 102, 241, 0.1);
+      border-color: #6366f1;
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.1);
+    }
+    .premium-upload-box input[type="file"] {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .upload-icon { font-size: 40px; margin-bottom: 5px; }
+    .upload-text { font-size: 14px; font-weight: 700; color: #a5b4fc; }
+    .upload-sub { font-size: 11px; color: #64748b; }
+    .file-status { margin-top: 10px; font-size: 12px; font-weight: 800; color: #10b981; }
+
   `;
   document.head.appendChild(style);
 })();
@@ -107,6 +175,23 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                 <label class="svc-form-label">Tên dịch vụ/Tour *</label>
                 <input type="text" id="svc-name" class="svc-form-input" placeholder="Tên hiển thị thu hút khách hàng" required>
               </div>
+              <div class="svc-form-row" style="margin-bottom: 20px;">
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Ảnh chính (URL)</label>
+                  <input type="text" id="svc-image" class="svc-form-input" placeholder="https://...">
+                </div>
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Hoặc Upload ảnh/video (Tất cả định dạng)</label>
+                  <div class="premium-upload-box" onclick="document.getElementById('svc-image-file').click()">
+                    <input type="file" id="svc-image-file" accept="image/*" multiple onchange="window.handleSvcImagePreview(this, 'svc-primary-preview')">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Nhấn để chọn từ thiết bị</div>
+                    <div class="upload-sub">Chấp nhận mọi loại ảnh (Tối đa 10MB/file)</div>
+                    <div class="file-status"></div>
+                  </div>
+                  <div id="svc-primary-preview" class="preview-container"></div>
+                </div>
+              </div>
               <div class="svc-form-row">
                 <div class="svc-form-group">
                   <label class="svc-form-label">Phân loại *</label>
@@ -129,13 +214,19 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                   </select>
                 </div>
               </div>
-              <div class="svc-form-group" style="margin-top: 20px;">
-                <label class="svc-form-label">Giá khởi điểm (VND) *</label>
-                <input type="number" id="svc-price" class="svc-form-input" placeholder="3200000" required>
+              <div class="svc-form-row" style="margin-top: 20px;">
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Giá khởi điểm (VND) *</label>
+                  <input type="number" id="svc-price" class="svc-form-input" placeholder="1999998" required>
+                </div>
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Giá gốc (VND) — để hiện giảm giá</label>
+                  <input type="number" id="svc-price-to" class="svc-form-input" placeholder="2499998">
+                </div>
               </div>
             </div>
 
-            <!-- SECTION 2: CHI TIẾT ĐỊA ĐIỂM -->
+            <!-- SECTION 2: ĐỊA ĐIỂM & LIÊN HỆ -->
             <div class="svc-section">
               <div class="svc-section-title">Địa điểm & Liên hệ</div>
               <div class="svc-form-row">
@@ -144,13 +235,46 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                   <input type="text" id="svc-region" class="svc-form-input" placeholder="VD: Sapa, Lào Cai" required>
                 </div>
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Số điện thoại hỗ trợ</label>
-                  <input type="text" id="svc-phone" class="svc-form-input" placeholder="090...">
+                  <label class="svc-form-label">Thành phố</label>
+                  <input type="text" id="svc-city" class="svc-form-input" placeholder="VD: Hà Nội">
                 </div>
               </div>
               <div class="svc-form-group" style="margin-top: 15px;">
                 <label class="svc-form-label">Địa chỉ chính xác</label>
                 <input type="text" id="svc-address" class="svc-form-input" placeholder="Số nhà, Tên đường...">
+              </div>
+              <div class="svc-form-row" style="margin-top: 15px;">
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Số điện thoại</label>
+                  <input type="text" id="svc-phone" class="svc-form-input" placeholder="090...">
+                </div>
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Email liên hệ</label>
+                  <input type="email" id="svc-email" class="svc-form-input" placeholder="info@example.com">
+                </div>
+              </div>
+              <div class="svc-form-group" style="margin-top: 15px;">
+                <label class="svc-form-label">Website</label>
+                <input type="text" id="svc-website" class="svc-form-input" placeholder="https://...">
+              </div>
+              <div class="svc-form-row" style="margin-top: 15px;">
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Giờ mở cửa</label>
+                  <input type="text" id="svc-open-time" class="svc-form-input" placeholder="08:00">
+                </div>
+                <div class="svc-form-group">
+                  <label class="svc-form-label">Giờ đóng cửa</label>
+                  <input type="text" id="svc-close-time" class="svc-form-input" placeholder="22:00">
+                </div>
+              </div>
+              <div class="svc-form-row" style="margin-top: 15px;">
+                <div class="svc-form-group" style="width: 100%;">
+                  <label class="svc-form-label">Định vị Bản đồ (Chọn vị trí chính xác)</label>
+                  <p style="font-size:12px; color:#94a3b8; margin-bottom:8px;">Kéo thả ghim trên bản đồ để tự động lấy tọa độ.</p>
+                  <div id="svc-map" style="height: 250px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); z-index: 1;"></div>
+                  <input type="hidden" id="svc-lat" value="21.0285">
+                  <input type="hidden" id="svc-lng" value="105.8542">
+                </div>
               </div>
             </div>
 
@@ -194,6 +318,14 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                 <textarea id="svc-desc" class="svc-form-input" style="height:100px; resize:none;" placeholder="Viết những lời chào mời hấp dẫn nhất..."></textarea>
               </div>
               <div class="svc-form-group">
+                <label class="svc-form-label">Tổng quan chi tiết (Overview)</label>
+                <textarea id="svc-overview" class="svc-form-input" style="height:80px; resize:none;" placeholder="Mô tả chi tiết hơn về dịch vụ, trải nghiệm đặc biệt..."></textarea>
+              </div>
+              <div class="svc-form-group">
+                <label class="svc-form-label">Tags (Gắn thẻ, cách nhau dấu phẩy)</label>
+                <input type="text" id="svc-tags" class="svc-form-input" placeholder="nature, family, romantic, adventure, luxury">
+              </div>
+              <div class="svc-form-group">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                   <label class="svc-form-label">Dấu ấn đặc biệt (Highlights)</label>
                   <button type="button" id="ai-generate-highlights" style="background:linear-gradient(135deg, #6366f1, #a855f7); border:none; border-radius:8px; padding:6px 12px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;">✨ AI Tạo highlights</button>
@@ -202,12 +334,41 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                 <div class="btn-add-item" id="btn-add-hl">+ Thêm điểm nổi bật</div>
               </div>
               <div class="svc-form-group">
-                <label class="svc-form-label">Ảnh trưng bày (Dán link cách nhau bằng dấu phẩy)</label>
-                <textarea id="svc-imgs" class="svc-form-input" style="height:60px; resize:none;" placeholder="https://..."></textarea>
+                <label class="svc-form-label">Ảnh trưng bày (Gallery)</label>
+                <textarea id="svc-imgs" class="svc-form-input" style="height:60px; resize:none; margin-bottom:12px;" placeholder="Dán link ảnh tại đây (cách nhau bởi dấu phẩy)..."></textarea>
+                <div class="premium-upload-box" onclick="document.getElementById('svc-img-files').click()">
+                  <input type="file" id="svc-img-files" accept="image/*" multiple onchange="window.handleSvcImagePreview(this, 'svc-gallery-preview')">
+                  <div class="upload-icon">📸</div>
+                  <div class="upload-text">Tải lên bộ sưu tập</div>
+                  <div class="upload-sub">Chọn tối đa 10 ảnh chất lượng cao</div>
+                  <div class="file-status"></div>
+                </div>
+                <div id="svc-gallery-preview" class="preview-container"></div>
               </div>
               <div class="svc-form-group">
                 <label class="svc-form-label">Video (Youtube/TikTok URL)</label>
                 <input type="text" id="svc-video" class="svc-form-input" placeholder="https://youtube.com/...">
+              </div>
+              <div class="svc-form-group">
+                <label class="svc-form-label">Trang thiết bị & Hỗ trợ (Amenities)</label>
+                <div class="amenities-grid">
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Lối đi xe lăn"><div class="amenity-card-content"><span class="amenity-icon">♿</span><span class="amenity-name">Lối đi xe lăn</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Thang máy"><div class="amenity-card-content"><span class="amenity-icon">🛗</span><span class="amenity-name">Thang máy</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Bãi đậu xe"><div class="amenity-card-content"><span class="amenity-icon">🅿️</span><span class="amenity-name">Bãi đậu xe</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Thân thiện thú cưng"><div class="amenity-card-content"><span class="amenity-icon">🐾</span><span class="amenity-name">Thân thiện thú cưng</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Phòng không hút thuốc"><div class="amenity-card-content"><span class="amenity-icon">🚭</span><span class="amenity-name">Phòng không hút thuốc</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Hồ bơi"><div class="amenity-card-content"><span class="amenity-icon">🏊</span><span class="amenity-name">Hồ bơi</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Dịch vụ Spa"><div class="amenity-card-content"><span class="amenity-icon">💆</span><span class="amenity-name">Dịch vụ Spa</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Phòng Gym"><div class="amenity-card-content"><span class="amenity-icon">🏋️</span><span class="amenity-name">Phòng Gym</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Buffet sáng"><div class="amenity-card-content"><span class="amenity-icon">🍳</span><span class="amenity-name">Buffet sáng</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Lễ tân 24/7"><div class="amenity-card-content"><span class="amenity-icon">🛎️</span><span class="amenity-name">Lễ tân 24/7</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Két an toàn"><div class="amenity-card-content"><span class="amenity-icon">🔒</span><span class="amenity-name">Két an toàn</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Wifi miễn phí"><div class="amenity-card-content"><span class="amenity-icon">🌐</span><span class="amenity-name">Wifi miễn phí</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Thanh toán thẻ"><div class="amenity-card-content"><span class="amenity-icon">💳</span><span class="amenity-name">Thanh toán thẻ</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Camera an ninh"><div class="amenity-card-content"><span class="amenity-icon">🛡️</span><span class="amenity-name">Camera an ninh</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Nhà hàng & Bar"><div class="amenity-card-content"><span class="amenity-icon">🍷</span><span class="amenity-name">Nhà hàng & Bar</span></div></label>
+                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Đưa đón sân bay"><div class="amenity-card-content"><span class="amenity-icon">🚐</span><span class="amenity-name">Đưa đón sân bay</span></div></label>
+                </div>
               </div>
             </div>
 
@@ -295,6 +456,22 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
               <div class="btn-add-item" id="btn-add-exp">+ Thêm trải nghiệm</div>
             </div>
 
+            <!-- SECTION 6b: LỊCH TRÌNH GỢI Ý (LÊN KẾ HOẠCH) - MULTI-PLAN -->
+            <div class="svc-section">
+              <div class="svc-section-title">Lên kế hoạch chuyến đi (Suggested Itinerary)</div>
+              <p style="font-size:12px; color:#94a3b8; margin-bottom:16px;">Tạo <b>nhiều kế hoạch</b> cho các loại khách khác nhau. Mỗi kế hoạch có loại khách, thời gian và các hoạt động riêng với hình ảnh, mô tả chi tiết.</p>
+              <div id="itinerary-plans-container" style="display:flex;flex-direction:column;gap:16px;"></div>
+              <button type="button" id="btn-add-plan" style="
+                margin-top:14px; width:100%; padding:12px;
+                background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(168,85,247,0.15));
+                border:1.5px dashed rgba(99,102,241,0.5); border-radius:12px;
+                color:#a5b4fc; font-size:13px; font-weight:700; cursor:pointer;
+                transition:all 0.2s;
+              " onmouseover="this.style.background='linear-gradient(135deg,rgba(99,102,241,0.3),rgba(168,85,247,0.3))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(99,102,241,0.15),rgba(168,85,247,0.15))'">
+                ＋ Thêm kế hoạch mới (Cặp đôi / Gia đình / Tiết kiệm / Sang trọng)
+              </button>
+            </div>
+
             <!-- SECTION 7: FAQ -->
             <div class="svc-section">
               <div class="svc-section-title">Câu hỏi thường gặp</div>
@@ -357,9 +534,130 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   // --- LOGIC: HIỆN/ẨN TOUR FIELDS ---
   const chkTour = document.getElementById('svc-is-tour');
   const tourFields = document.getElementById('tour-fields');
-  chkTour.addEventListener('change', () => {
+  chkTour.onchange = () => {
     tourFields.style.display = chkTour.checked ? 'flex' : 'none';
-  });
+  };
+
+  // Helper for image preview - defined outside initMap to ensure availability
+  window.handleSvcImagePreview = (input, previewId) => {
+    const container = document.getElementById(previewId);
+    if (!container) return;
+    container.innerHTML = '';
+    
+    const status = input.parentElement.querySelector('.file-status');
+    if (status) {
+      status.textContent = input.files.length > 0 ? `✅ ${input.files.length} tập tin đã chọn` : '';
+      input.parentElement.style.borderColor = input.files.length > 0 ? '#10b981' : 'rgba(255,255,255,0.1)';
+    }
+
+    if (input.files) {
+      Array.from(input.files).forEach((file, index) => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const div = document.createElement('div');
+          div.className = 'preview-item';
+          div.innerHTML = `
+            <img src="${e.target.result}">
+            <button class="remove-btn" onclick="window.removeSvcFile('${input.id}', ${index}, '${previewId}')">&times;</button>
+          `;
+          container.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  window.removeSvcFile = (inputId, index, previewId) => {
+    const input = document.getElementById(inputId);
+    const dt = new DataTransfer();
+    const { files } = input;
+    for (let i = 0; i < files.length; i++) {
+      if (i !== index) dt.items.add(files[i]);
+    }
+    input.files = dt.files;
+    window.handleSvcImagePreview(input, previewId);
+  };
+
+  // INIT MAP WHEN MODAL OPENS
+  initMap();  // --- MAP INITIALIZATION ---
+  let mapInstance = null;
+  let marker = null;
+  window.initEliteMap = initMap;
+  function initMap() {
+    if (!window.L) {
+      // Dynamically load Leaflet if not loaded
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      document.head.appendChild(link);
+      
+      const script = document.createElement('script');
+      script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      script.onload = setupLeafletMap;
+      document.head.appendChild(script);
+    } else {
+      setupLeafletMap();
+    };
+  }
+
+  function setupLeafletMap() {
+    if (mapInstance) {
+      mapInstance.invalidateSize();
+      return;
+    }
+    const mapEl = document.getElementById('svc-map');
+    if (!mapEl) return;
+    
+    const initialLat = 21.0285;
+    const initialLng = 105.8542;
+    mapInstance = L.map('svc-map').setView([initialLat, initialLng], 13);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(mapInstance);
+    
+    marker = L.marker([initialLat, initialLng], {draggable: true}).addTo(mapInstance);
+    
+    marker.on('dragend', function(e) {
+      const pos = marker.getLatLng();
+      document.getElementById('svc-lat').value = pos.lat.toFixed(6);
+      document.getElementById('svc-lng').value = pos.lng.toFixed(6);
+    });
+
+    mapInstance.on('click', function(e) {
+      marker.setLatLng(e.latlng);
+      document.getElementById('svc-lat').value = e.latlng.lat.toFixed(6);
+      document.getElementById('svc-lng').value = e.latlng.lng.toFixed(6);
+    });
+
+    // Handle address search via Nominatim
+    const addressInput = document.getElementById('svc-address');
+    let typingTimer;
+    addressInput.addEventListener('input', () => {
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(() => {
+        const query = addressInput.value.trim();
+        if (query.length > 5) {
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data && data.length > 0) {
+                const lat = parseFloat(data[0].lat);
+                const lon = parseFloat(data[0].lon);
+                mapInstance.setView([lat, lon], 14);
+                marker.setLatLng([lat, lon]);
+                document.getElementById('svc-lat').value = lat.toFixed(6);
+                document.getElementById('svc-lng').value = lon.toFixed(6);
+              }
+            }).catch(err => console.error('Geocoding error', err));
+        }
+      }, 1000);
+    });
+    
+    // Fix leaflet map display bug inside modals
+    setTimeout(() => { mapInstance.invalidateSize(); }, 300);
+  }
 
   // --- LOGIC: BUILDER HÀNH TRÌNH ---
   const itineraryList = document.getElementById('itinerary-list');
@@ -402,15 +700,85 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     div.style.alignItems = 'stretch';
     div.innerHTML = `
       <input type="text" placeholder="Tên trải nghiệm" class="exp-title" style="margin-bottom:8px;">
+      <textarea placeholder="Mô tả trải nghiệm" class="exp-desc" style="margin-bottom:8px; height:60px; resize:none; padding:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff;"></textarea>
       <div style="display:flex; gap:8px;">
         <input type="text" placeholder="Icon (emoji)" class="exp-icon" style="width:60px;">
         <input type="text" placeholder="Độ khó" class="exp-diff" style="width:80px;">
         <input type="text" placeholder="Thời lượng" class="exp-duration" style="flex:1;">
+        <input type="number" placeholder="Chi phí (VND)" class="exp-price" style="flex:1;">
       </div>
       <span class="builder-btn-remove" style="align-self:flex-end; margin-top:8px;">✕</span>
     `;
     div.querySelector('.builder-btn-remove').onclick = () => div.remove();
     expList.appendChild(div);
+  });
+
+  // --- LOGIC: BUILDER SUGGESTED ITINERARIES (MULTI-PLAN) ---
+  const plansContainer = document.getElementById('itinerary-plans-container');
+  const btnAddPlan = document.getElementById('btn-add-plan');
+
+  function createStepRow() {
+    const row = document.createElement('div');
+    row.className = 'sug-step-item';
+    row.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px;margin-bottom:8px;';
+    row.innerHTML = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
+        <input type="text" class="sug-time" placeholder="08:00" style="width:70px;flex:none;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:13px;">
+        <input type="text" class="sug-activity" placeholder="✏️ Tên hoạt động (VD: Ăn sáng bún chả...)" style="flex:1;min-width:180px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:13px;">
+        <button type="button" onclick="this.closest('.sug-step-item').remove()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:12px;">✕ Xóa</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <input type="text" class="sug-location" placeholder="📍 Địa điểm cụ thể..." style="flex:1;min-width:150px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:13px;">
+        <input type="text" class="sug-tips" placeholder="💡 Mẹo nhỏ (tùy chọn)..." style="flex:1;min-width:150px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:13px;">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input type="text" class="sug-img" placeholder="🖼️ URL hình ảnh (tùy chọn)" style="flex:1;min-width:200px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:12px;">
+        <textarea class="sug-desc" placeholder="📝 Mô tả thêm về hoạt động này..." rows="2" style="flex:2;min-width:200px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:12px;resize:vertical;"></textarea>
+      </div>
+    `;
+    return row;
+  }
+
+  function createPlanBlock() {
+    const planId = 'plan-' + Date.now();
+    const block = document.createElement('div');
+    block.className = 'sug-plan-block';
+    block.dataset.planId = planId;
+    block.style.cssText = 'background:rgba(99,102,241,0.07);border:1.5px solid rgba(99,102,241,0.25);border-radius:14px;padding:16px;';
+    block.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+          <select class="plan-type" style="background:rgba(0,0,0,0.3);border:1px solid rgba(99,102,241,0.4);color:#c4b5fd;padding:7px 12px;border-radius:8px;font-size:13px;font-weight:700;">
+            <option value="couple">💕 Cặp đôi</option>
+            <option value="family">👨‍👩‍👧 Gia đình</option>
+            <option value="budget">💰 Tiết kiệm</option>
+            <option value="luxury">✨ Sang trọng</option>
+            <option value="solo">🧘 Solo</option>
+            <option value="group">👥 Nhóm bạn</option>
+          </select>
+          <select class="plan-duration" style="background:rgba(0,0,0,0.3);border:1px solid rgba(99,102,241,0.4);color:#c4b5fd;padding:7px 12px;border-radius:8px;font-size:13px;font-weight:700;">
+            <option value="1">1 ngày</option>
+            <option value="2">2 ngày</option>
+            <option value="3">3 ngày</option>
+          </select>
+          <input type="text" class="plan-name" placeholder="Tên kế hoạch (VD: Lịch trình ăn uống Hà Nội)" style="flex:1;min-width:200px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 12px;border-radius:8px;font-size:13px;">
+        </div>
+        <button type="button" onclick="this.closest('.sug-plan-block').remove()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12px;white-space:nowrap;">🗑 Xóa kế hoạch</button>
+      </div>
+      <div class="plan-steps-list" style="display:flex;flex-direction:column;"></div>
+      <button type="button" class="btn-add-step" style="margin-top:10px;width:100%;padding:9px;background:rgba(99,102,241,0.1);border:1.5px dashed rgba(99,102,241,0.4);border-radius:10px;color:#a5b4fc;font-size:12px;font-weight:700;cursor:pointer;transition:0.2s;">＋ Thêm hoạt động vào lịch trình này</button>
+    `;
+    block.querySelector('.btn-add-step').addEventListener('click', () => {
+      const stepsList = block.querySelector('.plan-steps-list');
+      stepsList.appendChild(createStepRow());
+    });
+    // Add a default first step
+    block.querySelector('.plan-steps-list').appendChild(createStepRow());
+    return block;
+  }
+
+  btnAddPlan.addEventListener('click', () => {
+    plansContainer.appendChild(createPlanBlock());
   });
 
   // --- LOGIC: BUILDER FAQ ---
@@ -489,15 +857,15 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     btnAIDesc.textContent = 'Đang tạo...';
 
     try {
-      const token = localStorage.getItem('wander_token') || localStorage.getItem('biz_auth_token');
+      const token = typeof window.getAuthToken === 'function' ? window.getAuthToken() : (localStorage.getItem('biz_auth_token') || localStorage.getItem('wander_token'));
       const res = await fetch('/api/business/ai/generate-description', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
         body: JSON.stringify({ name, kind, region })
       });
       const data = await res.json();
-      if (data.success && data.data.description) {
-        document.getElementById('svc-desc').value = data.data.description;
+      if (data.success && data.data) {
+        document.getElementById('svc-desc').value = data.data;
       } else {
         alert('Không thể tạo mô tả: ' + (data.message || 'Lỗi không xác định'));
       }
@@ -519,22 +887,22 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     btnAIHighlights.textContent = 'Đang tạo...';
 
     try {
-      const token = localStorage.getItem('wander_token') || localStorage.getItem('biz_auth_token');
+      const token = typeof window.getAuthToken === 'function' ? window.getAuthToken() : (localStorage.getItem('biz_auth_token') || localStorage.getItem('wander_token'));
       const res = await fetch('/api/business/ai/generate-highlights', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
         body: JSON.stringify({ name, description })
       });
       const data = await res.json();
-      if (data.success && data.data.highlights) {
+      if (data.success && data.data) {
+        const lines = typeof data.data === 'string'
+          ? data.data.split('\n').map(s => s.trim()).filter(Boolean)
+          : (Array.isArray(data.data) ? data.data : []);
         hlList.innerHTML = '';
-        data.data.highlights.forEach(hl => {
+        lines.forEach(hl => {
           const div = document.createElement('div');
           div.className = 'builder-item';
-          div.innerHTML = `
-            <input type="text" value="${hl}" class="hl-input">
-            <span class="builder-btn-remove">✕</span>
-          `;
+          div.innerHTML = `<input type="text" value="${hl.replace(/"/g,'&quot;')}" class="hl-input"><span class="builder-btn-remove">✕</span>`;
           div.querySelector('.builder-btn-remove').onclick = () => div.remove();
           hlList.appendChild(div);
         });
@@ -559,23 +927,24 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     btnAIFAQ.textContent = 'Đang tạo...';
 
     try {
-      const token = localStorage.getItem('wander_token') || localStorage.getItem('biz_auth_token');
+      const token = typeof window.getAuthToken === 'function' ? window.getAuthToken() : (localStorage.getItem('biz_auth_token') || localStorage.getItem('wander_token'));
       const res = await fetch('/api/business/ai/generate-faq', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
         body: JSON.stringify({ name, description })
       });
       const data = await res.json();
-      if (data.success && data.data.faqs) {
+      if (data.success && data.data) {
+        const faqs = Array.isArray(data.data) ? data.data : [];
         faqList.innerHTML = '';
-        data.data.faqs.forEach(faq => {
+        faqs.forEach(faq => {
           const div = document.createElement('div');
           div.className = 'builder-item';
           div.style.flexDirection = 'column';
           div.style.alignItems = 'stretch';
           div.innerHTML = `
-            <input type="text" value="${faq.question}" class="faq-question" style="margin-bottom:8px;">
-            <input type="text" value="${faq.answer}" class="faq-answer">
+            <input type="text" value="${(faq.question||'').replace(/"/g,'&quot;')}" class="faq-question" style="margin-bottom:8px;">
+            <input type="text" value="${(faq.answer||'').replace(/"/g,'&quot;')}" class="faq-answer">
             <span class="builder-btn-remove" style="align-self:flex-end; margin-top:8px;">✕</span>
           `;
           div.querySelector('.builder-btn-remove').onclick = () => div.remove();
@@ -602,17 +971,18 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     btnAISEO.textContent = 'Đang tối ưu...';
 
     try {
-      const token = localStorage.getItem('wander_token') || localStorage.getItem('biz_auth_token');
+      const token = typeof window.getAuthToken === 'function' ? window.getAuthToken() : (localStorage.getItem('biz_auth_token') || localStorage.getItem('wander_token'));
       const res = await fetch('/api/business/ai/optimize-seo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
         body: JSON.stringify({ name, description })
       });
       const data = await res.json();
-      if (data.success && data.data.seo) {
-        document.getElementById('svc-meta-title').value = data.data.seo.metaTitle || '';
-        document.getElementById('svc-meta-desc').value = data.data.seo.metaDescription || '';
-        document.getElementById('svc-keywords').value = (data.data.seo.keywords || []).join(', ');
+      if (data.success && data.data) {
+        const seo = data.data;
+        document.getElementById('svc-meta-title').value = seo.title || '';
+        document.getElementById('svc-meta-desc').value = seo.description || '';
+        document.getElementById('svc-keywords').value = seo.keywords || '';
       } else {
         alert('Không thể tối ưu SEO: ' + (data.message || 'Lỗi không xác định'));
       }
@@ -644,6 +1014,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     safetyList.innerHTML = '';
     bringList.innerHTML = '';
     avoidList.innerHTML = '';
+    if (plansContainer) plansContainer.innerHTML = '';
   };
   btnClose.onclick = close;
   btnCancel.onclick = close;
@@ -652,94 +1023,232 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   // --- SUBMIT LOGIC ---
   btnSubmit.onclick = async () => {
     const name = document.getElementById('svc-name').value;
-    if (!name) return alert('Vui lòng nhập tên dịch vụ');
+    const kind = document.getElementById('svc-kind').value;
+    const region = document.getElementById('svc-region').value;
+    const address = document.getElementById('svc-address').value;
+
+    if (!name || !kind || !region || !address) {
+      alert('Vui lòng điền các trường bắt buộc (*)');
+      return;
+    }
 
     btnSubmit.disabled = true;
-    btnSubmit.textContent = 'Đang xử lý...';
+    btnSubmit.innerHTML = '<span class="spinner-small"></span> Đang xử lý...';
 
-    const highlights = Array.from(hlList.querySelectorAll('.hl-input')).map(i => i.value).filter(Boolean);
-    const itinerary = Array.from(itineraryList.children).map((div, idx) => ({
-      day: idx + 1,
-      title: div.querySelector('.it-title').value,
-      detail: div.querySelector('.it-desc').value
-    })).filter(it => it.title);
+    const price = document.getElementById('svc-price').value || 0;
+    const priceTo = document.getElementById('svc-price-to') ? document.getElementById('svc-price-to').value : null;
 
-    const experiences = Array.from(expList.children).map(div => ({
-      title: div.querySelector('.exp-title').value,
-      icon: div.querySelector('.exp-icon').value,
-      difficulty: div.querySelector('.exp-diff').value,
-      duration: div.querySelector('.exp-duration').value
-    })).filter(exp => exp.title);
+    // Collect amenities
+    const amenities = [];
+    document.querySelectorAll('.amenity-chk:checked').forEach(cb => {
+      amenities.push(cb.value);
+    });
 
-    const faqs = Array.from(faqList.children).map(div => ({
-      question: div.querySelector('.faq-question').value,
-      answer: div.querySelector('.faq-answer').value
-    })).filter(faq => faq.question);
+    // Collect tags
+    const tags = document.getElementById('svc-tags') ? 
+      document.getElementById('svc-tags').value.split(',').map(s => s.trim()).filter(s => s) : [];
 
-    const safetyTips = Array.from(safetyList.querySelectorAll('.safety-input')).map(i => i.value).filter(Boolean);
-    const whatToBring = Array.from(bringList.querySelectorAll('.bring-input')).map(i => i.value).filter(Boolean);
-    const whatNotToDo = Array.from(avoidList.querySelectorAll('.avoid-input')).map(i => i.value).filter(Boolean);
+    // FormData cho file upload
+    const payload = new FormData();
+    payload.append('name', name);
+    payload.append('kind', kind);
+    payload.append('region', region);
+    if(document.getElementById('svc-city')) payload.append('city', document.getElementById('svc-city').value);
+    payload.append('address', address);
+    payload.append('description', document.getElementById('svc-desc').value);
+    if(document.getElementById('svc-overview')) payload.append('overview', document.getElementById('svc-overview').value);
+    payload.append('priceFrom', price);
+    if(priceTo) payload.append('priceTo', priceTo);
+    payload.append('isTour', chkTour.checked);
 
-    const accessibility = {
-      wheelchairAccessible: document.getElementById('svc-wheelchair').checked,
-      elevator: document.getElementById('svc-elevator').checked,
-      accessibleRestrooms: document.getElementById('svc-restroom').checked,
+    if(document.getElementById('svc-phone')) payload.append('contactPhone', document.getElementById('svc-phone').value);
+    if(document.getElementById('svc-email')) payload.append('contactEmail', document.getElementById('svc-email').value);
+    if(document.getElementById('svc-website')) payload.append('website', document.getElementById('svc-website').value);
+    if(document.getElementById('svc-open-time')) payload.append('openTime', document.getElementById('svc-open-time').value);
+    if(document.getElementById('svc-close-time')) payload.append('closeTime', document.getElementById('svc-close-time').value);
+    if(document.getElementById('svc-lat')) payload.append('lat', document.getElementById('svc-lat').value);
+    if(document.getElementById('svc-lng')) payload.append('lng', document.getElementById('svc-lng').value);
+
+    // Quick Info
+    payload.append('visitDuration', document.getElementById('svc-visit-duration').value);
+    payload.append('crowdLevel', document.getElementById('svc-crowd-level').value);
+    payload.append('costLevel', document.getElementById('svc-cost-level').value);
+    payload.append('businessCategory', document.getElementById('svc-businessCategory').value);
+    
+    // Arrays
+    payload.append('amenities', JSON.stringify(amenities));
+    payload.append('tags', JSON.stringify(tags));
+    
+    // Images
+    const imgUrl = document.getElementById('svc-image');
+    if (imgUrl && imgUrl.value) {
+      payload.append('image', imgUrl.value);
+    }
+    // File Upload (Primary)
+    const imgFiles = document.getElementById('svc-image-file');
+    if (imgFiles && imgFiles.files.length > 0) {
+      for (let i = 0; i < imgFiles.files.length; i++) {
+        payload.append('imageFile', imgFiles.files[i]);
+      }
+    }
+
+    const suit = document.getElementById('svc-suitability').value;
+    if (suit) payload.append('suitability', JSON.stringify(suit.split(',').map(s=>s.trim())));
+
+    payload.append('bestTimeToVisit', document.getElementById('svc-best-time').value);
+    payload.append('bestSeason', document.getElementById('svc-best-season').value);
+    payload.append('internetQuality', document.getElementById('svc-internet').value);
+    payload.append('parking', document.getElementById('svc-parking').value);
+
+    // Accessibility
+    const acc = {
+      wheelchairAccessible: document.getElementById('svc-wheelchair') ? document.getElementById('svc-wheelchair').checked : false,
+      elevator: document.getElementById('svc-elevator') ? document.getElementById('svc-elevator').checked : false,
+      accessibleRestrooms: document.getElementById('svc-restroom') ? document.getElementById('svc-restroom').checked : false,
       notes: ''
     };
+    payload.append('accessibility', JSON.stringify(acc));
 
+    // Images & Video
+    const imagesStr = document.getElementById('svc-imgs').value;
+    if (imagesStr) {
+       payload.append('images', JSON.stringify(imagesStr.split(',').map(i=>i.trim()).filter(i=>i)));
+    }
+    payload.append('videoUrl', document.getElementById('svc-video').value);
+
+    // Gallery files
+    const galleryFiles = document.getElementById('svc-img-files');
+    if (galleryFiles && galleryFiles.files.length > 0) {
+      for (let i = 0; i < galleryFiles.files.length; i++) {
+        payload.append('imageFile', galleryFiles.files[i]);
+      }
+    }
+
+    // SEO
     const seo = {
       metaTitle: document.getElementById('svc-meta-title').value,
       metaDescription: document.getElementById('svc-meta-desc').value,
-      keywords: document.getElementById('svc-keywords').value.split(',').map(s => s.trim()).filter(Boolean)
+      keywords: document.getElementById('svc-keywords').value.split(',').map(s=>s.trim())
     };
+    payload.append('seo', JSON.stringify(seo));
 
-    const payload = {
-      name,
-      kind: document.getElementById('svc-kind').value,
-      priceFrom: document.getElementById('svc-price').value,
-      region: document.getElementById('svc-region').value,
-      address: document.getElementById('svc-address').value,
-      contactPhone: document.getElementById('svc-phone').value,
-      description: document.getElementById('svc-desc').value,
-      videoUrl: document.getElementById('svc-video').value,
-      images: document.getElementById('svc-imgs').value.split(',').map(s => s.trim()).filter(Boolean),
-      businessCategory: document.getElementById('svc-businessCategory').value,
-      isTour: chkTour.checked,
-      tourDuration: document.getElementById('svc-duration').value,
-      tourDifficulty: document.getElementById('svc-diff').value,
-      tourItinerary: itinerary,
-      highlights: highlights,
-      // New fields
-      visitDuration: document.getElementById('svc-visit-duration').value,
-      crowdLevel: document.getElementById('svc-crowd-level').value,
-      costLevel: document.getElementById('svc-cost-level').value,
-      suitability: document.getElementById('svc-suitability').value.split(',').map(s => s.trim()).filter(Boolean),
-      bestTimeToVisit: document.getElementById('svc-best-time').value,
-      bestSeason: document.getElementById('svc-best-season').value,
-      internetQuality: document.getElementById('svc-internet').value,
-      parking: document.getElementById('svc-parking').value,
-      accessibility: accessibility,
-      experiences: experiences,
-      faqs: faqs,
-      safetyTips: safetyTips.map(tip => ({ category: 'general', title: tip, description: tip, severity: 'medium' })),
-      whatToBring: whatToBring,
-      whatNotToDo: whatNotToDo,
-      seo: seo
-    };
+    // Highlights
+    const hl = [];
+    document.querySelectorAll('#highlight-list .hl-input').forEach(i => { if(i.value) hl.push(i.value) });
+    payload.append('highlights', JSON.stringify(hl));
+
+    // Experiences
+    const exp = [];
+    document.querySelectorAll('#experience-list .builder-item').forEach(div => {
+      const title = div.querySelector('.exp-title').value;
+      if (title) {
+        exp.push({
+          title,
+          description: div.querySelector('.exp-desc') ? div.querySelector('.exp-desc').value : '',
+          icon: div.querySelector('.exp-icon').value,
+          difficulty: div.querySelector('.exp-diff').value,
+          duration: div.querySelector('.exp-duration').value,
+          priceEstimate: div.querySelector('.exp-price') ? div.querySelector('.exp-price').value : ''
+        });
+      }
+    });
+    payload.append('experiences', JSON.stringify(exp));
+
+    // Suggested Itineraries (Multi-Plan)
+    const sugPlans = [];
+    document.querySelectorAll('#itinerary-plans-container .sug-plan-block').forEach(block => {
+      const type = block.querySelector('.plan-type').value;
+      const durationVal = block.querySelector('.plan-duration').value;
+      const name = block.querySelector('.plan-name').value || '';
+      const timeline = [];
+      block.querySelectorAll('.sug-step-item').forEach(step => {
+        const activity = step.querySelector('.sug-activity').value.trim();
+        if (activity) {
+          timeline.push({
+            time: step.querySelector('.sug-time').value.trim(),
+            activity,
+            location: step.querySelector('.sug-location').value.trim(),
+            tips: step.querySelector('.sug-tips').value.trim(),
+            description: step.querySelector('.sug-desc').value.trim(),
+            image: step.querySelector('.sug-img').value.trim()
+          });
+        }
+      });
+      if (timeline.length > 0) {
+        sugPlans.push({ type, duration: durationVal + ' ngày', name, timeline });
+      }
+    });
+    if (sugPlans.length > 0) {
+      payload.append('suggestedItineraries', JSON.stringify(sugPlans));
+    }
+
+    // FAQs
+    const faqs = [];
+    document.querySelectorAll('#faq-list .builder-item').forEach(div => {
+      const question = div.querySelector('.faq-question').value;
+      if (question) {
+        faqs.push({
+          question,
+          answer: div.querySelector('.faq-answer').value
+        });
+      }
+    });
+    payload.append('faqs', JSON.stringify(faqs));
+
+    // Safety & Tips
+    const safetyTips = [];
+    document.querySelectorAll('#safety-list .safety-input').forEach(i => { if(i.value) safetyTips.push({ category: 'general', title: i.value, description: i.value, severity: 'medium' }) });
+    payload.append('safetyTips', JSON.stringify(safetyTips));
+
+    const whatToBring = [];
+    document.querySelectorAll('#bring-list .bring-input').forEach(i => { if(i.value) whatToBring.push(i.value) });
+    payload.append('whatToBring', JSON.stringify(whatToBring));
+
+    const whatNotToDo = [];
+    document.querySelectorAll('#avoid-list .avoid-input').forEach(i => { if(i.value) whatNotToDo.push(i.value) });
+    payload.append('whatNotToDo', JSON.stringify(whatNotToDo));
+
+    // Tour specific
+    if (chkTour && chkTour.checked) {
+      payload.append('tourDuration', document.getElementById('svc-duration').value);
+      payload.append('tourDifficulty', document.getElementById('svc-diff').value);
+      
+      const itinerary = [];
+      document.querySelectorAll('#itinerary-list .builder-item').forEach((div, idx) => {
+        const title = div.querySelector('.it-title').value;
+        if (title) {
+          itinerary.push({
+            day: idx + 1,
+            title,
+            detail: div.querySelector('.it-desc').value
+          });
+        }
+      });
+      payload.append('tourItinerary', JSON.stringify(itinerary));
+    }
 
     try {
-      const token = localStorage.getItem('wander_token') || localStorage.getItem('biz_auth_token');
+      const token = typeof window.getAuthToken === 'function' ? window.getAuthToken() : null;
+                    
+      // POST without explicitly setting Content-Type so browser sets boundary for FormData
       const res = await fetch('/api/business/places', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-        body: JSON.stringify(payload)
+        headers: { 'x-auth-token': token },
+        body: payload
       });
-      const data = await res.json();
-      if (data.success) {
-        alert('Đã tạo thành công! Dịch vụ đang chờ kiểm duyệt Elite.');
-        location.reload();
+      const resData = await res.json();
+      if (resData.success) {
+        if (window.WanderUI && window.WanderUI.showToast) {
+          window.WanderUI.showToast("Dịch vụ Elite đã được gửi để phê duyệt!", "success");
+        } else {
+          alert("Dịch vụ Elite đã được gửi để phê duyệt!");
+        }
+        overlay.classList.remove('is-open');
+        
+        // Notify other components that a new service was added
+        window.dispatchEvent(new CustomEvent('svc-added'));
       } else {
-        alert('Lỗi: ' + data.message);
+        alert('Lỗi: ' + resData.message);
       }
     } catch(err) {
       alert('Không thể kết nối máy chủ');

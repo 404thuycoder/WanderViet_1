@@ -14,6 +14,8 @@ const Booking = require('../models/Booking');
 const AIInsight = require('../models/AIInsight');
 const BusinessActivity = require('../models/BusinessActivity');
 const { syncBusinessXP } = require('../utils/rankUtils');
+const Groq = require('groq-sdk');
+const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 
 const safeParseArray = (req, field, forceObjectArray = false) => {
   let val = req.body[field];
@@ -515,63 +517,144 @@ router.get('/ai-analytics', businessAuth, async (req, res) => {
   }
 });
 
+// ── AI Generation Endpoints ─────────────────────────────────────
+router.post('/ai/generate-description', businessAuth, async (req, res) => {
+  try {
+    if (!groq) return res.json({ success: true, data: "Mô tả mẫu: Đây là một địa điểm tuyệt vời..." });
+    const prompt = `Viết một đoạn mô tả hấp dẫn (khoảng 3-4 câu) bằng tiếng Việt cho dịch vụ du lịch có tên "${req.body.name || 'Dịch vụ mới'}" thuộc loại "${req.body.kind || 'du lịch'}". Chỉ trả về nội dung mô tả, không có phần mở đầu/kết thúc.`;
+    const completion = await groq.chat.completions.create({ messages: [{ role: 'user', content: prompt }], model: 'llama-3.3-70b-versatile', temperature: 0.7 });
+    res.json({ success: true, data: completion.choices[0]?.message?.content || '' });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+router.post('/ai/generate-highlights', businessAuth, async (req, res) => {
+  try {
+    if (!groq) return res.json({ success: true, data: "Điểm nổi bật 1\nĐiểm nổi bật 2\nĐiểm nổi bật 3" });
+    const prompt = `Liệt kê 3-4 điểm nổi bật nhất (mỗi ý 1 dòng, không có gạch đầu dòng hay số thứ tự) bằng tiếng Việt cho dịch vụ du lịch có tên "${req.body.name || 'Dịch vụ'}". Chỉ trả về các dòng chữ.`;
+    const completion = await groq.chat.completions.create({ messages: [{ role: 'user', content: prompt }], model: 'llama-3.3-70b-versatile', temperature: 0.7 });
+    res.json({ success: true, data: completion.choices[0]?.message?.content || '' });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+router.post('/ai/generate-faq', businessAuth, async (req, res) => {
+  try {
+    if (!groq) return res.json({ success: true, data: [{ question: "Giờ mở cửa?", answer: "Từ 8h sáng đến 10h tối." }] });
+    const prompt = `Tạo 2 câu hỏi thường gặp (FAQ) cho dịch vụ du lịch "${req.body.name || 'Dịch vụ'}". Trả về chuẩn JSON array với object có dạng {"question": "...", "answer": "..."}. Không kèm văn bản nào khác ngoài JSON.`;
+    const completion = await groq.chat.completions.create({ messages: [{ role: 'user', content: prompt }], model: 'llama-3.3-70b-versatile', temperature: 0.7 });
+    let raw = completion.choices[0]?.message?.content || '[]';
+    raw = raw.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
+    res.json({ success: true, data: JSON.parse(raw) });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
+router.post('/ai/optimize-seo', businessAuth, async (req, res) => {
+  try {
+    if (!groq) return res.json({ success: true, data: { title: req.body.title || '', description: req.body.description || '', keywords: "du lịch, trải nghiệm" } });
+    const prompt = `Tối ưu hóa SEO cho trang web dịch vụ du lịch. Tiêu đề hiện tại: "${req.body.title || ''}". Mô tả hiện tại: "${req.body.description || ''}". Trả về JSON với định dạng {"title": "Tiêu đề chuẩn SEO", "description": "Mô tả chuẩn SEO", "keywords": "từ khóa 1, từ khóa 2"}. Chỉ trả JSON, không kèm giải thích.`;
+    const completion = await groq.chat.completions.create({ messages: [{ role: 'user', content: prompt }], model: 'llama-3.3-70b-versatile', temperature: 0.7 });
+    let raw = completion.choices[0]?.message?.content || '{}';
+    raw = raw.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
+    res.json({ success: true, data: JSON.parse(raw) });
+  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+});
+
 // 2. Create a new place (with image upload)
 router.post('/places', businessAuth, upload.array('imageFile', 10), async (req, res) => {
   try {
-    let imagesArr = [];
-    
-    // 1. Files uploaded
+    // 1. Image handling
+    let galleryImages = [];
     if (req.files && req.files.length > 0) {
       req.files.forEach(file => {
-        imagesArr.push('/uploads/' + file.filename);
+        galleryImages.push('/uploads/' + file.filename);
       });
     }
-    
-    // 2. URLs passed as text
+
     if (req.body.image) {
-      imagesArr.push(req.body.image);
+      if (!galleryImages.includes(req.body.image)) galleryImages.push(req.body.image);
     }
+
     if (req.body.images) {
       let parsedImages = req.body.images;
       if (typeof parsedImages === 'string') {
-        try { parsedImages = JSON.parse(parsedImages); } catch (e) { parsedImages = [parsedImages]; }
+        try { 
+          parsedImages = JSON.parse(parsedImages); 
+        } catch (e) { 
+          parsedImages = parsedImages.split(',').map(s => s.trim()).filter(s => s);
+        }
       }
       if (Array.isArray(parsedImages)) {
-        imagesArr = imagesArr.concat(parsedImages);
+        parsedImages.forEach(img => {
+          if (img && !galleryImages.includes(img)) galleryImages.push(img);
+        });
       }
     }
     
-    imagesArr = [...new Set(imagesArr)];
+    galleryImages = [...new Set(galleryImages.filter(i => i))];
+    const mainImage = galleryImages[0] || '';
 
+    // 2. Data handling
     const amenitiesArr = safeParseArray(req, 'amenities');
     const highlightsArr = safeParseArray(req, 'highlights');
     const tagsArr = safeParseArray(req, 'tags');
+    const suitabilityArr = safeParseArray(req, 'suitability');
+    const weatherTagsArr = safeParseArray(req, 'weatherTags');
+    const whatToBringArr = safeParseArray(req, 'whatToBring');
+    const whatNotToDoArr = safeParseArray(req, 'whatNotToDo');
+    const experiencesArr = safeParseArray(req, 'experiences', true);
+    const faqsArr = safeParseArray(req, 'faqs', true);
+    const safetyTipsArr = safeParseArray(req, 'safetyTips', true);
+    const suggestedItinerariesArr = safeParseArray(req, 'suggestedItineraries', true);
+    const galleryArr = safeParseArray(req, 'gallery', true);
+    const tourItineraryArr = safeParseArray(req, 'tourItinerary', true);
+    const tourIncludesArr = safeParseArray(req, 'tourIncludes');
+
+    // Parse objects
+    let accessibilityObj = { wheelchairAccessible: false, elevator: false, accessibleRestrooms: false, notes: '' };
+    if (req.body.accessibility) {
+      try { accessibilityObj = typeof req.body.accessibility === 'string' ? JSON.parse(req.body.accessibility) : req.body.accessibility; } catch(e) {}
+    }
+    let seoObj = {};
+    if (req.body.seo) {
+      try { seoObj = typeof req.body.seo === 'string' ? JSON.parse(req.body.seo) : req.body.seo; } catch(e) {}
+    }
+    let gpsCoords = { lat: null, lng: null };
+    if (req.body.gpsCoordinates) {
+      try { gpsCoords = typeof req.body.gpsCoordinates === 'string' ? JSON.parse(req.body.gpsCoordinates) : req.body.gpsCoordinates; } catch(e) {}
+    }
 
     const newPlace = new Place({
       id: generateCustomId(req.body.kind),
       name: req.body.name,
       kind: req.body.kind,
+      businessCategory: req.body.businessCategory || 'other',
       region: req.body.region,
+      city: req.body.city,
       address: req.body.address,
       description: req.body.description,
-      overview: req.body.overview,
+      overview: req.body.overview || '',
       experience: req.body.experience,
       themeColor: req.body.themeColor,
       meta: req.body.meta,
       priceFrom: req.body.priceFrom,
       priceTo: req.body.priceTo,
-      openTime: req.body.openTime,
-      closeTime: req.body.closeTime,
-      openDays: req.body.openDays,
-      contactPhone: req.body.contactPhone,
-      contactEmail: req.body.contactEmail,
-      website: req.body.website,
-      videoUrl: req.body.videoUrl, // Thêm dòng này
-      lat: req.body.lat,
-      lng: req.body.lng,
+      averagePrice: req.body.averagePrice,
+      openTime: req.body.openTime || '',
+      closeTime: req.body.closeTime || '',
+      openDays: req.body.openDays || '',
+      contactPhone: req.body.contactPhone || '',
+      contactEmail: req.body.contactEmail || '',
+      website: req.body.website || '',
+      videoUrl: req.body.videoUrl || '',
+      coverImage: req.body.coverImage || '',
+      lat: req.body.lat || gpsCoords.lat,
+      lng: req.body.lng || gpsCoords.lng,
+      gpsCoordinates: {
+        lat: parseFloat(req.body.lat) || gpsCoords.lat || null,
+        lng: parseFloat(req.body.lng) || gpsCoords.lng || null
+      },
       ownerId: req.user.id,
-      image: imagesArr[0] || '',
-      images: imagesArr,
+      image: mainImage,
+      images: galleryImages,
       highlights: highlightsArr,
       tags: tagsArr,
       amenities: amenitiesArr,
@@ -579,6 +662,34 @@ router.post('/places', businessAuth, upload.array('imageFile', 10), async (req, 
       isTour: req.body.isTour === 'true' || req.body.isTour === true,
       status: 'pending',
       source: 'partner',
+      // Quick Info fields
+      visitDuration: req.body.visitDuration || '',
+      crowdLevel: req.body.crowdLevel || 'medium',
+      costLevel: req.body.costLevel || 'standard',
+      suitability: suitabilityArr,
+      bestTimeToVisit: req.body.bestTimeToVisit || '',
+      bestSeason: req.body.bestSeason || '',
+      weatherTags: weatherTagsArr,
+      internetQuality: req.body.internetQuality || 'fair',
+      parking: req.body.parking || 'none',
+      accessibility: accessibilityObj,
+      capacity: req.body.capacity ? parseInt(req.body.capacity) : null,
+      // Tour-specific
+      tourDuration: req.body.tourDuration || '',
+      tourDifficulty: req.body.tourDifficulty || 'easy',
+      tourItinerary: tourItineraryArr,
+      tourIncludes: tourIncludesArr,
+      tourGroupSize: req.body.tourGroupSize ? parseInt(req.body.tourGroupSize) : null,
+      // Rich content
+      experiences: experiencesArr,
+      suggestedItineraries: suggestedItinerariesArr,
+      faqs: faqsArr,
+      safetyTips: safetyTipsArr,
+      whatToBring: whatToBringArr,
+      whatNotToDo: whatNotToDoArr,
+      gallery: galleryArr,
+      seo: seoObj,
+      // Legacy nested
       amusementPlaces: safeParseArray(req, 'amusementPlaces', true),
       accommodations: safeParseArray(req, 'accommodations', true),
       diningPlaces: safeParseArray(req, 'diningPlaces', true),
@@ -619,61 +730,122 @@ router.put('/places/:id', businessAuth, upload.array('imageFile', 10), async (re
     const place = await Place.findOne({ id: req.params.id, ownerId: req.user.id });
     if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm hoặc bạn không có quyền sửa.' });
 
-    let imagesArr = place.images && place.images.length > 0 ? [...place.images] : (place.image ? [place.image] : []);
+    // 1. Image handling for Update
+    let currentImages = place.images || [];
+    if (place.image && !currentImages.includes(place.image)) {
+        currentImages.unshift(place.image);
+    }
 
+    let galleryImages = [...currentImages];
+
+    // If new files uploaded
     if (req.files && req.files.length > 0) {
       req.files.forEach(file => {
-        imagesArr.push('/uploads/' + file.filename);
+        galleryImages.push('/uploads/' + file.filename);
       });
     }
 
-    if (req.body.images !== undefined) {
-      let parsedImages = req.body.images;
-      if (typeof parsedImages === 'string') {
-        try { parsedImages = JSON.parse(parsedImages); } catch (e) { parsedImages = [parsedImages]; }
-      }
-      if (Array.isArray(parsedImages)) {
-        imagesArr = parsedImages;
-        if (req.files && req.files.length > 0) {
-           req.files.forEach(file => imagesArr.push('/uploads/' + file.filename));
-        }
-      }
-    } else if (req.body.image !== undefined && !req.files) {
-      imagesArr = [req.body.image];
+    // If URLs provided in body
+    if (req.body.image) {
+      if (!galleryImages.includes(req.body.image)) galleryImages.push(req.body.image);
     }
 
-    imagesArr = [...new Set(imagesArr.filter(i => Boolean(i)))];
+    if (req.body.images) {
+      let parsedImages = req.body.images;
+      if (typeof parsedImages === 'string') {
+        try { 
+          parsedImages = JSON.parse(parsedImages); 
+        } catch (e) { 
+          parsedImages = parsedImages.split(',').map(s => s.trim()).filter(s => s);
+        }
+      }
+      if (Array.isArray(parsedImages)) {
+        // If the user provided a full list of images, we might want to replace the current list
+        // but for now let's just merge to be safe, or check if it's meant to be a full replacement.
+        // Usually, a PUT with 'images' field implies replacement.
+        galleryImages = parsedImages.filter(i => i);
+        // But we MUST include the newly uploaded files
+        if (req.files && req.files.length > 0) {
+          req.files.forEach(file => {
+            const path = '/uploads/' + file.filename;
+            if (!galleryImages.includes(path)) galleryImages.push(path);
+          });
+        }
+      }
+    }
+    
+    galleryImages = [...new Set(galleryImages.filter(i => i))];
+    const mainImage = galleryImages[0] || '';
+
+    // Parse complex objects
+    let accessibilityObj = place.accessibility || {};
+    if (req.body.accessibility) {
+      try {
+        accessibilityObj = typeof req.body.accessibility === 'string' ? JSON.parse(req.body.accessibility) : req.body.accessibility;
+      } catch(e) {}
+    }
+    let seoObj = place.seo || {};
+    if (req.body.seo) {
+      try {
+        seoObj = typeof req.body.seo === 'string' ? JSON.parse(req.body.seo) : req.body.seo;
+      } catch(e) {}
+    }
 
     const updates = {
       name: req.body.name,
       kind: req.body.kind,
+      businessCategory: req.body.businessCategory || place.businessCategory,
       region: req.body.region,
+      city: req.body.city || place.city,
       address: req.body.address,
       description: req.body.description,
-      overview: req.body.overview,
+      overview: req.body.overview || place.overview,
       experience: req.body.experience,
       themeColor: req.body.themeColor,
       meta: req.body.meta,
       priceFrom: req.body.priceFrom,
       priceTo: req.body.priceTo,
-      openTime: req.body.openTime,
-      closeTime: req.body.closeTime,
-      openDays: req.body.openDays,
-      contactPhone: req.body.contactPhone,
-      contactEmail: req.body.contactEmail,
-      website: req.body.website,
-      lat: req.body.lat,
-      lng: req.body.lng,
-      image: imagesArr[0] || '',
-      images: imagesArr,
-      tags: safeParseArray(req, 'tags'),
-      amenities: safeParseArray(req, 'amenities'),
-      highlights: safeParseArray(req, 'highlights'),
-      amusementPlaces: safeParseArray(req, 'amusementPlaces', true),
-      accommodations: safeParseArray(req, 'accommodations', true),
-      diningPlaces: safeParseArray(req, 'diningPlaces', true),
-      checkInSpots: safeParseArray(req, 'checkInSpots', true)
+      averagePrice: req.body.averagePrice || place.averagePrice,
+      openTime: req.body.openTime || '',
+      closeTime: req.body.closeTime || '',
+      openDays: req.body.openDays || '',
+      contactPhone: req.body.contactPhone || '',
+      contactEmail: req.body.contactEmail || '',
+      website: req.body.website || '',
+      videoUrl: req.body.videoUrl || place.videoUrl || '',
+      coverImage: req.body.coverImage || place.coverImage || '',
+      lat: req.body.lat || place.lat,
+      lng: req.body.lng || place.lng,
+      gpsCoordinates: {
+        lat: parseFloat(req.body.lat) || (place.gpsCoordinates && place.gpsCoordinates.lat) || null,
+        lng: parseFloat(req.body.lng) || (place.gpsCoordinates && place.gpsCoordinates.lng) || null
+      },
+      image: mainImage,
+      images: galleryImages,
+      // Quick Info fields
+      visitDuration: req.body.visitDuration !== undefined ? req.body.visitDuration : place.visitDuration,
+      crowdLevel: req.body.crowdLevel !== undefined ? req.body.crowdLevel : place.crowdLevel,
+      costLevel: req.body.costLevel !== undefined ? req.body.costLevel : place.costLevel,
+      bestTimeToVisit: req.body.bestTimeToVisit !== undefined ? req.body.bestTimeToVisit : place.bestTimeToVisit,
+      bestSeason: req.body.bestSeason !== undefined ? req.body.bestSeason : place.bestSeason,
+      internetQuality: req.body.internetQuality !== undefined ? req.body.internetQuality : place.internetQuality,
+      parking: req.body.parking !== undefined ? req.body.parking : place.parking,
+      accessibility: accessibilityObj,
+      capacity: req.body.capacity !== undefined ? parseInt(req.body.capacity) : place.capacity,
+      // Tour-specific
+      tourDuration: req.body.tourDuration !== undefined ? req.body.tourDuration : place.tourDuration,
+      tourDifficulty: req.body.tourDifficulty !== undefined ? req.body.tourDifficulty : place.tourDifficulty,
+      tourGroupSize: req.body.tourGroupSize !== undefined ? parseInt(req.body.tourGroupSize) : place.tourGroupSize,
+      seo: seoObj,
+      updatedAt: new Date()
     };
+
+    const arrayFields = ['tags', 'amenities', 'highlights', 'suitability', 'weatherTags', 'tourItinerary', 'tourIncludes', 'experiences', 'suggestedItineraries', 'faqs', 'safetyTips', 'whatToBring', 'whatNotToDo', 'gallery', 'amusementPlaces', 'accommodations', 'diningPlaces', 'checkInSpots'];
+    arrayFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        updates[field] = safeParseArray(req, field, ['tourItinerary', 'experiences', 'suggestedItineraries', 'faqs', 'safetyTips', 'gallery', 'amusementPlaces', 'accommodations', 'diningPlaces', 'checkInSpots'].includes(field));
+      }
+    });
     
     // If a business updates an approved place, it goes back to pending for re-review
     if (req.user.role === 'business') {

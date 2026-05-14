@@ -32,7 +32,7 @@ ports.forEach(port => {
 // console.log('\n🚀 Bắt đầu chạy Server mới...');
 const server = spawn('node', ['server.js'], { 
     stdio: 'inherit', 
-    env: { ...process.env, NODE_OPTIONS: '--max-http-header-size=131072' }
+    env: { ...process.env, NODE_OPTIONS: '--max-http-header-size=262144' }
 });
 
 server.on('exit', (code) => {

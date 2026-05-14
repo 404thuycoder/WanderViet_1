@@ -32,12 +32,12 @@ ports.forEach(port => {
 console.log('\n🚀 Đang khởi động TOÀN BỘ hệ thống (Legacy Server + New API Backend)...');
 const server = spawn('node', ['server.js'], { 
     stdio: 'inherit', 
-    env: { ...process.env, NODE_OPTIONS: '--max-http-header-size=131072' }
+    env: { ...process.env, NODE_OPTIONS: '--max-http-header-size=262144' }
 });
 
 const backendAPI = spawn('node', ['server/server.js'], {
     stdio: 'inherit',
-    env: { ...process.env }
+    env: { ...process.env, NODE_OPTIONS: '--max-http-header-size=262144' }
 });
 
 server.on('exit', (code) => {

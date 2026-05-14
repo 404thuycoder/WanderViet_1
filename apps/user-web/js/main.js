@@ -27,7 +27,7 @@
       try {
         const data = JSON.parse(cached);
         if (data && data.length > 0) {
-          PLACES = data.filter(p => !p.ownerId);
+          PLACES = data;
           renderDestCards();
           return Promise.resolve(true);
         }
@@ -39,8 +39,8 @@
       return res.json();
     }).then(function (json) {
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-        // Chỉ lấy những địa điểm hệ thống (không thuộc doanh nghiệp) cho mục đích AI lên lịch
-        PLACES = json.data.filter(p => !p.ownerId);
+        // Lấy tất cả địa điểm được trả về từ API (đã được backend lọc approved)
+        PLACES = json.data;
         sessionStorage.setItem('wv_cached_places', JSON.stringify(PLACES));
         return true;
       }
@@ -48,7 +48,7 @@
     }).catch(function (e) {
       console.warn('Không thể tải từ API, dùng dữ liệu tĩnh:', e);
       if (Array.isArray(window.WANDER_PLACES) && window.WANDER_PLACES.length > 0) {
-        PLACES = window.WANDER_PLACES.filter(p => !p.ownerId);
+        PLACES = window.WANDER_PLACES;
       }
       return false;
     }).finally(function() {

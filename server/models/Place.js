@@ -113,7 +113,9 @@ const placeSchema = new mongoose.Schema({
       location: String,
       duration: String,
       cost: Number,
-      tips: String
+      tips: String,
+      description: String,
+      image: String
     }],
     totalCostEstimate: Number,
     aiGenerated: { type: Boolean, default: false }

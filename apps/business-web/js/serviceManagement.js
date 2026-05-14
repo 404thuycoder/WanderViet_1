@@ -235,14 +235,20 @@
         },
 
         add() {
-            state.editingId = null;
-            document.getElementById('sm-modal-title').textContent = '✨ Thêm dịch vụ mới';
-            const formIds = ['sm-form-name','sm-form-region','sm-form-address','sm-form-priceFrom','sm-form-image','sm-form-description', 'sm-form-highlights', 'sm-form-policy'];
-            formIds.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-            document.getElementById('sm-form-kind').value = 'diem-du-lich';
-            document.getElementById('sm-form-businessCategory').value = 'other';
-            document.getElementById('sm-form-isTour').checked = false;
-            document.getElementById('sm-modal-wrapper').classList.add('active');
+            const eliteModal = document.getElementById('add-svc-overlay');
+            if (eliteModal) {
+                eliteModal.classList.add('is-open');
+                if (window.initEliteMap) window.initEliteMap();
+            } else {
+                state.editingId = null;
+                document.getElementById('sm-modal-title').textContent = '✨ Thêm dịch vụ mới';
+                const formIds = ['sm-form-name','sm-form-region','sm-form-address','sm-form-priceFrom','sm-form-image','sm-form-description', 'sm-form-highlights', 'sm-form-policy'];
+                formIds.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+                document.getElementById('sm-form-kind').value = 'diem-du-lich';
+                document.getElementById('sm-form-businessCategory').value = 'other';
+                document.getElementById('sm-form-isTour').checked = false;
+                document.getElementById('sm-modal-wrapper').classList.add('active');
+            }
         },
 
         closeModal() {
@@ -474,6 +480,11 @@
 
         loadServices();
         checkAndSyncLegacyData();
+
+        // Listen for new service additions from other forms (like Elite form)
+        window.addEventListener('svc-added', () => {
+            loadServices();
+        });
     };
 
     async function checkAndSyncLegacyData() {

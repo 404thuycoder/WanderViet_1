@@ -1999,78 +1999,20 @@
         }
 
         async function load() {
-<<<<<<< Updated upstream
             if(!pid) {
                 document.getElementById('p-title').innerText = 'Không tìm thấy địa điểm';
                 return;
             }
-=======
-            if(!pid) return;
->>>>>>> Stashed changes
             if (window.WanderUI && WanderUI.showLoading) WanderUI.showLoading('Đang tải thông tin địa điểm...');
             try {
                 const res = await fetch(`/api/public/place/${pid}`);
                 const json = await res.json();
                 if (window.WanderUI && WanderUI.hideLoading) WanderUI.hideLoading();
 
-<<<<<<< Updated upstream
                 if(!json.success || !json.data) {
                     document.getElementById('p-title').innerText = 'Không tìm thấy địa điểm';
                     if (window.WanderUI && WanderUI.showToast) WanderUI.showToast(json.message || 'Không tìm thấy địa điểm', 'error');
                     return;
-=======
-                if(!json.success) {
-                    if (window.WanderUI && WanderUI.showToast) WanderUI.showToast(json.message || 'Không tìm thấy địa điểm', 'error');
-                    return;
-                }
-                const p = json.data;
-                window.currentPlace = p;
-                
-                // Update Base Info
-                document.getElementById('p-title').innerText = p.name;
-                
-                // Enhanced Description System
-                const descContainer = document.getElementById('p-desc-container');
-                const descEl = document.getElementById('p-desc');
-                const overviewEl = document.getElementById('p-overview');
-                const highlightsEl = document.getElementById('p-highlights');
-                const readMoreBtn = document.getElementById('read-more-btn');
-                
-                descEl.innerText = p.description || 'Trải nghiệm du lịch đẳng cấp được tinh tuyển bởi WanderViệt.';
-                
-                if (p.overview) {
-                    overviewEl.innerHTML = `<h4 style="font-weight:700; margin-bottom:12px; color:var(--text-main);">Tổng quan</h4><p>${p.overview}</p>`;
-                }
-                
-                if (p.highlights && p.highlights.length > 0) {
-                    highlightsEl.innerHTML = `
-                        <h4 style="font-weight:700; margin-bottom:12px; color:var(--text-main);">Điểm nổi bật</h4>
-                        <ul style="padding-left:20px;">
-                            ${p.highlights.map(h => `<li style="margin-bottom:8px;">${h}</li>`).join('')}
-                        </ul>
-                    `;
-                }
-                
-                // Read more functionality
-                if (descEl.innerText.length > 500 || overviewEl.innerHTML || highlightsEl.innerHTML) {
-                    readMoreBtn.style.display = 'inline-block';
-                    descContainer.style.maxHeight = '300px';
-                    descContainer.style.overflow = 'hidden';
-                }
-                
-                document.getElementById('p-price').innerText = (p.price || p.priceFrom || 0).toLocaleString('vi-VN') + ' ₫';
-                document.getElementById('sum-price').innerText = (p.price || p.priceFrom || 0).toLocaleString('vi-VN') + ' ₫';
-                document.getElementById('sum-title').innerText = p.name;
-                document.getElementById('sum-img').src = p.image;
-                document.getElementById('p-rate').innerText = parseFloat(p.ratingAvg || p.rating || 5.0).toFixed(1);
-                document.getElementById('p-review-count').innerText = `(${(p.reviewCount || 0)} đánh giá)`;
-                document.getElementById('p-fav-count').innerText = p.favoritesCount || 0;
-                document.getElementById('p-addr').innerText = (p.address || 'Việt Nam').split(',').pop().trim();
-                
-                // Record activity
-                if (window.WanderUI && WanderUI.recordActivity) {
-                    WanderUI.recordActivity('view_place', `Đã xem địa điểm: ${p.name}`, { placeId: p._id, placeName: p.name });
->>>>>>> Stashed changes
                 }
 
                 const p = json.data;
@@ -2185,7 +2127,6 @@
                     if (btn) btn.style.display = 'inline-flex';
                 }
 
-<<<<<<< Updated upstream
                 // ── Gallery ────────────────────────────────────────────
                 // Support both p.images (legacy) and p.gallery (new schema)
                 let galleryImgs = [];
@@ -2353,23 +2294,11 @@
                 }
 
                 // ── Nearby ─────────────────────────────────────────────
-=======
-                // Map & Nearby System
-                const lat = p.gpsCoordinates?.lat || p.lat;
-                const lng = p.gpsCoordinates?.lng || p.lng;
-                if (lat && lng) {
-                    const mapIframe = document.getElementById('google-map');
-                    mapIframe.src = `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3818.6!2d${lng}!3d${lat}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zM!5e0!3m2!1sen!2s!4v1`;
-                }
-
-                // Load nearby places
->>>>>>> Stashed changes
                 if (p.nearbyPlaces && p.nearbyPlaces.length > 0) {
                     window.nearbyData = p.nearbyPlaces;
                     filterNearby('restaurant');
                 }
 
-<<<<<<< Updated upstream
                 // ── Pay at counter ─────────────────────────────────────
                 if (!p.isTour || (p.tourDuration && !p.tourDuration.includes('ngày'))) {
                     const counterEl = document.getElementById('pay-counter');
@@ -2412,23 +2341,6 @@
                 }
 
                 // ── Experiences ────────────────────────────────────────
-=======
-                // Quick Info Section
-                document.getElementById('q-address').innerText = p.address || '...';
-                document.getElementById('q-hours').innerText = (p.openTime && p.closeTime) ? `${p.openTime} - ${p.closeTime}` : '...';
-                document.getElementById('q-price').innerText = (p.priceFrom && p.priceTo) ? `${p.priceFrom.toLocaleString()} - ${p.priceTo.toLocaleString()} ₫` : (p.priceFrom ? `${p.priceFrom.toLocaleString()} ₫` : '...');
-                document.getElementById('q-duration').innerText = p.visitDuration || '...';
-                document.getElementById('q-crowd').innerText = p.crowdLevel ? { low: 'Thấp', medium: 'Trung bình', high: 'Cao' }[p.crowdLevel] : '...';
-                document.getElementById('q-cost-level').innerText = p.costLevel ? { budget: 'Tiết kiệm', standard: 'Trung bình', luxury: 'Sang trọng' }[p.costLevel] : '...';
-                document.getElementById('q-suitability').innerText = p.suitability && p.suitability.length ? p.suitability.join(', ') : '...';
-                document.getElementById('q-best-time').innerText = p.bestTimeToVisit || '...';
-                document.getElementById('q-season').innerText = p.bestSeason || '...';
-                document.getElementById('q-internet').innerText = p.internetQuality ? { poor: 'Kém', fair: 'Trung bình', good: 'Tốt', excellent: 'Rất tốt' }[p.internetQuality] : '...';
-                document.getElementById('q-parking').innerText = p.parking ? { none: 'Không có', street: 'Vỉa hè', lot: 'Bãi đỗ xe', valet: 'Valet' }[p.parking] : '...';
-                document.getElementById('q-accessibility').innerText = p.accessibility ? (p.accessibility.wheelchairAccessible ? 'Có' : 'Không') : '...';
-
-                // Experience Section
->>>>>>> Stashed changes
                 if (p.experiences && p.experiences.length > 0) {
                     document.getElementById('experience-sec').style.display = 'block';
                     document.getElementById('experience-grid').innerHTML = p.experiences.map(exp => `

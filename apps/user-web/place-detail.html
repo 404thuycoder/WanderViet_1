@@ -2513,8 +2513,8 @@
                     safetySec.className = 'bento-card';
                     safetySec.id = 'safety-sec';
                     safetySec.innerHTML = `
-                        <span class="card-label">AN TOA?N & S_oC KHOE'</span>
-                        <h3 class="card-title" style="margin-bottom:32px; font-size:2rem;">L_u A an toAn</h3>
+                        <span class="card-label">AN TOÀN & SỨC KHỎE</span>
+                        <h3 class="card-title" style="margin-bottom:32px; font-size:2rem;">Lưu ý an toàn</h3>
                         <div style="display:flex; flex-direction:column; gap:16px;">
                             ${p.safetyTips.map(tip => `
                                 <div class="safety-item" style="background:${tip.severity === 'high' ? 'rgba(239,68,68,0.2)' : tip.severity === 'medium' ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)'}; border:1px solid ${tip.severity === 'high' ? 'rgba(239,68,68,0.3)' : tip.severity === 'medium' ? 'rgba(245,158,11,0.3)' : 'rgba(16,185,129,0.3)'}; border-radius:16px; padding:20px;">
@@ -2544,6 +2544,36 @@
                         ` : ''}
                     `;
                     document.querySelector('.left-col').insertBefore(safetySec, document.getElementById('reviews-sec'));
+                }
+
+                // Experiences Section
+                if (p.experiences && p.experiences.length > 0) {
+                    const expSec = document.createElement('div');
+                    expSec.className = 'bento-card';
+                    expSec.id = 'experiences-sec';
+                    expSec.innerHTML = `
+                        <span class="card-label">TRẢI NGHIỆM</span>
+                        <h3 class="card-title" style="margin-bottom:24px; font-size:1.8rem;">Những điểm nhấn đặc biệt</h3>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+                            ${p.experiences.map(e => `
+                                <div style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:12px; transition:transform 0.3s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
+                                    <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+                                        <div style="display:flex; align-items:center; gap:12px;">
+                                            <span style="font-size:2rem; background:rgba(99,102,241,0.1); width:48px; height:48px; display:flex; align-items:center; justify-content:center; border-radius:12px;">${e.icon||'✨'}</span>
+                                            <b style="font-size:1.1rem; color:var(--text-main); line-height:1.4;">${e.title}</b>
+                                        </div>
+                                    </div>
+                                    ${e.description ? `<p style="color:var(--text-dim); line-height:1.6; margin:0; font-size:0.95rem;">${e.description}</p>` : ''}
+                                    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:auto; padding-top:12px; border-top:1px solid rgba(255,255,255,0.05);">
+                                        ${e.difficulty ? `<span style="background:${e.difficulty==='hard'?'rgba(239,68,68,0.1)':e.difficulty==='medium'?'rgba(245,158,11,0.1)':'rgba(16,185,129,0.1)'}; color:${e.difficulty==='hard'?'#ef4444':e.difficulty==='medium'?'#f59e0b':'#10b981'}; padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:700;">${e.difficulty.toUpperCase()}</span>` : ''}
+                                        ${e.duration ? `<span style="background:rgba(255,255,255,0.05); color:var(--text-dim); padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:600;">⏱️ ${e.duration}</span>` : ''}
+                                        ${e.priceEstimate ? `<span style="background:rgba(255,255,255,0.05); color:var(--text-dim); padding:4px 10px; border-radius:8px; font-size:0.75rem; font-weight:600;">💰 ${Number(e.priceEstimate).toLocaleString('vi-VN')}đ</span>` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    document.querySelector('.left-col').insertBefore(expSec, document.getElementById('reviews-sec'));
                 }
 
                 // FAQ Section
@@ -2787,11 +2817,15 @@
 
             const source = (window.suggestedItineraries && window.suggestedItineraries.length > 0) ? window.suggestedItineraries : fallbacks;
             
-            const filtered = source.filter(it => 
-                (it.duration || "").includes(window.currentItineraryDays) && it.type === window.currentItineraryType
-            );
+            const daysStr = String(window.currentItineraryDays);
+            const filtered = source.filter(it => {
+                const dur = String(it.duration || '');
+                return dur.includes(daysStr) && it.type === window.currentItineraryType;
+            });
             
-            const it = filtered[0] || source.find(s => s.type === window.currentItineraryType) || source[0];
+            const it = filtered[0] 
+                || source.find(s => s.type === window.currentItineraryType) 
+                || source[0];
             if (!it) return;
 
             grid.innerHTML = (it.timeline || []).map((step, idx) => `

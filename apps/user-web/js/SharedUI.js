@@ -1438,15 +1438,69 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         ? `<p style="margin-bottom:8px;"><strong>📍 Địa chỉ:</strong> ${p.address || 'Liên hệ để biết vị trí chính xác'}</p>`
         : `<p style="margin-bottom:8px;"><strong>🚢 Di chuyển:</strong> ${p.transportTips || 'Bay đến sân bay gần nhất và di chuyển bằng taxi/bus.'}</p>`;
 
+      // --- Build Elite sections ---
+      const placeId = p.id || p._id || '';
+
+      // Overview
+      const overviewHtml = p.overview ? `<div style="margin-top:1.5rem;"><h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text);">📖 Tổng quan</h4><p style="line-height:1.7; color:var(--text-muted); font-size:0.95rem;">${p.overview}</p></div>` : '';
+
+      // Tags
+      const tagsHtml = (p.tags && p.tags.length) ? `<div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:8px;">${p.tags.map(t => `<span style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); border-radius:100px; padding:4px 14px; font-size:0.8rem; color:var(--accent); font-weight:600;">#${t}</span>`).join('')}</div>` : '';
+
+      // Quick Info grid
+      const qiItems = [];
+      if (p.openTime && p.closeTime) qiItems.push({icon:'🕐', label:'Giờ mở cửa', value:`${p.openTime} - ${p.closeTime}`});
+      if (p.visitDuration || p.tourDuration) qiItems.push({icon:'⏱️', label:'Thời lượng', value: p.visitDuration || p.tourDuration});
+      if (p.crowdLevel) qiItems.push({icon:'👥', label:'Đông đúc', value:{low:'Thấp',medium:'Trung bình',high:'Cao'}[p.crowdLevel]||p.crowdLevel});
+      if (p.costLevel) qiItems.push({icon:'💰', label:'Chi phí', value:{budget:'Tiết kiệm',standard:'Trung bình',luxury:'Sang trọng'}[p.costLevel]||p.costLevel});
+      if (p.suitability && p.suitability.length) qiItems.push({icon:'🎯', label:'Phù hợp', value: p.suitability.join(', ')});
+      if (p.bestTimeToVisit) qiItems.push({icon:'☀️', label:'Thời điểm đẹp', value: p.bestTimeToVisit});
+      if (p.bestSeason) qiItems.push({icon:'🌸', label:'Mùa đẹp nhất', value: p.bestSeason});
+      if (p.internetQuality) qiItems.push({icon:'🌐', label:'Internet', value:{poor:'Kém',fair:'TB',good:'Tốt',excellent:'Rất tốt'}[p.internetQuality]||p.internetQuality});
+      if (p.parking && p.parking !== 'none') qiItems.push({icon:'🅿️', label:'Đậu xe', value:{street:'Vỉa hè',lot:'Bãi đỗ',valet:'Valet'}[p.parking]||p.parking});
+      if (p.accessibility && p.accessibility.wheelchairAccessible) qiItems.push({icon:'♿', label:'Hỗ trợ', value:'Có hỗ trợ xe lăn'});
+      const quickInfoHtml = qiItems.length ? `<div style="margin-top:1.5rem;"><h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text);">ℹ️ Thông tin nhanh</h4><div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px;">${qiItems.map(q => `<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:12px; text-align:center;"><div style="font-size:1.4rem; margin-bottom:4px;">${q.icon}</div><div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; font-weight:700;">${q.label}</div><div style="font-size:0.85rem; font-weight:600; color:var(--text); margin-top:2px;">${q.value}</div></div>`).join('')}</div></div>` : '';
+
+      // Amenities
+      const amenIconMap = {'Lối đi xe lăn':'♿','Thang máy':'🛗','Bãi đậu xe':'🅿️','Thân thiện thú cưng':'🐾','Phòng không hút thuốc':'🚭','Hồ bơi':'🏊','Dịch vụ Spa':'💆','Phòng Gym':'🏋️','Buffet sáng':'🍳','Lễ tân 24/7':'🛎️','Két an toàn':'🔒','Wifi miễn phí':'🌐','Thanh toán thẻ':'💳','Camera an ninh':'🛡️','Nhà hàng & Bar':'🍷','Đưa đón sân bay':'🚐'};
+      const amenitiesHtml = (p.amenities && p.amenities.length) ? `<div style="margin-top:1.5rem;"><h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text);">🏨 Tiện nghi</h4><div style="display:flex; flex-wrap:wrap; gap:8px;">${p.amenities.map(a => `<span style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:8px 14px; font-size:0.85rem; display:inline-flex; align-items:center; gap:6px;"><span>${amenIconMap[a]||'✨'}</span>${a}</span>`).join('')}</div></div>` : '';
+
+      // Tour Itinerary
+      const tourItHtml = (p.tourItinerary && p.tourItinerary.length) ? `<div style="margin-top:1.5rem;"><h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text);">🗓️ Lịch trình Tour${p.tourDuration ? ' ('+p.tourDuration+')' : ''}</h4>${p.tourItinerary.map(t => `<div style="display:flex; gap:12px; margin-bottom:12px;"><div style="width:8px; height:8px; border-radius:50%; background:var(--accent); margin-top:7px; flex-shrink:0;"></div><div><strong style="color:var(--accent);">Ngày ${t.day||'?'}: ${t.title||''}</strong><p style="margin:4px 0 0; color:var(--text-muted); font-size:0.9rem;">${t.detail||''}</p></div></div>`).join('')}</div>` : '';
+
+      // Experiences
+      const expHtml = (p.experiences && p.experiences.length) ? `<div style="margin-top:1.5rem;"><h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text);">🌟 Trải nghiệm đặc biệt</h4><div style="display:flex; flex-direction:column; gap:12px;">${p.experiences.map(e => `<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:16px;"><div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;"><span style="font-size:1.5rem;">${e.icon||'✨'}</span><strong style="font-size:1rem;">${e.title||''}</strong>${e.difficulty?`<span style="background:${e.difficulty==='hard'?'rgba(239,68,68,0.2)':e.difficulty==='medium'?'rgba(245,158,11,0.2)':'rgba(16,185,129,0.2)'}; color:${e.difficulty==='hard'?'#ef4444':e.difficulty==='medium'?'#f59e0b':'#10b981'}; padding:2px 10px; border-radius:100px; font-size:0.7rem; font-weight:700;">${e.difficulty}</span>`:''}</div>${e.description?`<p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 8px;">${e.description}</p>`:''}<div style="display:flex; gap:16px; font-size:0.8rem; color:var(--text-muted);">${e.duration?`<span>⏱️ ${e.duration}</span>`:''}${e.priceEstimate?`<span>💰 ${Number(e.priceEstimate).toLocaleString('vi-VN')}đ</span>`:''}</div></div>`).join('')}</div></div>` : '';
+
+      // Suggested Itineraries
+      const sugItHtml = (p.suggestedItineraries && p.suggestedItineraries.length) ? `<div style="margin-top:1.5rem;"><h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text);">📋 Kế hoạch gợi ý</h4>${p.suggestedItineraries.map(plan => `<div style="background:rgba(99,102,241,0.05); border:1px solid rgba(99,102,241,0.15); border-radius:16px; padding:16px; margin-bottom:12px;"><div style="display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap;"><span style="background:var(--accent); color:#fff; padding:4px 12px; border-radius:8px; font-size:0.75rem; font-weight:700;">${{couple:'💕 Cặp đôi',family:'👨‍👩‍👧 Gia đình',budget:'💰 Tiết kiệm',luxury:'✨ Sang trọng',solo:'🧘 Solo',group:'👥 Nhóm'}[plan.type]||plan.type}</span><span style="color:var(--text-muted); font-size:0.85rem;">${plan.duration||''}</span>${plan.name?`<span style="color:var(--text); font-weight:600; font-size:0.85rem;">${plan.name}</span>`:''}</div>${(plan.timeline||[]).map(s => `<div style="display:flex; gap:10px; margin-bottom:8px;"><span style="color:var(--accent); font-weight:700; font-size:0.8rem; min-width:50px;">${s.time||''}</span><div style="flex:1;"><strong style="font-size:0.85rem;">${s.activity||''}</strong>${s.location?`<div style="font-size:0.8rem; color:var(--text-muted);">📍 ${s.location}</div>`:''}${s.tips?`<div style="font-size:0.8rem; color:var(--text-muted); opacity:0.7;">💡 ${s.tips}</div>`:''}${s.description?`<div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">${s.description}</div>`:''}</div></div>`).join('')}</div>`).join('')}</div>` : '';
+
+      // FAQs
+      const faqHtml = (p.faqs && p.faqs.length) ? `<div style="margin-top:1.5rem;"><h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text);">❓ Câu hỏi thường gặp</h4>${p.faqs.map((f,i) => `<div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:14px; margin-bottom:8px; overflow:hidden;"><button type="button" onclick="var a=this.nextElementSibling;a.style.display=a.style.display==='none'?'block':'none';this.querySelector('.fq-i').style.transform=a.style.display==='none'?'':'rotate(180deg)'" style="width:100%; padding:14px 16px; background:none; border:none; color:var(--text); font-weight:700; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; gap:8px; text-align:left;"><span style="flex:1;">${f.question}</span><span class="fq-i" style="transition:transform 0.3s; font-size:0.7rem;">▼</span></button><div style="display:none; padding:0 16px 14px; color:var(--text-muted); font-size:0.9rem; line-height:1.6; border-top:1px solid rgba(255,255,255,0.05);">${f.answer||''}</div></div>`).join('')}</div>` : '';
+
+      // Safety Tips + whatToBring + whatNotToDo
+      const safetyHtml = (p.safetyTips && p.safetyTips.length) || (p.whatToBring && p.whatToBring.length) || (p.whatNotToDo && p.whatNotToDo.length) ? `<div style="margin-top:1.5rem;"><h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text);">⚠️ An toàn & Lời khuyên</h4>${(p.safetyTips||[]).map(t => `<div style="background:${t.severity==='high'?'rgba(239,68,68,0.1)':t.severity==='medium'?'rgba(245,158,11,0.1)':'rgba(16,185,129,0.1)'}; border:1px solid ${t.severity==='high'?'rgba(239,68,68,0.2)':t.severity==='medium'?'rgba(245,158,11,0.2)':'rgba(16,185,129,0.2)'}; border-radius:12px; padding:12px 16px; margin-bottom:8px;"><strong>${t.title||''}</strong><p style="margin:4px 0 0; color:var(--text-muted); font-size:0.85rem;">${t.description||''}</p></div>`).join('')}${(p.whatToBring&&p.whatToBring.length)?`<div style="margin-top:12px;"><strong style="font-size:0.9rem;">🎒 Nên mang theo:</strong><div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">${p.whatToBring.map(i => `<span style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); border-radius:100px; padding:4px 12px; font-size:0.8rem;">${i}</span>`).join('')}</div></div>`:''}${(p.whatNotToDo&&p.whatNotToDo.length)?`<div style="margin-top:12px;"><strong style="font-size:0.9rem;">🚫 Không nên:</strong><div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;">${p.whatNotToDo.map(i => `<span style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); border-radius:100px; padding:4px 12px; font-size:0.8rem;">${i}</span>`).join('')}</div></div>`:''}</div>` : '';
+
+      // Contact info
+      const contactItems = [];
+      if (p.contactPhone) contactItems.push(`📞 ${p.contactPhone}`);
+      if (p.contactEmail) contactItems.push(`✉️ ${p.contactEmail}`);
+      if (p.website) contactItems.push(`🔗 <a href="${p.website}" target="_blank" style="color:var(--accent); text-decoration:none;">${p.website}</a>`);
+      const contactHtml = contactItems.length ? `<div style="margin-top:1rem; padding:1rem; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); border-radius:14px; display:flex; flex-wrap:wrap; gap:16px; font-size:0.9rem;">${contactItems.join(' <span style="opacity:0.3;">|</span> ')}</div>` : '';
+
+      // Video
+      const videoHtml = p.videoUrl ? `<div style="margin-top:1.5rem;"><h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text);">🎬 Video</h4><div style="border-radius:16px; overflow:hidden; aspect-ratio:16/9;">${p.videoUrl.includes('youtube.com') || p.videoUrl.includes('youtu.be') ? `<iframe src="${p.videoUrl.replace('watch?v=','embed/').replace('youtu.be/','youtube.com/embed/')}" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>` : `<a href="${p.videoUrl}" target="_blank" style="display:flex; align-items:center; justify-content:center; height:100%; background:rgba(255,255,255,0.03); color:var(--accent); font-weight:700;">▶ Xem video</a>`}</div></div>` : '';
+
       wrap.innerHTML = `
         <div class="place-view-content animate-in">
           <div class="place-detail__hero"><img src="${heroImage}" id="hero-target"></div>
           ${galleryHtml}
           <div class="place-detail__info-wrap">
             <h3 class="place-detail__title-v2">${p.name}</h3>
-            <p class="place-detail__meta-v2">🛡️ ${p.region} ${p.priceFrom ? `· Giá từ <strong style="color:var(--accent)">${new Intl.NumberFormat('vi-VN').format(p.priceFrom)}đ</strong>` : ''}</p>
+            <p class="place-detail__meta-v2">🛡️ ${p.region} ${p.priceFrom ? `· Giá từ <strong style="color:var(--accent)">${new Intl.NumberFormat('vi-VN').format(p.priceFrom)}đ</strong>` : ''}${p.priceTo ? ` — <s style="opacity:0.5">${new Intl.NumberFormat('vi-VN').format(p.priceTo)}đ</s>` : ''}</p>
             <p class="place-detail__desc" style="line-height:1.7; color:var(--text-muted); font-size:1rem;">${p.description || p.text || 'Thông tin chi tiết về dịch vụ này đang được cập nhật.'}</p>
-            
+            ${tagsHtml}
+            ${overviewHtml}
+
             ${p.highlights && p.highlights.length ? `
             <div style="margin-top:1.5rem;">
               <h4 style="margin-bottom:0.75rem; font-size:1.1rem; color:var(--text); display:flex; align-items:center; gap:8px;">✨ Điểm nổi bật</h4>
@@ -1454,6 +1508,10 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                 ${p.highlights.map(h => `<li style="margin-bottom:0.5rem;">${h}</li>`).join('')}
               </ul>
             </div>` : ''}
+
+            ${quickInfoHtml}
+            ${amenitiesHtml}
+            ${contactHtml}
 
             ${p.policy ? `
             <div style="margin-top:1.5rem;">
@@ -1467,6 +1525,13 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                ${transportHtml}
                ${p.sourceUrl ? `<p><strong>🔗 Tham khảo:</strong> <a href="${p.sourceUrl}" target="_blank" style="color:var(--accent); text-decoration:none;">${p.sourceName || 'Website chính thức'}</a></p>` : ''}
             </div>
+
+            ${tourItHtml}
+            ${expHtml}
+            ${videoHtml}
+            ${sugItHtml}
+            ${faqHtml}
+            ${safetyHtml}
           </div>
           ${actsHtml ? `
           <div class="place-detail__activities-v2">
@@ -1475,11 +1540,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           </div>` : ''}
           ${sectionsHtml}
           <div id="place-map" class="place-detail__map-v2"></div>
-          <div class="place-detail__actions-v2" style="padding: 1.5rem 2.5rem 2.5rem; display:flex; gap:12px;">
-            <button type="button" class="btn btn--primary" style="flex:1;" onclick="window.addStopById?addStopById('${p.id}'):null">Thêm vào lịch</button>
-            <button type="button" class="btn btn--ghost btn-wish-sync" style="flex:1;" onclick="window.toggleWish?toggleWish('${p.id}'):null">
+          <div class="place-detail__actions-v2" style="padding: 1.5rem 2.5rem 2.5rem; display:flex; gap:12px; flex-wrap:wrap;">
+            <button type="button" class="btn btn--primary" style="flex:1; min-width:140px;" onclick="window.addStopById?addStopById('${placeId}'):null">Thêm vào lịch</button>
+            <button type="button" class="btn btn--ghost btn-wish-sync" style="flex:1; min-width:140px;" onclick="window.toggleWish?toggleWish('${placeId}'):null">
               ♥ ${p.favoritesCount || 0}
             </button>
+            <a href="place-detail.html?id=${placeId}" class="btn btn--ghost" style="flex:1; min-width:140px; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:6px;">🔍 Xem đầy đủ</a>
           </div>
         </div>
         <div class="am-view-content" style="display:none;"></div>
@@ -1494,12 +1560,14 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         };
       });
 
-      // Map
-      if (window.L && p.lat) {
+      // Map — support both gpsCoordinates and legacy lat/lng
+      const mapLat = (p.gpsCoordinates && p.gpsCoordinates.lat) || p.lat;
+      const mapLng = (p.gpsCoordinates && p.gpsCoordinates.lng) || p.lng;
+      if (window.L && mapLat && mapLng) {
         setTimeout(() => {
-          const m = L.map("place-map", { scrollWheelZoom: false }).setView([p.lat, p.lng], 14);
+          const m = L.map("place-map", { scrollWheelZoom: false }).setView([mapLat, mapLng], 14);
           L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(m);
-          L.marker([p.lat, p.lng]).addTo(m);
+          L.marker([mapLat, mapLng]).addTo(m);
         }, 400);
       }
     } catch (e) {

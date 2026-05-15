@@ -155,12 +155,12 @@ router.get('/place/:id', async (req, res) => {
         .select('name displayName avatar isVerified customId contactPhone contactEmail');
     }
 
-    // Dùng place._doc nếu là Mongoose document, hoặc plain object nếu là fallback
-    const placeData = isFromDB ? (place._doc || place) : place;
+    // Dùng place trực tiếp (đã .lean() nên là plain object, không có _doc)
+    const placeData = place;
 
-    // Tăng viewsCount
-    if (isFromDB && mongoose.Types.ObjectId.isValid(id)) {
-      Place.findByIdAndUpdate(id, { $inc: { viewsCount: 1 } }).exec();
+    // Tăng viewsCount (hỗ trợ cả ObjectId lẫn custom string ID)
+    if (isFromDB && place._id) {
+      Place.findByIdAndUpdate(place._id, { $inc: { viewsCount: 1 } }).exec();
     }
 
     res.json({ success: true, data: { ...placeData, owner } });

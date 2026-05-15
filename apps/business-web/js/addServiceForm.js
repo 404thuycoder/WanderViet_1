@@ -20,9 +20,10 @@
       opacity: 0;
       visibility: hidden;
       transition: all 0.3s;
+      pointer-events: auto !important;
     }
-    .svc-modal-overlay.is-open { opacity: 1; visibility: visible; }
- 
+    .svc-modal-overlay.is-open { opacity: 1; visibility: visible; pointer-events: auto !important; }
+
     .svc-modal {
       background: #111827;
       width: 95%;
@@ -36,6 +37,7 @@
       border: 1px solid rgba(255,255,255,0.1);
       animation: modalSlideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
       color: #fff;
+      pointer-events: auto !important;
     }
     @keyframes modalSlideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
  
@@ -52,8 +54,8 @@
     .svc-modal-close { background: rgba(255,255,255,0.2); border: none; width: 36px; height: 36px; border-radius: 12px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
     .svc-modal-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
  
-    .svc-modal-body { padding: 0; overflow-y: auto; flex: 1; background: transparent; }
-    .svc-form { padding: 32px; display: flex; flex-direction: column; gap: 24px; }
+    .svc-modal-body { padding: 0; overflow-y: auto; flex: 1; background: transparent; pointer-events: auto !important; }
+    .svc-form { padding: 32px; display: flex; flex-direction: column; gap: 24px; pointer-events: auto !important; }
     
     .svc-section-title { font-size: 13px; font-weight: 800; color: #a5b4fc; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
     
@@ -94,15 +96,14 @@
 
     /* Amenities Grid UI */
     .amenities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 12px; }
-    .amenity-card { display: block; cursor: pointer; height: 100%; }
-    .amenity-card input { display: none; }
+    .amenity-card { display: block; cursor: pointer; height: 100%; position: relative; }
     .amenity-card-content {
       display: flex; align-items: center; gap: 12px; padding: 12px 16px;
       background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
       border-radius: 16px; transition: all 0.3s; height: 100%;
     }
     .amenity-card:hover .amenity-card-content { background: rgba(255,255,255,0.06); }
-    .amenity-card input:checked + .amenity-card-content {
+    .amenity-card.selected .amenity-card-content {
       background: rgba(99,102,241,0.1); border-color: #6366f1;
       box-shadow: 0 4px 15px rgba(99,102,241,0.15);
     }
@@ -111,11 +112,11 @@
       width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 10px;
       transition: all 0.3s;
     }
-    .amenity-card input:checked + .amenity-card-content .amenity-icon {
+    .amenity-card.selected .amenity-card-content .amenity-icon {
       background: #6366f1; color: #fff; transform: scale(1.1);
     }
     .amenity-name { font-size: 13px; font-weight: 600; color: #cbd5e1; transition: all 0.3s; }
-    .amenity-card input:checked + .amenity-card-content .amenity-name { color: #fff; }
+    .amenity-card.selected .amenity-card-content .amenity-name { color: #fff; }
 
     .premium-upload-box {
       display: flex;
@@ -131,25 +132,49 @@
       transition: all 0.3s;
       text-align: center;
       margin-top: 8px;
-      position: relative;
+      position: relative !important;
       overflow: hidden;
+      pointer-events: auto !important;
     }
     .premium-upload-box:hover {
       background: rgba(99, 102, 241, 0.1);
       border-color: #6366f1;
       box-shadow: 0 10px 30px rgba(99, 102, 241, 0.1);
     }
-    .premium-upload-box input[type="file"] {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      opacity: 0;
-      cursor: pointer;
-      z-index: 10;
-    }
     .upload-icon { font-size: 40px; margin-bottom: 5px; }
     .upload-text { font-size: 14px; font-weight: 700; color: #a5b4fc; }
     .upload-sub { font-size: 11px; color: #64748b; }
     .file-status { margin-top: 10px; font-size: 12px; font-weight: 800; color: #10b981; }
+
+    .native-file-input {
+      display: block;
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 8px;
+      color: #a5b4fc;
+      font-size: 12px;
+    }
+    .upload-trigger-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-top: 8px;
+      pointer-events: auto;
+    }
+    .upload-trigger-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
 
   `;
   document.head.appendChild(style);
@@ -175,22 +200,19 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                 <label class="svc-form-label">Tên dịch vụ/Tour *</label>
                 <input type="text" id="svc-name" class="svc-form-input" placeholder="Tên hiển thị thu hút khách hàng" required>
               </div>
-              <div class="svc-form-row" style="margin-bottom: 20px;">
-                <div class="svc-form-group">
-                  <label class="svc-form-label">Ảnh chính (URL)</label>
-                  <input type="text" id="svc-image" class="svc-form-input" placeholder="https://...">
-                </div>
-                <div class="svc-form-group">
-                  <label class="svc-form-label">Hoặc Upload ảnh/video (Tất cả định dạng)</label>
-                  <div class="premium-upload-box" onclick="document.getElementById('svc-image-file').click()">
-                    <input type="file" id="svc-image-file" accept="image/*" multiple onchange="window.handleSvcImagePreview(this, 'svc-primary-preview')">
-                    <div class="upload-icon">📁</div>
-                    <div class="upload-text">Nhấn để chọn từ thiết bị</div>
-                    <div class="upload-sub">Chấp nhận mọi loại ảnh (Tối đa 10MB/file)</div>
-                    <div class="file-status"></div>
-                  </div>
-                  <div id="svc-primary-preview" class="preview-container"></div>
-                </div>
+              <div class="svc-form-group" style="margin-bottom: 20px;">
+                <label class="svc-form-label">Ảnh chính (URL)</label>
+                <input type="text" id="svc-image" class="svc-form-input" placeholder="https://...">
+              </div>
+              <div class="svc-form-group" style="margin-bottom: 20px;">
+                <label class="svc-form-label">Upload ảnh/video từ thiết bị</label>
+                <label for="svc-image-file" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08)); border: 2px dashed rgba(99,102,241,0.3); border-radius: 16px; text-align: center; cursor: pointer; color: #a5b4fc; font-weight: 600; transition: all 0.3s; position: relative; overflow: hidden;">
+                  <div style="font-size: 32px; opacity: 0.8;">📁</div>
+                  <div style="font-size: 14px;">Click để chọn file</div>
+                  <div style="font-size: 11px; color: #64748b; font-weight: 400;">Hỗ trợ ảnh và video (tối đa 10MB/file)</div>
+                  <input type="file" id="svc-image-file" accept="image/*,video/*" multiple onchange="window.handleSvcImagePreview(this, 'svc-primary-preview')" style="position: absolute; opacity: 0; width: 1px; height: 1px;">
+                </label>
+                <div id="svc-primary-preview" class="preview-container"></div>
               </div>
               <div class="svc-form-row">
                 <div class="svc-form-group">
@@ -302,7 +324,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                 <div class="svc-form-group">
                   <label class="svc-form-label">Lịch trình chi tiết (Day-by-Day)</label>
                   <div id="itinerary-list" class="builder-list"></div>
-                  <div class="btn-add-item" id="btn-add-day">+ Thêm ngày hành trình</div>
+                  <button type="button" class="btn-add-item" id="btn-add-day">+ Thêm ngày hành trình</button>
                 </div>
               </div>
             </div>
@@ -331,18 +353,17 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                   <button type="button" id="ai-generate-highlights" style="background:linear-gradient(135deg, #6366f1, #a855f7); border:none; border-radius:8px; padding:6px 12px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;">✨ AI Tạo highlights</button>
                 </div>
                 <div id="highlight-list" class="builder-list"></div>
-                <div class="btn-add-item" id="btn-add-hl">+ Thêm điểm nổi bật</div>
+                <button type="button" class="btn-add-item" id="btn-add-hl">+ Thêm điểm nổi bật</button>
               </div>
               <div class="svc-form-group">
                 <label class="svc-form-label">Ảnh trưng bày (Gallery)</label>
                 <textarea id="svc-imgs" class="svc-form-input" style="height:60px; resize:none; margin-bottom:12px;" placeholder="Dán link ảnh tại đây (cách nhau bởi dấu phẩy)..."></textarea>
-                <div class="premium-upload-box" onclick="document.getElementById('svc-img-files').click()">
-                  <input type="file" id="svc-img-files" accept="image/*" multiple onchange="window.handleSvcImagePreview(this, 'svc-gallery-preview')">
-                  <div class="upload-icon">📸</div>
-                  <div class="upload-text">Tải lên bộ sưu tập</div>
-                  <div class="upload-sub">Chọn tối đa 10 ảnh chất lượng cao</div>
-                  <div class="file-status"></div>
-                </div>
+                <label for="svc-img-files" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08)); border: 2px dashed rgba(99,102,241,0.3); border-radius: 16px; text-align: center; cursor: pointer; color: #a5b4fc; font-weight: 600; transition: all 0.3s; position: relative; overflow: hidden; margin-top: 8px;">
+                  <div style="font-size: 32px; opacity: 0.8;">📸</div>
+                  <div style="font-size: 14px;">Click để chọn ảnh Gallery</div>
+                  <div style="font-size: 11px; color: #64748b; font-weight: 400;">Chọn nhiều ảnh cùng lúc</div>
+                  <input type="file" id="svc-img-files" accept="image/*" multiple onchange="window.handleSvcImagePreview(this, 'svc-gallery-preview')" style="position: absolute; opacity: 0; width: 1px; height: 1px;">
+                </label>
                 <div id="svc-gallery-preview" class="preview-container"></div>
               </div>
               <div class="svc-form-group">
@@ -352,22 +373,22 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
               <div class="svc-form-group">
                 <label class="svc-form-label">Trang thiết bị & Hỗ trợ (Amenities)</label>
                 <div class="amenities-grid">
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Lối đi xe lăn"><div class="amenity-card-content"><span class="amenity-icon">♿</span><span class="amenity-name">Lối đi xe lăn</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Thang máy"><div class="amenity-card-content"><span class="amenity-icon">🛗</span><span class="amenity-name">Thang máy</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Bãi đậu xe"><div class="amenity-card-content"><span class="amenity-icon">🅿️</span><span class="amenity-name">Bãi đậu xe</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Thân thiện thú cưng"><div class="amenity-card-content"><span class="amenity-icon">🐾</span><span class="amenity-name">Thân thiện thú cưng</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Phòng không hút thuốc"><div class="amenity-card-content"><span class="amenity-icon">🚭</span><span class="amenity-name">Phòng không hút thuốc</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Hồ bơi"><div class="amenity-card-content"><span class="amenity-icon">🏊</span><span class="amenity-name">Hồ bơi</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Dịch vụ Spa"><div class="amenity-card-content"><span class="amenity-icon">💆</span><span class="amenity-name">Dịch vụ Spa</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Phòng Gym"><div class="amenity-card-content"><span class="amenity-icon">🏋️</span><span class="amenity-name">Phòng Gym</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Buffet sáng"><div class="amenity-card-content"><span class="amenity-icon">🍳</span><span class="amenity-name">Buffet sáng</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Lễ tân 24/7"><div class="amenity-card-content"><span class="amenity-icon">🛎️</span><span class="amenity-name">Lễ tân 24/7</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Két an toàn"><div class="amenity-card-content"><span class="amenity-icon">🔒</span><span class="amenity-name">Két an toàn</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Wifi miễn phí"><div class="amenity-card-content"><span class="amenity-icon">🌐</span><span class="amenity-name">Wifi miễn phí</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Thanh toán thẻ"><div class="amenity-card-content"><span class="amenity-icon">💳</span><span class="amenity-name">Thanh toán thẻ</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Camera an ninh"><div class="amenity-card-content"><span class="amenity-icon">🛡️</span><span class="amenity-name">Camera an ninh</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Nhà hàng & Bar"><div class="amenity-card-content"><span class="amenity-icon">🍷</span><span class="amenity-name">Nhà hàng & Bar</span></div></label>
-                  <label class="amenity-card"><input type="checkbox" class="amenity-chk" value="Đưa đón sân bay"><div class="amenity-card-content"><span class="amenity-icon">🚐</span><span class="amenity-name">Đưa đón sân bay</span></div></label>
+                  <div class="amenity-card" data-value="Lối đi xe lăn" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">♿</span><span class="amenity-name">Lối đi xe lăn</span></div></div>
+                  <div class="amenity-card" data-value="Thang máy" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🛗</span><span class="amenity-name">Thang máy</span></div></div>
+                  <div class="amenity-card" data-value="Bãi đậu xe" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🅿️</span><span class="amenity-name">Bãi đậu xe</span></div></div>
+                  <div class="amenity-card" data-value="Thân thiện thú cưng" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🐾</span><span class="amenity-name">Thân thiện thú cưng</span></div></div>
+                  <div class="amenity-card" data-value="Phòng không hút thuốc" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🚭</span><span class="amenity-name">Phòng không hút thuốc</span></div></div>
+                  <div class="amenity-card" data-value="Hồ bơi" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🏊</span><span class="amenity-name">Hồ bơi</span></div></div>
+                  <div class="amenity-card" data-value="Dịch vụ Spa" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">💆</span><span class="amenity-name">Dịch vụ Spa</span></div></div>
+                  <div class="amenity-card" data-value="Phòng Gym" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🏋️</span><span class="amenity-name">Phòng Gym</span></div></div>
+                  <div class="amenity-card" data-value="Buffet sáng" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🍳</span><span class="amenity-name">Buffet sáng</span></div></div>
+                  <div class="amenity-card" data-value="Lễ tân 24/7" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🛎️</span><span class="amenity-name">Lễ tân 24/7</span></div></div>
+                  <div class="amenity-card" data-value="Két an toàn" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🔒</span><span class="amenity-name">Két an toàn</span></div></div>
+                  <div class="amenity-card" data-value="Wifi miễn phí" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🌐</span><span class="amenity-name">Wifi miễn phí</span></div></div>
+                  <div class="amenity-card" data-value="Thanh toán thẻ" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">💳</span><span class="amenity-name">Thanh toán thẻ</span></div></div>
+                  <div class="amenity-card" data-value="Camera an ninh" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🛡️</span><span class="amenity-name">Camera an ninh</span></div></div>
+                  <div class="amenity-card" data-value="Nhà hàng & Bar" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🍷</span><span class="amenity-name">Nhà hàng & Bar</span></div></div>
+                  <div class="amenity-card" data-value="Đưa đón sân bay" onclick="this.classList.toggle('selected')"><div class="amenity-card-content"><span class="amenity-icon">🚐</span><span class="amenity-name">Đưa đón sân bay</span></div></div>
                 </div>
               </div>
             </div>
@@ -436,13 +457,13 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
               <div class="svc-form-group">
                 <label class="svc-form-label">Accessibility (Tiện ích cho người khuyết tật)</label>
                 <div style="display:flex; gap:16px; flex-wrap:wrap;">
-                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <label for="svc-wheelchair" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
                     <input type="checkbox" id="svc-wheelchair"> Lăn xe
                   </label>
-                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <label for="svc-elevator" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
                     <input type="checkbox" id="svc-elevator"> Thang máy
                   </label>
-                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                  <label for="svc-restroom" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
                     <input type="checkbox" id="svc-restroom"> Nhà vệ sinh
                   </label>
                 </div>
@@ -453,7 +474,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
             <div class="svc-section">
               <div class="svc-section-title">Trải nghiệm đặc biệt</div>
               <div id="experience-list" class="builder-list"></div>
-              <div class="btn-add-item" id="btn-add-exp">+ Thêm trải nghiệm</div>
+              <button type="button" class="btn-add-item" id="btn-add-exp">+ Thêm trải nghiệm</button>
             </div>
 
             <!-- SECTION 6b: LỊCH TRÌNH GỢI Ý (LÊN KẾ HOẠCH) - MULTI-PLAN -->
@@ -479,7 +500,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                 <button type="button" id="ai-generate-faq" style="background:linear-gradient(135deg, #6366f1, #a855f7); border:none; border-radius:8px; padding:6px 12px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;">✨ AI Tạo FAQ</button>
               </div>
               <div id="faq-list" class="builder-list"></div>
-              <div class="btn-add-item" id="btn-add-faq">+ Thêm FAQ</div>
+              <button type="button" class="btn-add-item" id="btn-add-faq">+ Thêm FAQ</button>
             </div>
 
             <!-- SECTION 8: SAFETY & TIPS -->
@@ -488,17 +509,17 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
               <div class="svc-form-group">
                 <label class="svc-form-label">Cảnh báo an toàn</label>
                 <div id="safety-list" class="builder-list"></div>
-                <div class="btn-add-item" id="btn-add-safety">+ Thêm cảnh báo</div>
+                <button type="button" class="btn-add-item" id="btn-add-safety">+ Thêm cảnh báo</button>
               </div>
               <div class="svc-form-group">
                 <label class="svc-form-label">Nên mang theo</label>
                 <div id="bring-list" class="builder-list"></div>
-                <div class="btn-add-item" id="btn-add-bring">+ Thêm vật dụng</div>
+                <button type="button" class="btn-add-item" id="btn-add-bring">+ Thêm vật dụng</button>
               </div>
               <div class="svc-form-group">
                 <label class="svc-form-label">Không nên làm</label>
                 <div id="avoid-list" class="builder-list"></div>
-                <div class="btn-add-item" id="btn-add-avoid">+ Thêm điều tránh</div>
+                <button type="button" class="btn-add-item" id="btn-add-avoid">+ Thêm điều tránh</button>
               </div>
             </div>
 
@@ -559,7 +580,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
           div.className = 'preview-item';
           div.innerHTML = `
             <img src="${e.target.result}">
-            <button class="remove-btn" onclick="window.removeSvcFile('${input.id}', ${index}, '${previewId}')">&times;</button>
+            <button type="button" class="remove-btn" onclick="window.removeSvcFile('${input.id}', ${index}, '${previewId}')">&times;</button>
           `;
           container.appendChild(div);
         };
@@ -662,7 +683,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   // --- LOGIC: BUILDER HÀNH TRÌNH ---
   const itineraryList = document.getElementById('itinerary-list');
   const btnAddDay = document.getElementById('btn-add-day');
-  btnAddDay.addEventListener('click', () => {
+  if (btnAddDay) btnAddDay.addEventListener('click', async () => {
     const dayNum = itineraryList.children.length + 1;
     const div = document.createElement('div');
     div.className = 'builder-item';
@@ -679,7 +700,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   // --- LOGIC: BUILDER HIGHLIGHTS ---
   const hlList = document.getElementById('highlight-list');
   const btnAddHl = document.getElementById('btn-add-hl');
-  btnAddHl.addEventListener('click', () => {
+  if (btnAddHl) btnAddHl.addEventListener('click', async () => {
     const div = document.createElement('div');
     div.className = 'builder-item';
     div.innerHTML = `
@@ -693,7 +714,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   // --- LOGIC: BUILDER EXPERIENCES ---
   const expList = document.getElementById('experience-list');
   const btnAddExp = document.getElementById('btn-add-exp');
-  btnAddExp.addEventListener('click', () => {
+  if (btnAddExp) btnAddExp.addEventListener('click', async () => {
     const div = document.createElement('div');
     div.className = 'builder-item';
     div.style.flexDirection = 'column';
@@ -777,14 +798,14 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     return block;
   }
 
-  btnAddPlan.addEventListener('click', () => {
+  if (btnAddPlan) btnAddPlan.addEventListener('click', async () => {
     plansContainer.appendChild(createPlanBlock());
   });
 
   // --- LOGIC: BUILDER FAQ ---
   const faqList = document.getElementById('faq-list');
   const btnAddFaq = document.getElementById('btn-add-faq');
-  btnAddFaq.addEventListener('click', () => {
+  if (btnAddFaq) btnAddFaq.addEventListener('click', async () => {
     const div = document.createElement('div');
     div.className = 'builder-item';
     div.style.flexDirection = 'column';
@@ -798,15 +819,49 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     faqList.appendChild(div);
   });
 
+  
+  // --- LOGIC: IMAGE PREVIEW ---
+  window.handleSvcImagePreview = function(input, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    if (input.files) {
+      Array.from(input.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const div = document.createElement('div');
+          div.className = 'preview-item';
+          div.innerHTML = `
+            <img src="${e.target.result}">
+            <button type="button" class="remove-btn">✕</button>
+          `;
+          div.querySelector('.remove-btn').onclick = () => div.remove();
+          container.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
   // --- LOGIC: BUILDER SAFETY ---
   const safetyList = document.getElementById('safety-list');
   const btnAddSafety = document.getElementById('btn-add-safety');
-  btnAddSafety.addEventListener('click', () => {
+  if (btnAddSafety) btnAddSafety.addEventListener('click', async () => {
     const div = document.createElement('div');
     div.className = 'builder-item';
+    div.style.flexDirection = 'column';
+    div.style.alignItems = 'stretch';
     div.innerHTML = `
-      <input type="text" placeholder="Cảnh báo an toàn" class="safety-input">
-      <span class="builder-btn-remove">✕</span>
+      <div style="display:flex; gap:10px; margin-bottom:8px;">
+        <input type="text" placeholder="Tiêu đề cảnh báo (VD: Độ dốc cao)" class="safety-title" style="flex:1;">
+        <select class="safety-severity" style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; padding:0 8px;">
+          <option value="low">🟢 Nhẹ</option>
+          <option value="medium" selected>🟡 Trung bình</option>
+          <option value="high">🔴 Nghiêm trọng</option>
+        </select>
+      </div>
+      <textarea placeholder="Mô tả chi tiết cảnh báo..." class="safety-desc" style="height:60px; resize:none; padding:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; font-size:12px;"></textarea>
+      <span class="builder-btn-remove" style="align-self:flex-end; margin-top:8px;">✕ Xóa cảnh báo</span>
     `;
     div.querySelector('.builder-btn-remove').onclick = () => div.remove();
     safetyList.appendChild(div);
@@ -815,7 +870,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   // --- LOGIC: BUILDER BRING ---
   const bringList = document.getElementById('bring-list');
   const btnAddBring = document.getElementById('btn-add-bring');
-  btnAddBring.addEventListener('click', () => {
+  if (btnAddBring) btnAddBring.addEventListener('click', async () => {
     const div = document.createElement('div');
     div.className = 'builder-item';
     div.innerHTML = `
@@ -829,7 +884,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   // --- LOGIC: BUILDER AVOID ---
   const avoidList = document.getElementById('avoid-list');
   const btnAddAvoid = document.getElementById('btn-add-avoid');
-  btnAddAvoid.addEventListener('click', () => {
+  if (btnAddAvoid) btnAddAvoid.addEventListener('click', async () => {
     const div = document.createElement('div');
     div.className = 'builder-item';
     div.innerHTML = `
@@ -846,7 +901,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   const btnAIFAQ = document.getElementById('ai-generate-faq');
   const btnAISEO = document.getElementById('ai-optimize-seo');
 
-  btnAIDesc.addEventListener('click', async () => {
+  if (btnAIDesc) btnAIDesc.addEventListener('click', async () => {
     const name = document.getElementById('svc-name').value;
     const kind = document.getElementById('svc-kind').value;
     const region = document.getElementById('svc-region').value;
@@ -877,7 +932,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     }
   });
 
-  btnAIHighlights.addEventListener('click', async () => {
+  if (btnAIHighlights) btnAIHighlights.addEventListener('click', async () => {
     const name = document.getElementById('svc-name').value;
     const description = document.getElementById('svc-desc').value;
 
@@ -917,7 +972,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     }
   });
 
-  btnAIFAQ.addEventListener('click', async () => {
+  if (btnAIFAQ) btnAIFAQ.addEventListener('click', async () => {
     const name = document.getElementById('svc-name').value;
     const description = document.getElementById('svc-desc').value;
 
@@ -961,7 +1016,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     }
   });
 
-  btnAISEO.addEventListener('click', async () => {
+  if (btnAISEO) btnAISEO.addEventListener('click', async () => {
     const name = document.getElementById('svc-name').value;
     const description = document.getElementById('svc-desc').value;
 
@@ -1006,6 +1061,8 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
 
   const close = () => {
     overlay.classList.remove('is-open');
+    // Restore is-logging-in class when modal closes
+    document.body.classList.add('is-logging-in');
     form.reset();
     itineraryList.innerHTML = '';
     hlList.innerHTML = '';
@@ -1040,8 +1097,8 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
 
     // Collect amenities
     const amenities = [];
-    document.querySelectorAll('.amenity-chk:checked').forEach(cb => {
-      amenities.push(cb.value);
+    document.querySelectorAll('.amenity-card.selected').forEach(c => {
+      amenities.push(c.dataset.value);
     });
 
     // Collect tags
@@ -1197,7 +1254,17 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
 
     // Safety & Tips
     const safetyTips = [];
-    document.querySelectorAll('#safety-list .safety-input').forEach(i => { if(i.value) safetyTips.push({ category: 'general', title: i.value, description: i.value, severity: 'medium' }) });
+    document.querySelectorAll('#safety-list .builder-item').forEach(div => {
+      const title = div.querySelector('.safety-title') ? div.querySelector('.safety-title').value : '';
+      if (title) {
+        safetyTips.push({
+          category: 'general',
+          title: title,
+          description: div.querySelector('.safety-desc') ? div.querySelector('.safety-desc').value : '',
+          severity: div.querySelector('.safety-severity') ? div.querySelector('.safety-severity').value : 'medium'
+        });
+      }
+    });
     payload.append('safetyTips', JSON.stringify(safetyTips));
 
     const whatToBring = [];

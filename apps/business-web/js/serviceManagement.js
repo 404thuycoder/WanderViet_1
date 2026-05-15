@@ -237,6 +237,8 @@
         add() {
             const eliteModal = document.getElementById('add-svc-overlay');
             if (eliteModal) {
+                // Remove is-logging-in class to enable clicks
+                document.body.classList.remove('is-logging-in');
                 eliteModal.classList.add('is-open');
                 if (window.initEliteMap) window.initEliteMap();
             } else {

@@ -206,12 +206,11 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
               </div>
               <div class="svc-form-group" style="margin-bottom: 20px;">
                 <label class="svc-form-label">Upload ảnh/video từ thiết bị</label>
-                <label for="svc-image-file" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08)); border: 2px dashed rgba(99,102,241,0.3); border-radius: 16px; text-align: center; cursor: pointer; color: #a5b4fc; font-weight: 600; transition: all 0.3s; position: relative; overflow: hidden;">
+                <div id="svc-image-picker" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08)); border: 2px dashed rgba(99,102,241,0.3); border-radius: 16px; text-align: center; cursor: pointer; color: #a5b4fc; font-weight: 600; transition: all 0.3s; position: relative; overflow: hidden;">
                   <div style="font-size: 32px; opacity: 0.8;">📁</div>
                   <div style="font-size: 14px;">Click để chọn file</div>
                   <div style="font-size: 11px; color: #64748b; font-weight: 400;">Hỗ trợ ảnh và video (tối đa 10MB/file)</div>
-                  <input type="file" id="svc-image-file" accept="image/*,video/*" multiple onchange="window.handleSvcImagePreview(this, 'svc-primary-preview')" style="position: absolute; opacity: 0; width: 1px; height: 1px;">
-                </label>
+                </div>
                 <div id="svc-primary-preview" class="preview-container"></div>
               </div>
               <div class="svc-form-row">
@@ -358,12 +357,11 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
               <div class="svc-form-group">
                 <label class="svc-form-label">Ảnh trưng bày (Gallery)</label>
                 <textarea id="svc-imgs" class="svc-form-input" style="height:60px; resize:none; margin-bottom:12px;" placeholder="Dán link ảnh tại đây (cách nhau bởi dấu phẩy)..."></textarea>
-                <label for="svc-img-files" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08)); border: 2px dashed rgba(99,102,241,0.3); border-radius: 16px; text-align: center; cursor: pointer; color: #a5b4fc; font-weight: 600; transition: all 0.3s; position: relative; overflow: hidden; margin-top: 8px;">
+                <div id="svc-gallery-picker" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08)); border: 2px dashed rgba(99,102,241,0.3); border-radius: 16px; text-align: center; cursor: pointer; color: #a5b4fc; font-weight: 600; transition: all 0.3s; position: relative; overflow: hidden; margin-top: 8px;">
                   <div style="font-size: 32px; opacity: 0.8;">📸</div>
                   <div style="font-size: 14px;">Click để chọn ảnh Gallery</div>
                   <div style="font-size: 11px; color: #64748b; font-weight: 400;">Chọn nhiều ảnh cùng lúc</div>
-                  <input type="file" id="svc-img-files" accept="image/*" multiple onchange="window.handleSvcImagePreview(this, 'svc-gallery-preview')" style="position: absolute; opacity: 0; width: 1px; height: 1px;">
-                </label>
+                </div>
                 <div id="svc-gallery-preview" class="preview-container"></div>
               </div>
               <div class="svc-form-group">
@@ -558,6 +556,35 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   chkTour.onchange = () => {
     tourFields.style.display = chkTour.checked ? 'flex' : 'none';
   };
+
+  // --- DYNAMIC FILE PICKER ---
+  const imagePicker = document.getElementById('svc-image-picker');
+  if (imagePicker) {
+    imagePicker.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*,video/*';
+      input.multiple = true;
+      input.onchange = (e) => {
+        window.handleSvcImagePreview(e.target, 'svc-primary-preview');
+      };
+      input.click();
+    });
+  }
+
+  const galleryPicker = document.getElementById('svc-gallery-picker');
+  if (galleryPicker) {
+    galleryPicker.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.multiple = true;
+      input.onchange = (e) => {
+        window.handleSvcImagePreview(e.target, 'svc-gallery-preview');
+      };
+      input.click();
+    });
+  }
 
   // Helper for image preview - defined outside initMap to ensure availability
   window.handleSvcImagePreview = (input, previewId) => {

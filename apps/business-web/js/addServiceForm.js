@@ -54,18 +54,68 @@
     .svc-modal-close { background: rgba(255,255,255,0.2); border: none; width: 36px; height: 36px; border-radius: 12px; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
     .svc-modal-close:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
  
-    .svc-modal-body { padding: 0; overflow-y: auto; flex: 1; background: transparent; pointer-events: auto !important; }
-    .svc-form { padding: 32px; display: flex; flex-direction: column; gap: 24px; pointer-events: auto !important; }
+    .svc-modal-body { 
+      padding: 0; 
+      overflow-y: auto; 
+      flex: 1; 
+      background: #111827; 
+      pointer-events: auto !important; 
+      scrollbar-width: thin;
+      scrollbar-color: #374151 transparent;
+    }
+    .svc-modal-body::-webkit-scrollbar { width: 6px; }
+    .svc-modal-body::-webkit-scrollbar-thumb { background: #374151; border-radius: 10px; }
+
+    .svc-form { 
+      padding: 32px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 32px; 
+      pointer-events: auto !important; 
+      box-sizing: border-box;
+    }
     
-    .svc-section-title { font-size: 13px; font-weight: 800; color: #a5b4fc; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+    .svc-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .svc-section-title { 
+      font-size: 13px; 
+      font-weight: 800; 
+      color: #a5b4fc; 
+      text-transform: uppercase; 
+      letter-spacing: 2px; 
+      margin-bottom: 8px; 
+      border-bottom: 1px solid rgba(255,255,255,0.05); 
+      padding-bottom: 8px; 
+    }
     
-    .svc-form-group { display: flex; flex-direction: column; gap: 8px; }
+    .svc-form-group { display: flex; flex-direction: column; gap: 8px; width: 100%; box-sizing: border-box; }
     .svc-form-label { font-size: 13px; font-weight: 700; color: #94a3b8; }
-    .svc-form-input { border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 12px 16px; font-size: 14px; transition: all 0.2s; background: rgba(255,255,255,0.03); color: #fff; font-family: inherit; }
+    .svc-form-input { 
+      border: 1px solid rgba(255,255,255,0.1); 
+      border-radius: 14px; 
+      padding: 12px 16px; 
+      font-size: 14px; 
+      transition: all 0.2s; 
+      background: rgba(255,255,255,0.03); 
+      color: #fff; 
+      font-family: inherit; 
+      width: 100%;
+      box-sizing: border-box;
+    }
     .svc-form-input:focus { outline: none; border-color: #6366f1; background: rgba(255,255,255,0.06); box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
     .svc-form-input::placeholder { color: #4b5563; }
     
-    .svc-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .svc-form-row { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 20px; 
+      width: 100%;
+      box-sizing: border-box;
+    }
  
     /* List Builder UI */
     .builder-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
@@ -75,8 +125,18 @@
     .builder-btn-remove:hover { background: rgba(239,68,68,0.1); }
     .btn-add-item { width: fit-content; padding: 8px 16px; border-radius: 10px; border: 1px dashed rgba(99,102,241,0.3); color: #a5b4fc; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 8px; }
     .btn-add-item:hover { background: rgba(99,102,241,0.05); border-color: #6366f1; }
- 
-    .svc-modal-footer { padding: 24px 32px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: flex-end; gap: 16px; background: rgba(0,0,0,0.1); }
+  
+    .svc-modal-footer { 
+      padding: 24px 32px; 
+      border-top: 1px solid rgba(255,255,255,0.05); 
+      display: flex; 
+      justify-content: flex-end; 
+      gap: 16px; 
+      background: #111827; 
+      position: sticky;
+      bottom: 0;
+      z-index: 100;
+    }
     .btn-svc { padding: 14px 28px; border-radius: 16px; font-size: 15px; font-weight: 800; cursor: pointer; transition: 0.3s; border: none; font-family: inherit; }
     .btn-svc-cancel { background: rgba(255,255,255,0.05); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1); }
     .btn-svc-cancel:hover { background: rgba(255,255,255,0.08); }
@@ -216,78 +276,91 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
         </div>
         <div class="svc-modal-body">
           <form id="add-svc-form" class="svc-form">
-            <!-- SECTION 1: CƠ BẢN -->
+            <!-- SECTION 1: THÔNG TIN CƠ BẢN -->
             <div class="svc-section">
-              <div class="svc-section-title">Thông tin cơ bản</div>
-              <div class="svc-form-group" style="margin-bottom: 20px;">
-                <label class="svc-form-label">Tên dịch vụ/Tour *</label>
-                <input type="text" id="svc-name" class="svc-form-input" placeholder="Tên hiển thị thu hút khách hàng" required>
+              <div class="svc-section-title">✨ Thông tin cơ bản</div>
+              <div class="svc-form-group">
+                <label class="svc-form-label">Tên dịch vụ / Trải nghiệm *</label>
+                <input type="text" id="svc-name" class="svc-form-input" placeholder="VD: Khách sạn Mường Thanh Tuyên Quang" required>
               </div>
-              <div class="svc-form-group" style="margin-bottom: 20px;">
-                <label class="svc-form-label">Ảnh chính (URL)</label>
-                <input type="text" id="svc-image" class="svc-form-input" placeholder="https://...">
-              </div>
-              <div class="svc-form-group" style="margin-bottom: 20px;">
-                <label class="svc-form-label">Upload ảnh/video từ thiết bị</label>
-                <div id="svc-image-picker" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08)); border: 2px dashed rgba(99,102,241,0.3); border-radius: 16px; text-align: center; cursor: pointer; color: #a5b4fc; font-weight: 600; transition: all 0.3s; position: relative; overflow: hidden;">
-                  <div style="font-size: 32px; opacity: 0.8;">📁</div>
-                  <div style="font-size: 14px;">Click để chọn file</div>
-                  <div id="svc-image-status" style="font-size: 11px; color: #64748b; font-weight: 400;">Hỗ trợ ảnh và video (tối đa 10MB/file)</div>
-                </div>
-                <div id="svc-primary-preview" class="preview-container"></div>
-              </div>
+
               <div class="svc-form-row">
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Phân loại *</label>
+                  <label class="svc-form-label">Phân loại dịch vụ *</label>
                   <select id="svc-kind" class="svc-form-input">
-                    <option value="trai-nghiem">Trải nghiệm / Điểm đến</option>
-                    <option value="khach-san">Khách sạn / Villa</option>
-                    <option value="nha-hang">Nhà hàng / Quán ăn</option>
-                    <option value="giai-tri">Giải trí / Sự kiện</option>
-                    <option value="tien-ich">Tiện ích du lịch</option>
+                    <option value="khach-san">🏨 Lưu trú Elite</option>
+                    <option value="trai-nghiem">🛶 Trải nghiệm & Điểm đến</option>
+                    <option value="nha-hang">🍴 Ẩm thực thượng hạng</option>
+                    <option value="giai-tri">🎭 Giải trí & Sự kiện</option>
+                    <option value="tien-ich">🛠️ Tiện ích cao cấp</option>
                   </select>
                 </div>
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Nhóm quản lý *</label>
+                  <label class="svc-form-label">Danh mục quản lý *</label>
                   <select id="svc-businessCategory" class="svc-form-input">
-                    <option value="dining">Ẩm thực (Dining)</option>
-                    <option value="stay">Lưu trú (Stay)</option>
-                    <option value="tour">Tour & Trải nghiệm</option>
-                    <option value="facility">Tiện ích & Cơ sở vật chất</option>
-                    <option value="other">Khác</option>
+                    <option value="stay">🏨 Lưu trú (Stay)</option>
+                    <option value="dining">🍴 Ẩm thực (Dining)</option>
+                    <option value="tour">🛶 Tour & Trải nghiệm</option>
+                    <option value="facility">🛠️ Tiện ích & Cơ sở vật chất</option>
+                    <option value="other">🎯 Khác</option>
                   </select>
                 </div>
               </div>
-              <div class="svc-form-row" style="margin-top: 20px;">
+
+              <div class="svc-form-row">
                 <div class="svc-form-group">
                   <label class="svc-form-label">Giá khởi điểm (VND) *</label>
-                  <input type="number" id="svc-price" class="svc-form-input" placeholder="1999998" required>
+                  <input type="number" id="svc-price" class="svc-form-input" placeholder="1000000" required>
                 </div>
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Giá gốc (VND) — để hiện giảm giá</label>
-                  <input type="number" id="svc-price-to" class="svc-form-input" placeholder="2499998">
+                  <label class="svc-form-label">Giá gốc (VND)</label>
+                  <input type="number" id="svc-price-to" class="svc-form-input" placeholder="1500000">
                 </div>
+              </div>
+
+              <div class="svc-form-group">
+                <label class="svc-form-label">Ảnh đại diện chính (URL)</label>
+                <input type="text" id="svc-image" class="svc-form-input" placeholder="https://...">
+              </div>
+
+              <div class="svc-form-group">
+                <label class="svc-form-label">Tải lên ảnh/video bìa chính</label>
+                <div id="svc-image-picker" class="premium-upload-box">
+                  <div class="upload-icon">📁</div>
+                  <div class="upload-text">Thả file hoặc Click để chọn</div>
+                  <div id="svc-image-status" class="upload-sub">Hỗ trợ định dạng Media chất lượng cao</div>
+                </div>
+                <div id="svc-primary-preview" class="preview-container"></div>
               </div>
             </div>
 
             <!-- SECTION 2: ĐỊA ĐIỂM & LIÊN HỆ -->
             <div class="svc-section">
-              <div class="svc-section-title">Địa điểm & Liên hệ</div>
+              <div class="svc-section-title">📍 Địa điểm & Liên hệ</div>
               <div class="svc-form-row">
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Vùng/Miền *</label>
-                  <input type="text" id="svc-region" class="svc-form-input" placeholder="VD: Sapa, Lào Cai" required>
+                  <label class="svc-form-label">Khu vực (Tỉnh/Thành phố) *</label>
+                  <input type="text" id="svc-region" class="svc-form-input" placeholder="VD: Tuyên Quang" required>
                 </div>
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Thành phố</label>
-                  <input type="text" id="svc-city" class="svc-form-input" placeholder="VD: Hà Nội">
+                  <label class="svc-form-label">Thành phố/Quận huyện</label>
+                  <input type="text" id="svc-city" class="svc-form-input" placeholder="VD: TP Tuyên Quang">
                 </div>
               </div>
-              <div class="svc-form-group" style="margin-top: 15px;">
-                <label class="svc-form-label">Địa chỉ chính xác</label>
+              
+              <div class="svc-form-group">
+                <label class="svc-form-label">Địa chỉ chi tiết</label>
                 <input type="text" id="svc-address" class="svc-form-input" placeholder="Số nhà, Tên đường...">
               </div>
-              <div class="svc-form-row" style="margin-top: 15px;">
+
+              <div class="svc-form-group">
+                <label class="svc-form-label">Định vị chính xác</label>
+                <div id="svc-map" style="height: 250px; width: 100%; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);"></div>
+                <input type="hidden" id="svc-lat" value="21.0285">
+                <input type="hidden" id="svc-lng" value="105.8542">
+              </div>
+
+              <div class="svc-form-row">
                 <div class="svc-form-group">
                   <label class="svc-form-label">Số điện thoại</label>
                   <input type="text" id="svc-phone" class="svc-form-input" placeholder="090...">
@@ -297,11 +370,13 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                   <input type="email" id="svc-email" class="svc-form-input" placeholder="info@example.com">
                 </div>
               </div>
-              <div class="svc-form-group" style="margin-top: 15px;">
-                <label class="svc-form-label">Website</label>
+
+              <div class="svc-form-group">
+                <label class="svc-form-label">Website doanh nghiệp</label>
                 <input type="text" id="svc-website" class="svc-form-input" placeholder="https://...">
               </div>
-              <div class="svc-form-row" style="margin-top: 15px;">
+
+              <div class="svc-form-row">
                 <div class="svc-form-group">
                   <label class="svc-form-label">Giờ mở cửa</label>
                   <input type="text" id="svc-open-time" class="svc-form-input" placeholder="08:00">
@@ -311,24 +386,11 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                   <input type="text" id="svc-close-time" class="svc-form-input" placeholder="22:00">
                 </div>
               </div>
-              <div class="svc-form-row" style="margin-top: 15px;">
-                <div class="svc-form-group" style="width: 100%;">
-                  <label class="svc-form-label">Định vị Bản đồ (Chọn vị trí chính xác)</label>
-                  <p style="font-size:12px; color:#94a3b8; margin-bottom:8px;">Kéo thả ghim trên bản đồ để tự động lấy tọa độ.</p>
-                  <div id="svc-map" style="height: 250px; width: 100%; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); z-index: 1;"></div>
-                  <input type="hidden" id="svc-lat" value="21.0285">
-                  <input type="hidden" id="svc-lng" value="105.8542">
-                </div>
-              </div>
             </div>
 
-            <!-- SECTION 3: TOUR SPECIFIC (Conditional) -->
-            <div class="svc-section" id="tour-extras" style="background: rgba(99,102,241,0.03); padding: 20px; border-radius: 20px; border: 1px dashed rgba(99,102,241,0.2);">
-              <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
-                <input type="checkbox" id="svc-is-tour" style="width:20px; height:20px; cursor:pointer;">
-                <label for="svc-is-tour" class="svc-form-label" style="cursor:pointer; margin:0;">Đây là Tour du lịch (Có lịch trình & ngày đi)</label>
-              </div>
-              <div id="tour-fields" style="display:none; gap:20px; flex-direction:column;">
+            <!-- SECTION 3: THÔNG TIN TOUR (Mở rộng) -->
+            <div class="svc-section" id="tour-extras" style="background: rgba(99,102,241,0.03); padding: 24px; border-radius: 24px; border: 1.5px dashed rgba(99,102,241,0.2);">
+              <div id="tour-fields" style="display:flex; gap:20px; flex-direction:column;">
                 <div class="svc-form-row">
                    <div class="svc-form-group">
                      <label class="svc-form-label">Thời lượng</label>
@@ -337,49 +399,45 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                    <div class="svc-form-group">
                      <label class="svc-form-label">Độ khó</label>
                      <select id="svc-diff" class="svc-form-input">
-                       <option value="easy">Dễ dàng (Easy)</option>
-                       <option value="medium">Vừa sức (Medium)</option>
-                       <option value="hard">Thử thách (Hard)</option>
+                       <option value="easy">🟢 Dễ dàng (Easy)</option>
+                       <option value="medium" selected>🟡 Vừa sức (Medium)</option>
+                       <option value="hard">🔴 Thử thách (Hard)</option>
                      </select>
                    </div>
-                </div>
-                <div class="svc-form-group">
-                  <label class="svc-form-label">Lịch trình chi tiết (Day-by-Day)</label>
-                  <div id="itinerary-list" class="builder-list"></div>
-                  <button type="button" class="btn-add-item" id="btn-add-day">+ Thêm ngày hành trình</button>
                 </div>
                 <div class="svc-form-row">
                   <div class="svc-form-group">
                     <label class="svc-form-label">✅ Bao gồm (Includes)</label>
                     <div id="include-list" class="builder-list"></div>
-                    <button type="button" class="btn-add-item" id="btn-add-include">+ Thêm nội dung bao gồm</button>
+                    <button type="button" class="btn-add-item" id="btn-add-include">＋ Thêm mục</button>
                   </div>
                   <div class="svc-form-group">
                     <label class="svc-form-label">❌ Không bao gồm (Excludes)</label>
                     <div id="exclude-list" class="builder-list"></div>
-                    <button type="button" class="btn-add-item" id="btn-add-exclude">+ Thêm nội dung không bao gồm</button>
+                    <button type="button" class="btn-add-item" id="btn-add-exclude">＋ Thêm mục</button>
                   </div>
+                </div>
+                <div class="svc-form-group" style="margin-top:15px;">
+                  <label class="svc-form-label">🗺️ Lịch trình chi tiết (Itinerary)</label>
+                  <div id="itinerary-list" class="builder-list"></div>
+                  <button type="button" class="btn-add-item" id="btn-add-day">＋ Thêm ngày hành trình</button>
                 </div>
               </div>
             </div>
 
             <!-- SECTION 4: NỘI DUNG ELITE -->
             <div class="svc-section">
-              <div class="svc-section-title">Nội dung Elite</div>
+              <div class="svc-section-title">💎 Nội dung Elite Zenith</div>
               <div class="svc-form-group">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                   <label class="svc-form-label">Mô tả tổng quan</label>
                   <button type="button" id="ai-generate-desc" style="background:linear-gradient(135deg, #6366f1, #a855f7); border:none; border-radius:8px; padding:6px 12px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;">✨ AI Viết mô tả</button>
                 </div>
-                <textarea id="svc-desc" class="svc-form-input" style="height:100px; resize:none;" placeholder="Viết những lời chào mời hấp dẫn nhất..."></textarea>
+                <textarea id="svc-desc" class="svc-form-input" style="height:120px; resize:none;" placeholder="Viết những lời chào mời hấp dẫn nhất..."></textarea>
               </div>
               <div class="svc-form-group">
                 <label class="svc-form-label">Tổng quan chi tiết (Overview)</label>
                 <textarea id="svc-overview" class="svc-form-input" style="height:80px; resize:none;" placeholder="Mô tả chi tiết hơn về dịch vụ, trải nghiệm đặc biệt..."></textarea>
-              </div>
-              <div class="svc-form-group">
-                <label class="svc-form-label">Tags (Gắn thẻ, cách nhau dấu phẩy)</label>
-                <input type="text" id="svc-tags" class="svc-form-input" placeholder="nature, family, romantic, adventure, luxury">
               </div>
               <div class="svc-form-group">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -387,20 +445,20 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                   <button type="button" id="ai-generate-highlights" style="background:linear-gradient(135deg, #6366f1, #a855f7); border:none; border-radius:8px; padding:6px 12px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;">✨ AI Tạo highlights</button>
                 </div>
                 <div id="highlight-list" class="builder-list"></div>
-                <button type="button" class="btn-add-item" id="btn-add-hl">+ Thêm điểm nổi bật</button>
+                <button type="button" class="btn-add-item" id="btn-add-hl">＋ Thêm điểm nổi bật</button>
               </div>
               <div class="svc-form-group">
-                <label class="svc-form-label">Ảnh trưng bày (Gallery)</label>
+                <label class="svc-form-label">Bộ sưu tập hình ảnh (Gallery)</label>
                 <textarea id="svc-imgs" class="svc-form-input" style="height:60px; resize:none; margin-bottom:12px;" placeholder="Dán link ảnh tại đây (cách nhau bởi dấu phẩy)..."></textarea>
-                <div id="svc-gallery-picker" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(168,85,247,0.08)); border: 2px dashed rgba(99,102,241,0.3); border-radius: 16px; text-align: center; cursor: pointer; color: #a5b4fc; font-weight: 600; transition: all 0.3s; position: relative; overflow: hidden; margin-top: 8px;">
-                  <div style="font-size: 32px; opacity: 0.8;">📸</div>
-                  <div style="font-size: 14px;">Click để chọn ảnh Gallery</div>
-                  <div id="svc-gallery-status" style="font-size: 11px; color: #64748b; font-weight: 400;">Chọn nhiều ảnh cùng lúc</div>
+                <div id="svc-gallery-picker" class="premium-upload-box">
+                  <div class="upload-icon">📸</div>
+                  <div class="upload-text">Chọn nhiều ảnh Gallery cùng lúc</div>
+                  <div id="svc-gallery-status" class="upload-sub">Hệ thống tự động tối ưu hóa dung lượng</div>
                 </div>
                 <div id="svc-gallery-preview" class="preview-container"></div>
               </div>
               <div class="svc-form-group">
-                <label class="svc-form-label">Video (Youtube/TikTok URL)</label>
+                <label class="svc-form-label">Video giới thiệu (Youtube/TikTok URL)</label>
                 <input type="text" id="svc-video" class="svc-form-input" placeholder="https://youtube.com/...">
               </div>
               <div class="svc-form-group">
@@ -426,9 +484,9 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
               </div>
             </div>
 
-            <!-- SECTION 5: THÔNG TIN CHI TIẾT (QUICK INFO) -->
+            <!-- SECTION 5: THÔNG TIN CHI TIẾT -->
             <div class="svc-section">
-              <div class="svc-section-title">Thông tin chi tiết</div>
+              <div class="svc-section-title">📊 Thông tin chi tiết & Gợi ý</div>
               <div class="svc-form-row">
                 <div class="svc-form-group">
                   <label class="svc-form-label">Thời gian tham quan</label>
@@ -437,9 +495,9 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                 <div class="svc-form-group">
                   <label class="svc-form-label">Độ đông đúc</label>
                   <select id="svc-crowd-level" class="svc-form-input">
-                    <option value="low">Thấp</option>
-                    <option value="medium" selected>Vừa</option>
-                    <option value="high">Cao</option>
+                    <option value="low">🟢 Thấp (Yên tĩnh)</option>
+                    <option value="medium" selected>🟡 Vừa (Nhộn nhịp)</option>
+                    <option value="high">🔴 Cao (Rất đông)</option>
                   </select>
                 </div>
               </div>
@@ -447,29 +505,29 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                 <div class="svc-form-group">
                   <label class="svc-form-label">Mức chi phí</label>
                   <select id="svc-cost-level" class="svc-form-input">
-                    <option value="budget">Tiết kiệm</option>
-                    <option value="standard" selected>Trung bình</option>
-                    <option value="luxury">Cao cấp</option>
+                    <option value="budget">💰 Tiết kiệm</option>
+                    <option value="standard" selected>💵 Trung bình</option>
+                    <option value="luxury">💎 Cao cấp</option>
                   </select>
                 </div>
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Phù hợp với</label>
-                  <input type="text" id="svc-suitability" class="svc-form-input" placeholder="Gia đình, Couple, Solo, Group">
+                  <label class="svc-form-label">Đối tượng phù hợp</label>
+                  <input type="text" id="svc-suitability" class="svc-form-input" placeholder="Gia đình, Cặp đôi, Nhóm bạn...">
                 </div>
               </div>
               <div class="svc-form-row">
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Thời gian đẹp nhất</label>
+                  <label class="svc-form-label">Thời điểm đẹp nhất</label>
                   <input type="text" id="svc-best-time" class="svc-form-input" placeholder="VD: 8:00 - 10:00 sáng">
                 </div>
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Mùa đẹp nhất</label>
-                  <input type="text" id="svc-best-season" class="svc-form-input" placeholder="VD: Mùa thu">
+                  <label class="svc-form-label">Mùa du lịch lý tưởng</label>
+                  <input type="text" id="svc-best-season" class="svc-form-input" placeholder="VD: Mùa thu (Tháng 9-11)">
                 </div>
               </div>
               <div class="svc-form-row">
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Chất lượng internet</label>
+                  <label class="svc-form-label">Kết nối Internet</label>
                   <select id="svc-internet" class="svc-form-input">
                     <option value="poor">Kém</option>
                     <option value="fair" selected>Trung bình</option>
@@ -478,71 +536,74 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
                   </select>
                 </div>
                 <div class="svc-form-group">
-                  <label class="svc-form-label">Chỗ đậu xe</label>
+                  <label class="svc-form-label">Dịch vụ đỗ xe</label>
                   <select id="svc-parking" class="svc-form-input">
                     <option value="none">Không có</option>
                     <option value="street">Vỉa hè</option>
-                    <option value="lot">Bãi đỗ xe</option>
-                    <option value="valet">Valet</option>
+                    <option value="lot" selected>Bãi đỗ xe riêng</option>
+                    <option value="valet">Valet Parking</option>
                   </select>
+                </div>
+              </div>
+              <div class="svc-form-group" style="margin-top:10px;">
+                <label class="svc-form-label">Hỗ trợ tiếp cận (Accessibility)</label>
+                <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:8px; background:rgba(255,255,255,0.03); padding:12px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:#cbd5e1;"><input type="checkbox" id="svc-acc-wheelchair" style="width:16px; height:16px;"> ♿ Xe lăn</label>
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:#cbd5e1;"><input type="checkbox" id="svc-acc-elevator" style="width:16px; height:16px;"> 🛗 Thang máy</label>
+                  <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:13px; color:#cbd5e1;"><input type="checkbox" id="svc-acc-restroom" style="width:16px; height:16px;"> 🚻 WC tiếp cận</label>
                 </div>
               </div>
             </div>
 
-            <!-- SECTION 6: TRẢI NGHIỆM (EXPERIENCES) -->
+            <!-- SECTION 6: TRẢI NGHIỆM & KẾ HOẠCH -->
             <div class="svc-section">
-              <div class="svc-section-title">Trải nghiệm đặc biệt</div>
-              <div id="experience-list" class="builder-list"></div>
-              <button type="button" class="btn-add-item" id="btn-add-exp">+ Thêm trải nghiệm</button>
+              <div class="svc-section-title">🗺️ Trải nghiệm & Lên kế hoạch</div>
+              <div class="svc-form-group">
+                <label class="svc-form-label">Trải nghiệm đặc trưng (Experiences)</label>
+                <div id="experience-list" class="builder-list"></div>
+                <button type="button" class="btn-add-item" id="btn-add-exp">＋ Thêm trải nghiệm mới</button>
+              </div>
+              <div class="svc-form-group" style="margin-top:20px;">
+                <label class="svc-form-label">Kế hoạch hành trình gợi ý (Suggested Itineraries)</label>
+                <p style="font-size:12px; color:#94a3b8; margin-bottom:12px;">Thiết kế các gói lịch trình khác nhau cho từng nhóm khách hàng.</p>
+                <div id="itinerary-plans-container" style="display:flex;flex-direction:column;gap:16px;"></div>
+                <button type="button" id="btn-add-plan" class="btn-add-item" style="width:100%; padding:15px; border-style:solid;">＋ Thiết kế kế hoạch mới (Couple/Family/Luxury...)</button>
+              </div>
             </div>
 
-            <!-- SECTION 6b: LỊCH TRÌNH GỢI Ý (LÊN KẾ HOẠCH) - MULTI-PLAN -->
+            <!-- SECTION 7: CÂU HỎI THƯỜNG GẶP -->
             <div class="svc-section">
-              <div class="svc-section-title">Lên kế hoạch chuyến đi (Suggested Itinerary)</div>
-              <p style="font-size:12px; color:#94a3b8; margin-bottom:16px;">Tạo <b>nhiều kế hoạch</b> cho các loại khách khác nhau. Mỗi kế hoạch có loại khách, thời gian và các hoạt động riêng với hình ảnh, mô tả chi tiết.</p>
-              <div id="itinerary-plans-container" style="display:flex;flex-direction:column;gap:16px;"></div>
-              <button type="button" id="btn-add-plan" style="
-                margin-top:14px; width:100%; padding:12px;
-                background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(168,85,247,0.15));
-                border:1.5px dashed rgba(99,102,241,0.5); border-radius:12px;
-                color:#a5b4fc; font-size:13px; font-weight:700; cursor:pointer;
-                transition:all 0.2s;
-              " onmouseover="this.style.background='linear-gradient(135deg,rgba(99,102,241,0.3),rgba(168,85,247,0.3))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(99,102,241,0.15),rgba(168,85,247,0.15))'">
-                ＋ Thêm kế hoạch mới (Cặp đôi / Gia đình / Tiết kiệm / Sang trọng)
-              </button>
-            </div>
-
-            <!-- SECTION 7: FAQ -->
-            <div class="svc-section">
-              <div class="svc-section-title">Câu hỏi thường gặp</div>
+              <div class="svc-section-title">❓ Câu hỏi thường gặp (FAQ)</div>
               <div style="display:flex; justify-content:flex-end; margin-bottom:12px;">
-                <button type="button" id="ai-generate-faq" style="background:linear-gradient(135deg, #6366f1, #a855f7); border:none; border-radius:8px; padding:6px 12px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;">✨ AI Tạo FAQ</button>
+                <button type="button" id="ai-generate-faq" style="background:linear-gradient(135deg, #6366f1, #a855f7); border:none; border-radius:8px; padding:6px 12px; color:#fff; font-size:11px; font-weight:700; cursor:pointer;">✨ AI Gợi ý câu hỏi</button>
               </div>
               <div id="faq-list" class="builder-list"></div>
-              <button type="button" class="btn-add-item" id="btn-add-faq">+ Thêm FAQ</button>
+              <button type="button" class="btn-add-item" id="btn-add-faq">＋ Thêm câu hỏi</button>
             </div>
 
-            <!-- SECTION 8: SAFETY & TIPS -->
+            <!-- SECTION 8: AN TOÀN & CHÍNH SÁCH -->
             <div class="svc-section">
-              <div class="svc-section-title">An toàn & Lời khuyên</div>
-              <div class="svc-form-group">
-                <label class="svc-form-label">Cảnh báo an toàn</label>
-                <div id="safety-list" class="builder-list"></div>
-                <button type="button" class="btn-add-item" id="btn-add-safety">+ Thêm cảnh báo</button>
+              <div class="svc-section-title">🛡️ An toàn & Chính sách</div>
+              <div class="svc-form-row">
+                <div class="svc-form-group">
+                  <label class="svc-form-label">⚠️ Cảnh báo an toàn</label>
+                  <div id="safety-list" class="builder-list"></div>
+                  <button type="button" class="btn-add-item" id="btn-add-safety">＋ Thêm cảnh báo</button>
+                </div>
+                <div class="svc-form-group">
+                  <label class="svc-form-label">🎒 Nên mang theo</label>
+                  <div id="bring-list" class="builder-list"></div>
+                  <button type="button" class="btn-add-item" id="btn-add-bring">＋ Thêm vật dụng</button>
+                </div>
+                <div class="svc-form-group">
+                  <label class="svc-form-label">🚫 Lưu ý tránh (Avoid)</label>
+                  <div id="avoid-list" class="builder-list"></div>
+                  <button type="button" class="btn-add-item" id="btn-add-avoid">＋ Thêm lưu ý</button>
+                </div>
               </div>
-              <div class="svc-form-group">
-                <label class="svc-form-label">Nên mang theo</label>
-                <div id="bring-list" class="builder-list"></div>
-                <button type="button" class="btn-add-item" id="btn-add-bring">+ Thêm vật dụng</button>
-              </div>
-              <div class="svc-form-group">
-                <label class="svc-form-label">Không nên làm</label>
-                <div id="avoid-list" class="builder-list"></div>
-                <button type="button" class="btn-add-item" id="btn-add-avoid">+ Thêm điều tránh</button>
-              </div>
-              <div class="svc-form-group">
-                <label class="svc-form-label">Chính sách & Quy định (Cancellation, Rules, etc.)</label>
-                <textarea id="svc-policy" class="svc-form-input" style="height:100px; resize:none;" placeholder="VD: Hủy trước 48h hoàn tiền 100%..."></textarea>
+              <div class="svc-form-group" style="margin-top:15px;">
+                <label class="svc-form-label">📜 Chính sách & Quy định chung</label>
+                <textarea id="svc-policy" class="svc-form-input" style="height:100px; resize:none;" placeholder="Quy định về đặt/hủy phòng, nội quy cơ sở..."></textarea>
               </div>
             </div>
 
@@ -575,20 +636,20 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     </div>
   `;
 
-  // --- LOGIC: HIỆN/ẨN TOUR FIELDS ---
-  const chkTour = document.getElementById('svc-is-tour');
-  const tourFields = document.getElementById('tour-fields');
-  if (chkTour && tourFields) {
-    chkTour.onchange = () => {
-      tourFields.style.display = chkTour.checked ? 'flex' : 'none';
-    };
-  }
 
-  // Persistent file storage
-  window.svcSelectedFiles = [];
-  window.svcGalleryFiles = [];
+  // Persistent file storage keyed by service ID (or 'new' for new drafts)
+  window.svcFileStore = {
+    primary: {}, // { serviceId: [File, File, ...] }
+    gallery: {}  // { serviceId: [File, File, ...] }
+  };
 
-  // --- DYNAMIC FILE PICKER (HYBRID) ---
+  const getActiveId = () => btnSubmit.dataset.editId || 'new';
+  const getFiles = (type) => {
+    const id = getActiveId();
+    if (!window.svcFileStore[type][id]) window.svcFileStore[type][id] = [];
+    return window.svcFileStore[type][id];
+  };
+
   const imagePicker = document.getElementById('svc-image-picker');
   if (imagePicker) {
     imagePicker.addEventListener('click', () => {
@@ -598,8 +659,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
       input.multiple = true;
       input.onchange = (e) => {
         const newFiles = Array.from(e.target.files);
-        window.svcSelectedFiles = [...window.svcSelectedFiles, ...newFiles];
-        window.updateSvcPreview(window.svcSelectedFiles, 'svc-primary-preview');
+        window.appendSvcPreviewFiles(newFiles, 'svc-primary-preview');
       };
       input.click();
     });
@@ -614,41 +674,39 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
       input.multiple = true;
       input.onchange = (e) => {
         const newFiles = Array.from(e.target.files);
-        window.svcGalleryFiles = [...window.svcGalleryFiles, ...newFiles];
-        window.updateSvcPreview(window.svcGalleryFiles, 'svc-gallery-preview');
+        window.appendSvcPreviewFiles(newFiles, 'svc-gallery-preview');
       };
       input.click();
     });
   }
 
-  window.updateSvcPreview = (files, previewId) => {
+  window.appendSvcPreviewFiles = (files, previewId) => {
     const container = document.getElementById(previewId);
     if (!container) return;
-    container.innerHTML = '';
     
-    // Update status text
-    const statusId = previewId === 'svc-primary-preview' ? 'svc-image-status' : 'svc-gallery-status';
-    const statusEl = document.getElementById(statusId);
-    if (statusEl) {
-      statusEl.textContent = files.length > 0 ? `✅ ${files.length} tập tin đã chọn` : (previewId === 'svc-primary-preview' ? 'Hỗ trợ ảnh và video (tối đa 10MB/file)' : 'Chọn nhiều ảnh cùng lúc');
-      statusEl.style.color = files.length > 0 ? '#10b981' : '#64748b';
-    }
+    const type = previewId === 'svc-primary-preview' ? 'primary' : 'gallery';
+    const arr = getFiles(type);
 
-    files.forEach((file, index) => {
+    files.forEach(file => {
+      arr.push(file);
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const div = document.createElement('div');
         div.className = 'preview-item';
+        div.dataset.isFile = "true";
         const isVideo = file.type.startsWith('video/');
         const mediaHtml = isVideo 
           ? `<video src="${e.target.result}"></video>` 
           : `<img src="${e.target.result}">`;
 
+        file._wanderCategory = isVideo ? 'video' : 'other';
+
         div.innerHTML = `
           ${mediaHtml}
           ${previewId === 'svc-gallery-preview' ? `
             <select class="gallery-tag-select">
-              <option value="other">🏷️ Phân loại</option>
+              <option value="other" selected>🏷️ Phân loại</option>
               <option value="view">🌅 Cảnh quan & Không gian</option>
               <option value="dining">🍴 Ẩm thực & Thực đơn</option>
               <option value="service">✨ Dịch vụ & Tiện ích</option>
@@ -657,21 +715,35 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
               <option value="video" ${isVideo ? 'selected' : ''}>🎥 Video</option>
             </select>
           ` : ''}
-          <button type="button" class="remove-btn" onclick="window.removeStoredFile('${previewId}', ${index})">&times;</button>
+          <button type="button" class="remove-btn">&times;</button>
         `;
+
+        const sel = div.querySelector('.gallery-tag-select');
+        if (sel) sel.onchange = () => { file._wanderCategory = sel.value; };
+
+        div.querySelector('.remove-btn').onclick = () => {
+          div.remove();
+          const currentArr = getFiles(type);
+          const idx = currentArr.indexOf(file);
+          if (idx > -1) currentArr.splice(idx, 1);
+          window.updateSvcPreviewStatus(previewId);
+        };
+
         container.appendChild(div);
+        window.updateSvcPreviewStatus(previewId);
       };
       reader.readAsDataURL(file);
     });
   };
 
-  window.removeStoredFile = (previewId, index) => {
-    if (previewId === 'svc-primary-preview') {
-      window.svcSelectedFiles.splice(index, 1);
-      window.updateSvcPreview(window.svcSelectedFiles, previewId);
-    } else {
-      window.svcGalleryFiles.splice(index, 1);
-      window.updateSvcPreview(window.svcGalleryFiles, previewId);
+  window.updateSvcPreviewStatus = (previewId) => {
+    const statusId = previewId === 'svc-primary-preview' ? 'svc-image-status' : 'svc-gallery-status';
+    const statusEl = document.getElementById(statusId);
+    const type = previewId === 'svc-primary-preview' ? 'primary' : 'gallery';
+    const arr = getFiles(type);
+    if (statusEl) {
+      statusEl.textContent = arr.length > 0 ? `✅ ${arr.length} tập tin đã chọn` : (previewId === 'svc-primary-preview' ? 'Hỗ trợ ảnh và video (tối đa 10MB/file)' : 'Chọn nhiều ảnh cùng lúc');
+      statusEl.style.color = arr.length > 0 ? '#10b981' : '#64748b';
     }
   };
 
@@ -1160,12 +1232,22 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   const form = document.getElementById('add-svc-form');
 
   const triggers = document.querySelectorAll(triggerSelector);
-  triggers.forEach(btn => btn.onclick = () => overlay.classList.add('is-open'));
+  triggers.forEach(btn => btn.onclick = () => {
+    const isEditId = btnSubmit.dataset.editId || 'new';
+    overlay.classList.add('is-open');
+    
+    // Nếu form đang trống thì mới nạp draft
+    const nameEl = document.getElementById('svc-name');
+    if (nameEl && !nameEl.value) {
+      const saved = localStorage.getItem('wander_svc_draft_' + isEditId);
+      if (saved) {
+        window.restoreSvcDraft(saved);
+      }
+    }
+  });
 
-  const close = () => {
-    overlay.classList.remove('is-open');
-    // Restore is-logging-in class when modal closes
-    document.body.classList.add('is-logging-in');
+  window.clearSvcForm = (specificId = null) => {
+    const id = specificId || getActiveId();
     form.reset();
     itineraryList.innerHTML = '';
     hlList.innerHTML = '';
@@ -1179,15 +1261,343 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     const policyEl = document.getElementById('svc-policy');
     if (policyEl) policyEl.value = '';
     if (plansContainer) plansContainer.innerHTML = '';
+    
+    // Xóa file store cho ID này
+    delete window.svcFileStore.primary[id];
+    delete window.svcFileStore.gallery[id];
+    
+    document.getElementById('svc-primary-preview').innerHTML = '';
+    document.getElementById('svc-gallery-preview').innerHTML = '';
     if (btnSubmit) {
       delete btnSubmit.dataset.editId;
       btnSubmit.textContent = 'Đăng dịch vụ Elite';
       document.querySelector('.svc-modal-title').textContent = 'Dịch vụ Elite & Trải nghiệm';
     }
   };
-  btnClose.onclick = close;
-  btnCancel.onclick = close;
-  overlay.onclick = (e) => e.target === overlay && close();
+
+  const close = (force = false) => {
+    saveDraft(); // Luôn lưu khi đóng
+    overlay.classList.remove('is-open');
+    document.body.classList.add('is-logging-in');
+  };
+  btnClose.onclick = () => close(false);
+  btnCancel.onclick = () => close(false);
+  overlay.onclick = (e) => e.target === overlay && close(false);
+
+  // --- DRAFT / BỘ NHỚ TẠM ---
+  window.saveDraft = () => {
+    if (!overlay.classList.contains('is-open')) return;
+    const isEditId = btnSubmit.dataset.editId || 'new';
+    const draft = {
+      fields: {},
+      amenities: [],
+      highlights: [],
+      itinerary: [],
+      experiences: [],
+      faqs: [],
+      safety: [],
+      bring: [],
+      avoid: [],
+      includes: [],
+      excludes: [],
+      plans: [],
+      galleryUrls: []
+    };
+
+    // Simple fields
+    form.querySelectorAll('input:not([type="file"]), textarea, select').forEach(el => {
+      if (el.id) draft.fields[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+    });
+
+    // Amenities
+    document.querySelectorAll('.amenity-card.selected').forEach(c => {
+      draft.amenities.push(c.dataset.value);
+    });
+
+    // Highlights
+    document.querySelectorAll('#highlight-list .hl-input').forEach(i => { if(i.value) draft.highlights.push(i.value) });
+
+    // Itinerary
+    document.querySelectorAll('#itinerary-list .builder-item').forEach(div => {
+      const title = div.querySelector('.it-title').value;
+      if (title) draft.itinerary.push({ title, detail: div.querySelector('.it-desc').value });
+    });
+
+    // Experiences
+    document.querySelectorAll('#experience-list .builder-item').forEach(div => {
+      const title = div.querySelector('.exp-title') ? div.querySelector('.exp-title').value : '';
+      if (title) {
+        draft.experiences.push({
+          title,
+          description: div.querySelector('.exp-desc') ? div.querySelector('.exp-desc').value : '',
+          icon: div.querySelector('.exp-icon').value,
+          difficulty: div.querySelector('.exp-diff').value,
+          duration: div.querySelector('.exp-duration').value,
+          priceEstimate: div.querySelector('.exp-price') ? div.querySelector('.exp-price').value : ''
+        });
+      }
+    });
+
+    // FAQs
+    document.querySelectorAll('#faq-list .builder-item').forEach(div => {
+      const question = div.querySelector('.faq-question').value;
+      if (question) draft.faqs.push({ question, answer: div.querySelector('.faq-answer').value });
+    });
+
+    // Safety, Bring, Avoid, Includes, Excludes
+    document.querySelectorAll('#safety-list .safety-title').forEach(i => { if(i.value) draft.safety.push(i.value) });
+    document.querySelectorAll('#bring-list .bring-input').forEach(i => { if(i.value) draft.bring.push(i.value) });
+    document.querySelectorAll('#avoid-list .avoid-input').forEach(i => { if(i.value) draft.avoid.push(i.value) });
+    document.querySelectorAll('#include-list .include-input').forEach(i => { if(i.value) draft.includes.push(i.value) });
+    document.querySelectorAll('#exclude-list .exclude-input').forEach(i => { if(i.value) draft.excludes.push(i.value) });
+
+    // Plans
+    document.querySelectorAll('#itinerary-plans-container .sug-plan-block').forEach(block => {
+      const plan = {
+        type: block.querySelector('.plan-type').value,
+        duration: block.querySelector('.plan-duration').value,
+        name: block.querySelector('.plan-name').value,
+        timeline: []
+      };
+      block.querySelectorAll('.sug-step-item').forEach(step => {
+        plan.timeline.push({
+          time: step.querySelector('.sug-time').value,
+          activity: step.querySelector('.sug-activity').value,
+          location: step.querySelector('.sug-location').value,
+          tips: step.querySelector('.sug-tips').value,
+          image: step.querySelector('.sug-img').value,
+          description: step.querySelector('.sug-desc').value
+        });
+      });
+      draft.plans.push(plan);
+    });
+
+    // Gallery URLs (URL-based images only for draft to avoid storage limits)
+    document.querySelectorAll('#svc-gallery-preview .preview-item').forEach(div => {
+      const img = div.querySelector('img');
+      const select = div.querySelector('.gallery-tag-select');
+      // Chỉ lưu URL thật từ server, không lưu Blob URL (blob:) vì sẽ bị chết khi refresh
+      if (img && img.src && !div.dataset.isFile && !img.src.startsWith('blob:')) {
+        draft.galleryUrls.push({ url: img.src, category: select ? select.value : 'other' });
+      }
+    });
+
+    localStorage.setItem('wander_svc_draft_' + isEditId, JSON.stringify(draft));
+  };
+
+  form.addEventListener('input', () => {
+    clearTimeout(form._draftTimer);
+    form._draftTimer = setTimeout(saveDraft, 1000);
+  });
+  form.addEventListener('change', saveDraft);
+
+  window.restoreSvcDraft = (draftStr) => {
+    try {
+      const draft = JSON.parse(draftStr);
+      if (!draft) return;
+
+      // Simple fields
+      if (draft.fields) {
+        Object.keys(draft.fields).forEach(id => {
+          const el = document.getElementById(id);
+          // Không đè lên những trường quan trọng nếu chúng đã có giá trị mới hơn (tùy chọn)
+          if (el) {
+            if (el.type === 'checkbox') el.checked = draft.fields[id];
+            else el.value = draft.fields[id];
+          }
+        });
+      }
+
+      // Amenities
+      if (draft.amenities) {
+        document.querySelectorAll('.amenity-card').forEach(c => {
+          if (draft.amenities.includes(c.dataset.value)) c.classList.add('selected');
+          else c.classList.remove('selected');
+        });
+      }
+
+      // Highlights
+      if (draft.highlights && hlList) {
+        hlList.innerHTML = '';
+        draft.highlights.forEach(val => {
+          const btn = document.getElementById('btn-add-hl');
+          if (btn) btn.click();
+          const last = hlList.querySelector('.builder-item:last-child .hl-input');
+          if (last) last.value = val;
+        });
+      }
+
+      // Itinerary
+      if (draft.itinerary && itineraryList) {
+        itineraryList.innerHTML = '';
+        draft.itinerary.forEach(it => {
+          const btn = document.getElementById('btn-add-day');
+          if (btn) btn.click();
+          const lastItem = itineraryList.querySelector('.builder-item:last-child');
+          if (lastItem) {
+            lastItem.querySelector('.it-title').value = it.title;
+            lastItem.querySelector('.it-desc').value = it.detail;
+          }
+        });
+      }
+
+      // Experiences
+      if (draft.experiences && expList) {
+        expList.innerHTML = '';
+        draft.experiences.forEach(it => {
+          const btn = document.getElementById('btn-add-exp');
+          if (btn) btn.click();
+          const lastItem = expList.querySelector('.builder-item:last-child');
+          if (lastItem) {
+            lastItem.querySelector('.exp-title').value = it.title;
+            lastItem.querySelector('.exp-desc').value = it.description;
+            lastItem.querySelector('.exp-icon').value = it.icon;
+            lastItem.querySelector('.exp-diff').value = it.difficulty;
+            lastItem.querySelector('.exp-duration').value = it.duration;
+            lastItem.querySelector('.exp-price').value = it.priceEstimate;
+          }
+        });
+      }
+
+      // FAQs
+      if (draft.faqs && faqList) {
+        faqList.innerHTML = '';
+        draft.faqs.forEach(it => {
+          const btn = document.getElementById('btn-add-faq');
+          if (btn) btn.click();
+          const lastItem = faqList.querySelector('.builder-item:last-child');
+          if (lastItem) {
+            lastItem.querySelector('.faq-question').value = it.question;
+            lastItem.querySelector('.faq-answer').value = it.answer;
+          }
+        });
+      }
+
+      // Safety, Bring, Avoid, Includes, Excludes
+      const restoreSimpleList = (arr, listId, btnId, inputClass) => {
+        if (!arr) return;
+        const list = document.getElementById(listId);
+        const btn = document.getElementById(btnId);
+        if (list && btn) {
+          list.innerHTML = '';
+          arr.forEach(val => {
+            btn.click();
+            const last = list.querySelector('.' + inputClass + ':last-child');
+            if (last) last.value = val;
+          });
+        }
+      };
+      restoreSimpleList(draft.safety, 'safety-list', 'btn-add-safety', 'safety-title');
+      restoreSimpleList(draft.bring, 'bring-list', 'btn-add-bring', 'bring-input');
+      restoreSimpleList(draft.avoid, 'avoid-list', 'btn-add-avoid', 'avoid-input');
+      restoreSimpleList(draft.includes, 'include-list', 'btn-add-include', 'include-input');
+      restoreSimpleList(draft.excludes, 'exclude-list', 'btn-add-exclude', 'exclude-input');
+
+      // Plans
+      if (draft.plans && plansContainer) {
+        plansContainer.innerHTML = '';
+        draft.plans.forEach(p => {
+          const btn = document.getElementById('btn-add-plan');
+          if (btn) btn.click();
+          const lastBlock = plansContainer.querySelector('.sug-plan-block:last-child');
+          if (lastBlock) {
+            lastBlock.querySelector('.plan-type').value = p.type;
+            lastBlock.querySelector('.plan-duration').value = p.duration.replace(' ngày', '');
+            lastBlock.querySelector('.plan-name').value = p.name;
+            const stepsList = lastBlock.querySelector('.plan-steps-list');
+            stepsList.innerHTML = ''; // Clear default first step
+            p.timeline.forEach(stepData => {
+              const row = createStepRow();
+              row.querySelector('.sug-time').value = stepData.time;
+              row.querySelector('.sug-activity').value = stepData.activity;
+              row.querySelector('.sug-location').value = stepData.location;
+              row.querySelector('.sug-tips').value = stepData.tips;
+              row.querySelector('.sug-img').value = stepData.image;
+              row.querySelector('.sug-desc').value = stepData.description;
+              stepsList.appendChild(row);
+            });
+          }
+        });
+      }
+
+      // Gallery URLs (Server-side)
+      if (draft.galleryUrls && galleryUrlPreview) {
+        const existingUrls = Array.from(galleryUrlPreview.querySelectorAll('img')).map(img => img.src);
+        draft.galleryUrls.forEach(it => {
+          if (!existingUrls.includes(it.url)) {
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+            div.dataset.url = it.url;
+            div.innerHTML = `
+              <img src="${it.url}"><button type="button" class="remove-btn">&times;</button>
+              <select class="gallery-tag-select">
+                <option value="other" ${it.category==='other'?'selected':''}>Phân loại</option>
+                <option value="view" ${it.category==='view'?'selected':''}>🌅 Cảnh quan</option>
+                <option value="dining" ${it.category==='dining'?'selected':''}>🍴 Ẩm thực</option>
+                <option value="service" ${it.category==='service'?'selected':''}>✨ Dịch vụ</option>
+                <option value="activity" ${it.category==='activity'?'selected':''}>🛶 Hoạt động</option>
+                <option value="customer" ${it.category==='customer'?'selected':''}>📸 Khách hàng</option>
+                <option value="video" ${it.category==='video'?'selected':''}>🎥 Video</option>
+              </select>
+            `;
+            div.querySelector('.remove-btn').onclick = () => div.remove();
+            galleryUrlPreview.appendChild(div);
+          }
+        });
+      }
+
+      // Restore Binary Files Previews from Cache
+      const restoreBinaryPreviews = (previewId) => {
+        const type = previewId === 'svc-primary-preview' ? 'primary' : 'gallery';
+        const files = getFiles(type);
+        const container = document.getElementById(previewId);
+        if (container && files.length > 0) {
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    // Tránh duplicate nếu đã có (kiểm tra theo tên file hoặc nội dung)
+                    const isVideo = file.type.startsWith('video/');
+                    const mediaHtml = isVideo ? `<video src="${e.target.result}"></video>` : `<img src="${e.target.result}">`;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    div.dataset.isFile = "true";
+                    div.innerHTML = `
+                        ${mediaHtml}
+                        ${previewId === 'svc-gallery-preview' ? `
+                        <select class="gallery-tag-select">
+                            <option value="other" ${file._wanderCategory==='other'?'selected':''}>Phân loại</option>
+                            <option value="view" ${file._wanderCategory==='view'?'selected':''}>🌅 Cảnh quan</option>
+                            <option value="dining" ${file._wanderCategory==='dining'?'selected':''}>🍴 Ẩm thực</option>
+                            <option value="service" ${file._wanderCategory==='service'?'selected':''}>✨ Dịch vụ</option>
+                            <option value="activity" ${file._wanderCategory==='activity'?'selected':''}>🛶 Hoạt động</option>
+                            <option value="customer" ${file._wanderCategory==='customer'?'selected':''}>📸 Khách hàng</option>
+                            <option value="video" ${file._wanderCategory==='video'?'selected':''}>🎥 Video</option>
+                        </select>` : ''}
+                        <button type="button" class="remove-btn">&times;</button>
+                    `;
+                    div.querySelector('.remove-btn').onclick = () => {
+                        div.remove();
+                        const arr = getFiles(type);
+                        const idx = arr.indexOf(file);
+                        if (idx > -1) arr.splice(idx, 1);
+                        window.updateSvcPreviewStatus(previewId);
+                    };
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+      };
+      restoreBinaryPreviews('svc-primary-preview');
+      restoreBinaryPreviews('svc-gallery-preview');
+
+      if (window.WanderUI) window.WanderUI.showToast('Đã khôi phục dữ liệu đang làm dở', 'info');
+      // Trigger status update
+      window.updateSvcPreviewStatus('svc-primary-preview');
+      window.updateSvcPreviewStatus('svc-gallery-preview');
+    } catch(e) { console.error('Restore Draft Error:', e); }
+  };
 
   // --- SUBMIT LOGIC ---
   // --- LOGIC: REACTIVE URL PREVIEWS ---
@@ -1217,17 +1627,41 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   if (galleryUrlInput && galleryUrlPreview) {
     galleryUrlInput.addEventListener('input', () => {
       const urls = galleryUrlInput.value.split(',').map(s => s.trim()).filter(s => s);
-      galleryUrlPreview.innerHTML = '';
+      
+      // Lấy danh sách các URL đang hiển thị (chỉ lấy từ URL, không lấy từ File)
+      const existingUrls = Array.from(galleryUrlPreview.querySelectorAll('.preview-item[data-from-url="true"]'))
+        .map(el => el.dataset.url);
+
+      // 1. Xóa những URL không còn trong textarea
+      galleryUrlPreview.querySelectorAll('.preview-item[data-from-url="true"]').forEach(el => {
+        if (!urls.includes(el.dataset.url)) el.remove();
+      });
+
+      // 2. Thêm những URL mới chưa có
       urls.forEach(url => {
-        const div = document.createElement('div');
-        div.className = 'preview-item';
-        div.innerHTML = `<img src="${url}"><button type="button" class="remove-btn">&times;</button>`;
-        div.querySelector('.remove-btn').onclick = () => {
-          div.remove();
-          const currentUrls = galleryUrlInput.value.split(',').map(s => s.trim()).filter(s => s && s !== url);
-          galleryUrlInput.value = currentUrls.join(', ');
-        };
-        galleryUrlPreview.appendChild(div);
+        if (!existingUrls.includes(url)) {
+          const div = document.createElement('div');
+          div.className = 'preview-item';
+          div.dataset.fromUrl = "true";
+          div.dataset.url = url; // Lưu URL vào dataset để kiểm tra
+          div.innerHTML = `<img src="${url}"><button type="button" class="remove-btn">&times;</button>
+            <select class="gallery-tag-select">
+              <option value="other" selected>Phân loại</option>
+              <option value="view">🌅 Cảnh quan</option>
+              <option value="dining">🍴 Ẩm thực</option>
+              <option value="service">✨ Dịch vụ</option>
+              <option value="activity">🛶 Hoạt động</option>
+              <option value="customer">📸 Khách hàng</option>
+              <option value="video">🎥 Video</option>
+            </select>
+          `;
+          div.querySelector('.remove-btn').onclick = () => {
+            div.remove();
+            const currentUrls = galleryUrlInput.value.split(',').map(s => s.trim()).filter(s => s && s !== url);
+            galleryUrlInput.value = currentUrls.join(', ');
+          };
+          galleryUrlPreview.appendChild(div);
+        }
       });
     });
   }
@@ -1261,8 +1695,9 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
 
     // FormData cho file upload
     const payload = new FormData();
-    console.log('[Submit] Selected Primary Files:', window.svcSelectedFiles);
-    console.log('[Submit] Selected Gallery Files:', window.svcGalleryFiles);
+    const primaryFiles = getFiles('primary');
+    const galleryFiles = getFiles('gallery');
+    console.log('[Submit] Files:', { primaryFiles, galleryFiles });
     payload.append('name', name);
     payload.append('kind', kind);
     payload.append('region', region);
@@ -1272,7 +1707,7 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     if(document.getElementById('svc-overview')) payload.append('overview', document.getElementById('svc-overview').value);
     payload.append('priceFrom', price);
     if(priceTo) payload.append('priceTo', priceTo);
-    payload.append('isTour', chkTour.checked);
+    payload.append('isTour', kind === 'tour' || kind === 'trai-nghiem');
 
     if(document.getElementById('svc-phone')) payload.append('contactPhone', document.getElementById('svc-phone').value);
     if(document.getElementById('svc-email')) payload.append('contactEmail', document.getElementById('svc-email').value);
@@ -1298,8 +1733,8 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
       payload.append('image', imgUrlInput.value.trim());
     }
     // File Upload (Primary)
-    if (window.svcSelectedFiles && window.svcSelectedFiles.length > 0) {
-      window.svcSelectedFiles.forEach(file => {
+    if (primaryFiles.length > 0) {
+      primaryFiles.forEach(file => {
         payload.append('primaryFile', file);
       });
     }
@@ -1313,9 +1748,9 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     payload.append('parking', document.getElementById('svc-parking').value);
 
     payload.append('accessibility', JSON.stringify({
-      wheelchairAccessible: false,
-      elevator: false,
-      accessibleRestrooms: false,
+      wheelchairAccessible: document.getElementById('svc-acc-wheelchair').checked,
+      elevator: document.getElementById('svc-acc-elevator').checked,
+      accessibleRestrooms: document.getElementById('svc-acc-restroom').checked,
       notes: ''
     }));
 
@@ -1323,10 +1758,10 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     // Gallery Images & Metadata collection
     const galleryItems = [];
     document.querySelectorAll('#svc-gallery-preview .preview-item').forEach(div => {
-      const img = div.querySelector('img');
+      const media = div.querySelector('img, video');
       const select = div.querySelector('.gallery-tag-select');
-      if (img && img.src) {
-        let url = img.src;
+      if (media && media.src && !div.dataset.isFile) {
+        let url = media.src;
         // Clean URL to be relative if it's from our server
         if (url.includes('/uploads/')) {
           url = '/uploads/' + url.split('/uploads/')[1];
@@ -1352,13 +1787,12 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     payload.append('videoUrl', document.getElementById('svc-video').value);
 
     // Gallery files with Tags
-    if (window.svcGalleryFiles && window.svcGalleryFiles.length > 0) {
+    if (galleryFiles.length > 0) {
       const galleryMetadata = [];
-      const tagSelects = document.querySelectorAll('#svc-gallery-preview .gallery-tag-select');
       
-      window.svcGalleryFiles.forEach((file, idx) => {
+      galleryFiles.forEach((file) => {
         payload.append('galleryFile', file);
-        const tag = tagSelects[idx] ? tagSelects[idx].value : 'other';
+        const tag = file._wanderCategory || 'other';
         galleryMetadata.push({ type: tag });
       });
       payload.append('galleryMetadata', JSON.stringify(galleryMetadata));
@@ -1468,8 +1902,8 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
 
     payload.append('policy', document.getElementById('svc-policy').value);
 
-    // Tour specific
-    if (chkTour && chkTour.checked) {
+    // Tour specific (Automatic based on kind)
+    if (kind === 'tour' || kind === 'trai-nghiem') {
       payload.append('tourDuration', document.getElementById('svc-duration').value);
       payload.append('tourDifficulty', document.getElementById('svc-diff').value);
       
@@ -1508,22 +1942,12 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
         }
         overlay.classList.remove('is-open');
         document.body.classList.add('is-logging-in');
-        if (btnSubmit) {
-          delete btnSubmit.dataset.editId;
-          btnSubmit.textContent = 'Đăng dịch vụ Elite';
-          document.querySelector('.svc-modal-title').textContent = 'Dịch vụ Elite & Trải nghiệm';
-        }
-        form.reset();
-        itineraryList.innerHTML = '';
-        hlList.innerHTML = '';
-        expList.innerHTML = '';
-        faqList.innerHTML = '';
-        safetyList.innerHTML = '';
-        bringList.innerHTML = '';
-        avoidList.innerHTML = '';
-        if (includeList) includeList.innerHTML = '';
-        if (excludeList) excludeList.innerHTML = '';
-        if (plansContainer) plansContainer.innerHTML = '';
+        // Xóa bộ nhớ tạm sau khi nộp thành công
+        const isEditId = btnSubmit ? btnSubmit.dataset.editId || 'new' : 'new';
+        localStorage.removeItem('wander_svc_draft_' + isEditId);
+
+        // Dọn dẹp form và trạng thái
+        if (window.clearSvcForm) window.clearSvcForm();
         
         // Notify other components that a new service was added or updated
         window.dispatchEvent(new CustomEvent('svc-added'));

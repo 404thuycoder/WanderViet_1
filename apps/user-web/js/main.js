@@ -56,6 +56,14 @@
     });
   }
 
+  window.addEventListener('wander_data_sync', (e) => {
+    if (e.detail && e.detail.entity === 'place') {
+      console.log('Real-time sync triggered:', e.detail);
+      sessionStorage.removeItem('wv_cached_places');
+      loadPlacesFromAPI();
+    }
+  });
+
   function loadPublicStats() {
     const cached = sessionStorage.getItem('wv_cached_stats');
     if (cached) {
@@ -1408,7 +1416,71 @@
                          renderSection("Địa điểm ăn uống", p.diningPlaces, "diningPlaces", "🍲") + 
                          renderSection("Điểm check-in nổi tiếng", p.checkInSpots, "checkInSpots", "🤳");
 
+      // ELITE: Tour Highlights & Prep
+      var highlightsHtml = "";
+      if (p.highlights && p.highlights.length > 0) {
+        highlightsHtml = '<div class="place-detail__highlights-v2">' + 
+                           '<h4 class="detail-section-title">✨ Điểm nổi bật</h4>' +
+                           '<ul class="highlights-list">' + p.highlights.map(function(h){ return '<li>' + escapeHtml(h) + '</li>'; }).join('') + '</ul>' +
+                         '</div>';
+      }
+
+      // ELITE: Tour Itinerary (Structured)
+      var itineraryHtml = "";
+      if (p.tourItinerary && p.tourItinerary.length > 0) {
+        itineraryHtml = '<div class="place-detail__itinerary-v2">' + 
+                          '<h4 class="detail-section-title">🗺️ Lịch trình chi tiết</h4>' +
+                          '<div class="itinerary-timeline-v2">' + p.tourItinerary.map(function(t){
+                            return '<div class="itinerary-day-v2">' +
+                                     '<div class="day-num">Ngày ' + (t.day || '?') + '</div>' +
+                                     '<div class="day-content">' +
+                                       '<h5>' + escapeHtml(t.title || '') + '</h5>' +
+                                       '<p>' + escapeHtml(t.detail || '') + '</p>' +
+                                     '</div>' +
+                                   '</div>';
+                          }).join('') + '</div>' +
+                        '</div>';
+      } else if (p.activities && p.activities.length > 0) {
+        // Fallback to legacy activities
+        itineraryHtml = '<div class="place-detail__activities-v2">' + 
+                          '<h4 class="detail-section-title">📅 Lịch trình gợi ý</h4>' +
+                          p.activities.map(function (a) {
+                            var color = "#38bdf8";
+                            if (a.dayPart.toLowerCase().indexOf("sáng") !== -1) color = "#fbbf24";
+                            if (a.dayPart.toLowerCase().indexOf("chiều") !== -1) color = "#f43f5e";
+                            if (a.dayPart.toLowerCase().indexOf("tối") !== -1) color = "#818cf8";
+                            return '<div class="act-row-v2"><div class="act-dot" style="background:' + color + '"></div><div class="act-content"><strong style="color:' + color + '">' + escapeHtml(a.dayPart) + ': ' + escapeHtml(a.title) + '</strong><p>' + escapeHtml(a.tip) + '</p></div></div>';
+                          }).join("") + 
+                        '</div>';
+      }
+
+      // ELITE: Includes/Excludes
+      var includesExcludesHtml = "";
+      if (p.tourIncludes && p.tourIncludes.length > 0) {
+        includesExcludesHtml = '<div class="place-detail__policy-grid">' + 
+                                 '<div class="policy-box includes">' +
+                                   '<h6>Bao gồm</h6>' +
+                                   '<ul>' + p.tourIncludes.map(function(i){ return '<li>✓ ' + escapeHtml(i) + '</li>'; }).join('') + '</ul>' +
+                                 '</div>' +
+                                 (p.tourExcludes && p.tourExcludes.length > 0 ? 
+                                   '<div class="policy-box excludes">' +
+                                     '<h6>Không bao gồm</h6>' +
+                                     '<ul>' + p.tourExcludes.map(function(i){ return '<li>✕ ' + escapeHtml(i) + '</li>'; }).join('') + '</ul>' +
+                                   '</div>' : '') +
+                               '</div>';
+      }
+
       var verifiedBadge = p.verified ? '<div class="verified-badge-v2"><span class="icon">🛡️</span> Đã kiểm chứng' + (p.sourceName ? ' bởi ' + escapeHtml(p.sourceName) : '') + '</div>' : '';
+      
+      // ELITE: Duration & Difficulty Badges
+      var tourBadges = "";
+      if (p.isTour || p.kind === 'trai-nghiem') {
+        if (p.tourDuration) tourBadges += '<span class="tour-badge duration">⏱️ ' + escapeHtml(p.tourDuration) + '</span>';
+        if (p.tourDifficulty) {
+            var diffLabel = p.tourDifficulty === 'easy' ? 'Dễ' : p.tourDifficulty === 'medium' ? 'Vừa' : 'Thử thách';
+            tourBadges += '<span class="tour-badge difficulty ' + p.tourDifficulty + '">⛰️ ' + diffLabel + '</span>';
+        }
+      }
       
       var placeViewHtml = '<div class="place-view-content animate-in">' + 
           '<div class="place-detail__hero">' +
@@ -1420,10 +1492,16 @@
           '<div class="place-detail__body-grid">' +
             '<div class="place-detail__main-col">' +
               '<div class="place-detail__info-header">' +
-                '<h3 class="place-detail__title-v2">' + escapeHtml(p.name) + '</h3>' +
-                '<p class="place-detail__meta-v2">📍 ' + escapeHtml(p.region) + " · " + budgetLabel(p.budget) + " · " + paceVi(p.pace) + '</p>' +
+                '<div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">' +
+                    '<div>' +
+                        '<h3 class="place-detail__title-v2">' + escapeHtml(p.name) + '</h3>' +
+                        '<p class="place-detail__meta-v2">📍 ' + escapeHtml(p.region) + " · " + budgetLabel(p.budget) + " · " + paceVi(p.pace) + '</p>' +
+                    '</div>' +
+                    '<div class="tour-badges-wrap">' + tourBadges + '</div>' +
+                '</div>' +
               '</div>' +
-              '<div class="place-detail__desc">' + escapeHtml(p.text || "") + '</div>' +
+              '<div class="place-detail__desc">' + escapeHtml(p.text || p.description || "") + '</div>' +
+              highlightsHtml +
               '<div class="place-detail__guide">' +
                 '<p><strong>🚗 Di chuyển:</strong> ' + escapeHtml(p.transportTips || "Thông tin đang cập nhật...") + '</p>' + 
                 (p.sourceUrl ? '<p><strong>🔗 Tham khảo:</strong> <a href="' + escapeAttr(p.sourceUrl) + '" target="_blank">' + escapeHtml(p.sourceName || "Website chính thức") + '</a></p>' : "") + 

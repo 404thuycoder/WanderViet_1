@@ -14,7 +14,10 @@ const initSocket = (server) => {
 
     io.use((socket, next) => {
         const token = socket.handshake.auth.token || socket.handshake.query.token;
-        if (!token) return next(new Error('Authentication error: No token provided'));
+        if (!token) {
+            socket.user = { id: 'guest_' + Math.random().toString(36).substr(2, 9), role: 'guest' };
+            return next();
+        }
 
         try {
             const secret = (process.env.JWT_SECRET || 'wander-viet-secret-key-123').trim();
@@ -22,7 +25,8 @@ const initSocket = (server) => {
             socket.user = decoded;
             next();
         } catch (err) {
-            next(new Error('Authentication error: Invalid token'));
+            socket.user = { id: 'guest_' + Math.random().toString(36).substr(2, 9), role: 'guest' };
+            next();
         }
     });
 
@@ -35,6 +39,9 @@ const initSocket = (server) => {
             userSockets.set(userId, new Set());
         }
         userSockets.get(userId).add(socket.id);
+
+        // Join global sync room
+        socket.join('global_sync');
 
         // Join personal rooms for all possible identifiers to ensure reliability
         if (socket.user._id) socket.join(socket.user._id.toString());
@@ -102,10 +109,17 @@ const emitToUsers = (userIds, event, data) => {
     });
 };
 
+const broadcastGlobal = (event, data) => {
+    if (io) {
+        io.to('global_sync').emit(event, data);
+    }
+};
+
 module.exports = {
     initSocket,
     getIO,
     sendNotification,
     emitToUser,
-    emitToUsers
+    emitToUsers,
+    broadcastGlobal
 };

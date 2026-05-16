@@ -3327,6 +3327,15 @@
         });
       });
     }
+
+    // Listen for real-time synchronization events across portals
+    window.addEventListener('wander_data_sync', (e) => {
+      if (e.detail && e.detail.entity === 'place') {
+        console.log('Admin real-time sync triggered:', e.detail);
+        if (typeof loadModeration === 'function') loadModeration(true);
+        if (typeof loadPlaces === 'function') loadPlaces();
+      }
+    });
   });
 
   let moderationManagerChart = null;

@@ -386,9 +386,9 @@ QUY TẮC TỐI THƯỢNG (PHẢI TUÂN THỦ):
     systemPrompt += timeContext;
 
     // --- LANGUAGE RULE (Simplified to avoid confusion) ---
+    const languageNames = { 'vi': 'Tiếng Việt', 'en': 'English', 'jp': 'Japanese', 'kr': 'Korean', 'fr': 'French' };
     let langRule = "Trả lời bằng chính ngôn ngữ khách đang hỏi.";
     if (req.body.lang && req.body.lang !== 'auto') {
-      const languageNames = { 'vi': 'Tiếng Việt', 'en': 'English', 'jp': 'Japanese', 'kr': 'Korean', 'fr': 'French' };
       langRule = `BẮT BUỘC TRẢ LỜI BẰNG ${languageNames[req.body.lang] || 'Tiếng Việt'}.`;
     }
     systemPrompt += `\n${langRule}`;
@@ -696,14 +696,11 @@ Trả về CHỈ JSON theo format:
       }
 
     } catch (groqError) {
-      console.error('❌ Groq API Error Detail:', groqError);
-      if (groqError.response && groqError.response.data) {
-        console.error('Groq Response Data:', JSON.stringify(groqError.response.data));
-      }
+      console.error('❌ Groq API Error:', groqError.message);
       res.status(500).json({ success: false, answer: "Bộ não AI siêu tốc đang bảo trì, vui lòng thử lại sau!" });
     }
   } catch (error) {
-    console.error('Critical Chat Error:', error);
+    console.error('Critical Chat Error:', error.message);
     res.status(500).json({ success: false, answer: 'Lỗi hệ thống.' });
   }
 });

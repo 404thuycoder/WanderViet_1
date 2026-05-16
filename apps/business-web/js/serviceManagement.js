@@ -214,11 +214,25 @@
         },
 
         edit(id) {
+            const btnSubmit = document.getElementById('add-svc-submit-btn');
+            const eliteModal = document.getElementById('add-svc-overlay');
+            
+            // Nếu đã mở đúng ID này rồi thì chỉ cần hiện lại modal, không load lại dữ liệu (tránh mất thay đổi chưa lưu)
+            if (btnSubmit && btnSubmit.dataset.editId === id) {
+                if (eliteModal) {
+                    eliteModal.classList.add('is-open');
+                    document.body.classList.remove('is-logging-in');
+                    return;
+                }
+            }
+
+            // Lưu nháp của dịch vụ hiện tại trước khi chuyển sang dịch vụ mới
+            if (typeof window.saveDraft === 'function') window.saveDraft();
+
             state.editingId = id;
             const svc = state.services.find(s => s._id === id);
             if (!svc) return;
             
-            const eliteModal = document.getElementById('add-svc-overlay');
             if (eliteModal) {
                 document.body.classList.remove('is-logging-in');
                 
@@ -449,10 +463,6 @@
                     galleryInput.value = svc.images.join(', ');
                 }
 
-                // Reset global file trackers to avoid carry-over
-                window.svcSelectedFiles = [];
-                window.svcGalleryFiles = [];
-
                 // Experiences
                 const expList = document.getElementById('experience-list');
                 if (expList) {
@@ -558,7 +568,6 @@
                 }
 
                 // Setup submit button
-                const btnSubmit = document.getElementById('add-svc-submit-btn');
                 if (btnSubmit) {
                     btnSubmit.textContent = 'Lưu thay đổi';
                     btnSubmit.dataset.editId = id;
@@ -566,6 +575,12 @@
 
                 eliteModal.classList.add('is-open');
                 if (window.initEliteMap) window.initEliteMap();
+                
+                // Tự động khôi phục bản nháp (nếu có) mà không cần hỏi
+                const draftStr = localStorage.getItem('wander_svc_draft_' + id);
+                if (draftStr && window.restoreSvcDraft) {
+                    window.restoreSvcDraft(draftStr);
+                }
             } else {
                 // Fallback Legacy modal
                 document.getElementById('sm-modal-title').textContent = '✏️ Chỉnh sửa dịch vụ';
@@ -589,8 +604,19 @@
             if (eliteModal) {
                 // Remove is-logging-in class to enable clicks
                 document.body.classList.remove('is-logging-in');
+                
+                // Clear any existing edit ID
+                const btnSubmit = document.getElementById('add-svc-submit-btn');
+                if (btnSubmit) delete btnSubmit.dataset.editId;
+                
                 eliteModal.classList.add('is-open');
                 if (window.initEliteMap) window.initEliteMap();
+                
+                // Tự động khôi phục bản nháp "new" mà không cần hỏi
+                const draftStr = localStorage.getItem('wander_svc_draft_new');
+                if (draftStr && window.restoreSvcDraft) {
+                    window.restoreSvcDraft(draftStr);
+                }
             } else {
                 state.editingId = null;
                 document.getElementById('sm-modal-title').textContent = '✨ Thêm dịch vụ mới';
@@ -836,6 +862,14 @@
         // Listen for new service additions from other forms (like Elite form)
         window.addEventListener('svc-added', () => {
             loadServices();
+        });
+
+        // Listen for real-time synchronization events across portals
+        window.addEventListener('wander_data_sync', (e) => {
+            if (e.detail && e.detail.entity === 'place') {
+                console.log('Real-time sync triggered:', e.detail);
+                loadServices();
+            }
         });
     };
 

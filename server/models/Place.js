@@ -79,7 +79,7 @@ const placeSchema = new mongoose.Schema({
   gallery: [{
     url: String,
     type: { type: String, enum: ['image', 'video', '360', 'reel'], default: 'image' },
-    category: { type: String, enum: ['food', 'nature', 'hotel', 'nightlife', 'beach', 'adventure', 'general', 'space', 'menu', 'room', 'view', 'amenity', 'activity', 'customer', 'other'], default: 'general' },
+    category: { type: String, enum: ['food', 'nature', 'hotel', 'nightlife', 'beach', 'adventure', 'general', 'space', 'menu', 'room', 'view', 'amenity', 'activity', 'customer', 'other', 'dining', 'service', 'video'], default: 'general' },
     caption: String,
     uploadedBy: { type: String, default: 'business' }, // 'business' or 'user'
     likes: { type: Number, default: 0 },

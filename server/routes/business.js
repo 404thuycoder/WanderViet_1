@@ -14,6 +14,7 @@ const Booking = require('../models/Booking');
 const AIInsight = require('../models/AIInsight');
 const BusinessActivity = require('../models/BusinessActivity');
 const { syncBusinessXP } = require('../utils/rankUtils');
+const { broadcastGlobal } = require('../utils/socketManager');
 const Groq = require('groq-sdk');
 const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
 
@@ -725,6 +726,7 @@ router.post('/places', businessAuth, upload.fields([
     await newPlace.save();
     await syncBusinessXP(req.user.id);
     await logAction('PLACE_CREATED', `Đã thêm địa điểm: ${newPlace.name}`, req);
+    broadcastGlobal('data_sync', { entity: 'place', action: 'added' });
     res.json({ success: true, data: newPlace });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -901,6 +903,7 @@ router.put('/places/:id', businessAuth, upload.fields([
     await place.save();
     await syncBusinessXP(req.user.id);
     await logAction('PLACE_UPDATED', `Đã cập nhật địa điểm: ${place.name}`, req);
+    broadcastGlobal('data_sync', { entity: 'place', action: 'updated' });
     res.json({ success: true, data: place });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -914,6 +917,7 @@ router.delete('/places/:id', businessAuth, async (req, res) => {
     const place = await Place.findOneAndDelete(query);
     if (!place) return res.status(404).json({ success: false, message: 'Không thể xóa (Không tìm thấy hoặc sai quyền).' });
     await syncBusinessXP(req.user.id);
+    broadcastGlobal('data_sync', { entity: 'place', action: 'deleted' });
     res.json({ success: true, message: 'Đã xóa thành công.' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

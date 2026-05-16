@@ -41,6 +41,7 @@ const postSchema = new mongoose.Schema({
   }],
   
   isPublic: { type: Boolean, default: true },
+  isReview: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
 

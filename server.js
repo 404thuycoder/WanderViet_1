@@ -87,6 +87,7 @@ app.use('/api/knowledge', require('./server/routes/knowledge'));
 app.use('/api/social', require('./server/routes/social'));
 app.use('/api/bookings', require('./server/routes/bookings'));
 app.use('/api/payments', require('./server/routes/payments'));
+app.use('/api/place-reviews', require('./server/routes/placeReviews'));
 
 // FAIL-SAFE: Direct registration of place-photo proxy
 app.get('/api/public/place-photo', async (req, res) => {

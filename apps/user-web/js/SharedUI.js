@@ -292,21 +292,38 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   let socket = null;
 
   function initSocket() {
-    const token = localStorage.getItem('wander_token');
-    if (!token || typeof io === 'undefined' || socket) return;
+    const token = localStorage.getItem('wander_token') || localStorage.getItem('wander_admin_token') || localStorage.getItem('wander_business_token');
+    
+    if (typeof io === 'undefined') {
+      const script = document.createElement('script');
+      script.src = '/socket.io/socket.io.js';
+      script.onload = () => initSocket();
+      document.head.appendChild(script);
+      return;
+    }
+    
+    if (socket) return;
 
     socket = io({ 
-        auth: { token },
+        auth: { token: token || '' },
         transports: ['websocket', 'polling'],
         reconnectionAttempts: 5,
         timeout: 10000
     });
+    
+    window.WanderUI.socket = socket;
+
     socket.on('notification', (notif) => {
       WanderUI.showToast(notif.message || 'Bạn có thông báo mới!', 'info');
       updateNotificationBadge();
       if (document.getElementById('wander-notif-drawer')?.classList.contains('is-open')) {
         renderNotifications();
       }
+    });
+
+    socket.on('data_sync', (data) => {
+      const event = new CustomEvent('wander_data_sync', { detail: data });
+      window.dispatchEvent(event);
     });
   }
 
@@ -4308,6 +4325,36 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     openModal('notif-detail');
   }
 
+  function viewImage(url) {
+    let overlay = document.getElementById('wv-image-viewer');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.id = 'wv-image-viewer';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:1000000;background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;cursor:zoom-out;padding:20px;transition:opacity 0.3s ease;';
+      overlay.innerHTML = `
+        <img id="wv-image-viewer-img" src="" style="max-width:100%; max-height:100%; border-radius:12px; box-shadow:0 30px 60px rgba(0,0,0,0.6); object-fit:contain; transform:scale(0.9); transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);">
+        <button style="position:absolute; top:24px; right:24px; background:rgba(255,255,255,0.08); border:none; color:#fff; width:48px; height:48px; border-radius:50%; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,0.15); transition:all 0.2s;">✕</button>
+      `;
+      overlay.onclick = () => {
+        overlay.style.opacity = '0';
+        document.getElementById('wv-image-viewer-img').style.transform = 'scale(0.9)';
+        setTimeout(() => overlay.style.display = 'none', 300);
+      };
+      document.body.appendChild(overlay);
+    }
+    const img = document.getElementById('wv-image-viewer-img');
+    img.src = url;
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '0';
+    img.style.transform = 'scale(0.9)';
+    
+    // Force reflow
+    overlay.offsetHeight;
+    
+    overlay.style.opacity = '1';
+    img.style.transform = 'scale(1)';
+  }
+
   function copyToClipboard(text, btn) {
     if (!navigator.clipboard) {
       const textArea = document.createElement("textarea");
@@ -4327,7 +4374,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     }
   }
 
-  return { setTheme, toggleTheme, showToast, setButtonLoading, toggleNotificationDrawer, updateNotificationBadge, markAsRead, markAllAsRead, syncAuthUI, forceLogout, toggleUserMenu, openAuthModal, confirm, openPlaceDetail, openBookingDetail, openItineraryDetail, openNotificationDetailModal, getRankBadgeHTML, getRankIcon, getStoreKey, initSettingsHandlers, trackQuestActivity, getQuestActivity, startTopLoader, finishTopLoader, openModal, closeModal, copyToClipboard };
+  return { setTheme, toggleTheme, showToast, setButtonLoading, toggleNotificationDrawer, updateNotificationBadge, markAsRead, markAllAsRead, syncAuthUI, forceLogout, toggleUserMenu, openAuthModal, confirm, openPlaceDetail, openBookingDetail, openItineraryDetail, openNotificationDetailModal, getRankBadgeHTML, getRankIcon, getStoreKey, initSettingsHandlers, trackQuestActivity, getQuestActivity, startTopLoader, finishTopLoader, openModal, closeModal, copyToClipboard, viewImage };
 })());
 
 

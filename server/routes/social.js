@@ -54,10 +54,9 @@ router.get('/posts', async (req, res) => {
 
     const posts = await Post.find({ 
       $or: [
+        { 'location.placeId': mongoose.Types.ObjectId.isValid(placeId) ? new mongoose.Types.ObjectId(placeId) : placeId },
         { 'location.id': placeId },
-        { 'location.name': placeId },
-        { 'attachment.id': placeId },
-        { 'placeId': placeId } // Support both schemas
+        { 'placeId': placeId }
       ]
     })
     .sort({ createdAt: -1 })
@@ -492,27 +491,57 @@ router.post('/notifications/read', auth, async (req, res) => {
   }
 });
 
-// 5. ĐĂNG BÀI VIẾT MỚI (Nhật ký)
-router.post('/posts', auth, async (req, res) => {
+// 5. ĐĂNG BÀI VIẾT MỚI (Nhật ký / Community)
+router.post('/posts', upload.any(), auth, async (req, res) => {
   try {
+    if (!req.body) req.body = {};
     const realId = await resolveUserId(req.user.id);
-    const { content, media, location, attachment } = req.body;
-    const post = new Post({
-      userId: realId, 
-      userName: req.user.displayName || req.user.name, 
-      userAvatar: req.user.avatar || '',
-      content, 
-      media: (media || []).map(m => {
+    const { content, location, attachment, placeId } = req.body;
+    
+    // Process media from files or body
+    let finalMedia = [];
+    if (req.files && req.files.length > 0) {
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      req.files.forEach(file => {
+        finalMedia.push({
+          url: `/uploads/${file.filename}`,
+          type: file.mimetype.startsWith('video') ? 'video' : 'image'
+        });
+      });
+    } else if (req.body.media) {
+      // Handle legacy JSON media if any
+      const rawMedia = typeof req.body.media === 'string' ? JSON.parse(req.body.media) : req.body.media;
+      finalMedia = (rawMedia || []).map(m => {
         if (m.url && m.url.includes('/uploads/')) {
           const parts = m.url.split('/uploads/');
           m.url = '/uploads/' + parts[parts.length - 1];
         }
         return m;
-      }), 
+      });
+    }
+
+    // Handle Location / PlaceId
+    let finalLocation = location;
+    if (typeof location === 'string') {
+      try { finalLocation = JSON.parse(location); } catch(e) {}
+    }
+    
+    if (placeId && mongoose.Types.ObjectId.isValid(placeId)) {
+        if (!finalLocation) finalLocation = { name: 'Địa điểm' };
+        finalLocation.placeId = new mongoose.Types.ObjectId(placeId);
+    }
+
+    const post = new Post({
+      userId: realId, 
+      userName: req.user.displayName || req.user.name, 
+      userAvatar: req.user.avatar || '',
+      content, 
+      media: finalMedia, 
       mediaLayout: req.body.mediaLayout || 'grid',
-      location: location || null,
-      attachment: attachment || undefined,
-      isPublic: req.body.visibility === 'public'
+      location: finalLocation,
+      attachment: attachment ? (typeof attachment === 'string' ? JSON.parse(attachment) : attachment) : undefined,
+      isPublic: req.body.visibility !== 'private',
+      isReview: !!placeId
     });
     await post.save();
     const populatedPost = await Post.findById(post._id).populate('userId', 'name displayName avatar rank rankTier');
@@ -549,7 +578,8 @@ router.get('/feed', auth, async (req, res) => {
       $or: [
         { userId: { $in: friendIds } }, 
         { isPublic: true }
-      ] 
+      ],
+      isReview: { $ne: true }
     })
     .sort({ createdAt: -1 })
     .limit(30)

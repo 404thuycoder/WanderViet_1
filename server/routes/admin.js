@@ -18,7 +18,7 @@ const Story = require('../models/Story');
 const Booking = require('../models/Booking');
 const Transaction = require('../models/Transaction');
 const Notification = require('../models/Notification');
-const { sendNotification } = require('../utils/socketManager');
+const { sendNotification, broadcastGlobal } = require('../utils/socketManager');
 
 // Cấu hình Rank cho Admin API
 const RANK_CONFIG = [
@@ -1213,6 +1213,7 @@ router.post('/places', adminTokenAuth, superAdminAuth, upload.array('imageFile',
     }
     await place.save();
     await logAction(req.user?.email || 'admin', req.user?.role || 'admin', 'PLACE_CREATED', { placeId: place.id, name: place.name }, req.ip, req.headers['user-agent']);
+    broadcastGlobal('data_sync', { entity: 'place', action: 'added' });
     res.json({ success: true, data: place });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -1297,6 +1298,7 @@ router.put('/places/:id', adminTokenAuth, adminAuth, upload.array('imageFile', 1
     Object.assign(place, updates);
     await place.save();
     await logAction(req.user?.email || 'admin', req.user?.role || 'admin', 'PLACE_UPDATED', { placeId: place.id, name: place.name }, req.ip, req.headers['user-agent']);
+    broadcastGlobal('data_sync', { entity: 'place', action: 'updated' });
     res.json({ success: true, data: place });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -1309,6 +1311,7 @@ router.delete('/places/:id', adminTokenAuth, superAdminAuth, async (req, res) =>
     const place = await Place.findOneAndDelete({ id: req.params.id });
     if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy thông tin' });
     await logAction(req.user?.email || 'admin', req.user?.role || 'admin', 'PLACE_DELETED', { placeId: req.params.id, name: place.name }, req.ip, req.headers['user-agent']);
+    broadcastGlobal('data_sync', { entity: 'place', action: 'deleted' });
     res.json({ success: true, message: 'Đã xóa thành công' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -1611,6 +1614,7 @@ router.put('/places/:id/approve', adminTokenAuth, adminAuth, async (req, res) =>
     }
 
     await logAction(req.user.email, req.user.role, 'PLACE_APPROVED', { placeId: place.id, placeName: place.name }, req.ip, req.headers['user-agent']);
+    broadcastGlobal('data_sync', { entity: 'place', action: 'approved' });
     res.json({ success: true, message: 'Đã phê duyệt địa điểm', data: place });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -1642,6 +1646,7 @@ router.put('/places/:id/reject', adminTokenAuth, adminAuth, async (req, res) => 
     }
 
     await logAction(req.user.email, req.user.role, 'PLACE_REJECTED', { placeId: place.id, placeName: place.name, reason }, req.ip, req.headers['user-agent']);
+    broadcastGlobal('data_sync', { entity: 'place', action: 'rejected' });
     res.json({ success: true, message: 'Đã từ chối địa điểm', data: place });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

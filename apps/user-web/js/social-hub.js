@@ -2660,7 +2660,7 @@ const SocialHub = {
             const visibility = visSelect ? visSelect.dataset.value : 'public';
 
             if (this.editingPostId) {
-                // UPDATE POST (Media update not supported via simple PUT yet, just JSON fields)
+                console.log('[SubmitPost] Updating existing post:', this.editingPostId);
                 res = await fetch(`/api/social/posts/${this.editingPostId}`, {
                     method: 'PUT',
                     headers: {
@@ -2675,6 +2675,7 @@ const SocialHub = {
                     })
                 });
             } else if (this.postMediaFiles.length > 0) {
+                console.log('[SubmitPost] Creating new post with media:', this.postMediaFiles.length);
                 const formData = new FormData();
                 formData.append('content', content || '');
                 formData.append('visibility', visibility);
@@ -2682,7 +2683,10 @@ const SocialHub = {
                 if (this.currentPostAttachment) formData.append('attachment', JSON.stringify(this.currentPostAttachment));
                 if (this.mediaLayout) formData.append('mediaLayout', this.mediaLayout);
                 
-                this.postMediaFiles.forEach(f => formData.append('media', f));
+                this.postMediaFiles.forEach((f, idx) => {
+                    console.log(`[SubmitPost] Appending file ${idx}:`, f.name, f.size, f.type);
+                    formData.append('media', f);
+                });
                 
                 res = await new Promise((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
@@ -2702,6 +2706,7 @@ const SocialHub = {
 
                     xhr.onreadystatechange = () => {
                         if (xhr.readyState === 4) {
+                            console.log('[SubmitPost] XHR Complete. Status:', xhr.status);
                             if (progContainer) progContainer.style.display = 'none';
                             try {
                                 const response = JSON.parse(xhr.responseText);
@@ -2713,15 +2718,17 @@ const SocialHub = {
                     };
 
                     xhr.onerror = () => {
+                        console.error('[SubmitPost] XHR Error');
                         if (progContainer) progContainer.style.display = 'none';
                         reject(new Error("Lỗi kết nối mạng"));
                     };
 
-                    xhr.open('POST', '/api/social/posts/media');
+                    xhr.open('POST', '/api/social/posts');
                     xhr.setRequestHeader('x-auth-token', token);
                     xhr.send(formData);
                 });
             } else {
+                console.log('[SubmitPost] Creating text-only post');
                 res = await fetch('/api/social/posts', {
                     method: 'POST',
                     headers: {
@@ -2730,9 +2737,9 @@ const SocialHub = {
                     },
                     body: JSON.stringify({
                         content,
-                        location: locationEl?.dataset?.location ? { name: locationEl.dataset.location } : null,
-                        attachment: this.currentPostAttachment,
-                        visibility: visibility
+                        visibility,
+                        locationName: locationEl?.dataset?.location ? { name: locationEl.dataset.location } : null,
+                        attachment: this.currentPostAttachment
                     })
                 });
             }
@@ -2745,6 +2752,7 @@ const SocialHub = {
                 
             // Clear attachment state and UI
             this.currentPostAttachment = null;
+            this.postMediaFiles = []; // Clear media files array
             const attachPreview = document.getElementById('attachment-preview-container');
             if (attachPreview) attachPreview.style.display = 'none';
 
@@ -3546,6 +3554,20 @@ const SocialHub = {
             html = '<div class="search-no-results">Không tìm thấy kết quả nào trong mục này</div>';
         }
         container.innerHTML = html;
+    },
+
+    viewImage: function (url) {
+        if (!url) return;
+        const lightbox = document.createElement('div');
+        lightbox.className = 'lightbox-overlay';
+        lightbox.innerHTML = `
+            <div class="lightbox-content">
+                <img src="${url}" alt="Phóng to">
+                <button class="lightbox-close" onclick="this.closest('.lightbox-overlay').remove()">&times;</button>
+            </div>
+        `;
+        lightbox.onclick = (e) => { if (e.target === lightbox) lightbox.remove(); };
+        document.body.appendChild(lightbox);
     }
 };
 

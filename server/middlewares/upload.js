@@ -7,16 +7,8 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Use disk storage for reliability
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'upload-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Use memory storage for base64 upload to MongoDB
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   // Allow common images, videos, and audio

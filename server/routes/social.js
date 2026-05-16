@@ -95,11 +95,8 @@ router.get('/business/check-follow/:id', auth, async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
-// Multer config for media uploads - using disk storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '..', '..', 'uploads')),
-  filename: (req, file, cb) => cb(null, `social_${Date.now()}_${Math.random().toString(36).slice(2)}${path.extname(file.originalname)}`)
-});
+// Multer config for media uploads - using memory storage for MongoDB base64
+const storage = multer.memoryStorage();
 const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
   // Broadly allow images, videos, and audio
   const allowed = /jpeg|jpg|png|gif|webp|bmp|tiff|heic|heif|mp4|webm|mov|avi|flv|3gp|mp3|wav|ogg|m4a|aac|m4p|flac/;
@@ -144,22 +141,13 @@ function processPost(post, baseUrl) {
     });
   }
   
-  // Fix media URLs - handle both old /uploads/ and new /api/files/ URLs
+  // Clean up media URLs to be relative - be more aggressive with regex
   if (p.media && Array.isArray(p.media)) {
-    p.media = p.media.filter(m => {
-      // Filter out media items with undefined or invalid URLs
-      return m.url && m.url !== 'undefined' && m.url !== '' && !m.url.includes('undefined');
-    }).map(m => {
-      if (m.url) {
-        // If it's a relative URL starting with /uploads/, prepend baseUrl
-        if (m.url.startsWith('/uploads/')) {
-          m.url = `${baseUrl}${m.url}`;
-        }
-        // If it's a relative URL starting with /api/files/, prepend baseUrl
-        else if (m.url.startsWith('/api/files/')) {
-          m.url = `${baseUrl}${m.url}`;
-        }
-        // If it's already a full URL, leave it as is
+    p.media = p.media.filter(m => m.url && m.url !== 'undefined' && m.url !== '' && !m.url.includes('undefined')).map(m => {
+      if (typeof m.url === 'string') {
+        // Remove any protocol + hostname + port (e.g., http://localhost:3000)
+        // This makes URLs like http://localhost:3000/api/files/... become /api/files/...
+        m.url = m.url.replace(/^https?:\/\/[^\/]+/, '');
       }
       return m;
     });
@@ -205,22 +193,10 @@ router.get('/stories', auth, async (req, res) => {
       obj.likeCount = s.likes ? s.likes.length : 0;
       obj.isLiked = s.likes ? s.likes.some(id => id.toString() === realId.toString()) : false;
       
-      // Fix media URLs - handle both old /uploads/ and new /api/files/ URLs
       if (obj.media && Array.isArray(obj.media)) {
-        obj.media = obj.media.filter(m => {
-          // Filter out media items with undefined or invalid URLs
-          return m.url && m.url !== 'undefined' && m.url !== '' && !m.url.includes('undefined');
-        }).map(m => {
-          if (m.url) {
-            // If it's a relative URL starting with /uploads/, prepend baseUrl
-            if (m.url.startsWith('/uploads/')) {
-              m.url = `${baseUrl}${m.url}`;
-            }
-            // If it's a relative URL starting with /api/files/, prepend baseUrl
-            else if (m.url.startsWith('/api/files/')) {
-              m.url = `${baseUrl}${m.url}`;
-            }
-            // If it's already a full URL, leave it as is
+        obj.media = obj.media.filter(m => m.url && m.url !== 'undefined' && m.url !== '' && !m.url.includes('undefined')).map(m => {
+          if (typeof m.url === 'string') {
+            m.url = m.url.replace(/^https?:\/\/[^\/]+/, '');
           }
           return m;
         });
@@ -239,9 +215,14 @@ router.post('/stories', auth, upload.single('media'), async (req, res) => {
     const realId = await resolveUserId(req.user.id);
     if (!req.file) return res.status(400).json({ success: false, message: 'Vui lòng chọn ảnh hoặc video' });
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    // Upload file to MongoDB as base64
+    const uploadedFile = await uploadFile(req.file, `story_${Date.now()}_${req.file.originalname}`, {
+      userId: realId,
+      type: 'story'
+    });
+
     const media = {
-      url: `${baseUrl}/uploads/${req.file.filename}`,
+      url: `/api/files/${uploadedFile.id}`,
       type: req.file.mimetype.startsWith('video') ? 'video' : (req.file.mimetype.startsWith('audio') ? 'audio' : 'image')
     };
     
@@ -515,71 +496,96 @@ router.post('/notifications/read', auth, async (req, res) => {
 });
 
 // 5. ĐĂNG BÀI VIẾT MỚI (Nhật ký / Community)
-router.post('/posts', upload.any(), auth, async (req, res) => {
+router.post('/posts', auth, upload.array('media', 10), async (req, res) => {
+  console.log('[API POST /posts] Request received');
+  console.log('[API POST /posts] Files count:', req.files ? req.files.length : 0);
+  console.log('[API POST /posts] Content length:', req.body.content ? req.body.content.length : 0);
+
   try {
-    if (!req.body) req.body = {};
     const realId = await resolveUserId(req.user.id);
-    const { content, location, attachment, placeId } = req.body;
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     
-    // Process media from files or body
+    // 1. Process Fields
+    const { content, visibility, locationName, mediaLayout } = req.body;
+    let attachmentData;
+    try {
+      if (req.body.attachment) {
+        attachmentData = typeof req.body.attachment === 'string' ? JSON.parse(req.body.attachment) : req.body.attachment;
+      }
+    } catch(e) {
+      console.warn('[API POST /posts] Attachment parse error');
+    }
+
+    // 2. Process Media (from files or body)
     let finalMedia = [];
+    
+    // Files from Multipart (multer array('media'))
     if (req.files && req.files.length > 0) {
-      const baseUrl = `${req.protocol}://${req.get('host')}`;
-      req.files.forEach(file => {
-        finalMedia.push({
-          url: `/uploads/${file.filename}`,
-          type: file.mimetype.startsWith('video') ? 'video' : 'image'
-        });
-      });
-    } else if (req.body.media) {
-      // Handle legacy JSON media if any
-      const rawMedia = typeof req.body.media === 'string' ? JSON.parse(req.body.media) : req.body.media;
-      finalMedia = (rawMedia || []).map(m => {
-        // Keep existing URLs as they are (they might be from MongoDB or legacy)
-        return m;
-      });
-    }
-
-    // Handle Location / PlaceId
-    let finalLocation = location;
-    if (typeof location === 'string') {
-      try { finalLocation = JSON.parse(location); } catch(e) {}
+      console.log('[API POST /posts] Processing', req.files.length, 'files');
+      for (const file of req.files) {
+        try {
+          const uploadedFile = await uploadFile(file, `post_${Date.now()}_${file.originalname}`, {
+            userId: realId,
+            type: 'post'
+          });
+          finalMedia.push({
+            url: `/api/files/${uploadedFile.id}`,
+            type: file.mimetype.startsWith('video') ? 'video' : (file.mimetype.startsWith('audio') ? 'audio' : 'image')
+          });
+          console.log('[API POST /posts] File uploaded successfully:', uploadedFile.id);
+        } catch (uploadErr) {
+          console.error('[API POST /posts] File upload failed:', uploadErr.message);
+        }
+      }
     }
     
-    if (placeId && mongoose.Types.ObjectId.isValid(placeId)) {
-        if (!finalLocation) finalLocation = { name: 'Địa điểm' };
-        finalLocation.placeId = new mongoose.Types.ObjectId(placeId);
+    // Body from JSON (if any)
+    if (req.body.media) {
+      try {
+        const rawMedia = typeof req.body.media === 'string' ? JSON.parse(req.body.media) : req.body.media;
+        if (Array.isArray(rawMedia)) {
+          finalMedia = [...finalMedia, ...rawMedia];
+          console.log('[API POST /posts] Added', rawMedia.length, 'media items from body');
+        }
+      } catch(e) {
+        console.warn('[API POST /posts] req.body.media parse error');
+      }
     }
 
+    console.log('[API POST /posts] Final media count:', finalMedia.length);
+
+    // 3. Create Post
     const post = new Post({
       userId: realId, 
       userName: req.user.displayName || req.user.name, 
       userAvatar: req.user.avatar || '',
-      content, 
+      content: content || '', 
       media: finalMedia, 
-      mediaLayout: req.body.mediaLayout || 'grid',
-      location: finalLocation,
-      attachment: attachment ? (typeof attachment === 'string' ? JSON.parse(attachment) : attachment) : undefined,
-      isPublic: req.body.visibility !== 'private',
-      isReview: !!placeId
+      mediaLayout: mediaLayout || 'grid',
+      location: locationName ? { name: locationName } : null,
+      attachment: attachmentData,
+      isPublic: visibility === 'public' || req.body.isPublic !== false,
+      isReview: !!req.body.placeId
     });
+
     await post.save();
+    console.log('[API POST /posts] Post saved:', post._id);
+
     const populatedPost = await Post.findById(post._id).populate('userId', 'name displayName avatar rank rankTier');
-    const result = populatedPost.toObject();
-    if (populatedPost.userId && typeof populatedPost.userId === 'object') {
-        result.userName = populatedPost.userId.displayName || populatedPost.userId.name;
-        result.userAvatar = populatedPost.userId.avatar;
-    }
+    const result = processPost(populatedPost, baseUrl);
     
-    // Real-time: broadcast new post to all friends
+    // Real-time broadcast
     try {
       const friends = await Friendship.find({ $or: [{ requester: realId, status: 'accepted' }, { recipient: realId, status: 'accepted' }] });
       const friendIds = friends.map(f => f.requester.equals(realId) ? f.recipient : f.requester);
       emitToUsers(friendIds, 'new_post', result);
-    } catch(e) { /* Non-critical */ }
+    } catch(e) {}
     
     res.json({ success: true, post: result });
-  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+  } catch (err) { 
+    console.error('[API POST /posts] Fatal error:', err);
+    res.status(500).json({ success: false, message: err.message }); 
+  }
 });
 
 // 6. LẤY BẢNG TIN (Feed)
@@ -909,50 +915,7 @@ router.get('/posts/:id', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
-// 17. ĐĂNG BÀI CÓ MEDIA
-router.post('/posts/media', auth, upload.array('media', 5), async (req, res) => {
-  try {
-    const realId = await resolveUserId(req.user.id);
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const media = (req.files || []).map(f => {
-      let type = 'image';
-      if (f.mimetype.startsWith('video')) type = 'video';
-      else if (f.mimetype.startsWith('audio')) type = 'audio';
-      
-      console.log(`[Upload] File saved: ${f.filename} (${f.size} bytes) at ${f.path}`);
-      return { url: `/uploads/${f.filename}`, type }; // ⭐ Relative path
-    });
-    
-    let attachmentData;
-    try {
-      if (req.body.attachment) attachmentData = JSON.parse(req.body.attachment);
-    } catch(e) {}
-
-    const post = new Post({ 
-      userId: realId, 
-      userName: req.user.displayName || req.user.name, 
-      userAvatar: req.user.avatar || '', 
-      content: req.body.content || '', 
-      media, 
-      location: req.body.locationName ? { name: req.body.locationName } : null,
-      attachment: attachmentData,
-      isPublic: req.body.visibility === 'public'
-    });
-    await post.save();
-    const populatedPost = await Post.findById(post._id).populate('userId', 'name displayName avatar rank rankTier');
-    
-    const result = processPost(populatedPost, baseUrl);
-    
-    // Real-time: broadcast new post to all friends
-    try {
-      const friends = await Friendship.find({ $or: [{ requester: realId, status: 'accepted' }, { recipient: realId, status: 'accepted' }] });
-      const friendIds = friends.map(f => f.requester.equals(realId) ? f.recipient : f.requester);
-      emitToUsers(friendIds, 'new_post', result);
-    } catch(e) { /* Non-critical */ }
-    
-    res.json({ success: true, post: result });
-  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
-});
+// 17. Removed (merged with #5)
 
 // 18. CHIA SẺ BÀI VIẾT
 router.post('/posts/:id/share', auth, async (req, res) => {

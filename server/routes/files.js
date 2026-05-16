@@ -1,31 +1,30 @@
 const express = require('express');
 const router = express.Router();
-const { getFileStream, getFileInfo } = require('../utils/gridfsStorage');
+const { getFileData } = require('../utils/gridfsStorage');
 
-// Serve file from MongoDB GridFS
+// Serve file from MongoDB (base64)
 router.get('/:fileId', async (req, res) => {
   try {
     const { fileId } = req.params;
     
-    // Get file info first
-    const fileInfo = await getFileInfo(fileId);
+    // Get file data from MongoDB
+    const file = await getFileData(fileId);
+    
+    if (!file) {
+      return res.status(404).json({ success: false, message: 'File not found' });
+    }
+    
+    // Convert base64 to buffer
+    const buffer = Buffer.from(file.data, 'base64');
     
     // Set appropriate headers
-    res.setHeader('Content-Type', fileInfo.metadata?.mimetype || 'application/octet-stream');
-    res.setHeader('Content-Length', fileInfo.length);
-    res.setHeader('Content-Disposition', `inline; filename="${fileInfo.metadata?.originalName || fileInfo.filename}"`);
+    res.setHeader('Content-Type', file.mimetype || 'application/octet-stream');
+    res.setHeader('Content-Length', buffer.length);
+    res.setHeader('Content-Disposition', `inline; filename="${file.originalName || file.filename}"`);
     res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
     
-    // Stream the file
-    const downloadStream = await getFileStream(fileId);
-    downloadStream.pipe(res);
-    
-    downloadStream.on('error', (error) => {
-      console.error('Error streaming file:', error);
-      if (!res.headersSent) {
-        res.status(500).json({ success: false, message: 'Error streaming file' });
-      }
-    });
+    // Send the buffer
+    res.send(buffer);
     
   } catch (error) {
     console.error('Error serving file:', error);

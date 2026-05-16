@@ -17,6 +17,7 @@ const { syncBusinessXP } = require('../utils/rankUtils');
 const { broadcastGlobal } = require('../utils/socketManager');
 const Groq = require('groq-sdk');
 const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
+const { uploadFile } = require('../utils/gridfsStorage');
 
 const safeParseArray = (req, field, forceObjectArray = false) => {
   let val = req.body[field];
@@ -566,37 +567,57 @@ router.post('/places', businessAuth, upload.fields([
   { name: 'imageFile', maxCount: 10 } // fallback
 ]), async (req, res) => {
   try {
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     // 1. Image handling
     let galleryItems = []; // Array of { url, type }
     
     // Primary Image (Cover)
     let mainImage = req.body.image || '';
     if (req.files['primaryFile'] && req.files['primaryFile'][0]) {
-      mainImage = '/uploads/' + req.files['primaryFile'][0].filename;
+      const uploadedFile = await uploadFile(req.files['primaryFile'][0], `place_primary_${Date.now()}_${req.files['primaryFile'][0].originalname}`, {
+        ownerId: req.user.id,
+        type: 'place_primary'
+      });
+      mainImage = `/api/files/${uploadedFile.id}`;
     } else if (req.files['imageFile'] && req.files['imageFile'][0]) {
-      mainImage = '/uploads/' + req.files['imageFile'][0].filename;
+      const uploadedFile = await uploadFile(req.files['imageFile'][0], `place_primary_${Date.now()}_${req.files['imageFile'][0].originalname}`, {
+        ownerId: req.user.id,
+        type: 'place_primary'
+      });
+      mainImage = `/api/files/${uploadedFile.id}`;
     }
 
     // Gallery Files with Metadata
     const meta = safeParseArray(req, 'galleryMetadata', true);
     if (req.files['galleryFile'] && req.files['galleryFile'].length > 0) {
-      req.files['galleryFile'].forEach((file, idx) => {
+      for (let idx = 0; idx < req.files['galleryFile'].length; idx++) {
+        const file = req.files['galleryFile'][idx];
         const category = (meta[idx] && meta[idx].type) || 'other';
         const isVideo = file.mimetype && file.mimetype.startsWith('video/');
+        const uploadedFile = await uploadFile(file, `place_gallery_${Date.now()}_${file.originalname}`, {
+          ownerId: req.user.id,
+          type: 'place_gallery',
+          category: category
+        });
         galleryItems.push({
-          url: '/uploads/' + file.filename,
+          url: `/api/files/${uploadedFile.id}`,
           type: isVideo ? 'video' : 'image',
           category: category
         });
-      });
+      }
     }
 
     // Legacy imageFile support
     if (req.files['imageFile'] && req.files['imageFile'].length > 1) {
-      req.files['imageFile'].slice(1).forEach(file => {
+      for (const file of req.files['imageFile'].slice(1)) {
         const isVideo = file.mimetype && file.mimetype.startsWith('video/');
-        galleryItems.push({ url: '/uploads/' + file.filename, type: isVideo ? 'video' : 'image', category: 'other' });
-      });
+        const uploadedFile = await uploadFile(file, `place_gallery_${Date.now()}_${file.originalname}`, {
+          ownerId: req.user.id,
+          type: 'place_gallery',
+          category: 'other'
+        });
+        galleryItems.push({ url: `/api/files/${uploadedFile.id}`, type: isVideo ? 'video' : 'image', category: 'other' });
+      }
     }
 
     // Merge from body (URL strings)
@@ -764,28 +785,43 @@ router.put('/places/:id', businessAuth, upload.fields([
     if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm hoặc bạn không có quyền sửa.' });
 
     // 1. Image handling for Update
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
     let galleryItems = place.gallery || [];
     
     // Primary Image (Cover)
     let mainImage = (req.body.image !== undefined) ? req.body.image : place.image;
     if (req.files['primaryFile'] && req.files['primaryFile'][0]) {
-      mainImage = '/uploads/' + req.files['primaryFile'][0].filename;
+      const uploadedFile = await uploadFile(req.files['primaryFile'][0], `place_primary_${Date.now()}_${req.files['primaryFile'][0].originalname}`, {
+        ownerId: req.user.id,
+        type: 'place_primary'
+      });
+      mainImage = `/api/files/${uploadedFile.id}`;
     } else if (req.files['imageFile'] && req.files['imageFile'][0]) {
-      mainImage = '/uploads/' + req.files['imageFile'][0].filename;
+      const uploadedFile = await uploadFile(req.files['imageFile'][0], `place_primary_${Date.now()}_${req.files['imageFile'][0].originalname}`, {
+        ownerId: req.user.id,
+        type: 'place_primary'
+      });
+      mainImage = `/api/files/${uploadedFile.id}`;
     }
 
     // Gallery Files with Metadata
     const meta = safeParseArray(req, 'galleryMetadata', true);
     if (req.files['galleryFile'] && req.files['galleryFile'].length > 0) {
-      req.files['galleryFile'].forEach((file, idx) => {
+      for (let idx = 0; idx < req.files['galleryFile'].length; idx++) {
+        const file = req.files['galleryFile'][idx];
         const category = (meta[idx] && meta[idx].type) || 'other';
         const isVideo = file.mimetype && file.mimetype.startsWith('video/');
+        const uploadedFile = await uploadFile(file, `place_gallery_${Date.now()}_${file.originalname}`, {
+          ownerId: req.user.id,
+          type: 'place_gallery',
+          category: category
+        });
         galleryItems.push({
-          url: '/uploads/' + file.filename,
+          url: `/api/files/${uploadedFile.id}`,
           type: isVideo ? 'video' : 'image',
           category: category
         });
-      });
+      }
     }
 
     // Handle gallery URLs and metadata from body

@@ -598,13 +598,16 @@ router.get('/feed', auth, async (req, res) => {
 // 7. KẾT BẠN (Gửi lời mời)
 router.post('/friends/request', auth, async (req, res) => {
   try {
-    const realIdStr = req.user._id;
     const realId = await resolveUserId(req.user.id);
     const recipientId = req.body.recipientId;
     const realRecipientId = await resolveUserId(recipientId);
 
-    if (!realRecipientId) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
-    if (realId.equals(realRecipientId)) return res.status(400).json({ success: false, message: 'Không thể kết bạn với chính mình' });
+    if (!realId) return res.status(401).json({ success: false, message: 'Người dùng không hợp lệ' });
+    if (!realRecipientId) return res.status(404).json({ success: false, message: 'Không tìm thấy người nhận' });
+    
+    if (realId.toString() === realRecipientId.toString()) {
+      return res.status(400).json({ success: false, message: 'Không thể kết bạn với chính mình' });
+    }
 
     const existing = await Friendship.findOne({ 
       $or: [
@@ -616,7 +619,9 @@ router.post('/friends/request', auth, async (req, res) => {
     if (existing) {
       if (existing.status === 'accepted') return res.status(400).json({ success: false, message: 'Hai bạn đã là bạn bè.' });
       if (existing.status === 'pending') {
-        if (existing.requester.equals(realId)) return res.status(400).json({ success: false, message: 'Bạn đã gửi lời mời rồi.' });
+        if (existing.requester.toString() === realId.toString()) {
+          return res.status(400).json({ success: false, message: 'Bạn đã gửi lời mời rồi.' });
+        }
         return res.status(400).json({ success: false, message: 'Người này đã gửi lời mời cho bạn.' });
       }
       return res.status(400).json({ success: false, message: 'Thao tác không khả dụng.' });
@@ -625,29 +630,33 @@ router.post('/friends/request', auth, async (req, res) => {
     const newFriendship = new Friendship({ requester: realId, recipient: realRecipientId, status: 'pending' });
     await newFriendship.save();
 
+    const senderName = req.user.displayName || req.user.name;
     const notif = new Notification({ 
-      recipientId: realRecipientId, 
+      recipientId: realRecipientId.toString(), 
       recipientType: 'user', 
-      senderId: realId, 
-      senderName: req.user.displayName || req.user.name, 
+      senderId: realId.toString(), 
+      senderName, 
       type: 'friend_request', 
       title: 'Lời mời kết bạn mới! 👋', 
-      message: `${req.user.displayName || req.user.name} muốn kết bạn với bạn.`, 
+      message: `${senderName} muốn kết bạn với bạn.`, 
       link: '/apps/user-web/social-hub.html?tab=friends' 
     });
     await notif.save();
     
-    sendNotification(realRecipientId, {
+    sendNotification(realRecipientId.toString(), {
       type: 'friend_request',
-      senderId: realId,
-      senderName: req.user.displayName || req.user.name,
+      senderId: realId.toString(),
+      senderName,
       senderAvatar: req.user.avatar || '',
-      message: `${req.user.displayName || req.user.name} muốn kết bạn với bạn.`,
-      friendshipId: newFriendship._id
+      message: `${senderName} muốn kết bạn với bạn.`,
+      friendshipId: newFriendship._id.toString()
     });
     
-    res.json({ success: true, message: 'Đã gửi lời mời kết bạn!', friendshipId: newFriendship._id });
-  } catch (err) { res.status(500).json({ success: false, message: err.message }); }
+    res.json({ success: true, message: 'Đã gửi lời mời kết bạn!', friendshipId: newFriendship._id.toString() });
+  } catch (err) { 
+    console.error('[FriendRequest Error]', err);
+    res.status(500).json({ success: false, message: err.message }); 
+  }
 });
 
 // 8. BÌNH LUẬN

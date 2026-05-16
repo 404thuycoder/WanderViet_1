@@ -191,7 +191,7 @@ router.get('/stories', auth, async (req, res) => {
         };
       }
       obj.likeCount = s.likes ? s.likes.length : 0;
-      obj.isLiked = s.likes ? s.likes.some(id => id.toString() === realId) : false;
+      obj.isLiked = s.likes ? s.likes.some(id => id.toString() === realId.toString()) : false;
       
       // Fix media URLs
       if (obj.media && Array.isArray(obj.media)) {
@@ -267,7 +267,7 @@ router.post('/stories/:id/like', auth, async (req, res) => {
     const story = await Story.findById(req.params.id);
     if (!story) return res.status(404).json({ success: false, message: 'Không tìm thấy thước phim' });
 
-    const index = story.likes.indexOf(realId);
+    const index = story.likes.findIndex(lid => lid.toString() === realId.toString());
     if (index > -1) { story.likes.splice(index, 1); } else { story.likes.push(realId); }
 
     await story.save();
@@ -288,7 +288,7 @@ router.post('/reply-to-story/:id', auth, async (req, res) => {
     if (!story) return res.status(404).json({ success: false, message: `Không tìm thấy thước phim ID: ${req.params.id}` });
 
     const recipientId = story.userId.toString();
-    if (recipientId === realId) return res.status(400).json({ success: false, message: 'Bạn không thể phản hồi tin của chính mình' });
+    if (recipientId === realId.toString()) return res.status(400).json({ success: false, message: 'Bạn không thể phản hồi tin của chính mình' });
 
     // Tạo tin nhắn DM
     const ids = [String(realId), String(recipientId)].sort();
@@ -595,29 +595,58 @@ router.get('/feed', auth, async (req, res) => {
 
 // 6b section moved to top
 
-// 7. KẾT BẠN
+// 7. KẾT BẠN (Gửi lời mời)
 router.post('/friends/request', auth, async (req, res) => {
   try {
+    const realIdStr = req.user._id;
     const realId = await resolveUserId(req.user.id);
-    const realRecipientId = await resolveUserId(req.body.recipientId);
-    if (!realRecipientId) return res.status(404).json({ message: 'Không tìm thấy người dùng' });
-    if (realId === realRecipientId) return res.status(400).json({ message: 'Không thể kết bạn với chính mình' });
-    const existing = await Friendship.findOne({ $or: [{ requester: realId, recipient: realRecipientId }, { requester: realRecipientId, recipient: realId }] });
-    if (existing) return res.status(400).json({ message: 'Lời mời đã tồn tại hoặc đã là bạn.' });
-    await new Friendship({ requester: realId, recipient: realRecipientId, status: 'pending' }).save();
-    const notif = new Notification({ recipientId: realRecipientId, recipientType: 'user', senderId: realId, senderName: req.user.displayName || req.user.name, type: 'system', title: 'Lời mời kết bạn mới! 👋', message: `${req.user.displayName || req.user.name} muốn kết bạn với bạn.`, link: '/apps/user-web/social-hub.html' });
+    const recipientId = req.body.recipientId;
+    const realRecipientId = await resolveUserId(recipientId);
+
+    if (!realRecipientId) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+    if (realId.equals(realRecipientId)) return res.status(400).json({ success: false, message: 'Không thể kết bạn với chính mình' });
+
+    const existing = await Friendship.findOne({ 
+      $or: [
+        { requester: realId, recipient: realRecipientId }, 
+        { requester: realRecipientId, recipient: realId }
+      ] 
+    });
+
+    if (existing) {
+      if (existing.status === 'accepted') return res.status(400).json({ success: false, message: 'Hai bạn đã là bạn bè.' });
+      if (existing.status === 'pending') {
+        if (existing.requester.equals(realId)) return res.status(400).json({ success: false, message: 'Bạn đã gửi lời mời rồi.' });
+        return res.status(400).json({ success: false, message: 'Người này đã gửi lời mời cho bạn.' });
+      }
+      return res.status(400).json({ success: false, message: 'Thao tác không khả dụng.' });
+    }
+
+    const newFriendship = new Friendship({ requester: realId, recipient: realRecipientId, status: 'pending' });
+    await newFriendship.save();
+
+    const notif = new Notification({ 
+      recipientId: realRecipientId, 
+      recipientType: 'user', 
+      senderId: realId, 
+      senderName: req.user.displayName || req.user.name, 
+      type: 'friend_request', 
+      title: 'Lời mời kết bạn mới! 👋', 
+      message: `${req.user.displayName || req.user.name} muốn kết bạn với bạn.`, 
+      link: '/apps/user-web/social-hub.html?tab=friends' 
+    });
     await notif.save();
     
-    // Real-time notify via socket
     sendNotification(realRecipientId, {
       type: 'friend_request',
       senderId: realId,
       senderName: req.user.displayName || req.user.name,
       senderAvatar: req.user.avatar || '',
-      message: `${req.user.displayName || req.user.name} muốn kết bạn với bạn.`
+      message: `${req.user.displayName || req.user.name} muốn kết bạn với bạn.`,
+      friendshipId: newFriendship._id
     });
     
-    res.json({ success: true, message: 'Đã gửi lời mời kết bạn!' });
+    res.json({ success: true, message: 'Đã gửi lời mời kết bạn!', friendshipId: newFriendship._id });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
@@ -706,30 +735,55 @@ router.get('/friends/suggestions', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
-// 11. CHẤP NHẬN/TỪ CHỐI
+// 11. CHẤP NHẬN/TỪ CHỐI/XÓA LỜI MỜI
 router.post('/friends/respond', auth, async (req, res) => {
   try {
-    const realId = await resolveUserId(req.user.id);
+    const realIdStr = req.user._id; 
     const { friendshipId, action } = req.body;
+    
     const friendship = await Friendship.findById(friendshipId);
-    if (!friendship || friendship.recipient.toString() !== realId) return res.status(403).json({ message: 'Thao tác không hợp lệ' });
+    
+    if (!friendship) {
+      return res.status(404).json({ success: false, message: 'Không tìm thấy lời mời kết bạn' });
+    }
+
+    // Security check: Only recipient can accept/decline. Requester can only cancel (via unfriend)
+    if (friendship.recipient.toString() !== realIdStr) {
+      return res.status(403).json({ success: false, message: 'Bạn không có quyền thực hiện thao tác này' });
+    }
+
     if (action === 'accept') {
       friendship.status = 'accepted';
       friendship.updatedAt = new Date();
       await friendship.save();
       
-      // Real-time: notify the original requester that their request was accepted
-      const acceptor = await require('../models/User').findById(realId).select('name displayName avatar rank').lean();
+      const acceptor = await require('../models/User').findById(realIdStr).select('name displayName avatar rank').lean();
       emitToUser(friendship.requester, 'friend_accepted', {
-        friendId: realId,
+        friendId: realIdStr,
         friendName: req.user.displayName || req.user.name,
         friendAvatar: req.user.avatar || '',
         friend: acceptor
       });
+
+      // Notify original requester
+      const notif = new Notification({
+        recipientId: friendship.requester,
+        recipientType: 'user',
+        senderId: realIdStr,
+        senderName: req.user.displayName || req.user.name,
+        type: 'friend_accepted',
+        title: 'Lời mời kết bạn đã được chấp nhận! 🤝',
+        message: `${req.user.displayName || req.user.name} đã chấp nhận lời mời kết bạn của bạn.`,
+        link: `/apps/user-web/profile.html?id=${realIdStr}`
+      });
+      await notif.save();
+
     } else {
+      // Decline or Remove
       await Friendship.findByIdAndDelete(friendshipId);
     }
-    res.json({ success: true });
+    
+    res.json({ success: true, status: action === 'accept' ? 'friends' : 'none' });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
@@ -879,27 +933,55 @@ router.post('/posts/:id/share', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
-// 19. HỦY KẾT BẠN
+// 19. HỦY KẾT BẠN / HỦY LỜI MỜI
 router.post('/friends/unfriend', auth, async (req, res) => {
   try {
+    const realIdStr = req.user._id;
     const realId = await resolveUserId(req.user.id);
-    const friendRealId = await resolveUserId(req.body.friendId);
-    await Friendship.deleteOne({ $or: [{ requester: realId, recipient: friendRealId }, { requester: friendRealId, recipient: realId }], status: 'accepted' });
-    res.json({ success: true });
+    const friendId = req.body.friendId;
+    const friendRealId = await resolveUserId(friendId);
+
+    if (!friendRealId) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
+
+    // Find any friendship record between them
+    const friendship = await Friendship.findOne({ 
+      $or: [
+        { requester: realId, recipient: friendRealId }, 
+        { requester: friendRealId, recipient: realId }
+      ] 
+    });
+
+    if (!friendship) return res.status(404).json({ success: false, message: 'Không có mối quan hệ kết bạn' });
+
+    await Friendship.findByIdAndDelete(friendship._id);
+    res.json({ success: true, message: 'Đã hủy kết bạn/lời mời' });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
 // 20. TRẠNG THÁI KẾT BẠN
 router.get('/friends/status/:userId', auth, async (req, res) => {
   try {
+    const realIdStr = req.user._id;
     const realId = await resolveUserId(req.user.id);
     const targetRealId = await resolveUserId(req.params.userId);
     if (!targetRealId) return res.json({ success: true, status: 'none' });
-    const f = await Friendship.findOne({ $or: [{ requester: realId, recipient: targetRealId }, { requester: targetRealId, recipient: realId }] });
+
+    const f = await Friendship.findOne({ 
+      $or: [
+        { requester: realId, recipient: targetRealId }, 
+        { requester: targetRealId, recipient: realId }
+      ] 
+    });
+
     if (!f) return res.json({ success: true, status: 'none' });
-    if (f.status === 'accepted') return res.json({ success: true, status: 'friends' });
-    if (f.requester.toString() === realId) return res.json({ success: true, status: 'sent' });
-    return res.json({ success: true, status: 'received', friendshipId: f._id });
+    
+    if (f.status === 'accepted') return res.json({ success: true, status: 'friends', friendshipId: f._id.toString() });
+    
+    if (f.requester.toString() === realIdStr) {
+      return res.json({ success: true, status: 'sent', friendshipId: f._id.toString() });
+    } else {
+      return res.json({ success: true, status: 'received', friendshipId: f._id.toString() });
+    }
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
@@ -910,7 +992,7 @@ router.post('/messages/send', auth, async (req, res) => {
     const { recipientId, text } = req.body;
     if (!text || !recipientId) return res.status(400).json({ message: 'Thiếu thông tin' });
     const realRecipientId = await resolveUserId(recipientId);
-    const ids = [realId, realRecipientId].sort();
+    const ids = [realId.toString(), realRecipientId.toString()].sort();
     const conversationId = `dm_${ids[0]}_${ids[1]}`;
     const msg = new Message({ conversationId, senderId: realId, senderName: req.user.displayName || req.user.name, senderAvatar: req.user.avatar || '', text, readBy: [realId] });
     await msg.save();
@@ -935,7 +1017,7 @@ router.get('/messages/:recipientId', auth, async (req, res) => {
   try {
     const realId = await resolveUserId(req.user.id);
     const realRecipientId = await resolveUserId(req.params.recipientId);
-    const ids = [realId, realRecipientId].sort();
+    const ids = [realId.toString(), realRecipientId.toString()].sort();
     const conversationId = `dm_${ids[0]}_${ids[1]}`;
     const messages = await Message.find({ conversationId }).sort({ createdAt: 1 }).limit(100);
     res.json({ success: true, data: messages });
@@ -975,7 +1057,7 @@ router.get('/conversations', auth, async (req, res) => {
 router.post('/groups', auth, async (req, res) => { try { const realId = await resolveUserId(req.user.id); const { name, description, isPublic } = req.body; if (!name) return res.status(400).json({ message: 'Tên nhóm trống' }); const group = new Group({ name, description: description || '', creator: realId, isPublic: isPublic !== false, members: [{ userId: realId, role: 'admin' }] }); await group.save(); res.json({ success: true, group }); } catch (err) { res.status(500).json({ success: false, message: err.message }); } });
 router.get('/groups/mine', auth, async (req, res) => { try { const realId = await resolveUserId(req.user.id); const groups = await Group.find({ 'members.userId': realId }).populate('creator', 'name displayName avatar').lean(); res.json({ success: true, data: groups }); } catch (err) { res.status(500).json({ success: false, message: err.message }); } });
 router.get('/groups/search', auth, async (req, res) => { try { const groups = await Group.find({ isPublic: true, name: { $regex: req.query.q || '', $options: 'i' } }).limit(20).lean(); res.json({ success: true, data: groups }); } catch (err) { res.status(500).json({ success: false, message: err.message }); } });
-router.post('/groups/:id/join', auth, async (req, res) => { try { const realId = await resolveUserId(req.user.id); const group = await Group.findById(req.params.id); if (!group) return res.status(404).json({ message: 'Nhóm không tồn tại' }); if (group.members.find(m => m.userId.toString() === realId)) return res.status(400).json({ message: 'Đã là thành viên' }); group.members.push({ userId: realId, role: 'member' }); await group.save(); res.json({ success: true }); } catch (err) { res.status(500).json({ success: false, message: err.message }); } });
+router.post('/groups/:id/join', auth, async (req, res) => { try { const realId = await resolveUserId(req.user.id); const group = await Group.findById(req.params.id); if (!group) return res.status(404).json({ message: 'Nhóm không tồn tại' }); if (group.members.find(m => m.userId.toString() === realId.toString())) return res.status(400).json({ message: 'Đã là thành viên' }); group.members.push({ userId: realId, role: 'member' }); await group.save(); res.json({ success: true }); } catch (err) { res.status(500).json({ success: false, message: err.message }); } });
 router.post('/groups/:id/leave', auth, async (req, res) => { try { const realId = await resolveUserId(req.user.id); await Group.findByIdAndUpdate(req.params.id, { $pull: { members: { userId: realId } } }); res.json({ success: true }); } catch (err) { res.status(500).json({ success: false, message: err.message }); } });
 
 // 29. XEM HỒ SƠ NGƯỜI DÙNG KHÁC

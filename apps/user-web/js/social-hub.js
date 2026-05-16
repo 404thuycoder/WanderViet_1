@@ -3098,23 +3098,27 @@ const SocialHub = {
                             <span>Hạng ${f.requester?.rank || 'Đồng'}</span>
                         </div>
                         <div class="friend-actions">
-                            <button class="btn-xs btn--accept" onclick="SocialHub.respondFriend('${f._id}', 'accept')">✓</button>
-                            <button class="btn-xs btn--decline" onclick="SocialHub.respondFriend('${f._id}', 'decline')">&times;</button>
+                            <button class="btn-xs btn--accept" onclick="SocialHub.respondFriend('${f._id}', 'accept')" title="Chấp nhận">✓</button>
+                            <button class="btn-xs btn--decline" onclick="SocialHub.respondFriend('${f._id}', 'decline')" title="Từ chối">&times;</button>
                         </div>
                     </div>
                 `).join('');
             } else {
-                container.innerHTML = '<p class="empty-state-text">Không có lời mời mới.</p>';
+                container.innerHTML = '<p class="empty-state-text" style="padding:10px;">Không có lời mời mới.</p>';
             }
         } catch (err) { }
     },
 
     respondFriend: async function (id, action) {
         try {
-            await fetch('/api/social/friends/respond', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') }, body: JSON.stringify({ friendshipId: id, action }) });
-            this.fetchPendingFriends();
-            this.loadFriendsList();
-            this.loadUserProfile(); // Update friend count
+            const res = await fetch('/api/social/friends/respond', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') }, body: JSON.stringify({ friendshipId: id, action }) });
+            const data = await res.json();
+            if (data.success) {
+                if (window.WanderUI) WanderUI.showToast(action === 'accept' ? 'Đã chấp nhận lời mời!' : 'Đã xóa lời mời.', 'success');
+                this.fetchPendingFriends();
+                this.loadFriendsList();
+                this.loadUserProfile();
+            }
         } catch (err) { }
     },
 
@@ -3132,11 +3136,27 @@ const SocialHub = {
                             <strong>${f.displayName || f.name}</strong>
                             <span>Hạng ${f.rank || 'Đồng'}</span>
                         </div>
-                        <button class="btn-xs btn--chat" onclick="event.stopPropagation(); SocialHub.openChat('${f._id || f.id}', '${(f.displayName || f.name).replace(/'/g, '')}', '${f.avatar || ''}')">💬</button>
+                        <div class="friend-item-actions">
+                            <button class="btn-xs btn--chat" onclick="event.stopPropagation(); SocialHub.openChat('${f._id || f.id}', '${(f.displayName || f.name).replace(/'/g, '')}', '${f.avatar || ''}')" title="Nhắn tin"><i class="fas fa-comment"></i></button>
+                            <button class="btn-xs btn--decline" onclick="event.stopPropagation(); SocialHub.unfriend('${f._id || f.id}', '${(f.displayName || f.name).replace(/'/g, '')}')" title="Hủy kết bạn"><i class="fas fa-user-minus"></i></button>
+                        </div>
                     </div>
                 `).join('');
             } else {
-                container.innerHTML = '<p class="empty-state-text">Chưa có bạn bè.</p>';
+                container.innerHTML = '<p class="empty-state-text" style="padding:20px;">Chưa có bạn bè.</p>';
+            }
+        } catch (err) { }
+    },
+
+    unfriend: async function (userId, name) {
+        if (!confirm(`Bạn có chắc muốn hủy kết bạn với ${name}?`)) return;
+        try {
+            const res = await fetch('/api/social/friends/unfriend', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') }, body: JSON.stringify({ friendId: userId }) });
+            const data = await res.json();
+            if (data.success) {
+                if (window.WanderUI) WanderUI.showToast(`Đã hủy kết bạn với ${name}`, 'success');
+                this.loadFriendsList();
+                this.loadUserProfile();
             }
         } catch (err) { }
     },

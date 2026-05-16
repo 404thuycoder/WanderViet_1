@@ -225,27 +225,51 @@ const UserProfile = {
         try {
             const res = await fetch(`/api/social/friends/status/${userId}`, { headers: { 'x-auth-token': localStorage.getItem('wander_token') } });
             const data = await res.json();
+            const socialBtns = document.getElementById('profile-social-btns');
             const addBtn = document.getElementById('btn-add-friend');
             const msgBtn = document.getElementById('btn-send-message');
-            if (!addBtn) return;
+            
+            if (!socialBtns || !addBtn) return;
+            socialBtns.style.display = 'flex';
+
+            // Reset button states
+            addBtn.disabled = false;
+            addBtn.className = 'btn btn--primary';
+            addBtn.style.display = 'inline-flex';
+
+            // Remove any secondary buttons (like Decline) if they exist
+            const oldDecline = document.getElementById('btn-decline-friend');
+            if (oldDecline) oldDecline.remove();
+
             switch (data.status) {
                 case 'friends':
-                    addBtn.innerHTML = '✅ Đã là bạn bè';
-                    addBtn.classList.add('btn--secondary');
+                    addBtn.innerHTML = '<i class="fas fa-check-circle"></i> Bạn bè';
+                    addBtn.className = 'btn btn--secondary';
                     addBtn.onclick = () => this.unfriend(userId);
                     if (msgBtn) msgBtn.style.display = 'inline-flex';
                     break;
                 case 'sent':
-                    addBtn.innerHTML = '⏳ Đã gửi lời mời';
-                    addBtn.disabled = true;
+                    addBtn.innerHTML = '<i class="fas fa-user-clock"></i> Đã gửi lời mời';
+                    addBtn.className = 'btn btn--outline';
+                    addBtn.onclick = () => this.unfriend(userId); // Cancel request is same as unfriend (delete record)
+                    addBtn.title = 'Nhấn để hủy lời mời';
                     break;
                 case 'received':
-                    addBtn.innerHTML = '✅ Chấp nhận kết bạn';
+                    addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Chấp nhận';
                     addBtn.onclick = () => this.respondFriend(data.friendshipId, 'accept');
+                    
+                    // Add Decline button
+                    const declineBtn = document.createElement('button');
+                    declineBtn.id = 'btn-decline-friend';
+                    declineBtn.className = 'btn btn--ghost';
+                    declineBtn.innerHTML = '<i class="fas fa-user-times"></i> Từ chối';
+                    declineBtn.onclick = () => this.respondFriend(data.friendshipId, 'decline');
+                    socialBtns.insertBefore(declineBtn, addBtn.nextSibling);
                     break;
                 default:
-                    addBtn.innerHTML = '➕ Kết bạn';
+                    addBtn.innerHTML = '<i class="fas fa-user-plus"></i> Kết bạn';
                     addBtn.onclick = () => this.sendFriendRequest(userId);
+                    if (msgBtn) msgBtn.style.display = 'none';
             }
         } catch (err) { }
     },
@@ -254,23 +278,39 @@ const UserProfile = {
         try {
             const res = await fetch('/api/social/friends/request', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') }, body: JSON.stringify({ recipientId: userId }) });
             const data = await res.json();
-            if (data.success) { alert('Đã gửi lời mời kết bạn!'); this.checkFriendshipStatus(userId); }
-            else alert(data.message || 'Lỗi!');
-        } catch (err) { alert('Lỗi gửi lời mời!'); }
+            if (data.success) { 
+                if (window.WanderUI) WanderUI.showToast('Đã gửi lời mời kết bạn!', 'success');
+                this.checkFriendshipStatus(userId); 
+            }
+            else {
+                if (window.WanderUI) WanderUI.showToast(data.message || 'Lỗi!', 'error');
+            }
+        } catch (err) { 
+            if (window.WanderUI) WanderUI.showToast('Lỗi gửi lời mời!', 'error');
+        }
     },
 
     unfriend: async function (userId) {
-        if (!confirm('Bạn có chắc muốn hủy kết bạn?')) return;
+        if (!confirm('Bạn có chắc muốn thực hiện thao tác này?')) return;
         try {
-            await fetch('/api/social/friends/unfriend', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') }, body: JSON.stringify({ friendId: userId }) });
-            this.checkFriendshipStatus(userId);
+            const res = await fetch('/api/social/friends/unfriend', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') }, body: JSON.stringify({ friendId: userId }) });
+            const data = await res.json();
+            if (data.success) {
+                if (window.WanderUI) WanderUI.showToast(data.message || 'Thành công!', 'success');
+                this.checkFriendshipStatus(userId);
+            }
         } catch (err) { }
     },
 
     respondFriend: async function (id, action) {
         try {
-            await fetch('/api/social/friends/respond', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') }, body: JSON.stringify({ friendshipId: id, action }) });
-            this.checkFriendshipStatus(this.profileUserId);
+            const res = await fetch('/api/social/friends/respond', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') }, body: JSON.stringify({ friendshipId: id, action }) });
+            const data = await res.json();
+            if (data.success) {
+                const msg = action === 'accept' ? 'Đã chấp nhận kết bạn!' : 'Đã từ chối lời mời.';
+                if (window.WanderUI) WanderUI.showToast(msg, 'success');
+                this.checkFriendshipStatus(this.profileUserId);
+            }
         } catch (err) { }
     },
 

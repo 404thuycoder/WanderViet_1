@@ -305,7 +305,14 @@ router.post('/:id/faqs/:faqId/vote', auth, async (req, res) => {
   try {
     const { id, faqId } = req.params;
 
-    const place = await Place.findOne({ id: id });
+    let place;
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      place = await Place.findById(id);
+    }
+    if (!place) {
+      place = await Place.findOne({ id: id });
+    }
+    
     if (!place) {
       return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
     }
@@ -315,10 +322,23 @@ router.post('/:id/faqs/:faqId/vote', auth, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Không tìm thấy FAQ' });
     }
 
-    faq.helpfulCount += 1;
+    if (!faq.votedBy) faq.votedBy = [];
+    const userId = req.user.id;
+    const voteIndex = faq.votedBy.indexOf(userId);
+
+    let isHelpful = false;
+    if (voteIndex > -1) {
+      faq.votedBy.splice(voteIndex, 1);
+      faq.helpfulCount = Math.max(0, faq.helpfulCount - 1);
+    } else {
+      faq.votedBy.push(userId);
+      faq.helpfulCount += 1;
+      isHelpful = true;
+    }
+
     await place.save();
 
-    res.json({ success: true, helpfulCount: faq.helpfulCount });
+    res.json({ success: true, helpfulCount: faq.helpfulCount, isHelpful });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }

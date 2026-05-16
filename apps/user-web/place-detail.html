@@ -419,13 +419,41 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            padding: 24px;
+            padding: 20px;
             transition: all 0.3s;
+            margin-bottom: 16px;
         }
 
         .review-item:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.04);
             border-color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .community-posts-scroll {
+            max-height: 700px;
+            overflow-y: auto;
+            padding-right: 12px;
+            margin-bottom: 24px;
+            scroll-behavior: smooth;
+        }
+
+        .community-posts-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .community-posts-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+
+        .community-posts-scroll::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+        }
+
+        .community-posts-scroll::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
         }
 
         .review-header {
@@ -1773,10 +1801,28 @@
                 <div class="timeline" id="itinerary-grid"></div>
             </div>
 
-            <!-- Enhanced Review System -->
-            <div class="bento-card" id="reviews-sec">
-                <span class="card-label">ĐÁNH GIÁ KHÁCH HÀNG</span>
-                <h3 class="card-title" style="margin-bottom:32px; font-size:2rem;">Nhận xét từ cộng đồng</h3>
+            <!-- Ultimate Service (Moved Up) -->
+            <div class="bento-card">
+                <span class="card-label">ĐẶC QUYỀN WV ELITE</span>
+                <h3 class="card-title">Dịch vụ tối thượng</h3>
+                <div class="highlight-grid">
+                    <div class="h-item">
+                        <span class="h-icon">✨</span>
+                        <b class="h-name">Premium Support</b>
+                        <p class="h-text">Đội ngũ concierge riêng biệt hỗ trợ mọi yêu cầu của bạn 24/7 trong suốt hành trình.</p>
+                    </div>
+                    <div class="h-item">
+                        <span class="h-icon">🛡️</span>
+                        <b class="h-name">Elite Protection</b>
+                        <p class="h-text">Bảo hiểm du lịch cao cấp và hệ thống hỗ trợ khẩn cấp toàn cầu dành riêng cho đối tác Elite.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unified Community & Reviews Section -->
+            <div class="community-card" id="community-combined-sec">
+                <div class="community-label">CỘNG ĐỒNG & ĐÁNH GIÁ</div>
+                <h3 class="community-title">Trải nghiệm & Nhận xét</h3>
 
                 <!-- Review Analytics Block -->
                 <div class="review-stats">
@@ -1824,18 +1870,6 @@
                     </div>
                 </div>
 
-                <!-- Review Filters -->
-                <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;" id="review-filters">
-                    <button class="review-filter active" data-filter="all">Tất cả</button>
-                    <button class="review-filter" data-filter="latest">Mới nhất</button>
-                    <button class="review-filter" data-filter="high-rating">Điểm cao</button>
-                    <button class="review-filter" data-filter="family">Gia đình</button>
-                    <button class="review-filter" data-filter="couple">Couple</button>
-                    <button class="review-filter" data-filter="solo">Solo</button>
-                    <button class="review-filter" data-filter="verified">✓ Verified</button>
-                    <button class="review-filter" data-filter="with-photos">Có ảnh</button>
-                </div>
-
                 <!-- AI Review Summary -->
                 <div class="ai-review-summary" style="background:linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,85,247,0.1)); border:1px solid rgba(99,102,241,0.2); border-radius:16px; padding:20px; margin-bottom:24px;">
                     <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
@@ -1845,50 +1879,13 @@
                     <p style="color:var(--text-dim); line-height:1.6; margin:0;" id="ai-review-summary">Đang phân tích đánh giá...</p>
                 </div>
 
-                <!-- Reviews List -->
-                <div id="reviews-list" style="display:flex; flex-direction:column; gap:20px;"></div>
-
-                <!-- Load More -->
-                <button id="load-more-reviews" style="width:100%; margin-top:24px; padding:16px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:16px; color:var(--text-main); font-weight:700; cursor:pointer; transition:all 0.3s;">
-                    Xem thêm đánh giá
-                </button>
-            </div>
-
-            <div class="bento-card">
-                <span class="card-label">ĐẶC QUYỀN WV ELITE</span>
-                <h3 class="card-title">Dịch vụ tối thượng</h3>
-                <div class="highlight-grid">
-                    <div class="h-item">
-                        <span class="h-icon">✨</span>
-                        <b class="h-name">Premium Support</b>
-                        <p class="h-text">Đội ngũ concierge riêng biệt hỗ trợ mọi yêu cầu của bạn 24/7 trong suốt hành trình.</p>
-                    </div>
-                    <div class="h-item">
-                        <span class="h-icon">🛡️</span>
-                        <b class="h-name">Elite Protection</b>
-                        <p class="h-text">Bảo hiểm du lịch cao cấp và hệ thống hỗ trợ khẩn cấp toàn cầu dành riêng cho đối tác Elite.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Social/Community Section -->
-            <div class="community-card" id="social-sec">
-                <div class="community-label">CỘNG ĐỒNG</div>
-                <h3 class="community-title">Chia sẻ từ cộng đồng</h3>
-                
-                <!-- User Posts -->
-                <div id="community-posts">
-                    <!-- Posts or Empty State will be loaded dynamically -->
-                </div>
-                
-                <!-- Share Your Experience -->
-                <div class="share-form-card">
+                <!-- Share Your Experience Form -->
+                <div class="share-form-card" style="margin-bottom:32px;">
                     <div class="share-form-header">
                         <span>📸</span> Chia sẻ trải nghiệm của bạn
                     </div>
-                    
                     <div class="share-rating-row">
-                        <span class="share-rating-label">Đánh giá:</span>
+                        <span class="share-rating-label">Đánh giá của bạn:</span>
                         <div class="share-stars" id="star-rating">
                             <span onclick="setRating(1)" class="share-star active">⭐</span>
                             <span onclick="setRating(2)" class="share-star active">⭐</span>
@@ -1898,21 +1895,35 @@
                         </div>
                         <input type="hidden" id="review-rating" value="5">
                     </div>
-
-                    <textarea id="community-post-input" class="share-textarea" placeholder="Bạn cảm thấy dịch vụ này thế nào? Hãy chia sẻ cảm nhận nhé..."></textarea>
-                    
-                    <div id="community-image-preview" style="display:none; margin-bottom:16px; overflow-x:auto; white-space:nowrap; padding-bottom:8px; gap:12px;">
-                        <!-- Multiple previews will go here -->
-                    </div>
-
+                    <textarea id="community-post-input" class="share-textarea" placeholder="Dịch vụ này thế nào? Hãy chia sẻ cảm nhận và hình ảnh thực tế nhé..."></textarea>
+                    <div id="community-image-preview" style="display:none; margin-bottom:16px; overflow-x:auto; white-space:nowrap; padding-bottom:8px; gap:12px;"></div>
                     <div class="share-actions">
-                        <button onclick="submitCommunityPost()" class="btn-post">Đăng bài</button>
+                        <button onclick="submitCommunityPost()" class="btn-post">Đăng bài ngay</button>
                         <button onclick="document.getElementById('community-image-input').click()" class="btn-add-photo">
                             <span>📸</span> Thêm ảnh
                         </button>
                         <input type="file" id="community-image-input" accept="image/*" multiple style="display:none;" onchange="handleCommunityImageUpload(event)">
                     </div>
                 </div>
+
+                <!-- Unified Filters -->
+                <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;" id="review-filters">
+                    <button class="review-filter active" data-filter="all">Tất cả</button>
+                    <button class="review-filter" data-filter="latest">Mới nhất</button>
+                    <button class="review-filter" data-filter="high-rating">Điểm cao</button>
+                    <button class="review-filter" data-filter="with-photos">Có ảnh</button>
+                    <button class="review-filter" data-filter="verified">✓ Đã xác minh</button>
+                </div>
+
+                <!-- Unified Community Feed -->
+                <div id="community-posts" class="community-posts-scroll">
+                    <!-- Unified Posts & Reviews will be loaded here -->
+                </div>
+
+                <!-- Load More -->
+                <button id="load-more-reviews" style="width:100%; margin-top:12px; padding:16px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:16px; color:var(--text-main); font-weight:700; cursor:pointer; transition:all 0.3s;">
+                    Xem thêm hoạt động cộng đồng
+                </button>
             </div>
         </div>
         <aside>
@@ -2871,7 +2882,7 @@
                                     <div class="faq-answer" id="faq-answer-${index}" style="display:none; padding:0 20px 20px; color:var(--text-main); opacity:0.85; line-height:1.6; border-top:1px solid rgba(255,255,255,0.05);">
                                         ${faq.answer}
                                         <div style="margin-top:12px; display:flex; align-items:center; gap:8px;">
-                                            <button onclick="voteFAQ('${faq._id || index}')" style="background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:8px; padding:6px 12px; color:var(--text-dim); font-size:0.8rem; cursor:pointer; transition:all 0.3s;">👍 Hữu ích (${faq.helpfulCount || 0})</button>
+                                            <button onclick="voteFAQ('${faq._id || index}', this)" style="background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:8px; padding:6px 12px; color:var(--text-dim); font-size:0.8rem; cursor:pointer; transition:all 0.3s;">👍 Hữu ích (${faq.helpfulCount || 0})</button>
                                         </div>
                                     </div>
                                 </div>
@@ -2933,23 +2944,23 @@
                 const date = r.createdAt ? new Date(r.createdAt).toLocaleDateString('vi-VN') : '';
                 const sentiment = r.rating >= 4 ? 'positive' : r.rating === 3 ? 'neutral' : 'negative';
                 return `
-                <div class="review-item">
-                    <div class="review-header">
-                        <div class="review-avatar">${initials}</div>
+                <div class="review-item" style="border-left: 3px solid ${sentiment==='positive'?'#10b981':sentiment==='neutral'?'#f59e0b':'#ef4444'};">
+                    <div class="review-header" style="gap: 12px; margin-bottom: 12px;">
+                        <div class="review-avatar" style="width: 36px; height: 36px; font-size: 0.9rem;">${initials}</div>
                         <div class="review-user-info">
-                            <div class="review-user-name">
+                            <div class="review-user-name" style="font-size: 0.95rem;">
                                 ${r.userName || 'Khách hàng'}
-                                ${r.verified ? '<span class="review-verified">✓ Đã xác minh</span>' : ''}
-                                <span class="review-sentiment ${sentiment}" style="margin-left:auto">${sentiment==='positive'?'Tích cực':sentiment==='neutral'?'Trung lập':'Tiêu cực'}</span>
+                                ${r.verified ? '<span class="review-verified" style="font-size: 8px; padding: 1px 6px;">✓ Đã xác minh</span>' : ''}
                             </div>
-                            <div class="review-date">${date}</div>
+                            <div class="review-date" style="font-size: 11px;">${date}</div>
                         </div>
+                        <div class="review-sentiment ${sentiment}" style="margin-left:auto; font-size: 10px;">${sentiment==='positive'?'Tích cực':sentiment==='neutral'?'Trung lập':'Tiêu cực'}</div>
                     </div>
-                    <div class="review-rating"><span>${stars}</span></div>
-                    <div class="review-text">${r.text || ''}</div>
-                    ${r.images && r.images.length ? `<div class="review-images">${r.images.map(img=>`<img src="${img}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=300&q=80'" alt="review">`).join('')}</div>` : ''}
-                    <div class="review-actions">
-                        <span class="review-action" onclick="this.innerHTML='👍 '+((parseInt(this.innerHTML.match(/\\d+/)?.[0]||0))+1)+' Hữu ích'">👍 ${r.helpfulCount||0} Hữu ích</span>
+                    <div class="review-rating" style="margin-bottom: 8px;"><span style="font-size: 1rem;">${stars}</span></div>
+                    <div class="review-text" style="font-size: 14px; line-height: 1.5; color: var(--text-main); opacity: 0.9;">${r.content || r.text || ''}</div>
+                    ${r.images && r.images.length ? `<div class="review-images" style="margin-top: 12px; gap: 8px;">${r.images.map(img=>`<img src="${img}" style="width: 60px; height: 60px; border-radius: 8px;" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=WV&background=6366f1&color=fff'" alt="review">`).join('')}</div>` : ''}
+                    <div class="review-actions" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.03);">
+                        <span class="review-action" style="font-size: 12px; opacity: 0.7;" onclick="this.innerHTML='👍 '+((parseInt(this.innerHTML.match(/\\d+/)?.[0]||0))+1)+' Hữu ích'">👍 ${r.helpfulCount||0} Hữu ích</span>
                     </div>
                 </div>`;
             }).join('');
@@ -3127,7 +3138,7 @@
             }
         }
 
-        async function voteFAQ(faqId) {
+        async function voteFAQ(faqId, btn) {
             try {
                 const res = await fetch(`/api/places/${pid}/faqs/${faqId}/vote`, {
                     method: 'POST',
@@ -3136,9 +3147,22 @@
                 const json = await res.json();
                 if (json.success) {
                     window.WanderUI.showToast('Cảm ơn phản hồi của bạn!', 'success');
+                    if (btn && json.helpfulCount !== undefined) {
+                        btn.innerHTML = `👍 Hữu ích (${json.helpfulCount})`;
+                        if (json.isHelpful) {
+                            btn.style.color = '#10b981';
+                            btn.style.borderColor = '#10b981';
+                        } else {
+                            btn.style.color = 'var(--text-dim)';
+                            btn.style.borderColor = 'var(--glass-border)';
+                        }
+                    }
+                } else {
+                    window.WanderUI.showToast(json.message || 'Không thể thực hiện', 'error');
                 }
             } catch(e) {
                 console.error('FAQ vote error:', e);
+                window.WanderUI.showToast('Lỗi kết nối', 'error');
             }
         }
 
@@ -3505,14 +3529,22 @@
                 // Real Data Sync: Update Rating Stats
                 if (json.success && json.data) {
                     window.currentReviews = json.data;
-                    renderReviews(json.data, window.currentPlace || {});
+                    
+                    // Update stats directly instead of separate renderReviews
+                    const avgRating = json.data.reduce((s,r) => s + (r.rating||5), 0) / (json.data.length || 1);
+                    const positiveCount = json.data.filter(r => (r.rating||5) >= 4).length;
+                    const total = json.data.length;
+
+                    if (document.getElementById('review-avg')) document.getElementById('review-avg').innerText = avgRating.toFixed(1);
+                    if (document.getElementById('review-total')) document.getElementById('review-total').innerText = `${total} đánh giá`;
+                    if (document.getElementById('review-positive')) document.getElementById('review-positive').innerText = Math.round(positiveCount/(total||1)*100) + '%';
+                    
+                    if (window.renderStarDistribution) renderStarDistribution(json.data, avgRating);
                     
                     // Generate AI Summary
                     const aiSummaryEl = document.getElementById('ai-review-summary');
-                    if (aiSummaryEl && json.data.length > 0) {
-                        const goodPoints = json.data.filter(r => r.rating >= 4).length;
-                        const total = json.data.length;
-                        const pct = Math.round((goodPoints/total) * 100);
+                    if (aiSummaryEl && total > 0) {
+                        const pct = Math.round((positiveCount/total) * 100);
                         aiSummaryEl.innerHTML = `Dựa trên <b>${total} đánh giá</b>, địa điểm này nhận được <b>${pct}% phản hồi tích cực</b>. Khách hàng đặc biệt ấn tượng với chất lượng dịch vụ và không gian tại đây.`;
                     } else if (aiSummaryEl) {
                         aiSummaryEl.innerText = "Chưa có đủ dữ liệu để tạo tóm tắt AI.";
@@ -3520,39 +3552,49 @@
                 }
 
                 if (json.success && json.data && json.data.length > 0) {
-                    postsContainer.innerHTML = json.data.map(post => `
-                        <div class="community-post-card" style="background:rgba(255,255,255,0.02); border-left:4px solid #6366f1; border-radius:16px; padding:24px; margin-bottom:20px; animation: slideUp 0.4s ease-out; border: 1px solid var(--glass-border); border-left-width: 4px; position:relative;">
-                            <div style="display:flex; align-items:flex-start; gap:16px;">
-                                <img src="${post.userAvatar || 'https://ui-avatars.com/api/?name=' + (post.userName || 'U')}" style="width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid var(--glass-border);">
+                    postsContainer.innerHTML = json.data.map(post => {
+                        const sentiment = post.rating >= 4 ? 'positive' : post.rating === 3 ? 'neutral' : 'negative';
+                        return `
+                        <div class="community-post-card" style="background:rgba(255,255,255,0.02); border-left:4px solid ${post.rating >= 4 ? '#10b981' : post.rating === 3 ? '#f59e0b' : '#ef4444'}; border-radius:16px; padding:18px; margin-bottom:16px; animation: slideUp 0.4s ease-out; border: 1px solid var(--glass-border); border-left-width: 4px; position:relative;">
+                            <div style="display:flex; align-items:flex-start; gap:12px;">
+                                <img src="${post.userAvatar || 'https://ui-avatars.com/api/?name=' + (post.userName || 'U')}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid var(--glass-border);">
                                 <div style="flex:1;">
                                     <div style="display:flex; justify-content:space-between; align-items:center;">
                                         <div>
-                                            <div style="font-weight:700; color:var(--text-main); font-size:1.05rem;">${post.userName || 'Thành viên WanderViệt'}</div>
-                                            <div style="color:#fbbf24; font-size:14px; margin-top:4px;">${'⭐'.repeat(post.rating)}</div>
+                                            <div style="font-weight:700; color:var(--text-main); font-size:1rem;">${post.userName || 'Thành viên WanderViệt'}</div>
+                                            <div style="color:#fbbf24; font-size:12px; margin-top:2px;">
+                                                ${'⭐'.repeat(post.rating)}
+                                                ${post.verified ? '<span style="background:#10b981; color:#fff; font-size:8px; padding:1px 6px; border-radius:4px; margin-left:8px; font-weight:700; vertical-align:middle;">✓ VERIFIED</span>' : ''}
+                                            </div>
                                         </div>
                                         <div style="text-align:right;">
-                                            <div style="font-size:12px; color:var(--text-dim); opacity:0.8; font-weight:600;">${new Date(post.createdAt).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})} ${new Date(post.createdAt).toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'})}</div>
-                                            <div style="font-size:11px; color:var(--accent); opacity:0.7; margin-top:2px;">${timeAgo(post.createdAt)}</div>
+                                            <div style="font-size:11px; color:var(--text-dim); opacity:0.8;">${new Date(post.createdAt).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'})} ${new Date(post.createdAt).toLocaleDateString('vi-VN', {day:'2-digit', month:'2-digit'})}</div>
+                                            <div style="font-size:10px; color:var(--accent); opacity:0.7; margin-top:2px;">${timeAgo(post.createdAt)}</div>
+                                            <div class="review-sentiment ${sentiment}" style="font-size: 9px; margin-top:4px;">${sentiment==='positive'?'Tích cực':sentiment==='neutral'?'Trung lập':'Tiêu cực'}</div>
                                         </div>
                                     </div>
-                                    <div style="color:var(--text-main); font-size:15px; line-height:1.6; margin:12px 0; white-space: pre-wrap; opacity:0.95;">${post.content || ''}</div>
+                                    <div style="color:var(--text-main); font-size:14px; line-height:1.5; margin:10px 0; white-space: pre-wrap; opacity:0.9;">${post.content || post.text || ''}</div>
                                     
                                     ${post.images && post.images.length > 0 ? `
-                                        <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:8px; margin-top:16px;" class="no-scrollbar">
+                                        <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:8px; margin-top:12px;" class="no-scrollbar">
                                             ${post.images.map(img => `
-                                                <img src="${img}" style="height:150px; min-width:200px; border-radius:12px; object-fit:cover; cursor:pointer; transition:0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.2);" onclick="window.WanderUI.viewImage('${img}')" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='none'">
+                                                <img src="${img}" style="height:120px; min-width:160px; border-radius:10px; object-fit:cover; cursor:pointer; transition:0.3s;" onclick="window.WanderUI.viewImage('${img}')" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=WV&background=6366f1&color=fff'">
                                             `).join('')}
                                         </div>
                                     ` : ''}
 
-                                    <div style="margin-top:20px; display:flex; gap:16px; font-size:13px; color:var(--text-dim);">
-                                        <button class="btn-action-v2" onclick="likePost('${post._id}')" id="like-btn-${post._id}" style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:6px 14px; border-radius:100px; color:var(--text-main); cursor:pointer; transition:all 0.2s;">
-                                            <span style="font-size:16px;">👍</span> 
+                                    <div style="margin-top:16px; display:flex; gap:10px; font-size:12px; flex-wrap:wrap;">
+                                        <button class="btn-action-v2" onclick="likePost('${post._id}')" id="like-btn-${post._id}" style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:5px 12px; border-radius:100px; color:var(--text-main); cursor:pointer;">
+                                            <span>👍</span> 
                                             <b style="color:var(--accent);">${post.likes || 0}</b>
                                         </button>
-                                        <button class="btn-action-v2" onclick="toggleReplyInput('${post._id}')" style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:6px 14px; border-radius:100px; color:var(--text-main); cursor:pointer; transition:all 0.2s;">
-                                            <span style="font-size:16px;">💬</span> 
+                                        <button class="btn-action-v2" onclick="toggleReplyInput('${post._id}')" style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:5px 12px; border-radius:100px; color:var(--text-main); cursor:pointer;">
+                                            <span>💬</span> 
                                             <b>Trả lời</b>
+                                        </button>
+                                        <button class="btn-action-v2" style="display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:5px 12px; border-radius:100px; color:var(--text-main); cursor:pointer; opacity:0.8;" onclick="this.innerHTML='👍 '+((parseInt(this.innerHTML.match(/\\d+/)?.[0]||0))+1)+' Hữu ích'">
+                                            <span>⭐</span> 
+                                            <b>${post.helpfulCount || 0} Hữu ích</b>
                                         </button>
                                     </div>
 
@@ -3580,13 +3622,13 @@
                                 </div>
                             </div>
                         </div>
-                    `).join('');
+                    `;}).join('');
                 } else {
                     postsContainer.innerHTML = `
-                        <div class="community-empty-state">
-                            <div class="community-empty-icon">📸</div>
-                            <h3 class="community-empty-title">Chưa có bài chia sẻ nào</h3>
-                            <p class="community-empty-text">Hãy là người đầu tiên chia sẻ khoảnh khắc tuyệt vời của bạn!</p>
+                        <div class="community-empty-state" style="padding: 40px; text-align: center; background: rgba(255,255,255,0.02); border-radius: 16px; border: 1px dashed var(--glass-border);">
+                            <div class="community-empty-icon" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;">📸</div>
+                            <h3 class="community-empty-title" style="font-size: 1.1rem; color: var(--text-main);">Chưa có bài chia sẻ & đánh giá nào</h3>
+                            <p class="community-empty-text" style="color: var(--text-dim); font-size: 0.9rem;">Hãy là người đầu tiên chia sẻ khoảnh khắc tuyệt vời của bạn!</p>
                         </div>
                     `;
                 }

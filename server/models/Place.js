@@ -128,6 +128,7 @@ const placeSchema = new mongoose.Schema({
     question: String,
     answer: String,
     helpfulCount: { type: Number, default: 0 },
+    votedBy: [String],
     createdBy: { type: String, default: 'business' }, // 'business' or 'ai'
     createdAt: { type: Date, default: Date.now }
   }],

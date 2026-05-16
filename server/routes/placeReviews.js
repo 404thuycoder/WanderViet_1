@@ -56,13 +56,26 @@ router.post('/', auth, upload.array('image', 10), async (req, res) => {
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     const images = [];
     if (req.files && req.files.length > 0) {
+      console.log(`[PlaceReview POST] Processing ${req.files.length} images`);
       for (const file of req.files) {
-        const uploadedFile = await uploadFile(file, `review_${Date.now()}_${file.originalname}`, {
-          userId: realUserId,
-          placeId: realPlaceId,
-          type: 'review_image'
-        });
-        images.push(`/api/files/${uploadedFile.id}`);
+        try {
+          const uploadedFile = await uploadFile(file, `review_${Date.now()}_${file.originalname}`, {
+            userId: realUserId,
+            placeId: realPlaceId,
+            type: 'review_image'
+          });
+          
+          if (uploadedFile && uploadedFile.id) {
+            const imageUrl = `/api/files/${uploadedFile.id}`;
+            images.push(imageUrl);
+            console.log(`[PlaceReview POST] Image uploaded: ${imageUrl}`);
+          } else {
+            console.error('[PlaceReview POST] uploadFile returned invalid result:', uploadedFile);
+          }
+        } catch (uploadErr) {
+          console.error(`[PlaceReview POST] Individual image upload failed: ${uploadErr.message}`);
+          // Continue with other images or skip this one
+        }
       }
     }
 

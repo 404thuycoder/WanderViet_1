@@ -6,13 +6,18 @@ const multer = require('multer');
 const path = require('path');
 const PlaceReview = require('../models/PlaceReview');
 const Place = require('../models/Place');
-const { uploadFile } = require('../utils/gridfsStorage');
 const Notification = require('../models/Notification');
 const { auth } = require('./auth');
 const { sendNotification } = require('../utils/socketManager');
 
-// Multer config for review images - using memory storage for MongoDB GridFS
-const storage = multer.memoryStorage();
+// Multer config for review images - using disk storage
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const rootUploads = path.join(__dirname, '..', '..', 'uploads');
+    cb(null, rootUploads);
+  },
+  filename: (req, file, cb) => cb(null, `review_${Date.now()}_${Math.random().toString(36).slice(2)}${path.extname(file.originalname)}`)
+});
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
 const User = require('../models/User');
@@ -53,18 +58,7 @@ router.post('/', auth, upload.array('image', 10), async (req, res) => {
     // 2. Resolve Place Id (just use the string)
     const realPlaceId = placeId;
 
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const images = [];
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        const uploadedFile = await uploadFile(file, `review_${Date.now()}_${file.originalname}`, {
-          userId: realUserId,
-          placeId: realPlaceId,
-          type: 'review_image'
-        });
-        images.push(`${baseUrl}/api/files/${uploadedFile.id}`);
-      }
-    }
+    const images = (req.files || []).map(file => `/uploads/${file.filename}`);
 
     // Use direct collection insert to bypass Mongoose schema caching/validation issues
     const reviewData = {

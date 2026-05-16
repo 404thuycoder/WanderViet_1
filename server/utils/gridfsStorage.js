@@ -5,9 +5,21 @@ let bucket = null;
 function getBucket() {
   if (!bucket) {
     const db = mongoose.connection.db;
-    // Access GridFSBucket through mongoose's mongodb client
-    const { GridFSBucket } = mongoose.connection.client;
-    bucket = new GridFSBucket(db, { bucketName: 'uploads' });
+    // Try to get GridFSBucket from the MongoDB driver
+    try {
+      // Method 1: Try through mongoose connection client
+      const { GridFSBucket } = mongoose.connection.client;
+      bucket = new GridFSBucket(db, { bucketName: 'uploads' });
+    } catch (e) {
+      // Method 2: Try direct require if method 1 fails
+      try {
+        const { GridFSBucket } = require('mongodb');
+        bucket = new GridFSBucket(db, { bucketName: 'uploads' });
+      } catch (e2) {
+        console.error('[GridFS] Failed to initialize GridFSBucket:', e2);
+        throw new Error('GridFSBucket not available');
+      }
+    }
   }
   return bucket;
 }
@@ -15,31 +27,38 @@ function getBucket() {
 async function uploadFile(file, filename, metadata = {}) {
   const bucket = getBucket();
   return new Promise((resolve, reject) => {
-    const uploadStream = bucket.openUploadStream(filename, {
-      metadata: {
-        ...metadata,
-        originalName: file.originalname,
-        mimetype: file.mimetype,
-        size: file.size,
-        uploadDate: new Date()
-      }
-    });
-
-    uploadStream.on('error', (error) => {
-      reject(error);
-    });
-
-    uploadStream.on('finish', (result) => {
-      resolve({
-        id: result._id,
-        filename: result.filename,
-        length: result.length,
-        uploadDate: result.uploadDate,
-        url: `/api/files/${result._id}`
+    try {
+      const uploadStream = bucket.openUploadStream(filename, {
+        metadata: {
+          ...metadata,
+          originalName: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          uploadDate: new Date()
+        }
       });
-    });
 
-    uploadStream.end(file.buffer);
+      uploadStream.on('error', (error) => {
+        console.error('[GridFS Upload Error]:', error);
+        reject(error);
+      });
+
+      uploadStream.on('finish', (result) => {
+        console.log('[GridFS Upload Success]:', result._id, result.filename);
+        resolve({
+          id: result._id,
+          filename: result.filename,
+          length: result.length,
+          uploadDate: result.uploadDate,
+          url: `/api/files/${result._id}`
+        });
+      });
+
+      uploadStream.end(file.buffer);
+    } catch (error) {
+      console.error('[GridFS Upload Exception]:', error);
+      reject(error);
+    }
   });
 }
 

@@ -741,6 +741,10 @@ router.post('/friends/respond', auth, async (req, res) => {
     const realIdStr = req.user._id; 
     const { friendshipId, action } = req.body;
     
+    if (!mongoose.Types.ObjectId.isValid(friendshipId)) {
+      return res.status(400).json({ success: false, message: 'ID không hợp lệ' });
+    }
+
     const friendship = await Friendship.findById(friendshipId);
     
     if (!friendship) {
@@ -757,7 +761,7 @@ router.post('/friends/respond', auth, async (req, res) => {
       friendship.updatedAt = new Date();
       await friendship.save();
       
-      const acceptor = await require('../models/User').findById(realIdStr).select('name displayName avatar rank').lean();
+      const acceptor = await User.findById(realIdStr).select('name displayName avatar rank').lean();
       emitToUser(friendship.requester, 'friend_accepted', {
         friendId: realIdStr,
         friendName: req.user.displayName || req.user.name,

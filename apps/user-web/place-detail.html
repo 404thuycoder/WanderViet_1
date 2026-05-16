@@ -2296,7 +2296,11 @@
             const filtersContainer = document.getElementById('gallery-filters');
             if (!galleryGrid) return;
 
-            allGalleryItems = place.gallery || (place.images || []).map(img => ({ url: img, category: 'general', type: 'image' }));
+            // ELITE: Merge legacy images and new gallery system
+            allGalleryItems = (place.gallery && place.gallery.length > 0) 
+                ? place.gallery 
+                : (place.images || []).map(img => ({ url: img, category: 'general', type: 'image' }));
+            
             if (allGalleryItems.length === 0) {
                 if (gallerySec) gallerySec.style.display = 'none';
                 return;

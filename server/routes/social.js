@@ -17,6 +17,7 @@ const Group = require('../models/Group');
 const Story = require('../models/Story');
 const { emitToUser, emitToUsers, sendNotification } = require('../utils/socketManager');
 const Follow = require('../models/Follow');
+const { uploadFile } = require('../utils/gridfsStorage');
 
 // ==========================================
 // BUSINESS FOLLOWING ROUTES
@@ -94,11 +95,8 @@ router.get('/business/check-follow/:id', auth, async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
-// Multer config for media uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '..', 'uploads')),
-  filename: (req, file, cb) => cb(null, `social_${Date.now()}_${Math.random().toString(36).slice(2)}${path.extname(file.originalname)}`)
-});
+// Multer config for media uploads - using memory storage for MongoDB GridFS
+const storage = multer.memoryStorage();
 const upload = multer({ storage, limits: { fileSize: 50 * 1024 * 1024 }, fileFilter: (req, file, cb) => {
   // Broadly allow images, videos, and audio
   const allowed = /jpeg|jpg|png|gif|webp|bmp|tiff|heic|heif|mp4|webm|mov|avi|flv|3gp|mp3|wav|ogg|m4a|aac|m4p|flac/;
@@ -143,11 +141,19 @@ function processPost(post, baseUrl) {
     });
   }
   
-  // Fix media URLs
+  // Fix media URLs - handle both old /uploads/ and new /api/files/ URLs
   if (p.media && Array.isArray(p.media)) {
     p.media = p.media.map(m => {
-      if (m.url && m.url.startsWith('/uploads/')) {
-        m.url = `${baseUrl}${m.url}`;
+      if (m.url) {
+        // If it's a relative URL starting with /uploads/, prepend baseUrl
+        if (m.url.startsWith('/uploads/')) {
+          m.url = `${baseUrl}${m.url}`;
+        }
+        // If it's a relative URL starting with /api/files/, prepend baseUrl
+        else if (m.url.startsWith('/api/files/')) {
+          m.url = `${baseUrl}${m.url}`;
+        }
+        // If it's already a full URL, leave it as is
       }
       return m;
     });
@@ -193,11 +199,19 @@ router.get('/stories', auth, async (req, res) => {
       obj.likeCount = s.likes ? s.likes.length : 0;
       obj.isLiked = s.likes ? s.likes.some(id => id.toString() === realId.toString()) : false;
       
-      // Fix media URLs
+      // Fix media URLs - handle both old /uploads/ and new /api/files/ URLs
       if (obj.media && Array.isArray(obj.media)) {
         obj.media = obj.media.map(m => {
-          if (m.url && m.url.startsWith('/uploads/')) {
-            m.url = `${baseUrl}${m.url}`;
+          if (m.url) {
+            // If it's a relative URL starting with /uploads/, prepend baseUrl
+            if (m.url.startsWith('/uploads/')) {
+              m.url = `${baseUrl}${m.url}`;
+            }
+            // If it's a relative URL starting with /api/files/, prepend baseUrl
+            else if (m.url.startsWith('/api/files/')) {
+              m.url = `${baseUrl}${m.url}`;
+            }
+            // If it's already a full URL, leave it as is
           }
           return m;
         });
@@ -216,9 +230,15 @@ router.post('/stories', auth, upload.single('media'), async (req, res) => {
     const realId = await resolveUserId(req.user.id);
     if (!req.file) return res.status(400).json({ success: false, message: 'Vui lòng chọn ảnh hoặc video' });
 
+    // Upload file to MongoDB GridFS
+    const uploadedFile = await uploadFile(req.file, `story_${Date.now()}_${req.file.originalname}`, {
+      userId: realId,
+      type: 'story'
+    });
+
     const baseUrl = `${req.protocol}://${req.get('host')}`;
     const media = {
-      url: `${baseUrl}/uploads/${req.file.filename}`,
+      url: `${baseUrl}/api/files/${uploadedFile.id}`,
       type: req.file.mimetype.startsWith('video') ? 'video' : (req.file.mimetype.startsWith('audio') ? 'audio' : 'image')
     };
     
@@ -502,20 +522,22 @@ router.post('/posts', upload.any(), auth, async (req, res) => {
     let finalMedia = [];
     if (req.files && req.files.length > 0) {
       const baseUrl = `${req.protocol}://${req.get('host')}`;
-      req.files.forEach(file => {
+      for (const file of req.files) {
+        // Upload file to MongoDB GridFS
+        const uploadedFile = await uploadFile(file, `post_${Date.now()}_${file.originalname}`, {
+          userId: realId,
+          type: 'post'
+        });
         finalMedia.push({
-          url: `/uploads/${file.filename}`,
+          url: `${baseUrl}/api/files/${uploadedFile.id}`,
           type: file.mimetype.startsWith('video') ? 'video' : 'image'
         });
-      });
+      }
     } else if (req.body.media) {
       // Handle legacy JSON media if any
       const rawMedia = typeof req.body.media === 'string' ? JSON.parse(req.body.media) : req.body.media;
       finalMedia = (rawMedia || []).map(m => {
-        if (m.url && m.url.includes('/uploads/')) {
-          const parts = m.url.split('/uploads/');
-          m.url = '/uploads/' + parts[parts.length - 1];
-        }
+        // Keep existing URLs as they are (they might be from MongoDB or legacy)
         return m;
       });
     }

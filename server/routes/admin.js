@@ -19,6 +19,7 @@ const Booking = require('../models/Booking');
 const Transaction = require('../models/Transaction');
 const Notification = require('../models/Notification');
 const { sendNotification, broadcastGlobal } = require('../utils/socketManager');
+const { uploadFile } = require('../utils/gridfsStorage');
 
 // Cấu hình Rank cho Admin API
 const RANK_CONFIG = [
@@ -124,7 +125,12 @@ router.put('/profile', adminTokenAuth, adminAuth, upload.single('avatarFile'), a
     
     let avatarUrl = avatar;
     if (req.file) {
-      avatarUrl = '/uploads/' + req.file.filename;
+      const uploadedFile = await uploadFile(req.file, `admin_avatar_${Date.now()}_${req.file.originalname}`, {
+        userId: req.user.id,
+        type: 'admin_avatar'
+      });
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      avatarUrl = `${baseUrl}/api/files/${uploadedFile.id}`;
     }
     if (avatarUrl !== undefined) account.avatar = avatarUrl;
 

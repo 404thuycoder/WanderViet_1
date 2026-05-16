@@ -6,18 +6,13 @@ const multer = require('multer');
 const path = require('path');
 const PlaceReview = require('../models/PlaceReview');
 const Place = require('../models/Place');
+const { uploadFile } = require('../utils/gridfsStorage');
 const Notification = require('../models/Notification');
 const { auth } = require('./auth');
 const { sendNotification } = require('../utils/socketManager');
 
-// Multer config for review images
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const rootUploads = path.join(__dirname, '..', '..', 'uploads');
-    cb(null, rootUploads);
-  },
-  filename: (req, file, cb) => cb(null, `review_${Date.now()}_${Math.random().toString(36).slice(2)}${path.extname(file.originalname)}`)
-});
+// Multer config for review images - using memory storage for MongoDB GridFS
+const storage = multer.memoryStorage();
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
 const User = require('../models/User');
@@ -45,25 +40,31 @@ router.post('/', auth, upload.array('image', 10), async (req, res) => {
   console.log('[PlaceReview POST] Version: String IDs Enabled');
   try {
     let { placeId, content, rating, suitability } = req.body;
-    placeId = (placeId || '').toString().trim();
-    
-    console.log('[PlaceReview POST] Input:', { placeId, rating, userId: req.user.id });
+    const realUserId = await resolveUserId(req.user.id);
 
+    // Validation
     if (!placeId || !content || !rating) {
       return res.status(400).json({ success: false, message: 'Thiếu thông tin bắt buộc' });
     }
-
-    // 1. Resolve User ObjectId
-    const realUserId = await resolveUserId(req.user.id);
-    if (!realUserId) {
-      console.error('[PlaceReview POST] User not found:', req.user.id);
-      return res.status(404).json({ success: false, message: 'Không tìm thấy tài khoản người dùng' });
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({ success: false, message: 'Đánh giá phải từ 1 đến 5 sao' });
     }
 
     // 2. Resolve Place Id (just use the string)
     const realPlaceId = placeId;
 
-    const images = (req.files || []).map(file => `/uploads/${file.filename}`);
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const images = [];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const uploadedFile = await uploadFile(file, `review_${Date.now()}_${file.originalname}`, {
+          userId: realUserId,
+          placeId: realPlaceId,
+          type: 'review_image'
+        });
+        images.push(`${baseUrl}/api/files/${uploadedFile.id}`);
+      }
+    }
 
     // Use direct collection insert to bypass Mongoose schema caching/validation issues
     const reviewData = {

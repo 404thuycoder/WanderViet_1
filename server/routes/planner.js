@@ -20,7 +20,24 @@ const optionalAuth = (req, res, next) => {
   next();
 };
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY_PLANNER });
+// Hệ thống xoay vòng API Key để tránh Rate Limit / Hết Token
+const plannerKeys = [
+  process.env.GROQ_API_KEY_PLANNER,
+  process.env.GROQ_API_KEY_PLANNER_2
+].filter(Boolean);
+
+let currentKeyIndex = 0;
+let groq = new Groq({ apiKey: plannerKeys[currentKeyIndex] });
+
+function rotateGroqKey() {
+  if (plannerKeys.length > 1) {
+    currentKeyIndex = (currentKeyIndex + 1) % plannerKeys.length;
+    groq = new Groq({ apiKey: plannerKeys[currentKeyIndex] });
+    console.log(`🔄 [Groq Rotation] Đã chuyển sang API Key dự phòng (Key #${currentKeyIndex + 1})`);
+    return true;
+  }
+  return false;
+}
 
 // Nạp danh sách điểm đến để đưa vào Prompt Context cho AI
 const fs = require('fs');
@@ -64,10 +81,29 @@ router.post('/generate', optionalAuth, async (req, res) => {
 
     const numDays = parseInt(days);
 
+    // Fetch real weather
+    let weatherInfo = '';
+    let weatherDataForFrontend = null;
+    try {
+      const weatherRes = await fetch(`https://wttr.in/${encodeURIComponent(destination)}?format=j1`);
+      if (weatherRes.ok) {
+        const wttrJson = await weatherRes.json();
+        const current = wttrJson.current_condition[0];
+        weatherInfo = `Nhiệt độ hiện tại: ${current.temp_C}°C, Tình trạng: ${current.weatherDesc[0].value}`;
+        weatherDataForFrontend = {
+           temp: current.temp_C,
+           condition: current.weatherDesc[0].value
+        };
+      }
+    } catch(e) {
+      console.error('Weather fetch error:', e.message);
+    }
+
     const prompt = `Bạn là SIÊU KIẾN TRÚC SƯ LỊCH TRÌNH của WanderViệt. Nhiệm vụ của bạn là biến một chuyến đi thành một TÁC PHẨM NGHỆ THUẬT.
 
 === THÔNG TIN CHUYẾN ĐI ===
 - Điểm đến: ${destination}
+${weatherInfo ? `- THỜI TIẾT THỰC TẾ NGAY LÚC NÀY: ${weatherInfo} (HÃY sử dụng thông tin thời tiết này để miêu tả các hoạt động cho chân thực hơn)` : ''}
 - Số ngày: ${numDays} ngày
 - Ngân sách tổng cộng: ${budget}
 - Loại lưu trú: ${accommodation}
@@ -82,6 +118,7 @@ router.post('/generate', optionalAuth, async (req, res) => {
 2. NGÔN NGỮ GIÀU HÌNH ẢNH (VISUAL-READY): Các mô tả hoạt động (task) phải đầy cảm hứng, gợi hình. Thay vì ghi "Ăn sáng", hãy ghi "Thưởng thức bún bò chuẩn vị trong làn sương sớm Đà Lạt".
 3. TỐI ƯU HÓA "GIỜ VÀNG" (GOLDEN HOURS): Tìm kiếm thời điểm ánh sáng đẹp nhất cho từng địa điểm để khách có thể chụp ảnh đẹp nhất.
 4. ĐIỂM NHẤN CẢM XÚC: Mỗi ngày phải có 1 "Điểm chạm cảm xúc" (Highlight) - một trải nghiệm đáng nhớ nhất.
+5. CHỈ DẪN DI CHUYỂN (TRANSIT): Đối với mỗi hoạt động (trừ hoạt động cuối cùng trong ngày), bạn PHẢI tự suy luận khoảng cách và cung cấp hướng dẫn di chuyển chi tiết đến địa điểm tiếp theo trong trường "transitToNext" (Ví dụ: "🚗 Đi taxi khoảng 10 phút (2.5km) qua đường ABC", "🚶 Đi bộ khoảng 5 phút dọc theo phố XYZ").
 
 === QUY TẮC PHÂN TÍCH YÊU CẦU ===
 ${hasSunriseActivity ? `!!! CẢNH BÁO SĂN MÂY: Phải bắt đầu lúc 04:00–04:30 sáng.` : ''}
@@ -109,7 +146,8 @@ ${hasSunsetActivity ? `→ Hoàng hôn: xếp lúc 17:15–18:30 để bắt tr�
           "task": "Mô tả hoạt động đầy cảm hứng (Phải cực kỳ chi tiết, không ghi chung chung)", 
           "location": "Địa chỉ cụ thể hoặc tên quán ăn/điểm đến nổi tiếng", 
           "cost": "XXXđ",
-          "visualNote": "Gợi ý góc chụp ảnh, món nên thử hoặc cảm giác mang lại" 
+          "visualNote": "Gợi ý góc chụp ảnh, món nên thử hoặc cảm giác mang lại",
+          "transitToNext": "Hướng dẫn di chuyển thực tế đến điểm tiếp theo trong ngày (Thời gian, phương tiện, lộ trình ngắn)"
         }
       ]
     }
@@ -119,12 +157,16 @@ ${hasSunsetActivity ? `→ Hoàng hôn: xếp lúc 17:15–18:30 để bắt tr�
 LƯU Ý: Số ngày phải đúng ${numDays}. Mọi chi phí phải thực tế và không vượt quá ngân sách ${budget}.`;
 
 
-    const response = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        {
-          role: 'system',
-          content: `Bạn là chuyên gia lập lịch du lịch thực địa tại Việt Nam. Nhiệm vụ: tạo lịch trình CHÍNH XÁC, THỰC TẾ theo đúng yêu cầu.
+    let response;
+    const maxRetries = 3;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        response = await groq.chat.completions.create({
+          model: 'llama-3.3-70b-versatile',
+          messages: [
+            {
+              role: 'system',
+              content: `Bạn là chuyên gia lập lịch du lịch thực địa tại Việt Nam. Nhiệm vụ: tạo lịch trình CHÍNH XÁC, THỰC TẾ theo đúng yêu cầu.
 Quy tắc tuyệt đối:
 - "Săn mây / bình minh" → hoạt động lúc 04:30–06:30 SÁNG SỚM, KHÔNG được xếp chiều tối.
 - Số ngày trong itinerary PHẢI BẰNG số ngày được yêu cầu.
@@ -132,11 +174,29 @@ Quy tắc tuyệt đối:
 - ĐỘ CHÍNH XÁC: Bạn PHẢI cung cấp địa chỉ (location) thực tế, chính xác tại Việt Nam. Không được bịa đặt tên quán hay địa chỉ sai lệch.
 - CHẾ ĐỘ "KHÔNG QUAN TÂM HẠN MỨC": Nếu budget là "Không quan tâm hạn mức", hãy mặc định chọn những dịch vụ CAO CẤP nhất, quán ăn NỔI TIẾNG nhất và KHÔNG cần lo lắng về giá.
 - Chỉ trả về JSON hợp lệ.`
-        },
-        { role: 'user', content: prompt }
-      ],
-      response_format: { type: 'json_object' }
-    });
+            },
+            { role: 'user', content: prompt }
+          ],
+          response_format: { type: 'json_object' },
+          max_tokens: 4000
+        });
+        break; // Thành công, thoát vòng lặp
+      } catch (err) {
+        if ((err.status === 429 || err.status === 403 || err.message.includes('quota')) && attempt < maxRetries) {
+          // Nếu hết quota hoặc bị bóp băng thông, thử đổi sang Key dự phòng
+          const rotated = rotateGroqKey();
+          if (rotated) {
+            console.warn(`⚠️ [Groq API] Hết hạn mức hoặc Rate limit. Đã tự động đổi Key và thử lại (Lần ${attempt}/${maxRetries})...`);
+            await new Promise(res => setTimeout(res, 2000)); // Nghỉ 2s rồi thử key mới ngay
+          } else {
+             // Không có key dự phòng, đợi như bình thường
+             await new Promise(res => setTimeout(res, 15000));
+          }
+        } else {
+          throw err;
+        }
+      }
+    }
 
     let aiPlanStr = response.choices[0].message.content;
     aiPlanStr = aiPlanStr.trim();
@@ -232,7 +292,7 @@ Quy tắc tuyệt đối:
       })();
     }
 
-    res.json({ success: true, plan: aiPlanJson, itineraryId: savedDoc._id });
+    res.json({ success: true, plan: aiPlanJson, itineraryId: savedDoc._id, weather: weatherDataForFrontend });
   } catch (error) {
     console.error('❌ Planner API Error Detail:', error);
     if (error.response && error.response.data) {
@@ -357,9 +417,10 @@ router.post('/discover', async (req, res) => {
     messages.push({ role: 'user', content: message });
 
     const response = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       messages: messages,
-      response_format: { type: 'json_object' }
+      response_format: { type: 'json_object' },
+      max_tokens: 500
     });
 
     const aiRes = JSON.parse(response.choices[0].message.content);
@@ -397,20 +458,22 @@ router.post('/smart-wizard', optionalAuth, async (req, res) => {
 Nhiệm vụ: Thu thập thông tin từ người dùng để tạo lịch trình du lịch cá nhân hóa.
 
 QUY TẮC CỐT LÕI:
-1. GOM NHÓM CÂU HỎI: Hãy hỏi theo trình tự logic để thấu hiểu khách:
-   - ƯU TIÊN: Bạn muốn dành tiền và thời gian vào đâu nhiều nhất? (Hoạt động mạo hiểm, Nghỉ ngơi thư giãn, Mua sắm, hay Tham quan di tích?)
-   - CHỖ Ở: Bạn thích ở đâu? (Resort sang chảnh, Homestay ấm cúng, Hotel trung tâm, hay Cắm trại?)
-   - ĂN UỐNG: Phong cách ẩm thực? (Món địa phương/Vỉa hè, Nhà hàng sang trọng, Buffet, hay Tự túc?)
-   - NHỊP ĐỘ: Bạn muốn chuyến đi thế nào? (Dày đặc/Năng suất, Vừa phải, hay Chậm rãi/Thảnh thơi?)
+1. GOM NHÓM CÂU HỎI: BẠN PHẢI TRẢ VỀ TẤT CẢ 4 NHÓM CÂU HỎI CÙNG MỘT LÚC để thu thập toàn bộ thông tin trong 1 lần hỏi:
+   - ƯU TIÊN: Bạn muốn dành tiền và thời gian vào đâu nhiều nhất?
+   - CHỖ Ở: Bạn thích ở đâu?
+   - ĂN UỐNG: Phong cách ẩm thực?
+   - NHỊP ĐỘ: Bạn muốn chuyến đi thế nào?
+   (TUYỆT ĐỐI KHÔNG được trả về 1 nhóm lẻ tẻ, phải trả về đủ 4 nhóm trong mảng "groups")
 2. TRÌNH BÀY: Dùng ngôn ngữ tự nhiên. Phản hồi xác nhận thông tin bằng CHỮ IN HOA để highlight.
 3. PHÂN TÍCH: Tự suy luận từ câu trả lời của khách để điền vào detectedData.
-4. UI OPTIONS: Luôn sử dụng "type": "multi_select" cho các nhóm chính để khách có thể chọn nhiều phương án cùng lúc.
+4. UI OPTIONS: Luôn sử dụng "type": "multi_select" cho các nhóm chính để khách có thể chọn nhiều phương án cùng lúc. BẮT BUỘC trả về mảng "groups" chứa đủ 4 phần tử y như mẫu bên dưới.
+5. KẾT THÚC: Khi đã thu thập đủ thông tin (hoặc khách yêu cầu xong), BẮT BUỘC gán "nextStep": "ready" và KHÔNG trả về uiOptions nữa.
 
-Cấu trúc JSON:
+Cấu trúc JSON BẮT BUỘC (Không được thay đổi tên key):
 {
   "detectedData": { ... },
   "nextStep": "objective" | "aggregate_info" | "ready",
-  "aiMessage": "Lời chào và câu hỏi dẫn dắt về Ưu tiên, Chỗ ở, Ăn uống và Nhịp độ...",
+  "aiMessage": "Lời chào và câu hỏi dẫn dắt...",
   "uiOptions": {
     "type": "multi_select",
     "groups": [
@@ -450,9 +513,10 @@ ${userContext}`;
     messages.push({ role: 'user', content: message || "Bắt đầu" });
 
     const response = await groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       messages: messages,
-      response_format: { type: 'json_object' }
+      response_format: { type: 'json_object' },
+      max_tokens: 800
     });
 
     const result = JSON.parse(response.choices[0].message.content);
@@ -466,7 +530,7 @@ ${userContext}`;
 router.post('/save', auth, async (req, res) => {
   try {
     const { itineraryId, planJson, destination, days, budget } = req.body;
-    
+
     // TRƯỜNG HỢP 1: Lưu từ ID đã tồn tại (Draft -> My Trips)
     if (itineraryId) {
       const itin = await Itinerary.findById(itineraryId);
@@ -475,8 +539,8 @@ router.post('/save', auth, async (req, res) => {
       itin.userId = req.user.id;
       await itin.save();
       return res.json({ success: true, message: 'Đã lưu lịch trình thành công.' });
-    } 
-    
+    }
+
     // TRƯỜNG HỢP 2: Lưu lịch trình mới toanh (từ AI Chat trực tiếp)
     if (planJson) {
       if (!destination || !days) {
@@ -504,7 +568,7 @@ router.post('/save', auth, async (req, res) => {
 
       const saved = await newItin.save();
       await logAction(newItin.userEmail, 'user', 'ITINERARY_SAVED_FROM_CHAT', { itineraryId: saved._id });
-      
+
       return res.json({ success: true, message: 'Đã lưu lịch trình từ Chat!', itineraryId: saved._id });
     }
 
@@ -579,7 +643,7 @@ router.get('/my-trips', auth, async (req, res) => {
     if (req.user._id && req.user._id !== req.user.id) {
       userSearchIds.push(req.user._id.toString());
     }
-    
+
     const trips = await Itinerary.find({ userId: { $in: userSearchIds } }).sort({ createdAt: -1 });
     res.json({ success: true, data: trips });
   } catch (error) {

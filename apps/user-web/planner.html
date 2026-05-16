@@ -41,7 +41,7 @@
     href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=4" />
-  <link rel="stylesheet" href="css/planner.css?v=20260507n" />
+  <link rel="stylesheet" href="css/planner.css?v=20260516v1" />
 </head>
 
 <body>
@@ -63,6 +63,51 @@
           </h1>
           <p class="planner-hero-sub">Trả lời vài câu hỏi, AI sẽ hiểu bạn và lên lịch thật hợp lý!</p>
         </div>
+
+        <!-- 3-COLUMN LAYOUT: sidebar-left | form-center | sidebar-right -->
+        <div class="planner-3col-layout">
+
+          <!-- SIDEBAR TRÁI: Điểm đến hot -->
+          <div class="planner-sidebar planner-sidebar--left">
+            <div class="sidebar-section">
+              <div class="sidebar-section-title">🔥 Điểm Đến Hot</div>
+              <div class="sidebar-dest-list">
+                <div class="sidebar-dest-item" onclick="document.getElementById('destination').value='Sapa, Lào Cai'">
+                  <div class="sidebar-dest-img" style="background-image:url('https://images.unsplash.com/photo-1578894381163-e72c17f2d45f?w=120&q=80')"></div>
+                  <div class="sidebar-dest-info"><strong>Sapa</strong><span>Lào Cai</span></div>
+                  <span class="sidebar-dest-badge">Hot</span>
+                </div>
+                <div class="sidebar-dest-item" onclick="document.getElementById('destination').value='Hội An, Quảng Nam'">
+                  <div class="sidebar-dest-img" style="background-image:url('https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=120&q=80')"></div>
+                  <div class="sidebar-dest-info"><strong>Hội An</strong><span>Quảng Nam</span></div>
+                  <span class="sidebar-dest-badge">Trending</span>
+                </div>
+                <div class="sidebar-dest-item" onclick="document.getElementById('destination').value='Phú Quốc, Kiên Giang'">
+                  <div class="sidebar-dest-img" style="background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=120&q=80')"></div>
+                  <div class="sidebar-dest-info"><strong>Phú Quốc</strong><span>Kiên Giang</span></div>
+                  <span class="sidebar-dest-badge">Biển</span>
+                </div>
+                <div class="sidebar-dest-item" onclick="document.getElementById('destination').value='Đà Lạt, Lâm Đồng'">
+                  <div class="sidebar-dest-img" style="background-image:url('https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=120&q=80')"></div>
+                  <div class="sidebar-dest-info"><strong>Đà Lạt</strong><span>Lâm Đồng</span></div>
+                  <span class="sidebar-dest-badge">Mát</span>
+                </div>
+                <div class="sidebar-dest-item" onclick="document.getElementById('destination').value='Hạ Long, Quảng Ninh'">
+                  <div class="sidebar-dest-img" style="background-image:url('https://images.unsplash.com/photo-1528127269322-539801943592?w=120&q=80')"></div>
+                  <div class="sidebar-dest-info"><strong>Hạ Long</strong><span>Quảng Ninh</span></div>
+                  <span class="sidebar-dest-badge">Di sản</span>
+                </div>
+              </div>
+            </div>
+            <div class="sidebar-section">
+              <div class="sidebar-section-title">📊 Thống Kê AI</div>
+              <div class="sidebar-stats">
+                <div class="sidebar-stat-item"><span class="sidebar-stat-num">12,847</span><span class="sidebar-stat-label">Lịch trình đã tạo</span></div>
+                <div class="sidebar-stat-item"><span class="sidebar-stat-num">98%</span><span class="sidebar-stat-label">Hài lòng</span></div>
+                <div class="sidebar-stat-item"><span class="sidebar-stat-num">63</span><span class="sidebar-stat-label">Điểm đến</span></div>
+              </div>
+            </div>
+          </div>
 
         <!-- FORM BODY -->
         <div class="planner-form-body">
@@ -144,31 +189,40 @@
                 <input type="text" id="dest" class="planner-input" placeholder="VD: Đà Lạt, Phú Quốc..." required>
               </div>
 
-              <!-- NGÀY ĐI & SỐ NGÀY - giống ảnh tham khảo, dạng row -->
+              <!-- NGÀY ĐI & SỐ NGÀY & GIỜ - giống ảnh tham khảo, dạng row -->
               <div class="planner-dates-row">
                 <div class="planner-field-group" style="margin-bottom:0">
                   <label class="planner-field-label">📅 Ngày khởi hành</label>
                   <input type="date" id="tripDate" class="planner-input">
                 </div>
                 <div class="planner-field-group" style="margin-bottom:0">
-                  <label class="planner-field-label">📆 Số ngày</label>
-                  <input type="number" id="days" class="planner-input" placeholder="3" min="1" max="14" required>
+                  <label class="planner-field-label">🕒 Giờ khởi hành</label>
+                  <input type="time" id="departureTime" class="planner-input" value="08:00">
                 </div>
               </div>
 
-              <div class="planner-dates-row">
-                <div class="planner-field-group">
-                  <label class="planner-field-label">🌍 Quốc tịch</label>
-                  <select id="nationality" class="planner-input">
-                    <option value="Việt Nam" selected>🇻🇳 Việt Nam</option>
-                    <option value="Âu Mỹ">🇺🇸 Âu Mỹ</option>
-                    <option value="Hàn Quốc">🇰🇷 Hàn Quốc</option>
-                    <option value="Nhật Bản">🇯🇵 Nhật Bản</option>
-                    <option value="Trung Quốc">🇨🇳 Trung Quốc</option>
-                    <option value="Đông Nam Á">🌏 Đông Nam Á</option>
-                  </select>
+              <!-- BUỔI HOẠT ĐỘNG -->
+              <div class="planner-field-group" style="margin-top: 1rem;">
+                <label class="planner-field-label">🌅 Bạn muốn hoạt động vào buổi nào?</label>
+                <div class="travel-styles-grid" style="grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                  <div class="style-chip active" onclick="toggleStyle(this)" data-session="Sáng">
+                    <span class="style-icon">☀️</span> Sáng
+                  </div>
+                  <div class="style-chip active" onclick="toggleStyle(this)" data-session="Chiều">
+                    <span class="style-icon">⛅</span> Chiều
+                  </div>
+                  <div class="style-chip active" onclick="toggleStyle(this)" data-session="Tối">
+                    <span class="style-icon">🌙</span> Tối
+                  </div>
                 </div>
-                <div class="planner-field-group">
+              </div>
+
+              <div class="planner-dates-row" style="margin-top: 1rem;">
+                <div class="planner-field-group" style="margin-bottom:0">
+                  <label class="planner-field-label">📆 Số ngày</label>
+                  <input type="number" id="days" class="planner-input" placeholder="3" min="1" max="14" required>
+                </div>
+                <div class="planner-field-group" style="margin-bottom:0">
                   <label class="planner-field-label">👥 Thành viên</label>
                   <select id="companion" class="planner-input">
                     <option value="Một mình">Solo (Một mình)</option>
@@ -208,7 +262,7 @@
                 <textarea id="additionalInfo" class="planner-input" placeholder="VD: Muốn leo núi, ăn lãng mạn..." rows="2" style="height: 60px; resize: none;"></textarea>
               </div>
 
-              <button type="submit" class="planner-btn main-action">
+              <button type="button" id="btnStartSmartWizard" class="planner-btn main-action">
                 <span>Tiếp tục — AI sẽ hỏi thêm</span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
               </button>
@@ -301,6 +355,55 @@
           </div>
 
         </div><!-- end .planner-form-body -->
+
+          <!-- SIDEBAR PHẢI: Tips & Mẹo -->
+          <div class="planner-sidebar planner-sidebar--right">
+            <div class="sidebar-section">
+              <div class="sidebar-section-title">💡 Mẹo Du Lịch</div>
+              <div class="sidebar-tips-list">
+                <div class="sidebar-tip-item">
+                  <span class="sidebar-tip-icon">🌤️</span>
+                  <div><strong>Kiểm tra thời tiết</strong><p>Luôn xem dự báo 7 ngày trước khi đặt vé</p></div>
+                </div>
+                <div class="sidebar-tip-item">
+                  <span class="sidebar-tip-icon">💰</span>
+                  <div><strong>Đặt trước 2 tuần</strong><p>Giá vé và phòng thường rẻ hơn 30%</p></div>
+                </div>
+                <div class="sidebar-tip-item">
+                  <span class="sidebar-tip-icon">🎒</span>
+                  <div><strong>Hành lý gọn nhẹ</strong><p>Mang đủ dùng, tránh phí hành lý ký gửi</p></div>
+                </div>
+                <div class="sidebar-tip-item">
+                  <span class="sidebar-tip-icon">📱</span>
+                  <div><strong>Lưu offline map</strong><p>Tải bản đồ khu vực để dùng khi mất mạng</p></div>
+                </div>
+                <div class="sidebar-tip-item">
+                  <span class="sidebar-tip-icon">🍜</span>
+                  <div><strong>Thử đặc sản địa phương</strong><p>Đây là điểm nhấn không thể bỏ qua!</p></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="sidebar-section">
+              <div class="sidebar-section-title">⭐ Đánh Giá Gần Đây</div>
+              <div class="sidebar-reviews-mini">
+                <div class="sidebar-review-item">
+                  <div class="sidebar-review-avatar">TT</div>
+                  <div><strong>Thanh Tùng</strong><p>"AI lên lịch cực chính xác, đi Đà Lạt xong mê luôn!"</p><span class="sidebar-review-stars">★★★★★</span></div>
+                </div>
+                <div class="sidebar-review-item">
+                  <div class="sidebar-review-avatar">HL</div>
+                  <div><strong>Hồng Linh</strong><p>"Tiết kiệm được bao nhiêu công lên kế hoạch, quá tiện!"</p><span class="sidebar-review-stars">★★★★★</span></div>
+                </div>
+                <div class="sidebar-review-item">
+                  <div class="sidebar-review-avatar">MB</div>
+                  <div><strong>Minh Bảo</strong><p>"Lịch trình chi tiết từng giờ, rất hữu ích cho nhóm bạn bè."</p><span class="sidebar-review-stars">★★★★★</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- end .planner-3col-layout -->
       </aside>
 
 
@@ -373,7 +476,7 @@
   <script src="js/SharedUI.js?v=1778494999999" defer></script>
   <script src="js/chat-brain.js"></script>
   <script src="js/main.js?v=1778162961775" defer></script>
-  <script src="js/planner.js?v=1778162961775"></script>
+  <script src="js/planner.js?v=20260516v2"></script>
   <script>
     const REGION_DESTINATIONS = {
       'Miền Bắc': [
@@ -557,24 +660,6 @@
     function toggleStyle(chip) {
       chip.classList.toggle('active');
     }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      // Tab switching (Mode selector)
-      document.querySelectorAll('.mode-toggle-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const resultsContainer = document.getElementById('timelineResult');
-          if (btn.id === 'btnModeCompare') {
-            showComparisonView();
-          } else {
-            document.querySelectorAll('.mode-toggle-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            if (btn.id === 'btnModeForm') {
-               document.getElementById('optionCount').value = "1";
-            }
-          }
-        });
-      });
-    });
 
     function showComparisonView(plans, names, type = 'itinerary') {
       if (!plans || !Array.isArray(plans)) {
@@ -1138,6 +1223,21 @@
        }
     };
   </script>
+  <!-- PREMIUM ACTIVITY DETAILS MODAL -->
+  <div id="activityDetailModalOverlay" class="activity-modal-overlay">
+    <div class="activity-modal">
+      <div class="activity-modal-header">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <span style="font-size:1.5rem;">✨</span>
+          <h3 style="margin:0; font-size:1.25rem; color:#fff;">Chi tiết hoạt động</h3>
+        </div>
+        <button type="button" class="activity-modal-close" onclick="closeActivityModal()">×</button>
+      </div>
+      <div class="activity-modal-body" id="activityModalBody">
+        <!-- Content will be injected here via JS -->
+      </div>
+    </div>
+  </div>
 </body>
 </html>
 

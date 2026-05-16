@@ -1,0 +1,50 @@
+﻿
+        window.onload = load;
+
+
+        // Map & Nearby Functions (Dynamic Pro Edition + Persistence)
+        let map = null;
+        let mainMarker = null;
+        let discoveredMarkers = new Map(); // OSM ID -> Marker object
+        let discoveredPlaces = new Map();  // OSM ID -> Place data
+        let activeFilters = new Set();
+
+        function initMap(p) {
+            if (map) { map.remove(); map = null; }
+            discoveredMarkers.clear();
+            discoveredPlaces.clear();
+            
+            const lat = (p.gpsCoordinates && p.gpsCoordinates.lat) || p.lat || 21.0285;
+            const lng = (p.gpsCoordinates && p.gpsCoordinates.lng) || p.lng || 105.8542;
+
+            map = L.map('map-root', { zoomControl: false }).setView([lat, lng], 16);
+            
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; WanderViệt &copy; OpenStreetMap'
+            }).addTo(map);
+
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            const mainIcon = L.divIcon({
+                className: 'main-pin',
+                html: `<div style="background:var(--primary); width:32px; height:32px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 15px var(--primary); display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px;">📍</div>`,
+                iconSize: [32, 32],
+                iconAnchor: [16, 32]
+            });
+
+            mainMarker = L.marker([lat, lng], { icon: mainIcon }).addTo(map)
+                .bindPopup(`<b style="color:#000;">${p.name}</b><br><span style="color:#666; font-size:12px;">Vị trí chính xác</span>`, { closeButton: false })
+                .openPopup();
+            
+            window.currentPlaceCoords = { lat, lng };
+
+            // Dynamic Behavior: Search when map moves/zooms (Google Maps Style)
+            map.on('moveend', () => {
+                if (activeFilters.size > 0) refreshMapData();
+            });
+        }
+
+        async function initNearbyData(p) {
+            // Default: Show restaurants
+            toggleNearbyFilter('restaurant');
+        }

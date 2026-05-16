@@ -558,39 +558,62 @@ router.post('/ai/optimize-seo', businessAuth, async (req, res) => {
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
 
-// 2. Create a new place (with image upload)
-router.post('/places', businessAuth, upload.array('imageFile', 10), async (req, res) => {
+// 2. Create a new place (with categorized image upload)
+router.post('/places', businessAuth, upload.fields([
+  { name: 'primaryFile', maxCount: 1 },
+  { name: 'galleryFile', maxCount: 20 },
+  { name: 'imageFile', maxCount: 10 } // fallback
+]), async (req, res) => {
   try {
     // 1. Image handling
-    let galleryImages = [];
-    if (req.files && req.files.length > 0) {
-      req.files.forEach(file => {
-        galleryImages.push('/uploads/' + file.filename);
+    let galleryItems = []; // Array of { url, type }
+    
+    // Primary Image (Cover)
+    let mainImage = req.body.image || '';
+    if (req.files['primaryFile'] && req.files['primaryFile'][0]) {
+      mainImage = '/uploads/' + req.files['primaryFile'][0].filename;
+    } else if (req.files['imageFile'] && req.files['imageFile'][0]) {
+      mainImage = '/uploads/' + req.files['imageFile'][0].filename;
+    }
+
+    // Gallery Files with Metadata
+    const meta = safeParseArray(req, 'galleryMetadata', true);
+    if (req.files['galleryFile'] && req.files['galleryFile'].length > 0) {
+      req.files['galleryFile'].forEach((file, idx) => {
+        const category = (meta[idx] && meta[idx].type) || 'other';
+        const isVideo = file.mimetype && file.mimetype.startsWith('video/');
+        galleryItems.push({
+          url: '/uploads/' + file.filename,
+          type: isVideo ? 'video' : 'image',
+          category: category
+        });
       });
     }
 
-    if (req.body.image) {
-      if (!galleryImages.includes(req.body.image)) galleryImages.push(req.body.image);
+    // Legacy imageFile support
+    if (req.files['imageFile'] && req.files['imageFile'].length > 1) {
+      req.files['imageFile'].slice(1).forEach(file => {
+        const isVideo = file.mimetype && file.mimetype.startsWith('video/');
+        galleryItems.push({ url: '/uploads/' + file.filename, type: isVideo ? 'video' : 'image', category: 'other' });
+      });
     }
 
+    // Merge from body (URL strings)
     if (req.body.images) {
-      let parsedImages = req.body.images;
-      if (typeof parsedImages === 'string') {
-        try { 
-          parsedImages = JSON.parse(parsedImages); 
-        } catch (e) { 
-          parsedImages = parsedImages.split(',').map(s => s.trim()).filter(s => s);
+      const parsedImages = safeParseArray(req, 'images');
+      parsedImages.forEach(url => {
+        if (!galleryItems.find(it => it.url === url)) {
+          const isVideo = /\.(mp4|webm|mov|avi)$/i.test(url);
+          galleryItems.push({ url, type: isVideo ? 'video' : 'image', category: 'other' });
         }
-      }
-      if (Array.isArray(parsedImages)) {
-        parsedImages.forEach(img => {
-          if (img && !galleryImages.includes(img)) galleryImages.push(img);
-        });
-      }
+      });
     }
     
-    galleryImages = [...new Set(galleryImages.filter(i => i))];
-    const mainImage = galleryImages[0] || '';
+    // Ensure mainImage is at top of legacy 'images' array if needed
+    let legacyImages = galleryItems.map(it => it.url);
+    if (mainImage && !legacyImages.includes(mainImage)) {
+      legacyImages.unshift(mainImage);
+    }
 
     // 2. Data handling
     const amenitiesArr = safeParseArray(req, 'amenities');
@@ -607,6 +630,7 @@ router.post('/places', businessAuth, upload.array('imageFile', 10), async (req, 
     const galleryArr = safeParseArray(req, 'gallery', true);
     const tourItineraryArr = safeParseArray(req, 'tourItinerary', true);
     const tourIncludesArr = safeParseArray(req, 'tourIncludes');
+    const tourExcludesArr = safeParseArray(req, 'tourExcludes');
 
     // Parse objects
     let accessibilityObj = { wheelchairAccessible: false, elevator: false, accessibleRestrooms: false, notes: '' };
@@ -654,7 +678,8 @@ router.post('/places', businessAuth, upload.array('imageFile', 10), async (req, 
       },
       ownerId: req.user.id,
       image: mainImage,
-      images: galleryImages,
+      images: legacyImages,
+      gallery: galleryItems,
       highlights: highlightsArr,
       tags: tagsArr,
       amenities: amenitiesArr,
@@ -679,7 +704,9 @@ router.post('/places', businessAuth, upload.array('imageFile', 10), async (req, 
       tourDifficulty: req.body.tourDifficulty || 'easy',
       tourItinerary: tourItineraryArr,
       tourIncludes: tourIncludesArr,
+      tourExcludes: tourExcludesArr,
       tourGroupSize: req.body.tourGroupSize ? parseInt(req.body.tourGroupSize) : null,
+      policy: req.body.policy || '',
       // Rich content
       experiences: experiencesArr,
       suggestedItineraries: suggestedItinerariesArr,
@@ -687,7 +714,6 @@ router.post('/places', businessAuth, upload.array('imageFile', 10), async (req, 
       safetyTips: safetyTipsArr,
       whatToBring: whatToBringArr,
       whatNotToDo: whatNotToDoArr,
-      gallery: galleryArr,
       seo: seoObj,
       // Legacy nested
       amusementPlaces: safeParseArray(req, 'amusementPlaces', true),
@@ -705,8 +731,12 @@ router.post('/places', businessAuth, upload.array('imageFile', 10), async (req, 
   }
 });
 
-// 3. Update own place (with optional image upload)
-router.put('/places/:id', businessAuth, upload.array('imageFile', 10), async (req, res) => {
+// 3. Update own place (with categorized image upload)
+router.put('/places/:id', businessAuth, upload.fields([
+  { name: 'primaryFile', maxCount: 1 },
+  { name: 'galleryFile', maxCount: 20 },
+  { name: 'imageFile', maxCount: 10 }
+]), async (req, res) => {
   try {
     // Validate required fields
     const requiredFields = ['name', 'kind', 'region', 'address'];
@@ -727,55 +757,64 @@ router.put('/places/:id', businessAuth, upload.array('imageFile', 10), async (re
       });
     }
 
-    const place = await Place.findOne({ id: req.params.id, ownerId: req.user.id });
+    const query = /^[0-9a-fA-F]{24}$/.test(req.params.id) ? { _id: req.params.id, ownerId: req.user.id } : { id: req.params.id, ownerId: req.user.id };
+    const place = await Place.findOne(query);
     if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm hoặc bạn không có quyền sửa.' });
 
     // 1. Image handling for Update
-    let currentImages = place.images || [];
-    if (place.image && !currentImages.includes(place.image)) {
-        currentImages.unshift(place.image);
+    let galleryItems = place.gallery || [];
+    
+    // Primary Image (Cover)
+    let mainImage = (req.body.image !== undefined) ? req.body.image : place.image;
+    if (req.files['primaryFile'] && req.files['primaryFile'][0]) {
+      mainImage = '/uploads/' + req.files['primaryFile'][0].filename;
+    } else if (req.files['imageFile'] && req.files['imageFile'][0]) {
+      mainImage = '/uploads/' + req.files['imageFile'][0].filename;
     }
 
-    let galleryImages = [...currentImages];
-
-    // If new files uploaded
-    if (req.files && req.files.length > 0) {
-      req.files.forEach(file => {
-        galleryImages.push('/uploads/' + file.filename);
+    // Gallery Files with Metadata
+    const meta = safeParseArray(req, 'galleryMetadata', true);
+    if (req.files['galleryFile'] && req.files['galleryFile'].length > 0) {
+      req.files['galleryFile'].forEach((file, idx) => {
+        const category = (meta[idx] && meta[idx].type) || 'other';
+        const isVideo = file.mimetype && file.mimetype.startsWith('video/');
+        galleryItems.push({
+          url: '/uploads/' + file.filename,
+          type: isVideo ? 'video' : 'image',
+          category: category
+        });
       });
     }
 
-    // If URLs provided in body
-    if (req.body.image) {
-      if (!galleryImages.includes(req.body.image)) galleryImages.push(req.body.image);
+    // Handle gallery URLs and metadata from body
+    if (req.body.gallery) {
+      const parsedGallery = typeof req.body.gallery === 'string' ? JSON.parse(req.body.gallery) : req.body.gallery;
+      if (Array.isArray(parsedGallery)) {
+        const bodyItems = parsedGallery.map(item => {
+          const url = typeof item === 'string' ? item : item.url;
+          const category = item.category || 'other';
+          const isVideo = url.toLowerCase().match(/\.(mp4|webm|mov)$/i) || item.type === 'video';
+          return { url, type: isVideo ? 'video' : 'image', category };
+        });
+        bodyItems.forEach(bi => {
+          if (!galleryItems.find(gi => gi.url === bi.url)) galleryItems.push(bi);
+        });
+      }
+    } else if (req.body.images) {
+      const parsedUrls = typeof req.body.images === 'string' ? JSON.parse(req.body.images) : req.body.images;
+      parsedUrls.forEach(url => {
+        if (!galleryItems.find(it => it.url === url)) {
+          const isVideo = /\.(mp4|webm|mov|avi)$/i.test(url);
+          galleryItems.push({ url, type: isVideo ? 'video' : 'image', category: 'other' });
+        }
+      });
     }
 
-    if (req.body.images) {
-      let parsedImages = req.body.images;
-      if (typeof parsedImages === 'string') {
-        try { 
-          parsedImages = JSON.parse(parsedImages); 
-        } catch (e) { 
-          parsedImages = parsedImages.split(',').map(s => s.trim()).filter(s => s);
-        }
-      }
-      if (Array.isArray(parsedImages)) {
-        // If the user provided a full list of images, we might want to replace the current list
-        // but for now let's just merge to be safe, or check if it's meant to be a full replacement.
-        // Usually, a PUT with 'images' field implies replacement.
-        galleryImages = parsedImages.filter(i => i);
-        // But we MUST include the newly uploaded files
-        if (req.files && req.files.length > 0) {
-          req.files.forEach(file => {
-            const path = '/uploads/' + file.filename;
-            if (!galleryImages.includes(path)) galleryImages.push(path);
-          });
-        }
-      }
+    // Legacy fallback: if user cleared 'images' but we have galleryItems, sync them
+    let legacyImages = galleryItems.map(it => it.url);
+    if (mainImage && !legacyImages.includes(mainImage)) {
+      legacyImages.unshift(mainImage);
     }
-    
-    galleryImages = [...new Set(galleryImages.filter(i => i))];
-    const mainImage = galleryImages[0] || '';
 
     // Parse complex objects
     let accessibilityObj = place.accessibility || {};
@@ -812,6 +851,7 @@ router.put('/places/:id', businessAuth, upload.array('imageFile', 10), async (re
       contactPhone: req.body.contactPhone || '',
       contactEmail: req.body.contactEmail || '',
       website: req.body.website || '',
+      policy: req.body.policy !== undefined ? req.body.policy : place.policy,
       videoUrl: req.body.videoUrl || place.videoUrl || '',
       coverImage: req.body.coverImage || place.coverImage || '',
       lat: req.body.lat || place.lat,
@@ -821,7 +861,8 @@ router.put('/places/:id', businessAuth, upload.array('imageFile', 10), async (re
         lng: parseFloat(req.body.lng) || (place.gpsCoordinates && place.gpsCoordinates.lng) || null
       },
       image: mainImage,
-      images: galleryImages,
+      images: legacyImages,
+      gallery: galleryItems,
       // Quick Info fields
       visitDuration: req.body.visitDuration !== undefined ? req.body.visitDuration : place.visitDuration,
       crowdLevel: req.body.crowdLevel !== undefined ? req.body.crowdLevel : place.crowdLevel,
@@ -840,7 +881,8 @@ router.put('/places/:id', businessAuth, upload.array('imageFile', 10), async (re
       updatedAt: new Date()
     };
 
-    const arrayFields = ['tags', 'amenities', 'highlights', 'suitability', 'weatherTags', 'tourItinerary', 'tourIncludes', 'experiences', 'suggestedItineraries', 'faqs', 'safetyTips', 'whatToBring', 'whatNotToDo', 'gallery', 'amusementPlaces', 'accommodations', 'diningPlaces', 'checkInSpots'];
+    const arrayFields = ['tags', 'amenities', 'highlights', 'suitability', 'weatherTags', 'tourItinerary', 'tourIncludes', 'tourExcludes', 'experiences', 'suggestedItineraries', 'faqs', 'safetyTips', 'whatToBring', 'whatNotToDo', 'amusementPlaces', 'accommodations', 'diningPlaces', 'checkInSpots'];
+    if (req.body.policy !== undefined) updates.policy = req.body.policy;
     arrayFields.forEach(field => {
       if (req.body[field] !== undefined) {
         updates[field] = safeParseArray(req, field, ['tourItinerary', 'experiences', 'suggestedItineraries', 'faqs', 'safetyTips', 'gallery', 'amusementPlaces', 'accommodations', 'diningPlaces', 'checkInSpots'].includes(field));
@@ -868,7 +910,8 @@ router.put('/places/:id', businessAuth, upload.array('imageFile', 10), async (re
 // 4. Delete own place
 router.delete('/places/:id', businessAuth, async (req, res) => {
   try {
-    const place = await Place.findOneAndDelete({ id: req.params.id, ownerId: req.user.id });
+    const query = /^[0-9a-fA-F]{24}$/.test(req.params.id) ? { _id: req.params.id, ownerId: req.user.id } : { id: req.params.id, ownerId: req.user.id };
+    const place = await Place.findOneAndDelete(query);
     if (!place) return res.status(404).json({ success: false, message: 'Không thể xóa (Không tìm thấy hoặc sai quyền).' });
     await syncBusinessXP(req.user.id);
     res.json({ success: true, message: 'Đã xóa thành công.' });

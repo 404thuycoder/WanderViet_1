@@ -77,7 +77,7 @@
         if (grid) grid.innerHTML = '<div class="sm-empty"><div class="spinner"></div><p>Đang tải dịch vụ từ máy chủ...</p></div>';
         
         try {
-            const json = await apiFetch('/api/business/places');
+            const json = await apiFetch('/api/business/places?t=' + Date.now());
             if (json.success) {
                 state.services = json.data;
                 renderGrid();
@@ -218,20 +218,370 @@
             const svc = state.services.find(s => s._id === id);
             if (!svc) return;
             
-            document.getElementById('sm-modal-title').textContent = '✏️ Chỉnh sửa dịch vụ';
-            document.getElementById('sm-form-name').value = svc.name || '';
-            document.getElementById('sm-form-kind').value = svc.kind || 'diem-du-lich';
-            document.getElementById('sm-form-region').value = svc.region || '';
-            document.getElementById('sm-form-address').value = svc.address || '';
-            document.getElementById('sm-form-priceFrom').value = svc.priceFrom || '';
-            document.getElementById('sm-form-image').value = svc.image || '';
-            document.getElementById('sm-form-description').value = svc.description || '';
-            document.getElementById('sm-form-highlights').value = svc.highlights || '';
-            document.getElementById('sm-form-policy').value = svc.policy || '';
-            document.getElementById('sm-form-businessCategory').value = svc.businessCategory || 'other';
-            document.getElementById('sm-form-isTour').checked = !!svc.isTour;
-            
-            document.getElementById('sm-modal-wrapper').classList.add('active');
+            const eliteModal = document.getElementById('add-svc-overlay');
+            if (eliteModal) {
+                document.body.classList.remove('is-logging-in');
+                
+                // Populate Elite form
+                document.querySelector('.svc-modal-title').textContent = '✏️ Chỉnh sửa dịch vụ';
+                if(document.getElementById('svc-name')) document.getElementById('svc-name').value = svc.name || '';
+                if(document.getElementById('svc-kind')) document.getElementById('svc-kind').value = svc.kind || 'diem-du-lich';
+                if(document.getElementById('svc-businessCategory')) document.getElementById('svc-businessCategory').value = svc.businessCategory || 'other';
+                if(document.getElementById('svc-price')) document.getElementById('svc-price').value = svc.priceFrom || '';
+                if(document.getElementById('svc-price-to')) document.getElementById('svc-price-to').value = svc.priceTo || '';
+                if(document.getElementById('svc-region')) document.getElementById('svc-region').value = svc.region || '';
+                if(document.getElementById('svc-city')) document.getElementById('svc-city').value = svc.city || '';
+                if(document.getElementById('svc-address')) document.getElementById('svc-address').value = svc.address || '';
+                if(document.getElementById('svc-phone')) document.getElementById('svc-phone').value = svc.contactPhone || '';
+                if(document.getElementById('svc-email')) document.getElementById('svc-email').value = svc.contactEmail || '';
+                if(document.getElementById('svc-website')) document.getElementById('svc-website').value = svc.website || '';
+                if(document.getElementById('svc-open-time')) document.getElementById('svc-open-time').value = svc.openTime || '';
+                if(document.getElementById('svc-close-time')) document.getElementById('svc-close-time').value = svc.closeTime || '';
+                if(document.getElementById('svc-image')) document.getElementById('svc-image').value = svc.image || '';
+                if(document.getElementById('svc-desc')) document.getElementById('svc-desc').value = svc.description || '';
+                if(document.getElementById('svc-overview')) document.getElementById('svc-overview').value = svc.overview || '';
+                if(document.getElementById('svc-video')) document.getElementById('svc-video').value = svc.videoUrl || '';
+                if(document.getElementById('svc-tags') && Array.isArray(svc.tags)) document.getElementById('svc-tags').value = svc.tags.join(', ');
+                if(document.getElementById('svc-visit-duration')) document.getElementById('svc-visit-duration').value = svc.visitDuration || '';
+                if(document.getElementById('svc-crowd-level')) document.getElementById('svc-crowd-level').value = svc.crowdLevel || 'medium';
+                if(document.getElementById('svc-cost-level')) document.getElementById('svc-cost-level').value = svc.costLevel || 'standard';
+                if(document.getElementById('svc-suitability') && Array.isArray(svc.suitability)) document.getElementById('svc-suitability').value = svc.suitability.join(', ');
+                if(document.getElementById('svc-best-time')) document.getElementById('svc-best-time').value = svc.bestTimeToVisit || '';
+                if(document.getElementById('svc-best-season')) document.getElementById('svc-best-season').value = svc.bestSeason || '';
+                if(document.getElementById('svc-internet')) document.getElementById('svc-internet').value = svc.internetQuality || 'fair';
+                if(document.getElementById('svc-parking')) document.getElementById('svc-parking').value = svc.parking || 'none';
+                
+                // Map/GPS
+                if(document.getElementById('svc-lat')) document.getElementById('svc-lat').value = (svc.gpsCoordinates && svc.gpsCoordinates.lat) || svc.lat || '';
+                if(document.getElementById('svc-lng')) document.getElementById('svc-lng').value = (svc.gpsCoordinates && svc.gpsCoordinates.lng) || svc.lng || '';
+
+                
+                // SEO
+                if (svc.seo) {
+                    if(document.getElementById('svc-meta-title')) document.getElementById('svc-meta-title').value = svc.seo.metaTitle || '';
+                    if(document.getElementById('svc-meta-desc')) document.getElementById('svc-meta-desc').value = svc.seo.metaDescription || '';
+                    if(document.getElementById('svc-keywords') && Array.isArray(svc.seo.keywords)) document.getElementById('svc-keywords').value = svc.seo.keywords.join(', ');
+                }
+
+                // Checkboxes & Tour
+                const chkTour = document.getElementById('svc-is-tour');
+                if(chkTour) {
+                    chkTour.checked = !!svc.isTour;
+                    const tourFields = document.getElementById('tour-fields');
+                    if (tourFields) tourFields.style.display = chkTour.checked ? 'flex' : 'none';
+                    if (svc.isTour) {
+                        if(document.getElementById('svc-duration')) document.getElementById('svc-duration').value = svc.tourDuration || '';
+                        if(document.getElementById('svc-diff')) document.getElementById('svc-diff').value = svc.tourDifficulty || 'easy';
+                    }
+                }
+                
+                // Highlights
+                const hlList = document.getElementById('highlight-list');
+                if (hlList) {
+                    hlList.innerHTML = '';
+                    if (Array.isArray(svc.highlights)) {
+                        svc.highlights.forEach(hl => {
+                            const div = document.createElement('div');
+                            div.className = 'builder-item';
+                            div.innerHTML = `<input type="text" value="${hl.replace(/"/g,'&quot;')}" class="hl-input"><span class="builder-btn-remove">✕</span>`;
+                            div.querySelector('.builder-btn-remove').onclick = () => div.remove();
+                            hlList.appendChild(div);
+                        });
+                    }
+                }
+                
+                // Amenities
+                if (Array.isArray(svc.amenities)) {
+                    document.querySelectorAll('.amenity-card').forEach(card => {
+                        if (svc.amenities.includes(card.dataset.value)) card.classList.add('selected');
+                        else card.classList.remove('selected');
+                    });
+                }
+
+                // Tour Itinerary (Day-by-Day)
+                const tourItList = document.getElementById('itinerary-list');
+                if (tourItList) {
+                    tourItList.innerHTML = '';
+                    if (Array.isArray(svc.tourItinerary)) {
+                        svc.tourItinerary.forEach((item, idx) => {
+                            const div = document.createElement('div');
+                            div.className = 'builder-item';
+                            div.innerHTML = `
+                              <b style="font-size:12px; color:#6366f1; width:50px;">Ngày ${item.day || (idx + 1)}</b>
+                              <input type="text" value="${(item.title||'').replace(/"/g,'&quot;')}" class="it-title">
+                              <input type="text" value="${(item.detail||'').replace(/"/g,'&quot;')}" class="it-desc">
+                              <span class="builder-btn-remove">✕</span>
+                            `;
+                            div.querySelector('.builder-btn-remove').onclick = () => div.remove();
+                            tourItList.appendChild(div);
+                        });
+                    }
+                }
+
+                // Suggested Itineraries (Multi-Plan Builder)
+                const plansContainer = document.getElementById('itinerary-plans-container');
+                if (plansContainer) {
+                    plansContainer.innerHTML = '';
+                    if (Array.isArray(svc.suggestedItineraries)) {
+                        svc.suggestedItineraries.forEach(plan => {
+                            const block = document.createElement('div');
+                            block.className = 'sug-plan-block';
+                            block.style.cssText = 'background:rgba(99,102,241,0.07);border:1.5px solid rgba(99,102,241,0.25);border-radius:14px;padding:16px;margin-bottom:16px;';
+                            block.innerHTML = `
+                              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                                  <select class="plan-type" style="background:rgba(0,0,0,0.3);border:1px solid rgba(99,102,241,0.4);color:#c4b5fd;padding:7px 12px;border-radius:8px;font-size:13px;font-weight:700;">
+                                    <option value="couple" ${plan.type==='couple'?'selected':''}>💕 Cặp đôi</option>
+                                    <option value="family" ${plan.type==='family'?'selected':''}>👨‍👩‍👧 Gia đình</option>
+                                    <option value="budget" ${plan.type==='budget'?'selected':''}>💰 Tiết kiệm</option>
+                                    <option value="luxury" ${plan.type==='luxury'?'selected':''}>✨ Sang trọng</option>
+                                    <option value="solo" ${plan.type==='solo'?'selected':''}>🧘 Solo</option>
+                                    <option value="group" ${plan.type==='group'?'selected':''}>👥 Nhóm bạn</option>
+                                  </select>
+                                  <select class="plan-duration" style="background:rgba(0,0,0,0.3);border:1px solid rgba(99,102,241,0.4);color:#c4b5fd;padding:7px 12px;border-radius:8px;font-size:13px;font-weight:700;">
+                                    <option value="1" ${plan.duration==='1 ngày'?'selected':''}>1 ngày</option>
+                                    <option value="2" ${plan.duration==='2 ngày'?'selected':''}>2 ngày</option>
+                                    <option value="3" ${plan.duration==='3 ngày'?'selected':''}>3 ngày</option>
+                                  </select>
+                                  <input type="text" class="plan-name" value="${(plan.name||'').replace(/"/g,'&quot;')}" placeholder="Tên kế hoạch" style="flex:1;min-width:200px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 12px;border-radius:8px;font-size:13px;">
+                                </div>
+                                <button type="button" onclick="this.closest('.sug-plan-block').remove()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12px;white-space:nowrap;">🗑 Xóa kế hoạch</button>
+                              </div>
+                              <div class="plan-steps-list" style="display:flex;flex-direction:column;"></div>
+                              <button type="button" class="btn-add-step" style="margin-top:10px;width:100%;padding:9px;background:rgba(99,102,241,0.1);border:1.5px dashed rgba(99,102,241,0.4);border-radius:10px;color:#a5b4fc;font-size:12px;font-weight:700;cursor:pointer;transition:0.2s;">＋ Thêm hoạt động</button>
+                            `;
+                            
+                            const stepsList = block.querySelector('.plan-steps-list');
+                            if (Array.isArray(plan.timeline)) {
+                                plan.timeline.forEach(step => {
+                                    const row = document.createElement('div');
+                                    row.className = 'sug-step-item';
+                                    row.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px;margin-bottom:8px;';
+                                    row.innerHTML = `
+                                      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
+                                        <input type="text" class="sug-time" value="${(step.time||'').replace(/"/g,'&quot;')}" placeholder="08:00" style="width:70px;flex:none;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:13px;">
+                                        <input type="text" class="sug-activity" value="${(step.activity||'').replace(/"/g,'&quot;')}" placeholder="Tên hoạt động" style="flex:1;min-width:180px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:13px;">
+                                        <button type="button" onclick="this.closest('.sug-step-item').remove()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:12px;">✕ Xóa</button>
+                                      </div>
+                                      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                                        <input type="text" class="sug-location" value="${(step.location||'').replace(/"/g,'&quot;')}" placeholder="📍 Địa điểm..." style="flex:1;min-width:150px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:13px;">
+                                        <input type="text" class="sug-tips" value="${(step.tips||'').replace(/"/g,'&quot;')}" placeholder="💡 Mẹo..." style="flex:1;min-width:150px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:13px;">
+                                      </div>
+                                      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                        <input type="text" class="sug-img" value="${(step.image||'').replace(/"/g,'&quot;')}" placeholder="🖼️ URL ảnh" style="flex:1;min-width:200px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:12px;">
+                                        <textarea class="sug-desc" placeholder="📝 Mô tả..." rows="2" style="flex:2;min-width:200px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:12px;resize:vertical;">${step.description||''}</textarea>
+                                      </div>
+                                    `;
+                                    stepsList.appendChild(row);
+                                });
+                            }
+                            
+                            block.querySelector('.btn-add-step').onclick = () => {
+                                const row = document.createElement('div');
+                                row.className = 'sug-step-item';
+                                row.style.cssText = 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px;margin-bottom:8px;';
+                                row.innerHTML = `
+                                  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
+                                    <input type="text" class="sug-time" placeholder="08:00" style="width:70px;flex:none;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:13px;">
+                                    <input type="text" class="sug-activity" placeholder="Tên hoạt động" style="flex:1;min-width:180px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;border-radius:8px;font-size:13px;">
+                                    <button type="button" onclick="this.closest('.sug-step-item').remove()" style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:12px;">✕ Xóa</button>
+                                  </div>
+                                `;
+                                stepsList.appendChild(row);
+                            };
+                            
+                            plansContainer.appendChild(block);
+                        });
+                    }
+                }
+
+                // Images & Gallery Previews
+                const primaryPreview = document.getElementById('svc-primary-preview');
+                const mainImgInput = document.getElementById('svc-image');
+                if (primaryPreview) {
+                    primaryPreview.innerHTML = '';
+                    if (svc.image) {
+                        const div = document.createElement('div');
+                        div.className = 'preview-item';
+                        div.innerHTML = `<img src="${svc.image}"><button type="button" class="remove-btn">&times;</button>`;
+                        div.querySelector('.remove-btn').onclick = () => {
+                            div.remove();
+                            if (mainImgInput) mainImgInput.value = '';
+                        };
+                        primaryPreview.appendChild(div);
+                    }
+                }
+
+                const galleryPreview = document.getElementById('svc-gallery-preview');
+                const galleryInput = document.getElementById('svc-imgs');
+                if (galleryPreview) {
+                    galleryPreview.innerHTML = '';
+                    // Try to use modern 'gallery' array first, fallback to 'images'
+                    const items = (Array.isArray(svc.gallery) && svc.gallery.length > 0) ? svc.gallery : (Array.isArray(svc.images) ? svc.images.map(url => ({ url, category: 'other' })) : []);
+                    
+                    items.forEach(item => {
+                        const url = typeof item === 'string' ? item : item.url;
+                        const category = item.category || 'other';
+                        const isVideo = url.toLowerCase().match(/\.(mp4|webm|mov)$/) || item.type === 'video';
+                        
+                        const div = document.createElement('div');
+                        div.className = 'preview-item';
+                        div.innerHTML = `
+                            <img src="${url}">
+                            <button type="button" class="remove-btn">&times;</button>
+                            <select class="gallery-tag-select">
+                                <option value="other" ${category==='other'?'selected':''}>🏷️ Phân loại</option>
+                                <option value="view" ${['view','nature','space'].includes(category)?'selected':''}>🌅 Cảnh quan & Không gian</option>
+                                <option value="dining" ${['dining','food','menu'].includes(category)?'selected':''}>🍴 Ẩm thực & Thực đơn</option>
+                                <option value="service" ${['service','room','amenity'].includes(category)?'selected':''}>✨ Dịch vụ & Tiện ích</option>
+                                <option value="activity" ${category==='activity'?'selected':''}>🛶 Hoạt động & Trải nghiệm</option>
+                                <option value="customer" ${category==='customer'?'selected':''}>📸 Nội dung từ khách hàng</option>
+                                <option value="video" ${isVideo || category==='video' ? 'selected' : ''}>🎥 Video</option>
+                            </select>
+                        `;
+                        div.querySelector('.remove-btn').onclick = () => div.remove();
+                        galleryPreview.appendChild(div);
+                    });
+                }
+
+                // Gallery Textarea
+                if (galleryInput && Array.isArray(svc.images)) {
+                    galleryInput.value = svc.images.join(', ');
+                }
+
+                // Reset global file trackers to avoid carry-over
+                window.svcSelectedFiles = [];
+                window.svcGalleryFiles = [];
+
+                // Experiences
+                const expList = document.getElementById('experience-list');
+                if (expList) {
+                    expList.innerHTML = '';
+                    if (Array.isArray(svc.experiences)) {
+                        svc.experiences.forEach(exp => {
+                            const div = document.createElement('div');
+                            div.className = 'builder-item';
+                            div.style.flexDirection = 'column';
+                            div.style.alignItems = 'stretch';
+                            div.innerHTML = `
+                              <input type="text" value="${(exp.title||'').replace(/"/g,'&quot;')}" class="exp-title" style="margin-bottom:8px;">
+                              <textarea class="exp-desc" style="margin-bottom:8px; height:60px; resize:none; padding:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff;">${exp.description||''}</textarea>
+                              <div style="display:flex; gap:8px;">
+                                <input type="text" value="${(exp.icon||'').replace(/"/g,'&quot;')}" class="exp-icon" style="width:60px;">
+                                <input type="text" value="${(exp.difficulty||'').replace(/"/g,'&quot;')}" class="exp-diff" style="width:80px;">
+                                <input type="text" value="${(exp.duration||'').replace(/"/g,'&quot;')}" class="exp-duration" style="flex:1;">
+                                <input type="number" value="${exp.priceEstimate||''}" class="exp-price" style="flex:1;">
+                              </div>
+                              <span class="builder-btn-remove" style="align-self:flex-end; margin-top:8px;">✕</span>
+                            `;
+                            div.querySelector('.builder-btn-remove').onclick = () => div.remove();
+                            expList.appendChild(div);
+                        });
+                    }
+                }
+
+                // FAQs
+                const faqList = document.getElementById('faq-list');
+                if (faqList) {
+                    faqList.innerHTML = '';
+                    if (Array.isArray(svc.faqs)) {
+                        svc.faqs.forEach(faq => {
+                            const div = document.createElement('div');
+                            div.className = 'builder-item';
+                            div.style.flexDirection = 'column';
+                            div.style.alignItems = 'stretch';
+                            div.innerHTML = `
+                              <input type="text" value="${(faq.question||'').replace(/"/g,'&quot;')}" class="faq-question" style="margin-bottom:8px;">
+                              <input type="text" value="${(faq.answer||'').replace(/"/g,'&quot;')}" class="faq-answer">
+                              <span class="builder-btn-remove" style="align-self:flex-end; margin-top:8px;">✕</span>
+                            `;
+                            div.querySelector('.builder-btn-remove').onclick = () => div.remove();
+                            faqList.appendChild(div);
+                        });
+                    }
+                }
+
+                // Safety Tips
+                const safetyList = document.getElementById('safety-list');
+                if (safetyList) {
+                    safetyList.innerHTML = '';
+                    if (Array.isArray(svc.safetyTips)) {
+                        svc.safetyTips.forEach(s => {
+                            const div = document.createElement('div');
+                            div.className = 'builder-item';
+                            div.style.flexDirection = 'column';
+                            div.style.alignItems = 'stretch';
+                            div.innerHTML = `
+                              <div style="display:flex; gap:10px; margin-bottom:8px;">
+                                <input type="text" value="${(s.title||'').replace(/"/g,'&quot;')}" class="safety-title" style="flex:1;">
+                                <select class="safety-severity" style="background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; padding:0 8px;">
+                                  <option value="low" ${s.severity==='low'?'selected':''}>🟢 Nhẹ</option>
+                                  <option value="medium" ${s.severity==='medium'?'selected':''}>🟡 Trung bình</option>
+                                  <option value="high" ${s.severity==='high'?'selected':''}>🔴 Nghiêm trọng</option>
+                                </select>
+                              </div>
+                              <textarea class="safety-desc" style="height:60px; resize:none; padding:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; font-size:12px;">${s.description||''}</textarea>
+                              <span class="builder-btn-remove" style="align-self:flex-end; margin-top:8px;">✕ Xóa cảnh báo</span>
+                            `;
+                            div.querySelector('.builder-btn-remove').onclick = () => div.remove();
+                            safetyList.appendChild(div);
+                        });
+                    }
+                }
+
+                // Bring & Avoid
+                const bringList = document.getElementById('bring-list');
+                if (bringList) {
+                    bringList.innerHTML = '';
+                    if (Array.isArray(svc.whatToBring)) {
+                        svc.whatToBring.forEach(b => {
+                            const div = document.createElement('div');
+                            div.className = 'builder-item';
+                            div.innerHTML = `<input type="text" value="${b.replace(/"/g,'&quot;')}" class="bring-input"><span class="builder-btn-remove">✕</span>`;
+                            div.querySelector('.builder-btn-remove').onclick = () => div.remove();
+                            bringList.appendChild(div);
+                        });
+                    }
+                }
+                const avoidList = document.getElementById('avoid-list');
+                if (avoidList) {
+                    avoidList.innerHTML = '';
+                    if (Array.isArray(svc.whatNotToDo)) {
+                        svc.whatNotToDo.forEach(b => {
+                            const div = document.createElement('div');
+                            div.className = 'builder-item';
+                            div.innerHTML = `<input type="text" value="${b.replace(/"/g,'&quot;')}" class="avoid-input"><span class="builder-btn-remove">✕</span>`;
+                            div.querySelector('.builder-btn-remove').onclick = () => div.remove();
+                            avoidList.appendChild(div);
+                        });
+                    }
+                }
+
+                // Setup submit button
+                const btnSubmit = document.getElementById('add-svc-submit-btn');
+                if (btnSubmit) {
+                    btnSubmit.textContent = 'Lưu thay đổi';
+                    btnSubmit.dataset.editId = id;
+                }
+
+                eliteModal.classList.add('is-open');
+                if (window.initEliteMap) window.initEliteMap();
+            } else {
+                // Fallback Legacy modal
+                document.getElementById('sm-modal-title').textContent = '✏️ Chỉnh sửa dịch vụ';
+                document.getElementById('sm-form-name').value = svc.name || '';
+                document.getElementById('sm-form-kind').value = svc.kind || 'diem-du-lich';
+                document.getElementById('sm-form-region').value = svc.region || '';
+                document.getElementById('sm-form-address').value = svc.address || '';
+                document.getElementById('sm-form-priceFrom').value = svc.priceFrom || '';
+                document.getElementById('sm-form-image').value = svc.image || '';
+                document.getElementById('sm-form-description').value = svc.description || '';
+                document.getElementById('sm-form-highlights').value = Array.isArray(svc.highlights) ? svc.highlights.join('\n') : (svc.highlights || '');
+                document.getElementById('sm-form-policy').value = svc.policy || '';
+                document.getElementById('sm-form-businessCategory').value = svc.businessCategory || 'other';
+                document.getElementById('sm-form-isTour').checked = !!svc.isTour;
+                document.getElementById('sm-modal-wrapper').classList.add('active');
+            }
         },
 
         add() {

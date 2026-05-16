@@ -135,7 +135,7 @@ async function generateResponseMetadata(message, aiAnswer, locationContext) {
 
 router.post('/', optionalAuth, async (req, res) => {
   try {
-    const { message, coords, itinerary, activeTrip, deviceId, role, sessionId } = req.body;
+    const { message, coords, itinerary, activeTrip, deviceId, role, sessionId, placeContext } = req.body;
     let currentSessionId = sessionId;
 
     if (!message) {
@@ -220,7 +220,7 @@ router.post('/', optionalAuth, async (req, res) => {
     // Kiểm tra câu hỏi có trong Database chưa để tiết kiệm API (Chỉ áp dụng cho tiếng Việt hoặc Auto)
     let searchResult = null; // Lưu kết quả nếu phải đi "tìm kiếm"
 
-    if (chatbotDb.readyState === 1 && message.length > 2 && (targetLang === 'vi' || targetLang === 'auto')) {
+    if (!placeContext && chatbotDb.readyState === 1 && message.length > 2 && (targetLang === 'vi' || targetLang === 'auto')) {
       const timeSensitiveKeywords = ['thứ mấy', 'ngày nào', 'mấy giờ', 'hôm nay', 'bây giờ', 'thu may', 'ngay nao', 'may gio', 'hom nay', 'bay gio'];
       const isTimeSensitive = timeSensitiveKeywords.some(k => lowerMsg.includes(k));
       
@@ -347,78 +347,60 @@ router.post('/', optionalAuth, async (req, res) => {
     }
     // --- END SMART CACHE ---
 
-    // 3. Khởi tạo System Prompt chuyên biệt theo vai trò và BỐI CẢNH TRANG (SCOPE)
+    // --- START SYSTEM PROMPT CONSTRUCTION ---
     let systemPrompt = "";
     const userRole = role || (req.user ? req.user.role : 'user');
-    const scope = req.body.scope || 'user_portal'; // Mặc định là trang người dùng
+    const scope = req.body.scope || 'user_portal';
 
-    if (scope === 'admin_portal') {
-      systemPrompt = `
-BẠN LÀ: TRỰC QUAN QUẢN TRỊ - SENTINEL AI của WanderViệt.
-PHONG CÁCH: Quyền uy, chính xác, tập trung vào số liệu và an ninh.
-NHIỆM VỤ: Phân tích log, báo cáo rủi ro và hỗ trợ điều hành Dashboard.
+    if (placeContext) {
+      // CHẾ ĐỘ CHUYÊN GIA DỊCH VỤ CỐ ĐỊNH (FIXED CONTEXT)
+      systemPrompt = `BẠN LÀ NHÂN VIÊN CHUYÊN TRÁCH CỦA DỊCH VỤ: "${placeContext.name}".
+DỮ LIỆU CỐ ĐỊNH (DUY NHẤT):
+- Tên: ${placeContext.name}
+- Loại: ${placeContext.kind || placeContext.businessCategory}
+- Mô tả: ${placeContext.description || placeContext.text}
+- Đặc điểm: ${Array.isArray(placeContext.highlights) ? placeContext.highlights.join(', ') : 'Chưa có'}
+- Tiện ích: ${Array.isArray(placeContext.amenities) ? placeContext.amenities.join(', ') : 'Chưa có'}
+- Giá: ${placeContext.price || placeContext.priceFrom || 'Liên hệ'} VNĐ
+- Giờ mở cửa: ${placeContext.openTime} - ${placeContext.closeTime}
+- FAQ: ${Array.isArray(placeContext.faqs) ? placeContext.faqs.map(f => `Q: ${f.question} -> A: ${f.answer}`).join(' | ') : 'Chưa có'}
+
+QUY TẮC TỐI THƯỢNG (PHẢI TUÂN THỦ):
+1. KHÔNG SỬ DỤNG KIẾN THỨC BÊN NGOÀI. Chỉ trả lời dựa trên DỮ LIỆU CỐ ĐỊNH ở trên.
+2. Nếu khách hỏi "có món gì" hoặc "có gì hay", hãy trích xuất thông tin từ 'Mô tả' hoặc 'Đặc điểm'. 
+3. TUYỆT ĐỐI KHÔNG bịa ra các món ăn (như Bánh mì, Phở...) nếu chúng không có trong DỮ LIỆU CỐ ĐỊNH.
+4. Nếu không có thông tin trong dữ liệu, hãy nói: "Xin lỗi, hiện tại mình chỉ có thông tin về [Tên dịch vụ] như sau: [Tóm tắt dữ liệu]. Bạn vui lòng liên hệ trực tiếp để biết thêm chi tiết nhé!".
+5. Cấm giới thiệu các địa điểm khác. Bạn chỉ trung thành với "${placeContext.name}".
 `;
+    } else if (scope === 'admin_portal') {
+      systemPrompt = `BẠN LÀ: TRỰC QUAN QUẢN TRỊ - SENTINEL AI của WanderViệt. Phong cách: Chính xác.`;
     } else if (scope === 'business_portal') {
-      systemPrompt = `
-BẠN LÀ: CỐ VẤN KINH DOANH CHIẾN LƯỢC WanderViệt.
-PHONG CÁCH: Nhạy bén, thực dụng, xưng "Tôi" gọi "Doanh nghiệp".
-NHIỆM VỤ: Giúp đối tác tối ưu doanh thu, mô tả dịch vụ thu hút và thấu hiểu thị trường.
-`;
+      systemPrompt = `BẠN LÀ: CỐ VẤN KINH DOANH WanderViệt. Hỗ trợ doanh nghiệp tối ưu vận hành.`;
     } else {
-      // Mặc định cho User Portal - SIÊU CẤP THẾ HỆ 3.0 (SUPER-INTIMATE)
-      systemPrompt = `
-BẠN LÀ: WANDER-SOUL - Một thực thể AI có tâm hồn, là "Người đồng hành tri kỷ" của người dùng.
-PHONG CÁCH: Thông thái, tinh tế, và cực kỳ thấu hiểu (High EQ).
-
-QUY TẮC "SIÊU CẤP" (TUÂN THỦ TUYỆT ĐỐI):
-1. NGẮN GỌN & ĐÚNG TRỌNG TÂM: Tuyệt đối không dài dòng. Câu trả lời phải súc tích, đi thẳng vào vấn đề người dùng hỏi.
-2. PHÂN TÁCH MỤC RÕ RÀNG: Khi đưa ra lịch trình hoặc danh sách, hãy sử dụng các gạch đầu dòng (-) hoặc số thứ tự (1, 2, 3) để người dùng dễ quan sát. 
-3. PHẦN "NỔI BẬT": Khi đề xuất lịch trình hoặc địa điểm, LUÔN LUÔN thêm một dòng cuối cùng bắt đầu bằng "✨ Nổi bật: " để nêu bật điểm đặc sắc nhất của chuyến đi/địa điểm đó.
-4. TRÍ NHỚ & CẢM XÚC: Nhớ các chi tiết nhỏ của người dùng để cá nhân hóa (High EQ). Xưng "mình" - "bạn" thân thiết.
-5. CHI TIẾT "WOW": Thêm một mẹo nhỏ hoặc lưu ý "thổ địa" súc tích.
-`;
+      systemPrompt = `BẠN LÀ: WANDER-SOUL - Trợ lý du lịch thông thái. Thân thiện, High EQ.`;
     }
 
-    // Thêm chỉ dẫn về phong cách xưng hô
-    if (userRole === 'admin' || userRole === 'superadmin') {
-      systemPrompt += "PHONG CÁCH: Chuyên nghiệp, bảo mật, tập trung vào dữ liệu.\n";
-    } else if (userRole === 'business') {
-      systemPrompt += "PHONG CÁCH: Lịch sự, nhạy bén kinh doanh, xưng 'Tôi' và gọi 'Doanh nghiệp'.\n";
-    } else {
-      systemPrompt += "PHONG CÁCH: Thân thiện, hào hứng, xưng 'mình' gọi 'bạn'.\n";
-    }
-
-    // --- REAL-TIME CONTEXT INJECTION (Fix Hallucination) ---
+    // --- REAL-TIME CONTEXT ---
     const now = new Date();
-    const daysVN = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
-    const timeContext = `\n[Hệ thống]: Hôm nay là ${daysVN[now.getDay()]}, ngày ${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}. Bây giờ là ${now.getHours()} giờ ${now.getMinutes()} phút.`;
+    const timeContext = `\n[Bối cảnh]: ${now.getHours()}:${now.getMinutes()} ngày ${now.getDate()}/${now.getMonth()+1}/${now.getFullYear()}.`;
     systemPrompt += timeContext;
+
+    // --- LANGUAGE RULE (Simplified to avoid confusion) ---
+    let langRule = "Trả lời bằng chính ngôn ngữ khách đang hỏi.";
+    if (req.body.lang && req.body.lang !== 'auto') {
+      const languageNames = { 'vi': 'Tiếng Việt', 'en': 'English', 'jp': 'Japanese', 'kr': 'Korean', 'fr': 'French' };
+      langRule = `BẮT BUỘC TRẢ LỜI BẰNG ${languageNames[req.body.lang] || 'Tiếng Việt'}.`;
+    }
+    systemPrompt += `\n${langRule}`;
 
     // --- AI CONTEXT GUARD: ÉP AI CHỈ TRẢ LỜI ĐÚNG PHẠM VI ---
     systemPrompt += `
 QUY TẮC CỐT LÕI:
-1. Nếu hỏi nội dung KHÔNG liên quan du lịch/hệ thống, hãy từ chối khéo léo và ngắn gọn.
-2. Trả lời dưới 120 từ (trừ khi lập lịch chi tiết).
-3. Sử dụng Markdown súc tích.
+1. Nếu hỏi nội dung KHÔNG liên quan du lịch/hệ thống, hãy từ chối khéo léo.
+${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ THỂ'. KHÔNG ĐƯỢC tư vấn sang các địa điểm hoặc dịch vụ khác ngoài "${placeContext.name}". Nếu khách hỏi nơi khác, hãy nhắc khách rằng bạn là chuyên gia riêng của "${placeContext.name}".` : '2. Tư vấn du lịch rộng khắp dựa trên dữ liệu hệ thống.'}
+3. Trả lời dưới 120 từ.
+4. Sử dụng Markdown súc tích.
 `;
-
-    // Thêm ngữ cảnh thời gian thực & Ngôn ngữ
-    const languageNames = {
-      'vi': 'Tiếng Việt',
-      'en': 'English',
-      'jp': 'Japanese (日本語)',
-      'kr': 'Korean (한국어)',
-      'fr': 'French (Français)'
-    };
-
-    // Tạo chỉ dẫn ngôn ngữ cực kỳ nghiêm ngặt (Language Jail)
-    let langRule = "";
-    if (targetLang === 'auto') {
-      langRule = "DETECT: Identify the user's language and respond ONLY in that language.";
-    } else {
-      const langName = languageNames[targetLang] || 'Tiếng Việt';
-      langRule = `STRICT LANGUAGE MODE: You MUST respond ONLY in ${langName}. DO NOT use any other language.`;
-    }
 
     // --- AI SELF-LEARNING MEMORY ---
     let userMemoryContext = "";
@@ -426,24 +408,18 @@ QUY TẮC CỐT LÕI:
       try {
         const fullUser = await User.findById(req.user.id).select('preferenceProfile');
         if (fullUser && fullUser.preferenceProfile && fullUser.preferenceProfile.aiInsights && fullUser.preferenceProfile.aiInsights.length > 0) {
-          userMemoryContext = "AI MEMORY (Past Insights about this user): " + fullUser.preferenceProfile.aiInsights.join("; ");
+          userMemoryContext = "\n- TRÍ NHỚ VỀ KHÁCH: " + fullUser.preferenceProfile.aiInsights.join("; ");
         }
-      } catch (err) {
-        console.error("Lỗi lấy User Memory:", err.message);
-      }
+      } catch (err) { }
     }
 
-    systemPrompt += `
-${langRule}
-CHARACTER: WanderViệt Assistant (Friendly, Proactive, Travel Expert).
-CONTEXT: ${locationContext} | ${tripContext}
-${userMemoryContext ? 'THÔNG TIN CÁ NHÂN (HÃY SỬ DỤNG ĐỂ CÁ NHÂN HÓA): ' + userMemoryContext + '\n' : ''}
-${searchResult ? 'THÔNG TIN MỚI TRA CỨU (HÃY SỬ DỤNG ĐỂ TRẢ LỜI): ' + searchResult + '\n' : ''}
-USER ROLE: ${userRole} | CURRENT PAGE: ${scope}
-INSTRUCTION: 
-- Luôn giữ thái độ thân thiện như một người bạn (BFF).
-- Tuân thủ quy tắc NGẮN GỌN và PHÂN TÁCH MỤC.
-    `;
+    systemPrompt += userMemoryContext;
+    if (searchResult) systemPrompt += `\n- THÔNG TIN TRA CỨU MỚI: ${searchResult}`;
+    
+    systemPrompt += `\n- NGỮ CẢNH VỊ TRÍ: ${locationContext}`;
+    systemPrompt += `\n- VAI TRÒ NGƯỜI DÙNG: ${userRole} | TRANG: ${scope}`;
+    
+    systemPrompt += `\n\nCHỈ THỊ CUỐI CÙNG: Trả lời bằng ngôn ngữ của khách. Thân thiện, ngắn gọn, cực kỳ am hiểu về dữ liệu trên.`;
 
     // --- PHÁT HIỆN YÊU CẦU LẬP LỊCH TRÌNH (ITINERARY GENERATION) ---
     const itineraryKeywords = [
@@ -616,17 +592,19 @@ Trả về CHỈ JSON theo format:
       }
 
       // 4. Gọi Groq API
-      // Sử dụng key riêng cho business
+      // Sử dụng model mạnh hơn (70b) cho chế độ chuyên gia dịch vụ để tránh từ chối trả lời về giá
+      const useBetterModel = (placeContext || userRole === 'business');
       const currentGroq = userRole === 'business' ? groqBusiness : groq;
+      
       const completion = await currentGroq.chat.completions.create({
         messages: [
           { role: "system", content: systemPrompt },
           ...chatHistory,
           { role: "user", content: finalUserMessage }
         ],
-        model: userRole === 'business' ? "llama-3.3-70b-versatile" : "llama-3.1-8b-instant",
-        temperature: userRole === 'business' ? 0.7 : 0.6,
-        max_tokens: userRole === 'business' ? 300 : 180
+        model: useBetterModel ? "llama-3.3-70b-versatile" : "llama-3.1-8b-instant",
+        temperature: useBetterModel ? 0.7 : 0.6,
+        max_tokens: useBetterModel ? 500 : 180
       });
 
       const aiAnswer = completion.choices[0]?.message?.content || "Mình chưa nghe rõ, bạn nói lại nhé!";

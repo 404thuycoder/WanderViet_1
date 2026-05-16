@@ -152,73 +152,38 @@
         }
 
         /* Quick Info Section */
-        .quick-info-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-
         .info-item {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            padding: 20px;
+            transition: all 0.3s;
         }
 
         .info-item:hover {
-            background: rgba(255, 255, 255, 0.06);
+            background: rgba(99, 102, 241, 0.05);
             border-color: var(--primary);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
         }
 
         .info-icon {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            flex-shrink: 0;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .info-content {
-            flex: 1;
-            min-width: 0;
+            font-size: 2rem;
+            margin-bottom: 12px;
         }
 
         .info-label {
-            font-size: 10px;
+            font-size: 11px;
             font-weight: 800;
             color: var(--text-dim);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 4px;
-            opacity: 0.7;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
         }
 
         .info-value {
             font-size: 14px;
             font-weight: 600;
             color: var(--text-main);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .info-item:hover .info-value {
-            white-space: normal;
-            overflow: visible;
         }
 
         /* Gallery System */
@@ -597,36 +562,6 @@
             border-radius: 100px;
             font-size: 0.75rem;
             font-weight: 700;
-        }
-
-        /* Typing Indicator */
-        .typing-indicator {
-            display: flex;
-            gap: 4px;
-            padding: 4px 0;
-        }
-
-        .typing-indicator span {
-            width: 8px;
-            height: 8px;
-            background: var(--text-dim);
-            border-radius: 50%;
-            display: inline-block;
-            animation: typing 1.4s infinite ease-in-out both;
-            opacity: 0.6;
-        }
-
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes typing {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-
-        .ai-message.error p {
-            color: #ef4444;
-            font-weight: 600;
         }
 
         .experience-difficulty.easy {
@@ -1279,6 +1214,7 @@
     </style>
 </head>
 <body>
+    <button class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
     <header id="header-container"></header>
 
     <section class="hero">
@@ -1334,41 +1270,66 @@
             <div class="bento-card" id="quick-info-sec">
                 <span class="card-label">THÔNG TIN NHANH</span>
                 <h3 class="card-title" style="margin-bottom:32px; font-size:2rem;">Tổng quan</h3>
-                <div class="quick-info-grid">
-                    <div class="info-item qi-item" id="qi-address">
+                <div class="quick-info-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:24px;">
+                    <div class="info-item">
                         <div class="info-icon">📍</div>
-                        <div class="info-content">
-                            <div class="info-label">Địa chỉ</div>
-                            <div class="info-value" id="q-address">...</div>
-                        </div>
+                        <div class="info-label">Địa chỉ</div>
+                        <div class="info-value" id="q-address">...</div>
                     </div>
-                    <div class="info-item qi-item" id="qi-hours">
-                        <div class="info-icon">🕒</div>
-                        <div class="info-content">
-                            <div class="info-label">Giờ mở cửa</div>
-                            <div class="info-value" id="q-hours">...</div>
-                        </div>
+                    <div class="info-item">
+                        <div class="info-icon">🕐</div>
+                        <div class="info-label">Giờ mở cửa</div>
+                        <div class="info-value" id="q-hours">...</div>
                     </div>
-                    <div class="info-item qi-item" id="qi-price">
+                    <div class="info-item">
                         <div class="info-icon">💰</div>
-                        <div class="info-content">
-                            <div class="info-label">Giá tham khảo</div>
-                            <div class="info-value" id="q-price">...</div>
-                        </div>
+                        <div class="info-label">Giá vé</div>
+                        <div class="info-value" id="q-price">...</div>
                     </div>
-                    <div class="info-item qi-item" id="qi-duration">
+                    <div class="info-item">
                         <div class="info-icon">⏱️</div>
-                        <div class="info-content">
-                            <div class="info-label">Thời gian dự kiến</div>
-                            <div class="info-value" id="q-duration">...</div>
-                        </div>
+                        <div class="info-label">Thời gian tham quan</div>
+                        <div class="info-value" id="q-duration">...</div>
                     </div>
-                    <div class="info-item qi-item" id="qi-suitability">
+                    <div class="info-item">
+                        <div class="info-icon">👥</div>
+                        <div class="info-label">Độ đông đúc</div>
+                        <div class="info-value" id="q-crowd">...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">💎</div>
+                        <div class="info-label">Mức chi phí</div>
+                        <div class="info-value" id="q-cost-level">...</div>
+                    </div>
+                    <div class="info-item">
                         <div class="info-icon">👨‍👩‍👧</div>
-                        <div class="info-content">
-                            <div class="info-label">Phù hợp</div>
-                            <div class="info-value" id="q-suitability">...</div>
-                        </div>
+                        <div class="info-label">Phù hợp với</div>
+                        <div class="info-value" id="q-suitability">...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🌤️</div>
+                        <div class="info-label">Thời gian đẹp nhất</div>
+                        <div class="info-value" id="q-best-time">...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🍂</div>
+                        <div class="info-label">Mùa đẹp nhất</div>
+                        <div class="info-value" id="q-season">...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">📶</div>
+                        <div class="info-label">Chất lượng internet</div>
+                        <div class="info-value" id="q-internet">...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">🅿️</div>
+                        <div class="info-label">Chỗ đậu xe</div>
+                        <div class="info-value" id="q-parking">...</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-icon">♿</div>
+                        <div class="info-label">Accessibility</div>
+                        <div class="info-value" id="q-accessibility">...</div>
                     </div>
                 </div>
             </div>
@@ -1376,11 +1337,11 @@
             <div class="bento-card">
                 <span class="card-label">TRẢI NGHIỆM</span>
                 <h3 class="card-title">Câu chuyện diệu kỳ</h3>
-                <div id="p-desc-container" style="color:var(--text-main); font-size:1.1rem; line-height:1.8; opacity:0.9;">
-                    <p id="p-desc" style="margin:0;"></p>
+                <div id="p-desc-container" style="color:var(--text-dim); font-size:1.25rem; line-height:2.2;">
+                    <p id="p-desc"></p>
                     <div id="p-overview" style="margin-top:24px; padding-top:24px; border-top:1px solid var(--glass-border);"></div>
                     <div id="p-highlights" style="margin-top:24px;"></div>
-                    <button id="read-more-btn" onclick="toggleReadMore()" style="margin-top:24px; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3); border-radius:12px; padding:12px 32px; color:var(--primary); font-weight:700; cursor:pointer; transition:all 0.3s; display:none; font-size:0.9rem;">Xem toàn bộ câu chuyện ▼</button>
+                    <button id="read-more-btn" onclick="toggleReadMore()" style="margin-top:16px; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3); border-radius:12px; padding:12px 24px; color:var(--text-main); font-weight:700; cursor:pointer; transition:all 0.3s; display:none;">Đọc thêm ▼</button>
                 </div>
             </div>
 
@@ -1392,10 +1353,16 @@
             <div class="bento-card" id="gallery-sec">
                 <span class="card-label" style="margin-bottom:16px;">BỘ SƯU TẬP</span>
                 <h3 class="card-title" style="margin-bottom:24px; font-size:2rem;">Hình ảnh & Video</h3>
-                <div style="display:flex; gap:12px; margin-bottom:32px; flex-wrap:wrap;" id="gallery-filters">
-                    <!-- Dynamic filters injected by JS -->
+                <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;" id="gallery-filters">
+                    <button class="gallery-filter active" data-filter="all">Tất cả</button>
+                    <button class="gallery-filter" data-filter="food">🍴 Food</button>
+                    <button class="gallery-filter" data-filter="nature">🌿 Nature</button>
+                    <button class="gallery-filter" data-filter="hotel">🏨 Hotel</button>
+                    <button class="gallery-filter" data-filter="nightlife">🌙 Nightlife</button>
+                    <button class="gallery-filter" data-filter="beach">🏖️ Beach</button>
+                    <button class="gallery-filter" data-filter="adventure">🏔️ Adventure</button>
                 </div>
-                <div id="gallery-grid" class="masonry-gallery" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:20px;"></div>
+                <div id="gallery-grid" class="masonry-gallery"></div>
             </div>
 
             <!-- AI Travel Assistant Section -->
@@ -1457,22 +1424,22 @@
                 <button class="btn" style="margin-top:24px; background:linear-gradient(135deg, var(--primary), #818cf8); border:none; border-radius:12px; padding:12px 24px; color:#fff; font-weight:700; cursor:pointer;" onclick="saveToItinerary()">📅 Lưu vào lịch trình của tôi</button>
             </div>
 
-            <!-- Map Section -->
+            <!-- Map & Nearby Section -->
             <div class="bento-card" id="map-sec">
-                <span class="card-label">VỊ TRÍ BẢN ĐỒ</span>
-                <h3 class="card-title" style="margin-bottom:32px; font-size:2rem;">Vị trí chính xác</h3>
-                <div id="map-container" style="width:100%; height:450px; border-radius:24px; overflow:hidden; margin-bottom:24px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); position:relative;">
+                <span class="card-label">BẢN ĐỒ & GẦN ĐÂY</span>
+                <h3 class="card-title" style="margin-bottom:32px; font-size:2rem;">Khám phá xung quanh</h3>
+                <div id="map-container" style="width:100%; height:400px; border-radius:24px; overflow:hidden; margin-bottom:24px; background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); position:relative;">
                     <div id="map-root" style="width:100%; height:100%; z-index:1;"></div>
                     <button class="btn--ghost" onclick="viewMap()" style="position:absolute; top:12px; left:12px; z-index:1000; padding:8px 16px; font-size:12px; background:rgba(0,0,0,0.5); backdrop-filter:blur(10px); color:#fff; border:1px solid rgba(255,255,255,0.2);">Xem toàn màn hình ↗</button>
                 </div>
-                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:20px; padding:20px; display:flex; align-items:center; gap:15px;">
-                    <div style="background:var(--primary); width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px;">📍</div>
-                    <div style="flex:1;">
-                        <div style="font-size:14px; color:var(--text-dim); margin-bottom:2px;">ĐỊA CHỈ CHÍNH XÁC</div>
-                        <div id="map-addr-text" style="font-weight:700; color:var(--text-main); font-size:1.1rem;">...</div>
-                    </div>
-                    <button class="btn--primary" style="padding:10px 20px; border-radius:12px;" onclick="window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(document.getElementById('p-title').innerText + ' ' + document.getElementById('p-addr').innerText), '_blank')">Chỉ đường ↗</button>
+                <div style="display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap;" id="nearby-filters">
+                    <button class="nearby-filter" data-type="restaurant" onclick="toggleNearbyFilter('restaurant')">🍽️ Nhà hàng</button>
+                    <button class="nearby-filter" data-type="hotel" onclick="toggleNearbyFilter('hotel')">🏨 Khách sạn</button>
+                    <button class="nearby-filter" data-type="cafe" onclick="toggleNearbyFilter('cafe')">☕ Quán cafe</button>
+                    <button class="nearby-filter" data-type="attraction" onclick="toggleNearbyFilter('attraction')">🎯 Điểm tham quan</button>
+                    <button class="nearby-filter" data-type="other" onclick="toggleNearbyFilter('other')">✨ Khác</button>
                 </div>
+                <div id="nearby-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:16px;"></div>
             </div>
 
             <div class="bento-card" id="highlights-sec" style="display:none;">
@@ -2029,29 +1996,6 @@
             } catch(e) { document.getElementById('p-status').style.display = 'none'; document.getElementById('p-form').style.display = 'block'; }
         }
 
-        window.filterGallery = (cat) => {
-            const items = document.querySelectorAll('.gallery-item');
-            const filters = document.querySelectorAll('.gallery-filter');
-            
-            // Update active button UI
-            filters.forEach(btn => {
-                const btnCat = btn.getAttribute('onclick').match(/'([^']+)'/)?.[1];
-                if (btnCat === cat) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-
-            // Filter items
-            items.forEach(item => {
-                if (cat === 'all') {
-                    item.style.display = 'block';
-                } else {
-                    const itemCat = item.getAttribute('data-category');
-                    if (itemCat === cat) item.style.display = 'block';
-                    else item.style.display = 'none';
-                }
-            });
-        };
-
         async function load() {
             if(!pid) {
                 document.getElementById('p-title').innerText = 'Không tìm thấy địa điểm';
@@ -2134,14 +2078,16 @@
                 const setEl = (id, val) => { 
                     const el = document.getElementById(id); 
                     if(el) {
-                        const container = el.closest('.info-item');
                         if (val && val !== '...' && val !== '') {
                             el.innerText = val;
+                            if (el.parentElement) el.parentElement.style.display = 'flex';
                         } else {
-                            el.innerText = 'Chưa cập nhật';
-                            el.style.opacity = '0.5';
+                            if (el.parentElement && el.parentElement.classList.contains('qi-item')) {
+                                el.parentElement.style.display = 'none';
+                            } else {
+                                el.innerText = '...';
+                            }
                         }
-                        if (container) container.style.display = 'flex';
                     } 
                 };
                 
@@ -2149,48 +2095,20 @@
                 setEl('q-hours', (p.openTime && p.closeTime) ? `${p.openTime} - ${p.closeTime}` : (p.openDays || null));
                 setEl('q-price', (p.priceFrom && p.priceTo) ? `${p.priceFrom.toLocaleString()} - ${p.priceTo.toLocaleString()} ₫` : (basePrice ? basePrice.toLocaleString() + ' ₫' : null));
                 setEl('q-duration', p.visitDuration || p.tourDuration || null);
+                setEl('q-crowd', p.crowdLevel ? ({low:'Thấp',medium:'Trung bình',high:'Cao'}[p.crowdLevel]) : null);
+                setEl('q-cost-level', p.costLevel ? ({budget:'Tiết kiệm',standard:'Trung bình',luxury:'Sang trọng'}[p.costLevel]) : null);
                 setEl('q-suitability', p.suitability && p.suitability.length ? p.suitability.join(', ') : null);
+                setEl('q-best-time', p.bestTimeToVisit || null);
+                setEl('q-season', p.bestSeason || null);
+                setEl('q-internet', p.internetQuality ? ({poor:'Kém',fair:'Trung bình',good:'Tốt',excellent:'Rất tốt'}[p.internetQuality]) : null);
+                setEl('q-parking', p.parking ? ({none:'Không có',street:'Vỉa hè',lot:'Bãi đỗ xe',valet:'Valet'}[p.parking]) : null);
+                setEl('q-accessibility', p.accessibility && p.accessibility.wheelchairAccessible ? 'Có hỗ trợ' : null);
 
                 // ── Map Synchronization ────────────────────────────────
                 initMap(p);
 
-                // ── AI Welcome Customization ───────────────────────────
-                const isTour = p.isTour || p.businessCategory === 'tour' || p.kind === 'trai-nghiem' || p.kind === 'giai-tri';
-                const isHotel = p.businessCategory === 'stay' || p.kind === 'khach-san';
-                const isDining = p.businessCategory === 'dining' || p.kind === 'nha-hang';
-
-                const pName = p.name || 'địa điểm này';
-                const pKindDisplay = p.isTour ? 'Tour' : (kindMap[p.kind] || 'trải nghiệm');
-                const aiInput = document.getElementById('ai-input');
-                if (aiInput) {
-                    aiInput.placeholder = `Hỏi tôi về ${pName}...`;
-                    aiInput.onkeypress = (e) => { if(e.key === 'Enter') sendAIMessage(); };
-                }
-
-                const aiWelcomeContent = document.querySelector('.ai-welcome .ai-content');
-                if (aiWelcomeContent) {
-                    aiWelcomeContent.innerHTML = `
-                        <p>Xin chào! Tôi là trợ lý AI chuyên môn về <b>${pName}</b>.</p>
-                        <p style="margin-top:8px;">Bạn đang tìm hiểu về ${pKindDisplay} này? Tôi có thể giúp bạn:</p>
-                        <ul style="margin-top:12px; padding-left:20px; font-size:13px; color:var(--text-dim);">
-                            <li>Thông tin chi tiết & Điểm đặc sắc nhất của ${pName}</li>
-                            <li>Giá vé, các gói dịch vụ & Ưu đãi hiện có</li>
-                            <li>Tư vấn thời gian & Cách chuẩn bị (trang phục, đồ dùng)</li>
-                            <li>Giải đáp các thắc mắc về chính sách & hỗ trợ</li>
-                        </ul>
-                        <p style="margin-top:12px; font-size:12px; font-style:italic; color:var(--primary);">Hỏi tôi bất cứ điều gì về ${pName}!</p>
-                    `;
-                }
-
-                // Update AI Quick Buttons (Simplified labels)
-                const btn1 = document.querySelector('[onclick="quickAIAction(\'best-time\')"]');
-                const btn2 = document.querySelector('[onclick="quickAIAction(\'outfit\')"]');
-                const btn3 = document.querySelector('[onclick="quickAIAction(\'itinerary\')"]');
-                const btn4 = document.querySelector('[onclick="quickAIAction(\'cost\')"]');
-                if(btn1) btn1.innerText = `⏰ Giờ mở cửa?`;
-                if(btn2) btn2.innerText = `🍴 Món đặc sắc?`;
-                if(btn3) btn3.innerText = `📍 Cách đi đến?`;
-                if(btn4) btn4.innerText = `💰 Giá & Ưu đãi?`;
+                // ── Nearby Exploration Data ───────────────────────────
+                initNearbyData(p);
 
                 // ── Favorite check ─────────────────────────────────────
                 const token = localStorage.getItem('wander_token');
@@ -2233,78 +2151,17 @@
                 // Additional Details
 
 
-                // ── Gallery & Dynamic Filters ──────────────────────────
-                let galleryItems = [];
-                if (p.gallery && p.gallery.length > 0) galleryItems = p.gallery;
-                else if (p.images && p.images.length > 0) galleryItems = p.images.map(url => ({ url, type: 'image' }));
-                
-                if (galleryItems.length > 0) {
-                    const gallerySec = document.getElementById('gallery-sec');
-                    if (gallerySec) gallerySec.style.display = 'block';
-
-                    const filtersContainer = document.getElementById('gallery-filters');
-                    
-                    // Fixed Categories System
-                    const coreCategories = [
-                        { id: 'view', label: 'Cảnh quan & Không gian', icon: '🌅', tags: ['view', 'nature', 'space'] },
-                        { id: 'dining', label: 'Ẩm thực & Thực đơn', icon: '🍴', tags: ['dining', 'food', 'menu'] },
-                        { id: 'service', label: 'Dịch vụ & Tiện ích', icon: '✨', tags: ['service', 'room', 'amenity'] },
-                        { id: 'activity', label: 'Hoạt động & Trải nghiệm', icon: '🛶', tags: ['activity'] },
-                        { id: 'customer', label: 'Nội dung từ khách hàng', icon: '📸', tags: ['customer'] },
-                        { id: 'video', label: 'Video', icon: '🎥', tags: ['video'] }
-                    ];
-
-                    let filtersHtml = `<button class="gallery-filter active" onclick="filterGallery('all')">Tất cả</button>`;
-                    
-                    coreCategories.forEach(cat => {
-                        // We always show these buttons as "Fixed" per user request
-                        filtersHtml += `<button class="gallery-filter" onclick="filterGallery('${cat.id}')">${cat.icon} ${cat.label}</button>`;
-                    });
-
-                    if (filtersContainer) filtersContainer.innerHTML = filtersHtml;
-
-                    const grid = document.getElementById('gallery-grid');
-                    if (grid) {
-                        grid.innerHTML = galleryItems.map((item, idx) => {
-                            const url = item.url || item;
-                            const isVideo = url.toLowerCase().match(/\.(mp4|webm|mov)$/) || item.type === 'video';
-                            const rawCat = item.category || (isVideo ? 'video' : 'other');
-                            
-                            // Map raw category to core category for filtering
-                            let itemCategory = 'other';
-                            if (['view', 'nature', 'space'].includes(rawCat)) itemCategory = 'view';
-                            else if (['dining', 'food', 'menu'].includes(rawCat)) itemCategory = 'dining';
-                            else if (['service', 'room', 'amenity'].includes(rawCat)) itemCategory = 'service';
-                            else if (['activity'].includes(rawCat)) itemCategory = 'activity';
-                            else if (['customer'].includes(rawCat)) itemCategory = 'customer';
-                            else if (['video'].includes(rawCat)) itemCategory = 'video';
-
-                            const categoryLabels = {
-                                'view': 'Cảnh quan & Không gian',
-                                'dining': 'Ẩm thực & Thực đơn',
-                                'service': 'Dịch vụ & Tiện ích',
-                                'activity': 'Hoạt động & Trải nghiệm',
-                                'customer': 'Nội dung từ khách hàng',
-                                'video': 'Video'
-                            };
-                            const displayCategory = categoryLabels[itemCategory] || '';
-                            const spanClass = (idx % 5 === 0) ? 'grid-column: span 2; grid-row: span 2;' : '';
-                            
-                            return `
-                                <div style="border-radius:24px; overflow:hidden; position:relative; border:1px solid rgba(255,255,255,0.05); cursor:pointer; transition:0.4s; ${spanClass}" 
-                                     onclick="${isVideo ? '' : `document.getElementById('hero-img').src='${url}'`}"
-                                     class="gallery-item" data-type="${isVideo ? 'video' : 'image'}" data-category="${itemCategory}">
-                                    ${isVideo ? `
-                                        <video src="${url}" muted loop onmouseover="this.play()" onmouseout="this.pause()" style="width:100%; height:100%; object-fit:cover;"></video>
-                                        <div style="position:absolute; top:12px; right:12px; background:rgba(0,0,0,0.5); width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px;">▶</div>
-                                    ` : `
-                                        <img src="${url}" loading="lazy" style="width:100%; height:100%; object-fit:cover; transition:0.6s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                                    `}
-                                    ${itemCategory && itemCategory !== 'other' && itemCategory !== 'image' ? `<div style="position:absolute; top:12px; left:12px; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); padding:4px 10px; border-radius:8px; font-size:11px; color:#a5b4fc; font-weight:700; text-transform:uppercase; letter-spacing:1px;">${displayCategory}</div>` : ''}
-                                </div>
-                            `;
-                        }).join('');
-                    }
+                // ── Gallery ────────────────────────────────────────────
+                // Support both p.images (legacy) and p.gallery (new schema)
+                let galleryImgs = [];
+                if (p.gallery && p.gallery.length > 0) galleryImgs = p.gallery.map(g => g.url || g).filter(Boolean);
+                else if (p.images && p.images.length > 0) galleryImgs = p.images;
+                if (galleryImgs.length > 0) {
+                    document.getElementById('gallery-sec').style.display = 'block';
+                    document.getElementById('gallery-grid').innerHTML = galleryImgs.map(img => `
+                        <div style="border-radius:16px;overflow:hidden;aspect-ratio:4/3;border:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:0.3s" onclick="document.getElementById('hero-img').src='${img}'">
+                            <img src="${img}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=800&q=80'" style="width:100%;height:100%;object-fit:cover;transition:0.5s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                        </div>`).join('');
                 }
 
                 // ── Highlights grid ────────────────────────────────────
@@ -2321,6 +2178,9 @@
                 // ── Category Specific Features ─────────────────────────────────────────────
                 const catSpecSec = document.getElementById('category-specific-sec');
                 const catSpecContent = document.getElementById('cat-spec-content');
+                const isTour = p.isTour || p.businessCategory === 'tour' || p.kind === 'trai-nghiem' || p.kind === 'giai-tri';
+                const isHotel = p.businessCategory === 'stay' || p.kind === 'khach-san';
+                const isDining = p.businessCategory === 'dining' || p.kind === 'nha-hang';
 
                 if (isTour) {
                     catSpecSec.style.display = 'block';
@@ -2328,21 +2188,21 @@
                     document.getElementById('cat-spec-title').innerText = 'Chi tiết hành trình & Chuẩn bị';
                     
                     const includes = p.tourIncludes && p.tourIncludes.length > 0 ? p.tourIncludes : ['Xe đưa đón tận nơi', 'Hướng dẫn viên bản địa', 'Nước uống & Khăn lạnh', 'Vé tham quan các điểm', 'Bảo hiểm du lịch'];
-                    const excludes = p.tourExcludes && p.tourExcludes.length > 0 ? p.tourExcludes : (p.whatNotToDo && p.whatNotToDo.length > 0 ? p.whatNotToDo : ['Chi phí cá nhân', 'Tiền tip cho HDV', 'Thuế VAT (nếu xuất hóa đơn)', 'Các bữa ăn không có trong lịch trình']);
+                    const excludes = p.whatNotToDo && p.whatNotToDo.length > 0 ? p.whatNotToDo : ['Chi phí cá nhân', 'Tiền tip cho HDV', 'Thuế VAT (nếu xuất hóa đơn)', 'Các bữa ăn không có trong lịch trình'];
                     const preps = p.whatToBring && p.whatToBring.length > 0 ? p.whatToBring : ['Trang phục thoải mái', 'Kem chống nắng', 'Giấy tờ tùy thân', 'Sạc dự phòng'];
                     
                     let html = `<div style="display:flex; flex-wrap:wrap; gap:32px;">`;
                     html += `<div style="flex:1; min-width:300px;">
                         <h4 style="font-size:1.2rem; font-weight:700; color:var(--text-main); margin-bottom:16px;">✅ Bao gồm</h4>
                         <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
-                            ${includes.map(i => `<li style="display:flex; align-items:flex-start; gap:12px; color:var(--text-main); opacity:0.9;"><span style="color:#10b981; font-weight:bold;">✓</span> <span>${i}</span></li>`).join('')}
+                            ${includes.map(i => `<li style="display:flex; align-items:flex-start; gap:12px; color:var(--text-dim);"><span style="color:#10b981; font-weight:bold;">✓</span> <span>${i}</span></li>`).join('')}
                         </ul>
                     </div>`;
                     
                     html += `<div style="flex:1; min-width:300px;">
                         <h4 style="font-size:1.2rem; font-weight:700; color:var(--text-main); margin-bottom:16px;">❌ Không bao gồm</h4>
                         <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px;">
-                            ${excludes.map(i => `<li style="display:flex; align-items:flex-start; gap:12px; color:var(--text-main); opacity:0.9;"><span style="color:#ef4444; font-weight:bold;">✕</span> <span>${i}</span></li>`).join('')}
+                            ${excludes.map(i => `<li style="display:flex; align-items:flex-start; gap:12px; color:var(--text-dim);"><span style="color:#ef4444; font-weight:bold;">✕</span> <span>${i}</span></li>`).join('')}
                         </ul>
                     </div>`;
                     html += `</div>`;
@@ -2379,7 +2239,7 @@
                     let html = `<div style="margin-bottom:24px;">
                         <h4 style="font-size:1.2rem; font-weight:700; color:var(--text-main); margin-bottom:16px;">✨ Tiện nghi nổi bật</h4>
                         <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px;">
-                            ${amenities.map(a => `<div style="display:flex; align-items:center; gap:8px; color:var(--text-main); opacity:0.9;"><span style="color:#6366f1;">❖</span> <span>${a}</span></div>`).join('')}
+                            ${amenities.map(a => `<div style="display:flex; align-items:center; gap:8px; color:var(--text-dim);"><span style="color:#6366f1;">❖</span> <span>${a}</span></div>`).join('')}
                         </div>
                     </div>`;
                     
@@ -2406,7 +2266,7 @@
                     html += `<div style="flex:1; min-width:300px;">
                         <h4 style="font-size:1.2rem; font-weight:700; color:var(--text-main); margin-bottom:16px;">🍴 Tiện ích nhà hàng</h4>
                         <ul style="list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                            ${amenities.map(a => `<li style="display:flex; align-items:center; gap:8px; color:var(--text-main); opacity:0.9;"><span style="color:#f59e0b;">✔</span> <span>${a}</span></li>`).join('')}
+                            ${amenities.map(a => `<li style="display:flex; align-items:center; gap:8px; color:var(--text-dim);"><span style="color:#f59e0b;">✔</span> <span>${a}</span></li>`).join('')}
                         </ul>
                     </div>`;
                     
@@ -2619,10 +2479,7 @@
             const items = place.gallery || (place.images || []).map(img => ({ url: img, category: 'general', type: 'image' }));
             
             function renderItems(filter = 'all') {
-                const filtered = filter === 'all' ? items : items.filter(it => {
-                    const cat = (it.category || it.type || '').toLowerCase();
-                    return cat === filter;
-                });
+                const filtered = filter === 'all' ? items : items.filter(it => (it.category || '').toLowerCase() === filter);
                 if (filtered.length === 0 && filter !== 'all') {
                     galleryGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-dim);">Chưa có ảnh trong danh mục này.</div>`;
                     return;
@@ -2644,26 +2501,6 @@
             });
 
             renderItems();
-        }
-
-        function filterGallery(filter) {
-            document.querySelectorAll('.gallery-filter').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.getAttribute('onclick') && btn.getAttribute('onclick').includes("'" + filter + "'")) {
-                    btn.classList.add('active');
-                }
-            });
-            document.querySelectorAll('.gallery-item').forEach(item => {
-                const cat = (item.dataset.category || '').toLowerCase();
-                const type = (item.dataset.type || '').toLowerCase();
-                if (filter === 'all') {
-                    item.style.display = '';
-                } else if (filter === 'video') {
-                    item.style.display = type === 'video' ? '' : 'none';
-                } else {
-                    item.style.display = (cat === filter) ? '' : 'none';
-                }
-            });
         }
 
         function initSocialProof() {
@@ -2805,7 +2642,7 @@
                                         <span style="flex:1;">${faq.question}</span>
                                         <span class="faq-icon" style="transition:transform 0.3s;">▼</span>
                                     </button>
-                                    <div class="faq-answer" id="faq-answer-${index}" style="display:none; padding:0 20px 20px; color:var(--text-main); opacity:0.85; line-height:1.6; border-top:1px solid rgba(255,255,255,0.05);">
+                                    <div class="faq-answer" id="faq-answer-${index}" style="display:none; padding:0 20px 20px; color:var(--text-dim); line-height:1.6; border-top:1px solid rgba(255,255,255,0.05);">
                                         ${faq.answer}
                                         <div style="margin-top:12px; display:flex; align-items:center; gap:8px;">
                                             <button onclick="voteFAQ('${faq._id || index}')" style="background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:8px; padding:6px 12px; color:var(--text-dim); font-size:0.8rem; cursor:pointer; transition:all 0.3s;">👍 Hữu ích (${faq.helpfulCount || 0})</button>
@@ -2839,9 +2676,110 @@
                 loadCommunityPosts();
 
 
+                // ── Itineraries ───────────────────────────────�               
+                    return {
+                        id: el.id,
+                        name: tags.name || `Địa điểm ${cat}`,
+                        lat: el.lat,
+                        lng: el.lon,
+                        address: addr,
+                        type: cat,
+                        distanceText: d < 1000 ? `${Math.round(d)}m` : `${(d/1000).toFixed(1)}km`,
+                        travelTime: d < 500 ? '5 phút đi bộ' : d < 1000 ? '12 phút đi bộ' : '5 phút taxi',
+                        rating: (4 + Math.random() * 0.9).toFixed(1),
+                        reviews: Math.floor(Math.random() * 500) + 50,
+                        image: `https://source.unsplash.com/400x300/?${cat},city,${tags.name?encodeURIComponent(tags.name):''}`
+                    };
+                });
+                renderNearbyUI(currentNearbyData);
             } catch (err) {
-                console.error('Load error:', err);
+                console.error('Map search error:', err);
+                grid.style.opacity = '1';
             }
+        }
+
+        function clearMarkers() {
+            nearbyMarkers.forEach(m => map.removeLayer(m));
+            nearbyMarkers = [];
+        }
+
+        function renderNearbyUI(data) {
+            const grid = document.getElementById('nearby-grid');
+            
+            // Add markers
+            data.forEach(n => {
+                const iconHtml = `<div style="background:#fff; width:32px; height:32px; border-radius:50%; border:2px solid var(--primary); display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 4px 15px rgba(0,0,0,0.4);">${getEmoji(n.type)}</div>`;
+                const icon = L.divIcon({ className: 'nearby-pin', html: iconHtml, iconSize: [32, 32], iconAnchor: [16, 32] });
+                const m = L.marker([n.lat, n.lng], { icon }).addTo(map)
+                    .bindPopup(`<b>${n.name}</b><br><span style="font-size:12px;color:#666;">${n.address}</span>`, { closeButton: false });
+                nearbyMarkers.push(m);
+            });
+
+            grid.innerHTML = data.slice(0, 15).map(n => `
+                <div class="nearby-card" style="background:rgba(255,255,255,0.02); border:1px solid var(--glass-border); border-radius:20px; overflow:hidden; transition:0.3s; cursor:pointer;" onclick="focusOnMarker(${n.lat}, ${n.lng}, '${n.name}')">
+                    <div style="height:140px; overflow:hidden; position:relative;">
+                        <img src="${n.image}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=400&q=80'" style="width:100%; height:100%; object-fit:cover;">
+                        <div style="position:absolute; bottom:12px; left:12px; background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); padding:4px 8px; border-radius:8px; font-size:11px; color:#fff;">${getEmoji(n.type)} ${n.type}</div>
+                    </div>
+                    <div style="padding:16px;">
+                        <div style="font-weight:800; color:var(--text-main); margin-bottom:4px; font-size:0.95rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${n.name}</div>
+                        <div style="font-size:12px; color:var(--text-dim); margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+                            <span>📍 ${n.distanceText}</span> • <span>⏱️ ${n.travelTime}</span>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="color:#fbbf24; font-size:13px; font-weight:700;">★ ${n.rating}</span>
+                            <button style="background:var(--primary); color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;" onclick="event.stopPropagation(); window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(n.name + ' ' + n.address)}', '_blank')">Chi tiết ↗</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getEmoji(type) {
+            if (type.includes('restaurant') || type.includes('food')) return '🍽️';
+            if (type.includes('hotel') || type.includes('tourism')) return '🏨';
+            if (type.includes('cafe')) return '☕';
+            if (type.includes('attraction') || type.includes('viewpoint')) return '🎯';
+            return '✨';
+        }
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // meters
+            const φ1 = lat1 * Math.PI/180;
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+                      Math.cos(φ1) * Math.cos(φ2) *
+                      Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function focusOnMarker(lat, lng, name) {
+            if (!map) return;
+            map.flyTo([lat, lng], 17, { duration: 1.5 });
+            nearbyMarkers.forEach(m => {
+                if (Math.abs(m.getLatLng().lat - lat) < 0.0001 && Math.abs(m.getLatLng().lng - lng) < 0.0001) {
+                    m.openPopup();
+                }
+            });
+        }
+
+        function focusOnMarker(lat, lng, name) {
+            if (!map) return;
+            map.flyTo([lat, lng], 17, { duration: 1.5 });
+            nearbyMarkers.forEach(m => {
+                if (m.getLatLng().lat === lat && m.getLatLng().lng === lng) {
+                    m.openPopup();
+                }
+            });
+            if (mainMarker.getLatLng().lat === lat && mainMarker.getLatLng().lng === lng) mainMarker.openPopup();
+        }
+
+        function viewMap() {
+            const mapSec = document.getElementById('map-sec');
+            mapSec.scrollIntoView({ behavior: 'smooth' });
         }
 
         // FAQ Functions
@@ -2895,73 +2833,49 @@
             input.value = '';
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
             
-            // Thinking state
-            const thinkingId = 'ai-thinking-' + Date.now();
-            messagesContainer.innerHTML += `
-                <div class="ai-message" id="${thinkingId}">
-                    <div class="ai-avatar">🤖</div>
-                    <div class="ai-content">
-                        <div class="typing-indicator">
-                            <span></span><span></span><span></span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            // Get place name for context
+            const pNameEl = document.getElementById('p-title');
+            const pCatEl = document.getElementById('p-cat');
+            const pName = pNameEl ? pNameEl.innerText : 'địa điểm này';
+            const pKind = pCatEl ? pCatEl.innerText : 'trải nghiệm';
 
-            try {
-                const res = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'x-auth-token': localStorage.getItem('wander_token') || ''
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        placeContext: window.currentPlace,
-                        scope: 'user_place_detail'
-                    })
-                });
-                const json = await res.json();
+            // Simulate AI response with context
+            setTimeout(() => {
+                let response = "";
+                const msg = message.toLowerCase();
                 
-                const thinkingEl = document.getElementById(thinkingId);
-                if (thinkingEl) thinkingEl.remove();
-
-                if (json.success) {
-                    messagesContainer.innerHTML += `
-                        <div class="ai-message">
-                            <div class="ai-avatar">🤖</div>
-                            <div class="ai-content">
-                                <p>${json.answer.replace(/\n/g, '<br>')}</p>
-                            </div>
-                        </div>
-                    `;
+                if (msg.includes('thời gian') || msg.includes('đẹp nhất') || msg.includes('khi nào')) {
+                    response = `Dựa trên dữ liệu khí hậu và lượng khách tại ${pName}, tôi gợi ý bạn nên ghé thăm vào khoảng tháng 12 đến tháng 4 năm sau. Đây là mùa khô, trời trong xanh rất thích hợp để khám phá.`;
+                } else if (msg.includes('mặc gì') || msg.includes('trang phục') || msg.includes('quần áo')) {
+                    response = `Vì đây là ${pKind}, bạn nên ưu tiên trang phục thoải mái, thấm hút mồ hôi. ${pKind === 'Tour' ? 'Nếu có leo núi hay đi bộ nhiều, đừng quên một đôi giày thể thao tốt và kem chống nắng nhé!' : 'Nếu là nhà hàng sang trọng, một bộ váy nhẹ nhàng hoặc áo sơ mi sẽ rất phù hợp.'}`;
+                } else if (msg.includes('chi phí') || msg.includes('tiền') || msg.includes('giá')) {
+                    const price = document.getElementById('q-price').innerText;
+                    response = `Giá dịch vụ cơ bản tại đây khoảng ${price}. Tuy nhiên, tôi khuyên bạn nên chuẩn bị thêm khoảng 20-30% cho các chi phí phát sinh như đồ uống, quà lưu niệm hoặc các dịch vụ đi kèm khác.`;
+                } else if (msg.includes('lịch trình') || msg.includes('đi đâu')) {
+                    response = `Để tận hưởng trọn vẹn ${pName}, bạn có thể tham khảo lịch trình: Sáng check-in và tham quan khu vực chính, trưa thưởng thức ẩm thực tại chỗ, chiều tham gia các hoạt động trải nghiệm. Bạn có thể xem chi tiết ở mục 'Lên kế hoạch chuyến đi' ngay bên dưới!`;
                 } else {
-                    throw new Error(json.answer || 'Lỗi kết nối AI');
+                    response = `Chào bạn! Tôi là trợ lý AI của WanderViệt. Về ${pName}, địa điểm này hiện đang rất được ưa chuộng nhờ ${pKind === 'Khách sạn' ? 'dịch vụ nghỉ dưỡng cao cấp' : 'không gian kiến trúc độc đáo'}. Bạn cần tôi hỗ trợ cụ thể về vấn đề gì nữa không?`;
                 }
-            } catch(e) {
-                const thinkingEl = document.getElementById(thinkingId);
-                if (thinkingEl) thinkingEl.remove();
+
                 messagesContainer.innerHTML += `
-                    <div class="ai-message error">
-                        <div class="ai-avatar">⚠️</div>
+                    <div class="ai-message">
+                        <div class="ai-avatar">🤖</div>
                         <div class="ai-content">
-                            <p>Xin lỗi, tôi đang gặp chút sự cố kỹ thuật. Bạn thử lại sau nhé!</p>
+                            <p>${response}</p>
                         </div>
                     </div>
                 `;
-            }
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 800);
         }
 
         function quickAIAction(action) {
             const input = document.getElementById('ai-input');
-            const pName = window.currentPlace ? window.currentPlace.name : 'địa điểm này';
             const questions = {
-                'best-time': `Giờ mở cửa và thời gian nào ghé thăm ${pName} là tốt nhất?`,
-                'outfit': `${pName} có những dịch vụ/món ăn gì đặc sắc nhất?`,
-                'itinerary': `Chỉ đường và cách di chuyển thuận tiện nhất đến ${pName}?`,
-                'cost': `Bảng giá chi tiết và các chương trình ưu đãi hiện có tại ${pName} là gì?`
+                'best-time': 'Thời gian nào trong ngày là đẹp nhất để ghé thăm?',
+                'outfit': 'Tôi nên mặc gì khi đến đây?',
+                'itinerary': 'Lên lịch trình 1 ngày cho tôi',
+                'cost': 'Ước tính chi phí cho chuyến đi này'
             };
             input.value = questions[action];
             sendAIMessage();
@@ -3318,7 +3232,6 @@
         }
 
         // ============================================
-        // ============================================
         // SOCIAL PROOF SYSTEM
         // ============================================
         const spNames = ['Minh Anh', 'Thu Hà', 'Quang Huy', 'Lan Chi', 'Tuấn Kiệt', 'Bảo Ngọc', 'Đức Thắng', 'Hồng Nhung'];
@@ -3370,78 +3283,54 @@
             }
         }
 
-
-        function filterGallery(type) {
-            const items = document.querySelectorAll('.gallery-item');
-            const btns = document.querySelectorAll('.gallery-filter');
-            btns.forEach(btn => {
-                const text = btn.innerText.toLowerCase();
-                if (type === 'all' && (text === 'tất cả' || text.includes('all'))) btn.classList.add('active');
-                else if (text.includes(type) || (type === 'video' && text.includes('🎥'))) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-            items.forEach(item => {
-                if (type === 'all') item.style.display = 'block';
-                else item.style.display = (item.dataset.type === type) ? 'block' : 'none';
-            });
+        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+            themeToggle.textContent = '☀️';
         }
 
-        function toggleReadMore() {
-            const container = document.getElementById('p-desc-container');
-            const btn = document.getElementById('read-more-btn');
-            if (container.style.maxHeight === 'none') {
-                container.style.maxHeight = '280px';
-                btn.innerText = 'Xem toàn bộ câu chuyện ▼';
-                container.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                container.style.maxHeight = 'none';
-                btn.innerText = 'Thu gọn câu chuyện ▲';
-            }
-        }
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            themeToggle.textContent = isLight ? '☀️' : '🌙';
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        });
+
 
         window.onload = load;
 
-        // Map Functions
-        let map = null;
-        let mainMarker = null;
- 
-        function initMap(p) {
-            if (map) { map.remove(); map = null; }
-            
-            const lat = (p.gpsCoordinates && p.gpsCoordinates.lat) || p.lat || 21.0285;
-            const lng = (p.gpsCoordinates && p.gpsCoordinates.lng) || p.lng || 105.8542;
- 
-            map = L.map('map-root', { zoomControl: false }).setView([lat, lng], 17);
-            
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; WanderViệt &copy; OpenStreetMap'
-            }).addTo(map);
- 
-            L.control.zoom({ position: 'bottomright' }).addTo(map);
- 
-            const mainIcon = L.divIcon({
-                className: 'main-pin',
-                html: '<div style="background:var(--primary); width:40px; height:40px; border-radius:50%; border:4px solid #fff; box-shadow:0 0 25px var(--primary); display:flex; align-items:center; justify-content:center; color:#fff; font-size:22px; animation: pulse-main 2s infinite;">📍</div>',
-                iconSize: [40, 40],
-                iconAnchor: [20, 40]
-            });
- 
-            mainMarker = L.marker([lat, lng], { icon: mainIcon }).addTo(map)
-                .bindPopup('<div style="padding:10px; min-width:180px;"><div style="font-size:0.7rem; color:var(--primary); font-weight:700; margin-bottom:4px;">BẠN ĐANG Ở ĐÂY</div><b style="color:var(--text-main); font-size:1.1rem;">' + p.name + '</b></div>', { closeButton: false })
-                .openPopup();
-            
-            document.getElementById('map-addr-text').textContent = p.address || 'Địa chỉ đang cập nhật...';
-            window.currentPlaceCoords = { lat, lng };
-        }
+        // Performance: Lazy Loading with Intersection Observer
+        document.addEventListener('DOMContentLoaded', () => {
+            // Lazy load images
+            const lazyImages = document.querySelectorAll('img[data-src]');
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.add('loaded');
+                        observer.unobserve(img);
+                    }
+                });
+            }, { rootMargin: '50px 0px', threshold: 0.01 });
 
-        function viewMap() {
-            const { lat, lng } = window.currentPlaceCoords;
-            window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
-        }
+            lazyImages.forEach(img => imageObserver.observe(img));
 
-        const pulseStyle = document.createElement('style');
-        pulseStyle.innerHTML = '@keyframes pulse-main { 0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); } 70% { box-shadow: 0 0 0 20px rgba(99, 102, 241, 0); } 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); } }';
-        document.head.appendChild(pulseStyle);
+            // Lazy load sections
+            const lazySections = document.querySelectorAll('.lazy-load');
+            const sectionObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '100px 0px', threshold: 0.1 });
+
+            lazySections.forEach(section => sectionObserver.observe(section));
+        });
 
         // Add loading="lazy" to all images for native lazy loading
         document.querySelectorAll('img').forEach(img => {

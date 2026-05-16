@@ -1,0 +1,200 @@
+﻿        // FAQ Functions
+        function toggleFAQ(index) {
+            const answer = document.getElementById(`faq-answer-${index}`);
+            const icon = answer.previousElementSibling.querySelector('.faq-icon');
+            if (answer.style.display === 'none') {
+                answer.style.display = 'block';
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                answer.style.display = 'none';
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        async function voteFAQ(faqId) {
+            try {
+                const res = await fetch(`/api/places/${pid}/faqs/${faqId}/vote`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') }
+                });
+                const json = await res.json();
+                if (json.success) {
+                    window.WanderUI.showToast('Cảm ơn phản hồi của bạn!', 'success');
+                }
+            } catch(e) {
+                console.error('FAQ vote error:', e);
+            }
+        }
+
+        // AI Chat Functions
+        function openAIChat() {
+            const aiSec = document.getElementById('ai-assistant-sec');
+            aiSec.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function sendAIMessage() {
+            const input = document.getElementById('ai-input');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            const messagesContainer = document.getElementById('ai-chat-messages');
+            messagesContainer.innerHTML += `
+                <div class="ai-message user">
+                    <div class="ai-avatar" style="background:linear-gradient(135deg, #f59e0b, #d97706);">👤</div>
+                    <div class="ai-content">
+                        <p>${message}</p>
+                    </div>
+                </div>
+            `;
+            input.value = '';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Get place name for context
+            const pNameEl = document.getElementById('p-title');
+            const pCatEl = document.getElementById('p-cat');
+            const pName = pNameEl ? pNameEl.innerText : 'địa điểm này';
+            const pKind = pCatEl ? pCatEl.innerText : 'trải nghiệm';
+
+            // Simulate AI response with context
+            setTimeout(() => {
+                let response = "";
+                const msg = message.toLowerCase();
+                
+                if (msg.includes('thời gian') || msg.includes('đẹp nhất') || msg.includes('khi nào')) {
+                    response = `Dựa trên dữ liệu khí hậu và lượng khách tại ${pName}, tôi gợi ý bạn nên ghé thăm vào khoảng tháng 12 đến tháng 4 năm sau. Đây là mùa khô, trời trong xanh rất thích hợp để khám phá.`;
+                } else if (msg.includes('mặc gì') || msg.includes('trang phục') || msg.includes('quần áo')) {
+                    response = `Vì đây là ${pKind}, bạn nên ưu tiên trang phục thoải mái, thấm hút mồ hôi. ${pKind === 'Tour' ? 'Nếu có leo núi hay đi bộ nhiều, đừng quên một đôi giày thể thao tốt và kem chống nắng nhé!' : 'Nếu là nhà hàng sang trọng, một bộ váy nhẹ nhàng hoặc áo sơ mi sẽ rất phù hợp.'}`;
+                } else if (msg.includes('chi phí') || msg.includes('tiền') || msg.includes('giá')) {
+                    const price = document.getElementById('q-price').innerText;
+                    response = `Giá dịch vụ cơ bản tại đây khoảng ${price}. Tuy nhiên, tôi khuyên bạn nên chuẩn bị thêm khoảng 20-30% cho các chi phí phát sinh như đồ uống, quà lưu niệm hoặc các dịch vụ đi kèm khác.`;
+                } else if (msg.includes('lịch trình') || msg.includes('đi đâu')) {
+                    response = `Để tận hưởng trọn vẹn ${pName}, bạn có thể tham khảo lịch trình: Sáng check-in và tham quan khu vực chính, trưa thưởng thức ẩm thực tại chỗ, chiều tham gia các hoạt động trải nghiệm. Bạn có thể xem chi tiết ở mục 'Lên kế hoạch chuyến đi' ngay bên dưới!`;
+                } else {
+                    response = `Chào bạn! Tôi là trợ lý AI của WanderViệt. Về ${pName}, địa điểm này hiện đang rất được ưa chuộng nhờ ${pKind === 'Khách sạn' ? 'dịch vụ nghỉ dưỡng cao cấp' : 'không gian kiến trúc độc đáo'}. Bạn cần tôi hỗ trợ cụ thể về vấn đề gì nữa không?`;
+                }
+
+                messagesContainer.innerHTML += `
+                    <div class="ai-message">
+                        <div class="ai-avatar">🤖</div>
+                        <div class="ai-content">
+                            <p>${response}</p>
+                        </div>
+                    </div>
+                `;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 800);
+        }
+
+        function quickAIAction(action) {
+            const input = document.getElementById('ai-input');
+            const questions = {
+                'best-time': 'Thời gian nào trong ngày là đẹp nhất để ghé thăm?',
+                'outfit': 'Tôi nên mặc gì khi đến đây?',
+                'itinerary': 'Lên lịch trình 1 ngày cho tôi',
+                'cost': 'Ước tính chi phí cho chuyến đi này'
+            };
+            input.value = questions[action];
+            sendAIMessage();
+        }
+
+        // Itinerary Functions
+        window.currentItineraryDays = 1;
+        window.currentItineraryType = 'couple';
+
+        function filterItinerary(days) {
+            window.currentItineraryDays = days;
+            document.querySelectorAll('.itinerary-filter').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.days) === days);
+            });
+            renderSuggestedItinerary();
+        }
+
+        function filterItineraryType(type) {
+            window.currentItineraryType = type;
+            document.querySelectorAll('.itinerary-type').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+            renderSuggestedItinerary();
+        }
+
+        function renderSuggestedItinerary() {
+            const grid = document.getElementById('itinerary-timeline');
+            if (!grid) return;
+            
+            // Premium Fallback Data if backend data is missing
+            const fallbacks = [
+                { 
+                    duration: "1 ngày", type: "couple", 
+                    timeline: [
+                        { time: "08:00", activity: "Đón tại khách sạn & Ăn sáng đặc sản", location: "Trung tâm thành phố", tips: "Nên khởi hành sớm để tránh đông đúc." },
+                        { time: "10:00", activity: "Check-in & Tham quan chính", location: "Khu vực trung tâm", tips: "Góc chụp ảnh đẹp nhất là phía bên trái cổng chào." },
+                        { time: "12:00", activity: "Ăn trưa & Nghỉ ngơi", location: "Nhà hàng địa phương", tips: "Thử món signature của quán." },
+                        { time: "14:00", activity: "Hoạt động trải nghiệm / Workshop", location: "Khu trải nghiệm", tips: "Phù hợp cho cả người mới bắt đầu." },
+                        { time: "17:30", activity: "Ngắm hoàng hôn & Chill", location: "Rooftop/Bờ biển", tips: "Địa điểm ngắm mặt trời lặn tuyệt nhất." }
+                    ]
+                },
+                {
+                    duration: "2 ngày", type: "couple",
+                    timeline: [
+                        { time: "09:00", activity: "Tour khám phá sâu hơn", location: "Ngoại ô", tips: "Mang theo đồ dự phòng nếu có hoạt động nước." },
+                        { time: "14:00", activity: "Trải nghiệm văn hóa bản địa", location: "Làng nghề", tips: "Có thể mua quà lưu niệm thủ công tại đây." },
+                        { time: "18:00", activity: "Tiệc tối lãng mạn", location: "Bãi biển/Sân vườn", tips: "Cần đặt bàn trước ít nhất 4 tiếng." }
+                    ]
+                }
+            ];
+
+            let source = window.suggestedItineraries || [];
+            if (source.length === 0) source = fallbacks;
+            
+            const daysStr = String(window.currentItineraryDays);
+            const filtered = source.filter(it => {
+                const dur = String(it.duration || '');
+                return dur.includes(daysStr) && it.type === window.currentItineraryType;
+            });
+            
+            const it = filtered[0] 
+                || source.find(s => String(s.duration || '').includes(daysStr))
+                || source.find(s => s.type === window.currentItineraryType) 
+                || source[0];
+            
+            if (!it || !it.timeline) {
+                grid.innerHTML = `<div style="text-align:center; padding:40px; color:var(--text-dim);">Lịch trình cho lựa chọn này đang được cập nhật...</div>`;
+                return;
+            }
+
+            grid.innerHTML = it.timeline.map((step, idx) => `
+                <div class="t-step">
+                    <div class="t-dot" style="background:${idx === 0 ? 'var(--primary)' : 'rgba(255,255,255,0.2)'}"></div>
+                    <span class="t-time">${step.time || '00:00'}</span>
+                    <h4 class="t-title">${step.activity || ''}</h4>
+                    <div class="t-desc">
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                            <span style="font-size:12px;">📍</span>
+                            <b style="font-size:13px; color:var(--text-main);">${step.location || ''}</b>
+                        </div>
+                        ${step.tips ? `<div style="font-size:13px; color:var(--text-dim); opacity:0.8; line-height:1.4;">💡 ${step.tips}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+
+
+        function saveToItinerary() {
+            if (!localStorage.getItem('wander_token')) return window.WanderUI.openAuthModal();
+            window.WanderUI.showToast('Đã lưu vào lịch trình!', 'success');
+        }
+
+        // Share Function
+        function sharePlace() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.getElementById('p-title').innerText,
+                    text: document.getElementById('p-desc').innerText,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                window.WanderUI.showToast('Đã copy link!', 'success');
+            }
+        }

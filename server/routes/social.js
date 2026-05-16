@@ -46,6 +46,32 @@ router.post('/business/follow', auth, async (req, res) => {
   }
 });
 
+// 6b. LẤY BÀI VIẾT THEO ĐỊA ĐIỂM (Community Posts for Place Detail) - Moved to top to prevent 404
+router.get('/posts', async (req, res) => {
+  try {
+    const { placeId } = req.query;
+    if (!placeId) return res.status(400).json({ success: false, message: 'Thiếu placeId' });
+
+    const posts = await Post.find({ 
+      $or: [
+        { 'location.id': placeId },
+        { 'location.name': placeId },
+        { 'attachment.id': placeId },
+        { 'placeId': placeId } // Support both schemas
+      ]
+    })
+    .sort({ createdAt: -1 })
+    .limit(30)
+    .populate('userId', 'name displayName avatar rank rankTier');
+
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    res.json({ success: true, data: posts.map(p => processPost(p, baseUrl)) });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+
 router.get('/business/following', auth, async (req, res) => {
   try {
     const following = await Follow.find({ followerId: req.user.id });
@@ -536,6 +562,8 @@ router.get('/feed', auth, async (req, res) => {
     res.json({ success: true, data });
   } catch (err) { res.status(500).json({ success: false, message: err.message }); }
 });
+
+// 6b section moved to top
 
 // 7. KẾT BẠN
 router.post('/friends/request', auth, async (req, res) => {

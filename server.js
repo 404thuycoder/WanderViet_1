@@ -28,11 +28,15 @@ app.use(express.urlencoded({ extended: true, limit: '100mb' }));
 // Ensure uploads directory exists
 const fs = require('fs');
 const uploadsDir = path.join(__dirname, 'uploads');
+const serverUploadsDir = path.join(__dirname, 'server', 'uploads');
+
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
+console.log(`[SERVER] Static uploads serving from: ${uploadsDir}`);
 app.use('/uploads', express.static(uploadsDir));
+app.use('/uploads', express.static(serverUploadsDir)); // Fallback to server/uploads if needed
 
 // Performance & Caching Policy + UTF-8 Enforcement
 app.use((req, res, next) => {
@@ -83,6 +87,28 @@ app.use('/api/knowledge', require('./server/routes/knowledge'));
 app.use('/api/social', require('./server/routes/social'));
 app.use('/api/bookings', require('./server/routes/bookings'));
 app.use('/api/payments', require('./server/routes/payments'));
+
+// FAIL-SAFE: Direct registration of place-photo proxy
+app.get('/api/public/place-photo', async (req, res) => {
+  try {
+    const { name, address } = req.query;
+    if (!name) return res.status(400).send('Name required');
+    const cleanAddress = (address || '').replace(/Vị trí trên bản đồ|Vị trí chính xác trên bản đồ/g, '').trim();
+    const searchQuery = encodeURIComponent(`${name} ${cleanAddress}`);
+    const searchUrl = `https://www.google.com/maps/search/${searchQuery}`;
+    const response = await fetch(searchUrl, {
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36', 'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7' }
+    });
+    const html = await response.text();
+    const ogImageMatch = html.match(/<meta content="(https:\/\/lh5\.googleusercontent\.com\/p\/[^"]+)"/);
+    if (ogImageMatch) return res.redirect(ogImageMatch[1]);
+    const scriptPhotoMatch = html.match(/https:\/\/lh5\.googleusercontent\.com\/p\/[^"= ]+/);
+    if (scriptPhotoMatch) return res.redirect(scriptPhotoMatch[0]);
+    res.redirect(`https://loremflickr.com/400/300/${encodeURIComponent(name)},vietnam`);
+  } catch (err) {
+    res.redirect('https://loremflickr.com/400/300/landscape,vietnam');
+  }
+});
 
 // Static User Web
 app.use('/assets', express.static(path.join(__dirname, 'apps/user-web/assets')));

@@ -1,0 +1,50 @@
+﻿    <script src="js/SharedUI.js?v=1778494999999"></script>
+    <script>
+        // SỬA LỖI ĐỒNG BỘ THEME
+        const observer = new MutationObserver(() => {
+            const theme = document.documentElement.getAttribute('data-theme') || 'dark';
+            document.body.setAttribute('data-theme', theme);
+        });
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+        const pid = new URLSearchParams(window.location.search).get('id');
+        let currentM = 'qr';
+
+        function openPayment() { 
+            document.getElementById('p-form').style.display = 'block';
+            document.getElementById('p-status').style.display = 'none';
+            document.getElementById('st-loading').style.display = 'none';
+            document.getElementById('st-success').style.display = 'none';
+            document.getElementById('p-modal').classList.add('is-active'); 
+            const d = new Date(); d.setDate(d.getDate() + 1); 
+            document.getElementById('c-date').value = d.toISOString().split('T')[0]; 
+            document.querySelector('.modal-content').scrollTop = 0;
+            const btn = document.getElementById('btn-pay-main');
+            if(btn) { btn.disabled = false; btn.innerText = 'XÁC NHẬN & THANH TOÁN'; }
+        }
+        function closePayment() { 
+            document.getElementById('p-modal').classList.remove('is-active'); 
+        }
+        function setM(t, el) { 
+            currentM = t; 
+            document.querySelectorAll('.pay-item').forEach(i=>i.classList.remove('is-active')); 
+            el.classList.add('is-active'); 
+        }
+        function setQR(bank, el, e) {
+            e.stopPropagation();
+            document.querySelectorAll('.bank-opt').forEach(i=>i.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${bank.toUpperCase()}-WANDERVIET`;
+        }
+        function toggleBanks(e) {
+            e.stopPropagation();
+            const ex = document.querySelectorAll('.b-ex');
+            const tg = document.getElementById('bank-toggle');
+            const isHidden = ex[0].style.display === 'none';
+            ex.forEach(el => el.style.display = isHidden ? 'flex' : 'none');
+            tg.innerText = isHidden ? 'Ít hơn' : 'Khác';
+        }
+
+        async function doPay() {
+            const name = document.getElementById('c-name').value;
+            if(!name) { alert("Vui lòng nhập tên!"); return; }

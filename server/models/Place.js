@@ -11,6 +11,7 @@ const placeSchema = new mongoose.Schema({
   isUtility:     { type: Boolean, default: false },
   tourDuration:  { type: String, default: '' },        // VD: '3N2Đ'
   tourIncludes:  [String],                              // Bao gồm: ăn sáng, xe đón...
+  tourExcludes:  [String],                              // Không bao gồm: tip, VAT...
   tourGroupSize: { type: Number, default: null },       // Số khách tối đa
   tourDifficulty:{ type: String, enum: ['easy','medium','hard'], default: 'easy' },
   tourItinerary: [{ day: Number, title: String, detail: String }], // Lịch trình theo ngày
@@ -50,6 +51,7 @@ const placeSchema = new mongoose.Schema({
   contactPhone:  { type: String, default: '' },
   contactEmail:  { type: String, default: '' },
   website:       { type: String, default: '' },
+  policy:        { type: String, default: '' },
 
   // NEW: Quick Info fields
   gpsCoordinates: {
@@ -77,7 +79,7 @@ const placeSchema = new mongoose.Schema({
   gallery: [{
     url: String,
     type: { type: String, enum: ['image', 'video', '360', 'reel'], default: 'image' },
-    category: { type: String, enum: ['food', 'nature', 'hotel', 'nightlife', 'beach', 'adventure', 'general'], default: 'general' },
+    category: { type: String, enum: ['food', 'nature', 'hotel', 'nightlife', 'beach', 'adventure', 'general', 'space', 'menu', 'room', 'view', 'amenity', 'activity', 'customer', 'other'], default: 'general' },
     caption: String,
     uploadedBy: { type: String, default: 'business' }, // 'business' or 'user'
     likes: { type: Number, default: 0 },
@@ -106,7 +108,7 @@ const placeSchema = new mongoose.Schema({
   suggestedItineraries: [{
     name: String,
     duration: String, // "1 day", "2 days", "3 days"
-    type: { type: String, enum: ['couple', 'family', 'solo', 'group', 'budget', 'luxury'], default: 'general' },
+    type: { type: String, enum: ['couple', 'family', 'solo', 'group', 'budget', 'luxury', 'general'], default: 'general' },
     timeline: [{
       time: String,
       activity: String,

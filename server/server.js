@@ -18,6 +18,10 @@ app.use(express.json());
 // Enable CORS
 app.use(cors());
 
+// Serve static uploads
+const uploadsDir = path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(uploadsDir));
+
 // Route files
 const auth = require('./routes/auth').router;
 const services = require('./routes/business');
@@ -26,6 +30,12 @@ const reviews = require('./routes/feedback');
 const messages = require('./routes/chat');
 const preferences = require('./routes/planner');
 const dashboard = require('./routes/admin');
+const social = require('./routes/social');
+const places = require('./routes/places');
+const publicRoutes = require('./routes/public');
+const activities = require('./routes/activities');
+const notifications = require('./routes/notifications');
+const payments = require('./routes/payments');
 
 // Mount routers
 app.use('/api/auth', auth);
@@ -35,6 +45,12 @@ app.use('/api/reviews', reviews);
 app.use('/api/messages', messages);
 app.use('/api/preferences', preferences);
 app.use('/api/dashboard', dashboard);
+app.use('/api/social', social);
+app.use('/api/places', places);
+app.use('/api/public', publicRoutes);
+app.use('/api/activities', activities);
+app.use('/api/notifications', notifications);
+app.use('/api/payments', payments);
 
 // Root endpoint
 app.get('/', (req, res) => {

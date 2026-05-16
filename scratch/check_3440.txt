@@ -1,0 +1,30 @@
+﻿            const φ1 = lat1 * Math.PI/180;
+            const φ2 = lat2 * Math.PI/180;
+            const Δφ = (lat2-lat1) * Math.PI/180;
+            const Δλ = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
+
+
+
+        // Map & Nearby Functions (Dynamic Pro Edition + Persistence)
+        let map = null;
+        let mainMarker = null;
+        let discoveredMarkers = new Map(); // OSM ID -> Marker object
+        let discoveredPlaces = new Map();  // OSM ID -> Place data
+        let activeFilters = new Set();
+
+        function initMap(p) {
+            if (map) { map.remove(); map = null; }
+            discoveredMarkers.clear();
+            discoveredPlaces.clear();
+            
+            const lat = (p.gpsCoordinates && p.gpsCoordinates.lat) || p.lat || 21.0285;
+            const lng = (p.gpsCoordinates && p.gpsCoordinates.lng) || p.lng || 105.8542;
+
+            map = L.map('map-root', { zoomControl: false }).setView([lat, lng], 16);
+            
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; WanderViệt &copy; OpenStreetMap'
+            }).addTo(map);

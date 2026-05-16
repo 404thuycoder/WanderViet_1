@@ -1,0 +1,20 @@
+﻿        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            themeToggle.textContent = isLight ? '☀️' : '🌙';
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        });
+
+
+        window.onload = load;
+
+
+        // Map & Nearby Functions (Dynamic Pro Edition + Persistence)
+        let map = null;
+        let mainMarker = null;
+        let discoveredMarkers = new Map(); // OSM ID -> Marker object
+        let discoveredPlaces = new Map();  // OSM ID -> Place data
+        let activeFilters = new Set();
+

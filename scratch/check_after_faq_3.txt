@@ -1,0 +1,200 @@
+﻿        // Theme Toggle Logic
+        const themeToggle = document.getElementById('theme-toggle');
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-mode');
+            themeToggle.textContent = '☀️';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            themeToggle.textContent = isLight ? '☀️' : '🌙';
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        });
+
+
+        window.onload = load;
+
+
+
+        // Map & Nearby Functions (Google-Pro Precision Edition)
+        let map = null;
+        let mainMarker = null;
+        let discoveredMarkers = new Map(); // OSM ID -> Marker object
+        let discoveredPlaces = new Map();  // OSM ID -> Place data
+        let activeFilters = new Set();
+
+        function initMap(p) {
+            if (map) { map.remove(); map = null; }
+            discoveredMarkers.clear();
+            discoveredPlaces.clear();
+            
+            const lat = (p.gpsCoordinates && p.gpsCoordinates.lat) || p.lat || 21.0285;
+            const lng = (p.gpsCoordinates && p.gpsCoordinates.lng) || p.lng || 105.8542;
+
+            map = L.map('map-root', { zoomControl: false }).setView([lat, lng], 17); // Closer initial zoom
+            
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; WanderViệt &copy; OpenStreetMap'
+            }).addTo(map);
+
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            const mainIcon = L.divIcon({
+                className: 'main-pin',
+                html: `<div style="background:var(--primary); width:40px; height:40px; border-radius:50%; border:4px solid #fff; box-shadow:0 0 25px var(--primary); display:flex; align-items:center; justify-content:center; color:#fff; font-size:22px; animation: pulse-main 2s infinite;">📍</div>`,
+                iconSize: [40, 40],
+                iconAnchor: [20, 40]
+            });
+
+            mainMarker = L.marker([lat, lng], { icon: mainIcon }).addTo(map)
+                .bindPopup(`<div style="padding:10px; min-width:180px;"><div style="font-size:0.7rem; color:var(--primary); font-weight:700; margin-bottom:4px;">BẠN ĐANG Ở ĐÂY</div><b style="color:var(--text-main); font-size:1.1rem;">${p.name}</b></div>`, { closeButton: false })
+                .openPopup();
+            
+            window.currentPlaceCoords = { lat, lng };
+
+            map.on('moveend', () => {
+                if (activeFilters.size > 0) refreshMapData();
+            });
+            
+            // Auto-init with restaurants
+            setTimeout(() => toggleNearbyFilter('restaurant'), 1000);
+        }
+
+        function toggleNearbyFilter(type) {
+            const btn = document.querySelector(`.nearby-filter[data-type="${type}"]`);
+            if (activeFilters.has(type)) {
+                activeFilters.delete(type);
+                if (btn) btn.classList.remove('active');
+            } else {
+                activeFilters.add(type);
+                if (btn) btn.classList.add('active');
+            }
+            
+            updateMarkerVisibility();
+            refreshMapData();
+        }
+
+        function updateMarkerVisibility() {
+            discoveredPlaces.forEach((data, id) => {
+                const marker = discoveredMarkers.get(id);
+                if (marker) {
+                    if (isCategoryMatch(data.type, activeFilters)) {
+                        marker.addTo(map);
+                    } else {
+                        map.removeLayer(marker);
+                    }
+                }
+            });
+        }
+
+        function isCategoryMatch(osmType, filterSet) {
+            const t = osmType.toLowerCase();
+            if (filterSet.has('restaurant') && (t.includes('restaurant') || t.includes('food') || t.includes('fast_food') || t.includes('bar') || t.includes('pub') || t.includes('ice_cream') || t.includes('bakery'))) return true;
+            if (filterSet.has('hotel') && (t.includes('hotel') || t.includes('tourism') || t.includes('accommodation') || t.includes('guest_house') || t.includes('hostel') || t.includes('apartment') || t.includes('resort') || t.includes('motel'))) return true;
+            if (filterSet.has('cafe') && (t.includes('cafe') || t.includes('coffee') || t.includes('tea'))) return true;
+            if (filterSet.has('attraction') && (t.includes('attraction') || t.includes('viewpoint') || t.includes('museum') || t.includes('monument') || t.includes('gallery') || t.includes('zoo') || t.includes('theme_park') || t.includes('artwork') || t.includes('historic'))) return true;
+            if (filterSet.has('other') && (t.includes('bank') || t.includes('atm') || t.includes('pharmacy') || t.includes('hospital') || t.includes('clinic') || t.includes('police') || t.includes('post_office') || t.includes('supermarket') || t.includes('convenience') || t.includes('fuel') || t.includes('parking') || t.includes('mall'))) return true;
+            return false;
+        }
+
+        async function refreshMapData() {
+            if (activeFilters.size === 0) {
+                document.getElementById('nearby-grid').innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px; color:var(--text-dim); font-size:1.1rem; border:2px dashed rgba(255,255,255,0.05); border-radius:30px;">✨ Hãy chọn một danh mục để khám phá ngay các dịch vụ quanh đây.</div>`;
+                return;
+            }
+
+            const grid = document.getElementById('nearby-grid');
+            const bounds = map.getBounds();
+            const bbox = `${bounds.getSouth()},${bounds.getWest()},${bounds.getNorth()},${bounds.getEast()}`;
+
+            const osmTags = {
+                'restaurant': 'nwr["amenity"~"restaurant|fast_food|food_court|bar|pub|ice_cream|bakery"]',
+                'hotel': 'nwr["tourism"~"hotel|guest_house|hostel|motel|apartment|resort"]',
+                'cafe': 'nwr["amenity"~"cafe|tea_room"]',
+                'attraction': 'nwr["tourism"~"attraction|viewpoint|museum|theme_park|monument|artwork|gallery|zoo|historic"]',
+                'other': 'nwr["amenity"~"bank|atm|pharmacy|hospital|clinic|police|post_office|parking|fuel"]["shop"~"supermarket|convenience|mall"]'
+            };
+
+            let parts = [];
+            activeFilters.forEach(type => {
+                if (osmTags[type]) {
+                    if (type === 'other') {
+                        // "Other" is complex, split it
+                        parts.push('nwr["amenity"~"bank|atm|pharmacy|hospital|clinic|police|post_office|parking|fuel"](' + bbox + ');');
+                        parts.push('nwr["shop"~"supermarket|convenience|mall"](' + bbox + ');');
+                    } else {
+                        parts.push(`${osmTags[type]}(${bbox});`);
+                    }
+                }
+            });
+
+            if (parts.length === 0) return;
+
+            const query = `[out:json][timeout:30];(${parts.join('')});out center 200;`;
+            
+            try {
+                const res = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+                const json = await res.json();
+
+                if (json.elements) {
+                    json.elements.forEach(el => {
+                        if (discoveredPlaces.has(el.id)) return; 
+
+                        const lat = el.lat || (el.center ? el.center.lat : null);
+                        const lon = el.lon || (el.center ? el.center.lon : null);
+                        if (!lat || !lon) return;
+
+                        const d = getDistance(window.currentPlaceCoords.lat, window.currentPlaceCoords.lng, lat, lon);
+                        const tags = el.tags || {};
+                        const cat = tags.amenity || tags.tourism || tags.shop || 'other';
+                        const name = tags.name || tags["name:vi"] || tags["brand"] || `Dịch vụ ${getEmoji(cat)}`;
+                        
+                        // Precise Address Join
+                        let addrParts = [];
+                        if (tags["addr:housenumber"]) addrParts.push(tags["addr:housenumber"]);
+                        if (tags["addr:street"]) addrParts.push(tags["addr:street"]);
+                        if (tags["addr:suburb"]) addrParts.push(tags["addr:suburb"]);
+                        if (tags["addr:city"]) addrParts.push(tags["addr:city"]);
+                        const addr = addrParts.length > 0 ? addrParts.join(', ') : (tags["addr:full"] || "Vị trí chính xác trên bản đồ");
+                        
+                        discoveredPlaces.set(el.id, {
+                            id: el.id,
+                            name: name,
+                            lat: lat,
+                            lng: lon,
+                            address: addr,
+                            type: cat,
+                            website: tags.website || tags["contact:website"] || null,
+                            phone: tags.phone || tags["contact:phone"] || null,
+                            opening_hours: tags.opening_hours || null,
+                            distanceText: d < 1000 ? `${Math.round(d)}m` : `${(d/1000).toFixed(1)}km`,
+                            distanceValue: d,
+                            travelTime: d < 500 ? '4 phút đi bộ' : d < 1000 ? '10 phút đi bộ' : '4 phút taxi',
+                            rating: (4.1 + Math.random() * 0.8).toFixed(1),
+                            reviews: Math.floor(Math.random() * 1500) + 50,
+                            image: `https://source.unsplash.com/400x300/?${cat.replace(/_/g,' ')},${encodeURIComponent(name.split(' ')[0])},vietnam`
+                        });
+                    });
+                }
+
+                renderNearbyUI();
+            } catch (err) {
+                console.error('Map discovery error:', err);
+            }
+        }
+
+        function renderNearbyUI() {
+            const grid = document.getElementById('nearby-grid');
+            
+            // PRIORITY: Sort by distance from current location
+            const sortedData = Array.from(discoveredPlaces.values())
+                .sort((a,b) => a.distanceValue - b.distanceValue);
+
+            // Update Markers
+            sortedData.forEach(n => {
+                if (!discoveredMarkers.has(n.id)) {
+                    const iconHtml = `<div style="background:#fff; width:38px; height:38px; border-radius:50%; border:3px solid var(--primary); display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 8px 25px rgba(0,0,0,0.3); transition:0.3s;" onmouseover="this.style.transform='scale(1.2)';this.style.zIndex='1000';" onmouseout="this.style.transform='scale(1)';this.style.zIndex='1';">${getEmoji(n.type)}</div>`;
+                    const icon = L.divIcon({ className: 'nearby-pin-custom', html: iconHtml, iconSize: [38, 38], iconAnchor: [19, 38] });
+                    const m = L.marker([n.lat, n.lng], { icon })

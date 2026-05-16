@@ -103,6 +103,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     }
 
     try {
+      const suppressToast = args[1] && args[1].headers && args[1].headers['X-Suppress-Toast'] === 'true';
       const response = await originalFetch.apply(this, args);
 
       if (response.status === 403 || response.status === 401) {
@@ -121,7 +122,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         } catch (e) { /* ignore parse error */ }
       }
 
-      if (!response.ok && !url.includes('/api/auth/me')) {
+      if (!response.ok && !url.includes('/api/auth/me') && !suppressToast) {
         console.error(`[Fetch Error] ${response.status} ${url}`);
         // Optionally show a toast for specific critical errors
         if (response.status >= 500) {
@@ -131,8 +132,20 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
       return response;
     } catch (err) {
+      const suppressToast = args[1] && args[1].headers && args[1].headers['X-Suppress-Toast'] === 'true';
+      if (err.name === 'AbortError') {
+        console.warn(`[Fetch Aborted] ${url}`);
+        if (!suppressToast) {
+          // Only show toast if it wasn't a background timeout
+          // window.WanderUI.showToast('Yêu cầu hết hạn hoặc bị hủy', 'info'); 
+        }
+        throw err;
+      }
+      
       console.error(`[Fetch Network Error] ${url}`, err);
-      window.WanderUI.showToast('Lỗi kết nối mạng', 'error');
+      if (!suppressToast) {
+        window.WanderUI.showToast('Lỗi kết nối mạng', 'error');
+      }
       throw err;
     }
   };

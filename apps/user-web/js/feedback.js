@@ -52,6 +52,22 @@ const FeedbackHub = {
             this.renderUserMiniCard();
             await this.loadThreads();
             this.setupEventListeners();
+
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab');
+            if (tab) {
+                this.switchTab(tab);
+            }
+            const bizId = params.get('bizId');
+            if (bizId) {
+                const thread = this.allThreads.find(t => t.businessId === bizId);
+                if (thread) {
+                    this.selectThread(thread._id);
+                } else {
+                    const bizName = params.get('bizName') || 'Doanh nghiệp';
+                    await this.createNewBusinessThread(bizId, bizName);
+                }
+            }
         } catch (err) {
             console.error('Init Error:', err);
             this.showError('Không thể khởi tạo hệ thống.');
@@ -385,6 +401,34 @@ const FeedbackHub = {
                 <button class="btn btn--ghost" style="margin-top:20px;" onclick="location.reload()">Thử lại</button>
             </div>
         `;
+    },
+
+    createNewBusinessThread: async function(bizId, bizName) {
+        try {
+            const res = await fetch('/api/feedback/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-auth-token': localStorage.getItem('wander_token')
+                },
+                body: JSON.stringify({
+                    message: `[Từ kênh: ${bizName}] Xin chào, tôi muốn tìm hiểu thêm thông tin.`,
+                    type: 'business',
+                    businessId: bizId
+                })
+            });
+            const json = await res.json();
+            if (json.success) {
+                await this.loadThreads();
+                const newThread = this.allThreads.find(t => t.businessId === bizId) || this.allThreads[0];
+                if (newThread) {
+                    this.switchTab('business');
+                    this.selectThread(newThread._id);
+                }
+            }
+        } catch (e) {
+            console.error('Failed to auto-create thread', e);
+        }
     }
 };
 

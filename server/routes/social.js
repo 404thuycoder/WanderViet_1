@@ -29,17 +29,28 @@ router.post('/business/follow', auth, async (req, res) => {
     const realUserId = req.user.id; // Follower
     
     const existing = await Follow.findOne({ followerId: realUserId, businessId });
+    
+    // Xây dựng query an toàn
+    const conditions = [{ customId: businessId }];
+    if (mongoose.Types.ObjectId.isValid(businessId)) conditions.push({ _id: businessId });
+    const bQuery = { $or: conditions };
+
     if (existing) {
       // Unfollow
       await Follow.deleteOne({ _id: existing._id });
-      await BusinessAccount.findOneAndUpdate({ $or: [{ _id: businessId }, { customId: businessId }] }, { $inc: { followersCount: -1 } });
+      const bAcc = await BusinessAccount.findOneAndUpdate(bQuery, { $inc: { followersCount: -1 } });
+      if (!bAcc && mongoose.Types.ObjectId.isValid(businessId)) {
+          await Place.findByIdAndUpdate(businessId, { $inc: { followersCount: -1 } }).catch(()=>null);
+      }
       return res.json({ success: true, message: 'Đã bỏ theo dõi', following: false });
     } else {
       // Follow
       const newFollow = new Follow({ followerId: realUserId, businessId });
       await newFollow.save();
-      await BusinessAccount.findOneAndUpdate({ $or: [{ _id: businessId }, { customId: businessId }] }, { $inc: { followersCount: 1 } });
-      
+      const bAcc = await BusinessAccount.findOneAndUpdate(bQuery, { $inc: { followersCount: 1 } });
+      if (!bAcc && mongoose.Types.ObjectId.isValid(businessId)) {
+          await Place.findByIdAndUpdate(businessId, { $inc: { followersCount: 1 } }).catch(()=>null);
+      }
       return res.json({ success: true, message: 'Đã theo dõi', following: true });
     }
   } catch (err) {

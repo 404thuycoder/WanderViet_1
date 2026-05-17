@@ -79,14 +79,51 @@
         .side-panel::-webkit-scrollbar { width: 4px; }
         .side-panel::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
         
-        .side-title { font-size: 11px; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 24px; display: block; }
+        .filter-header { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 24px; display: flex; align-items: center; gap: 8px; }
+        .filter-group { border-bottom: 1px solid var(--glass-border); padding-bottom: 24px; margin-bottom: 24px; }
+        .filter-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .filter-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
         
         .f-item {
-            padding: 14px 20px; border-radius: 18px; cursor: pointer; transition: 0.3s;
-            display: flex; justify-content: space-between; align-items: center; color: var(--text-dim); margin-bottom: 8px; font-size: 14px;
-            user-select: none;
+            display: flex; align-items: center; gap: 12px; cursor: pointer; color: var(--text-dim); margin-bottom: 14px; font-size: 14px; user-select: none; transition: 0.2s;
         }
-        .f-item:hover, .f-item.active { background: var(--primary); color: #fff; box-shadow: 0 10px 20px rgba(99,102,241,0.2); }
+        .f-item:hover { color: var(--text-main); }
+        .f-item:active .f-checkbox { transform: scale(0.9); }
+        .f-item:last-child { margin-bottom: 0; }
+        
+        .f-checkbox {
+            width: 22px; height: 22px; border: 2px solid var(--glass-border); border-radius: 6px; 
+            display: flex; align-items: center; justify-content: center; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255,255,255,0.02); flex-shrink: 0;
+        }
+        .f-checkbox svg { 
+            width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; 
+            stroke-dasharray: 24; stroke-dashoffset: 24; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        
+        .f-item.active .f-checkbox { background: var(--primary); border-color: var(--primary); box-shadow: 0 4px 10px rgba(99,102,241,0.3); }
+        .f-item.active .f-checkbox svg { stroke-dashoffset: 0; }
+        .f-item.active { color: var(--text-main); font-weight: 700; }
+        
+        .f-count { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--text-dim); background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 2px 8px; border-radius: 12px; transition: 0.3s; }
+        .f-item.active .f-count { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        .sub-input {
+            width: 100%; background: var(--bg-system); border: 1px solid var(--glass-border); 
+            border-radius: 12px; padding: 12px 16px; color: var(--text-main); font-size: 13px;
+            margin-bottom: 12px; outline: none; transition: 0.3s; box-sizing: border-box; font-family: inherit;
+        }
+        .sub-input::placeholder { color: var(--text-dim); }
+        .sub-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+        
+        .price-operator { display: flex; gap: 8px; }
+        .po-btn { 
+            flex: 1; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); 
+            color: var(--text-dim); padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 700; 
+            cursor: pointer; transition: 0.2s; 
+        }
+        .po-btn:hover { background: rgba(255,255,255,0.08); }
+        .po-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 4px 10px rgba(99,102,241,0.2); }
 
         .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
 
@@ -161,25 +198,102 @@
     <main class="layout">
         <aside>
             <div class="side-panel">
-                <span class="side-title">Hệ thống phân loại</span>
-                <div id="cat-list">
-                    <div class="f-item active" onclick="setFilter('cat', 'all', this)"><span>🌐 Tất cả dịch vụ</span><b id="cnt-all">0</b></div>
-                    <div class="f-item" onclick="setFilter('cat', 'Khách sạn', this)"><span>🏨 Lưu trú Elite</span><b id="cnt-hotel">0</b></div>
-                    <div class="f-item" onclick="setFilter('cat', 'Tour', this)"><span>🗺️ Trải nghiệm Tour</span><b id="cnt-tour">0</b></div>
-                    <div class="f-item" onclick="setFilter('cat', 'Ẩm thực', this)"><span>🍽️ Ẩm thực & Giải trí</span><b id="cnt-food">0</b></div>
+                <div class="filter-header">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                    Lọc theo:
                 </div>
-                <div style="margin-top:40px;">
-                    <span class="side-title">Điểm đến trọng điểm</span>
-                    <div class="f-item" onclick="setFilter('addr', 'Hà Nội', this)"><span>📍 Hà Nội</span></div>
-                    <div class="f-item" onclick="setFilter('addr', 'Hồ Chí Minh', this)"><span>📍 TP. Hồ Chí Minh</span></div>
-                    <div class="f-item" onclick="setFilter('addr', 'Phú Quốc', this)"><span>📍 Phú Quốc</span></div>
+                
+                <div class="filter-group">
+                    <div class="filter-title">Hạng mục</div>
+                    <div id="cat-list">
+                        <label class="f-item active" onclick="setFilter('cat', 'all', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>Tất cả dịch vụ</span>
+                            <span class="f-count" id="cnt-all">0</span>
+                        </label>
+                        <label class="f-item" onclick="setFilter('cat', 'Khách sạn', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>Lưu trú & Khách sạn</span>
+                            <span class="f-count" id="cnt-hotel">0</span>
+                        </label>
+                        <label class="f-item" onclick="setFilter('cat', 'Tour', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>Tour & Trải nghiệm</span>
+                            <span class="f-count" id="cnt-tour">0</span>
+                        </label>
+                        <label class="f-item" onclick="setFilter('cat', 'Văn hóa', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>Bảo tàng & Văn hóa</span>
+                            <span class="f-count" id="cnt-culture">0</span>
+                        </label>
+                        <label class="f-item" onclick="setFilter('cat', 'Thiên nhiên', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>Thiên nhiên & Ngoài trời</span>
+                            <span class="f-count" id="cnt-nature">0</span>
+                        </label>
+                        <label class="f-item" onclick="setFilter('cat', 'Giải trí', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>Hoạt động giải trí & Vé</span>
+                            <span class="f-count" id="cnt-ent">0</span>
+                        </label>
+                        <label class="f-item" onclick="setFilter('cat', 'Ẩm thực', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>Ăn uống & Ẩm thực</span>
+                            <span class="f-count" id="cnt-food">0</span>
+                        </label>
+                    </div>
                 </div>
-                <div style="margin-top:40px;" id="price-list">
-                    <span class="side-title">Mức giá dịch vụ</span>
-                    <div class="f-item active" onclick="setFilter('price', 'all', this)"><span>💎 Tất cả mức giá</span></div>
-                    <div class="f-item" onclick="setFilter('price', '0-1000000', this)"><span>💸 Dưới 1.000.000₫</span></div>
-                    <div class="f-item" onclick="setFilter('price', '1000000-5000000', this)"><span>💳 1tr - 5tr</span></div>
-                    <div class="f-item" onclick="setFilter('price', '5000000-999999999', this)"><span>👑 Trên 5.000.000₫</span></div>
+
+                <div class="filter-group">
+                    <div class="filter-title">Địa điểm</div>
+                    <input type="text" id="custom-addr" class="sub-input" placeholder="🔍 Nhập tìm tỉnh/thành phố..." oninput="setCustomAddr(this.value)">
+                    <div id="addr-list">
+                        <label class="f-item active" onclick="setFilter('addr', 'all', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>Tất cả địa điểm</span>
+                        </label>
+                        <label class="f-item" onclick="setFilter('addr', 'Hà Nội', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>Hà Nội</span>
+                        </label>
+                        <label class="f-item" onclick="setFilter('addr', 'Hồ Chí Minh', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>TP. Hồ Chí Minh</span>
+                        </label>
+                        <label class="f-item" onclick="setFilter('addr', 'Phú Quốc', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>Phú Quốc</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="filter-group" id="price-list">
+                    <div class="filter-title">Mức giá</div>
+                    <div style="background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; margin-bottom: 16px;">
+                        <div style="font-size: 11px; font-weight: 800; color: var(--text-dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Nhập khoảng giá tùy chỉnh</div>
+                        <input type="number" id="custom-price" class="sub-input" style="margin-bottom: 12px;" placeholder="VD: 1500000..." oninput="setCustomPrice(this.value)">
+                        <div class="price-operator">
+                            <button class="po-btn active" id="po-less" onclick="setPriceOperator('less')">Nhỏ hơn</button>
+                            <button class="po-btn" id="po-greater" onclick="setPriceOperator('greater')">Lớn hơn</button>
+                        </div>
+                    </div>
+
+                    <label class="f-item active" onclick="setFilter('price', 'all', this)">
+                        <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                        <span>Tất cả mức giá</span>
+                    </label>
+                    <label class="f-item" onclick="setFilter('price', '0-1000000', this)">
+                        <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                        <span>Dưới 1.000.000₫</span>
+                    </label>
+                    <label class="f-item" onclick="setFilter('price', '1000000-5000000', this)">
+                        <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                        <span>1.000.000₫ - 5.000.000₫</span>
+                    </label>
+                    <label class="f-item" onclick="setFilter('price', '5000000-999999999', this)">
+                        <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                        <span>Trên 5.000.000₫</span>
+                    </label>
                 </div>
             </div>
         </aside>
@@ -219,7 +333,8 @@
         });
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-        let rawData = [], filterCat = 'all', filterAddr = 'all', filterPrice = 'all', channel = 'svc', sortBy = 'pop';
+        let rawData = [], filterCats = new Set(), filterAddrs = new Set(), filterPrices = new Set(), channel = 'svc', sortBy = 'pop';
+        let customAddr = '', customPriceVal = 0, priceOperator = 'less';
 
         async function init() {
             try {
@@ -233,50 +348,116 @@
             } catch(e) {}
         }
 
-        function isMatch(p, cat) {
+        function isMatch(p, cats) {
+            if (cats.size === 0) return true;
             const k = (p.kind || '').toLowerCase();
             const c = (p.category || '').toLowerCase();
             const n = (p.name || '').toLowerCase();
-            if (cat === 'Khách sạn') return k === 'khach-san' || c.includes('khách sạn') || c.includes('resort') || c.includes('hotel') || n.includes('khách sạn') || n.includes('resort');
-            if (cat === 'Tour') return p.isTour || k === 'trai-nghiem' || k === 'diem-du-lich' || c.includes('tour') || c.includes('trải nghiệm') || n.includes('tour') || n.includes('trải nghiệm');
-            if (cat === 'Ẩm thực') return k === 'nha-hang' || k === 'giai-tri' || c.includes('ẩm thực') || c.includes('nhà hàng') || c.includes('dining') || n.includes('nhà hàng') || n.includes('quán ăn');
+            
+            for (let cat of cats) {
+                if (cat === 'Khách sạn' && (k === 'khach-san' || c.includes('khách sạn') || c.includes('resort') || c.includes('hotel') || n.includes('khách sạn') || n.includes('resort'))) return true;
+                if (cat === 'Tour' && (p.isTour || k === 'trai-nghiem' || k === 'diem-du-lich' || c.includes('tour') || c.includes('trải nghiệm') || n.includes('tour') || n.includes('trải nghiệm'))) return true;
+                if (cat === 'Ẩm thực' && (k === 'nha-hang' || k === 'giai-tri' || c.includes('ẩm thực') || c.includes('nhà hàng') || c.includes('dining') || n.includes('nhà hàng') || n.includes('quán ăn') || c.includes('ăn uống'))) return true;
+                if (cat === 'Văn hóa' && (c.includes('văn hóa') || c.includes('bảo tàng') || c.includes('nghệ thuật') || n.includes('bảo tàng'))) return true;
+                if (cat === 'Thiên nhiên' && (c.includes('thiên nhiên') || c.includes('ngoài trời') || c.includes('công viên') || n.includes('vườn') || n.includes('thiên nhiên'))) return true;
+                if (cat === 'Giải trí' && (k === 'giai-tri' || c.includes('giải trí') || c.includes('vé') || n.includes('công viên nước') || n.includes('khu vui chơi'))) return true;
+            }
             return false;
         }
 
         function updateStats() {
             document.getElementById('cnt-all').innerText = rawData.length;
-            document.getElementById('cnt-hotel').innerText = rawData.filter(p => isMatch(p, 'Khách sạn')).length;
-            document.getElementById('cnt-tour').innerText = rawData.filter(p => isMatch(p, 'Tour')).length;
-            document.getElementById('cnt-food').innerText = rawData.filter(p => isMatch(p, 'Ẩm thực')).length;
+            document.getElementById('cnt-hotel').innerText = rawData.filter(p => isMatch(p, new Set(['Khách sạn']))).length;
+            document.getElementById('cnt-tour').innerText = rawData.filter(p => isMatch(p, new Set(['Tour']))).length;
+            document.getElementById('cnt-food').innerText = rawData.filter(p => isMatch(p, new Set(['Ẩm thực']))).length;
+            document.getElementById('cnt-culture').innerText = rawData.filter(p => isMatch(p, new Set(['Văn hóa']))).length;
+            document.getElementById('cnt-nature').innerText = rawData.filter(p => isMatch(p, new Set(['Thiên nhiên']))).length;
+            document.getElementById('cnt-ent').innerText = rawData.filter(p => isMatch(p, new Set(['Giải trí']))).length;
+        }
+
+        function setCustomAddr(val) {
+            customAddr = val;
+            if(val.trim() !== '') {
+                filterAddrs.clear();
+                document.querySelectorAll('#addr-list .f-item').forEach(i => i.classList.remove('active'));
+                document.querySelector('#addr-list .f-item[onclick*="\'all\'"]')?.classList.add('active');
+            }
+            syncFilters();
+        }
+
+        function setCustomPrice(val) {
+            customPriceVal = Number(val) || 0;
+            if(customPriceVal > 0) {
+                filterPrices.clear();
+                // We shouldn't target all elements in price-list since there are labels inside
+                document.querySelectorAll('#price-list > label.f-item').forEach(i => i.classList.remove('active'));
+                document.querySelector('#price-list > label.f-item[onclick*="\'all\'"]')?.classList.add('active');
+            }
+            syncFilters();
+        }
+
+        function setPriceOperator(op) {
+            priceOperator = op;
+            document.getElementById('po-less').classList.toggle('active', op === 'less');
+            document.getElementById('po-greater').classList.toggle('active', op === 'greater');
+            syncFilters();
         }
 
         function setFilter(type, val, el) {
-            if(type === 'cat') {
-                if(filterCat === val && val !== 'all') filterCat = 'all'; else filterCat = val;
-                document.querySelectorAll('#cat-list .f-item').forEach(i=>i.classList.remove('active'));
-                const target = (filterCat === 'all') ? document.querySelector('#cat-list .f-item[onclick*="\'all\'"]') : el;
-                target?.classList.add('active');
-            } else if(type === 'price') {
-                if(filterPrice === val && val !== 'all') filterPrice = 'all'; else filterPrice = val;
-                document.querySelectorAll('#price-list .f-item').forEach(i=>i.classList.remove('active'));
-                const target = (filterPrice === 'all') ? document.querySelector('#price-list .f-item[onclick*="\'all\'"]') : el;
-                target?.classList.add('active');
-            } else if(type === 'addr') {
-                if(filterAddr === val) filterAddr = 'all'; else filterAddr = val;
-                document.querySelectorAll('.side-panel .f-item').forEach(i=>{ if(i.innerText.includes('📍')) i.classList.remove('active'); });
-                if(filterAddr !== 'all') el.classList.add('active');
+            const listId = type === 'cat' ? 'cat-list' : type === 'addr' ? 'addr-list' : 'price-list';
+            const stateSet = type === 'cat' ? filterCats : type === 'addr' ? filterAddrs : filterPrices;
+
+            if (type === 'addr' && customAddr !== '') {
+                document.getElementById('custom-addr').value = '';
+                customAddr = '';
+            }
+            if (type === 'price' && customPriceVal > 0) {
+                document.getElementById('custom-price').value = '';
+                customPriceVal = 0;
+            }
+
+            if (val === 'all') {
+                stateSet.clear();
+                document.querySelectorAll(`#${listId} .f-item`).forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+            } else {
+                if (stateSet.has(val)) {
+                    stateSet.delete(val);
+                    el.classList.remove('active');
+                } else {
+                    stateSet.add(val);
+                    el.classList.add('active');
+                }
+                
+                const allBtn = document.querySelector(`#${listId} .f-item[onclick*="'all'"]`);
+                if (stateSet.size > 0) {
+                    allBtn.classList.remove('active');
+                } else {
+                    allBtn.classList.add('active');
+                }
             }
             syncFilters();
         }
 
         function resetAllFilters() {
-            filterCat = 'all';
-            filterAddr = 'all';
-            filterPrice = 'all';
+            filterCats.clear();
+            filterAddrs.clear();
+            filterPrices.clear();
+            
+            customAddr = '';
+            customPriceVal = 0;
+            priceOperator = 'less';
+            
             document.getElementById('mainSearch').value = '';
+            document.getElementById('custom-addr').value = '';
+            document.getElementById('custom-price').value = '';
+            document.getElementById('po-less').classList.add('active');
+            document.getElementById('po-greater').classList.remove('active');
+
             document.querySelectorAll('.side-panel .f-item').forEach(i => i.classList.remove('active'));
             document.querySelector('#cat-list .f-item[onclick*="\'all\'"]')?.classList.add('active');
-            document.querySelector('#price-list .f-item[onclick*="\'all\'"]')?.classList.add('active');
+            document.querySelector('#price-list > label.f-item[onclick*="\'all\'"]')?.classList.add('active');
+            document.querySelector('#addr-list .f-item[onclick*="\'all\'"]')?.classList.add('active');
             syncFilters();
         }
 
@@ -286,21 +467,54 @@
             document.getElementById('btn-biz').classList.toggle('active', ch==='biz');
             syncFilters();
         }
+
+        function toSearchStr(str) {
+            if (!str) return '';
+            return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        }
+
         function syncFilters() {
             let list = rawData;
-            const q = document.getElementById('mainSearch').value.toLowerCase();
+            const q = toSearchStr(document.getElementById('mainSearch').value);
             
-            if(q) list = list.filter(p=> p.name.toLowerCase().includes(q) || (p.ownerName||'').toLowerCase().includes(q));
-            if(filterCat !== 'all') {
-                list = list.filter(p => isMatch(p, filterCat));
+            if(q) {
+                list = list.filter(p => 
+                    toSearchStr(p.name).includes(q) || 
+                    toSearchStr(p.ownerName).includes(q) || 
+                    toSearchStr(p.address).includes(q) || 
+                    toSearchStr(p.region).includes(q)
+                );
             }
-            if(filterAddr !== 'all') list = list.filter(p=> (p.address||'').includes(filterAddr));
             
-            if(filterPrice !== 'all') {
-                const [min, max] = filterPrice.split('-').map(Number);
+            if(filterCats.size > 0) list = list.filter(p => isMatch(p, filterCats));
+            
+            if(customAddr.trim() !== '') {
+                const searchAddr = toSearchStr(customAddr);
+                list = list.filter(p => toSearchStr(p.address).includes(searchAddr) || toSearchStr(p.region).includes(searchAddr));
+            } else if(filterAddrs.size > 0) {
+                list = list.filter(p => {
+                    for (let addr of filterAddrs) {
+                        if ((p.address||'').includes(addr)) return true;
+                    }
+                    return false;
+                });
+            }
+            
+            if(customPriceVal > 0) {
                 list = list.filter(p => {
                     const pr = p.price || p.priceFrom || 0;
-                    return pr >= min && pr <= max;
+                    if (priceOperator === 'less') return pr <= customPriceVal;
+                    if (priceOperator === 'greater') return pr >= customPriceVal;
+                    return true;
+                });
+            } else if(filterPrices.size > 0) {
+                list = list.filter(p => {
+                    const pr = p.price || p.priceFrom || 0;
+                    for (let priceRange of filterPrices) {
+                        const [min, max] = priceRange.split('-').map(Number);
+                        if (pr >= min && pr <= max) return true;
+                    }
+                    return false;
                 });
             }
 
@@ -330,12 +544,24 @@
         function groupByOwner(data) {
             const groups = {};
             data.forEach(p => {
-                const owner = p.ownerName || 'WanderViệt Partner';
-                if(!groups[owner]) groups[owner] = { name: owner, places: [] };
-                groups[owner].places.push(p);
+                const ownerName = p.ownerName || p.name || 'WanderViệt Partner';
+                const ownerId = p.ownerId || p._id || p.id;
+                const hasRealBiz = p.hasRealBusiness !== undefined ? p.hasRealBusiness : (p.ownerId !== p._id);
+                if(!groups[ownerName]) groups[ownerName] = { 
+                    name: ownerName, 
+                    id: ownerId, 
+                    places: [],
+                    hasRealBusiness: hasRealBiz,
+                    businessData: p.businessData
+                };
+                // Ensure if any place in the group has real business, the group has it
+                if (hasRealBiz) groups[ownerName].hasRealBusiness = true;
+                groups[ownerName].places.push(p);
             });
             return groups;
         }
+
+        // ... [renderSvc is unchanged below] ...
 
         function renderSvc(data) {
             if(data.length === 0) {
@@ -374,21 +600,24 @@
 
         function renderBiz(data) {
             const groups = groupByOwner(data);
-            const owners = Object.values(groups);
+            const owners = Object.values(groups).filter(g => g.hasRealBusiness);
             
             if(owners.length === 0) {
                 document.getElementById('display-grid').innerHTML = `<div style="grid-column:span 3; padding:100px; text-align:center; color:var(--text-dim);">Không tìm thấy kênh doanh nghiệp nào phù hợp.</div>`;
                 return;
             }
 
-            document.getElementById('display-grid').innerHTML = owners.map(b => `
-                <div class="biz-card" onclick="window.location.href='business-profile.html?name=${encodeURIComponent(b.name)}'">
-                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=6366f1&color=fff&size=128" class="biz-logo">
+            document.getElementById('display-grid').innerHTML = owners.map(b => {
+                const avatar = b.businessData?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=6366f1&color=fff&size=128`;
+                const bio = b.businessData?.bio || `Đối tác chiến lược cung cấp ${b.places.length} trải nghiệm tinh hoa tại hệ thống WanderViệt.`;
+                return `
+                <div class="biz-card" onclick="window.location.href='business-profile.html?id=${b.id}'">
+                    <img src="${avatar}" class="biz-logo" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=6366f1&color=fff&size=128';">
                     <div>
                         <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                             <div>
                                 <h3 style="font-size:1.8rem; font-weight:800; margin:0 0 8px;">${b.name}</h3>
-                                <p style="color:var(--text-dim); font-size:14px; margin:0;">Đối tác chiến lược cung cấp ${b.places.length} trải nghiệm tinh hoa tại hệ thống WanderViệt.</p>
+                                <p style="color:var(--text-dim); font-size:14px; margin:0;">${bio}</p>
                             </div>
                             <button class="btn-search" style="padding:10px 24px;">TRUY CẬP KÊNH</button>
                         </div>
@@ -404,14 +633,14 @@
                                     <img src="${imgUrl}" onerror="this.onerror=null;this.src='${fallbackImg}';">
                                     <div style="overflow:hidden;">
                                         <b style="font-size:12px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</b>
-                                        <span style="font-size:9px; color:var(--primary); font-weight:800;">${(p.price || 0).toLocaleString()} ₫</span>
+                                        <span style="font-size:9px; color:var(--primary); font-weight:800;">${(p.price || p.priceFrom || 0).toLocaleString('vi-VN')} ₫</span>
                                     </div>
                                 </div>
                                 `}).join('')}
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
         }
 
         window.onload = init;

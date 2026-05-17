@@ -131,7 +131,7 @@ router.get('/reviews', async (req, res) => {
 router.get('/business/:id', async (req, res) => {
   try {
     const biz = await BusinessAccount.findOne(buildIdQuery(req.params.id)).select('name displayName avatar customId isVerified');
-    if (!biz) return res.status(404).json({ success: false, message: 'Not found' });
+    if (!biz) return res.json({ success: false, message: 'Not found' });
     res.json({ success: true, data: biz });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -164,7 +164,7 @@ router.get('/business/:id/full', async (req, res) => {
   try {
     const biz = await BusinessAccount.findOne(buildIdQuery(req.params.id)).select('-password');
     
-    if (!biz) return res.status(404).json({ success: false, message: 'Doanh nghiệp không tồn tại' });
+    if (!biz) return res.json({ success: false, message: 'Doanh nghiệp không tồn tại' });
 
     // Tìm tất cả dịch vụ/tour của doanh nghiệp này (match cả customId lẫn ObjectId)
     const ownerConditions = [{ ownerId: biz.customId }];
@@ -203,7 +203,7 @@ router.get('/place/:id', async (req, res) => {
       place = placesData.find(p => p.id === id || p.slug === id || p._id === id);
     }
     
-    if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+    if (!place) return res.json({ success: false, message: 'Không tìm thấy địa điểm' });
 
     // Lấy thông tin chủ sở hữu (nếu có)
     let owner = null;
@@ -291,11 +291,27 @@ router.get('/all-places', async (req, res) => {
     // Gắn thêm ownerName cho từng place để hiển thị đẹp hơn
     const enrichedPlaces = await Promise.all(places.map(async (p) => {
       let ownerName = 'WanderViệt Partner';
+      let ownerId = null;
+      let hasRealBusiness = false;
+      let businessData = null;
+      
       if (p.ownerId) {
-        const owner = await BusinessAccount.findOne(buildIdQuery(p.ownerId)).select('displayName name');
-        if (owner) ownerName = owner.displayName || owner.name;
+        const owner = await BusinessAccount.findOne(buildIdQuery(p.ownerId)).select('displayName name _id customId avatar bio');
+        if (owner) {
+            ownerName = owner.displayName || owner.name;
+            ownerId = owner.customId || owner._id;
+            hasRealBusiness = true;
+            businessData = { avatar: owner.avatar, bio: owner.bio };
+        } else {
+            ownerName = p.ownerName || p.name;
+            ownerId = p.ownerId || p._id;
+        }
+      } else {
+        ownerName = p.ownerName || p.name;
+        ownerId = p._id;
       }
-      return { ...p._doc, ownerName };
+      
+      return { ...p._doc, ownerName, ownerId, hasRealBusiness, businessData };
     }));
 
     res.json({ success: true, data: enrichedPlaces });

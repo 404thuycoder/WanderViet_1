@@ -119,13 +119,13 @@
             <h1 class="biz-name" id="biz-name">Đang tải...</h1>
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div style="display:flex; gap:32px; color:var(--text-dim); font-weight:700;">
-                    <span>🌟 <b style="color:var(--text-main);">4.9</b> Đánh giá</span>
-                    <span>👥 <b style="color:var(--text-main);">1.2k</b> Theo dõi</span>
+                    <span>🌟 <b style="color:var(--text-main);" id="biz-rating">0.0</b> <span style="font-weight: normal;">(<span id="biz-review-count">0</span> đánh giá)</span></span>
+                    <span>👥 <b style="color:var(--text-main);" id="biz-followers">0</b> Theo dõi</span>
                     <span>📍 <b style="color:var(--text-main);" id="biz-loc">Việt Nam</b></span>
                 </div>
                 <div class="action-bar">
                     <button class="btn-follow" id="follow-btn" onclick="toggleFollow()">+ THEO DÕI</button>
-                    <button style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-main); padding:14px; border-radius:18px; cursor:pointer;">✉️</button>
+                    <button id="btn-support" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-main); padding:14px; border-radius:18px; cursor:pointer;" onclick="openSupport()">✉️</button>
                 </div>
             </div>
         </div>
@@ -139,10 +139,10 @@
             </div>
             <div class="info-card">
                 <span class="info-title">Thông tin liên hệ</span>
-                <div style="display:flex; flex-direction:column; gap:16px; font-size:14px;">
-                    <div>📧 contact@wanderviet.vn</div>
-                    <div>📞 +84 123 456 789</div>
-                    <div>🌐 www.wanderviet.vn</div>
+                <div id="biz-contact" style="display:flex; flex-direction:column; gap:16px; font-size:14px;">
+                    <div>📧 <span id="biz-email">Đang tải...</span></div>
+                    <div>📞 <span id="biz-phone">Đang tải...</span></div>
+                    <div>🌐 <span id="biz-web">Đang tải...</span></div>
                 </div>
             </div>
         </aside>
@@ -167,17 +167,59 @@
         const params = new URLSearchParams(window.location.search);
         const ownerName = params.get('name');
         const ownerId = params.get('id');
+        let currentBizId = ownerId || ownerName;
         let isFollowing = false;
 
-        function toggleFollow() {
-            isFollowing = !isFollowing;
+        function getFollowKey() {
+            return `wv_follow_${currentBizId}`;
+        }
+
+        function updateFollowBtn() {
             const btn = document.getElementById('follow-btn');
-            const name = document.getElementById('biz-name').innerText;
+            isFollowing = localStorage.getItem(getFollowKey()) === 'true';
             btn.innerText = isFollowing ? '✓ ĐANG THEO DÕI' : '+ THEO DÕI';
             btn.classList.toggle('active', isFollowing);
-            if(window.WanderUI && window.WanderUI.showToast) {
-                window.WanderUI.showToast(isFollowing ? `Đã theo dõi ${name}` : `Đã bỏ theo dõi`);
+        }
+
+        async function toggleFollow() {
+            const token = localStorage.getItem('wander_token');
+            if (!token) {
+                if(window.WanderUI && window.WanderUI.showToast) window.WanderUI.showToast('Vui lòng đăng nhập để theo dõi');
+                return;
             }
+            try {
+                const res = await fetch('/api/social/business/follow', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+                    body: JSON.stringify({ businessId: currentBizId })
+                });
+                const json = await res.json();
+                if (json.success) {
+                    isFollowing = json.following;
+                    localStorage.setItem(getFollowKey(), isFollowing);
+                    
+                    const btn = document.getElementById('follow-btn');
+                    btn.innerText = isFollowing ? '✓ ĐANG THEO DÕI' : '+ THEO DÕI';
+                    btn.classList.toggle('active', isFollowing);
+                    
+                    const followersEl = document.getElementById('biz-followers');
+                    let count = parseInt(followersEl.innerText.replace(/\D/g, '')) || 0;
+                    if (isFollowing) count++; else count--;
+                    followersEl.innerText = count.toLocaleString('vi-VN');
+
+                    const name = document.getElementById('biz-name').innerText;
+                    if(window.WanderUI && window.WanderUI.showToast) {
+                        window.WanderUI.showToast(isFollowing ? `Đã theo dõi ${name}` : `Đã bỏ theo dõi ${name}`);
+                    }
+                }
+            } catch (err) {
+                console.error('Follow error:', err);
+            }
+        }
+
+        function openSupport() {
+            const name = document.getElementById('biz-name').innerText;
+            window.location.href = `feedback.html?tab=business&bizId=${currentBizId}&bizName=${encodeURIComponent(name)}`;
         }
 
         async function load() {
@@ -191,6 +233,38 @@
                     if (json.success) {
                         biz = json.data.profile;
                         places = json.data.services || [];
+                    } else if (json.message === 'Doanh nghiệp không tồn tại') {
+                        // Fallback: This ownerId might just be attached to Places directly without a BusinessAccount
+                        let pRes = await fetch(`/api/public/places?ownerId=${ownerId}`);
+                        let pJson = await pRes.json();
+                        let foundPlaces = pJson.success ? pJson.data : [];
+
+                        if (foundPlaces.length === 0) {
+                            // If still nothing, it might literally be the Place ID itself
+                            const singleRes = await fetch(`/api/public/place/${ownerId}`);
+                            const singleJson = await singleRes.json();
+                            if (singleJson.success && singleJson.data) {
+                                foundPlaces = [singleJson.data];
+                            }
+                        }
+
+                        if (foundPlaces.length > 0) {
+                            const p = foundPlaces[0];
+                            const isSystem = foundPlaces.length > 1 || (p.ownerId && p.ownerId.startsWith('BIZ-'));
+                            
+                            biz = {
+                                _id: p.ownerId || p._id,
+                                id: p.ownerId || p.id || p._id,
+                                name: isSystem ? 'WanderViệt Partner' : (p.ownerName || p.name),
+                                displayName: isSystem ? 'WanderViệt Partner' : (p.ownerName || p.name),
+                                avatar: isSystem ? 'https://ui-avatars.com/api/?name=WanderVi%E1%BB%87t+Partner&background=6366f1&color=fff&size=256' : (p.image || p.coverImage || (p.images && p.images[0])),
+                                description: isSystem ? `Đối tác chiến lược cung cấp ${foundPlaces.length} trải nghiệm tinh hoa tại hệ thống WanderViệt.` : (p.description || p.snippet),
+                                email: p.contactEmail,
+                                phone: p.contactPhone,
+                                website: p.website
+                            };
+                            places = foundPlaces;
+                        }
                     }
                 }
 
@@ -223,6 +297,9 @@
                 }
 
                 // Render Profile
+                currentBizId = biz._id || biz.id || biz.customId || currentBizId;
+                updateFollowBtn();
+                
                 const name = biz.displayName || biz.name;
                 document.title = name + ' - WanderViệt';
                 document.getElementById('biz-name').innerText = name;
@@ -230,9 +307,50 @@
                 if (biz.avatar) {
                     document.getElementById('biz-logo').innerHTML = `<img src="${biz.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">`;
                 }
+                
+                // Check follow state from server
+                const token = localStorage.getItem('wander_token');
+                if (token && currentBizId) {
+                    try {
+                        const followRes = await fetch(`/api/social/business/check-follow/${currentBizId}`, {
+                            headers: { 'x-auth-token': token }
+                        });
+                        const followJson = await followRes.json();
+                        if (followJson.success) {
+                            isFollowing = followJson.following;
+                            localStorage.setItem(getFollowKey(), isFollowing);
+                        }
+                    } catch (e) {}
+                }
+                updateFollowBtn();
+                
+                let avgRating = 5.0;
+                let realReviewCount = 0;
+                if (places.length > 0) {
+                    const ratings = places.map(p => parseFloat(p.ratingAvg || p.rating || 0)).filter(r => r > 0);
+                    if (ratings.length > 0) {
+                        avgRating = (ratings.reduce((a,b) => a+b, 0) / ratings.length).toFixed(1);
+                    }
+                    realReviewCount = places.reduce((sum, p) => sum + (p.reviewCount || 0), 0); 
+                }
+
+                document.getElementById('biz-rating').innerText = biz.rating || avgRating;
+                const reviewCountEl = document.getElementById('biz-review-count');
+                if (reviewCountEl) reviewCountEl.innerText = realReviewCount.toLocaleString('vi-VN');
+                
+                const realFollowers = biz.followersCount || biz.followers || 0;
+                document.getElementById('biz-followers').innerText = realFollowers.toLocaleString('vi-VN');
+                
                 if (biz.notes || biz.description) {
                     document.getElementById('biz-desc').innerText = biz.notes || biz.description;
                 }
+                
+                document.getElementById('biz-email').innerText = biz.email || 'contact@wanderviet.vn';
+                document.getElementById('biz-phone').innerText = biz.phone || '+84 123 456 789';
+                document.getElementById('biz-web').innerText = biz.website || 'www.wanderviet.vn';
+
+                // Save email to global for the support button
+                window.currentBizEmail = biz.email || 'contact@wanderviet.vn';
 
                 // Render Services
                 const grid = document.getElementById('svc-grid');

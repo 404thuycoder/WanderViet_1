@@ -1178,14 +1178,7 @@ router.delete('/posts/:id/reaction', auth, async (req, res) => {
   }
 });
 
-// FALLBACK DEBUG ROUTE
-router.use((req, res) => {
-  res.status(404).json({ 
-    success: false, 
-    message: `API Route not found in social.js: ${req.method} ${req.originalUrl}`,
-    hint: "Check social.js mounting and route definitions"
-  });
-});
+// NOTE: Fallback 404 moved to end of file to prevent blocking routes defined below
 
 // ==========================================
 // USER ACTIVITY STATS
@@ -1245,6 +1238,68 @@ router.get('/profile/stats', auth, async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
+});
+
+// ==========================================
+// BACKWARD COMPAT: /posts/media alias (redirects to /posts handler)
+// ==========================================
+router.post('/posts/media', auth, upload.array('media', 10), async (req, res) => {
+  // This is an alias - same logic as POST /posts
+  try {
+    const realId = await resolveUserId(req.user.id);
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const { content, visibility, locationName, mediaLayout } = req.body;
+    let attachmentData;
+    try {
+      if (req.body.attachment) {
+        attachmentData = typeof req.body.attachment === 'string' ? JSON.parse(req.body.attachment) : req.body.attachment;
+      }
+    } catch(e) {}
+
+    let finalMedia = [];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        try {
+          const uploadedFile = await uploadFile(file, `post_${Date.now()}_${file.originalname}`, { userId: realId, type: 'post' });
+          finalMedia.push({
+            url: `/api/files/${uploadedFile.id}`,
+            type: file.mimetype.startsWith('video') ? 'video' : (file.mimetype.startsWith('audio') ? 'audio' : 'image')
+          });
+        } catch (uploadErr) {
+          console.error('[POST /posts/media] File upload failed:', uploadErr.message);
+        }
+      }
+    }
+
+    const post = new Post({
+      userId: realId,
+      userName: req.user.displayName || req.user.name,
+      userAvatar: req.user.avatar || '',
+      content: content || '',
+      media: finalMedia,
+      mediaLayout: mediaLayout || 'grid',
+      location: locationName ? { name: locationName } : null,
+      attachment: attachmentData,
+      isPublic: visibility === 'public' || req.body.isPublic !== false
+    });
+    await post.save();
+
+    const populatedPost = await Post.findById(post._id).populate('userId', 'name displayName avatar rank rankTier');
+    const result = processPost(populatedPost, baseUrl);
+    res.json({ success: true, post: result });
+  } catch (err) {
+    console.error('[POST /posts/media] Fatal:', err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// FALLBACK DEBUG ROUTE — must be last
+router.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `API Route not found in social.js: ${req.method} ${req.originalUrl}`,
+    hint: 'Check social.js mounting and route definitions'
+  });
 });
 
 module.exports = router;

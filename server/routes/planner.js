@@ -168,6 +168,7 @@ LƯU Ý: Số ngày phải đúng ${numDays}. Mọi chi phí phải thực tế 
               role: 'system',
               content: `Bạn là chuyên gia lập lịch du lịch thực địa tại Việt Nam. Nhiệm vụ: tạo lịch trình CHÍNH XÁC, THỰC TẾ theo đúng yêu cầu.
 Quy tắc tuyệt đối:
+- BẮT BUỘC ĐI QUA ĐỊA ĐIỂM CHỈ ĐỊNH: Nếu trong 'Yêu cầu đặc biệt' có chứa danh sách địa điểm (ví dụ: 'Ưu tiên đi qua các địa điểm du lịch: ...'), bạn PHẢI BẮT BUỘC sắp xếp lịch trình đi qua TOÀN BỘ các địa điểm này một cách hợp lý và thực tế. Tuyệt đối không được bỏ sót bất kỳ điểm nào!
 - "Săn mây / bình minh" → hoạt động lúc 04:30–06:30 SÁNG SỚM, KHÔNG được xếp chiều tối.
 - Số ngày trong itinerary PHẢI BẰNG số ngày được yêu cầu.
 - Ngày 1 PHẢI tính thời gian di chuyển đến điểm đến.

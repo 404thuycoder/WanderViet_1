@@ -1,6 +1,97 @@
 /* ===================== PLANNER.JS ===================== */
 window.WanderPlanner = window.WanderPlanner || {};
 
+const VN_PLACES_PHOTOS = {
+  "hồ hoàn kiếm": "https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop",
+  "hoàn kiếm": "https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop",
+  "lăng bác": "https://images.unsplash.com/photo-1599708153386-62e26066265e?w=800&fit=crop",
+  "phố cổ": "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop",
+  "vịnh hạ long": "https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop",
+  "hạ long": "https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop",
+  "đảo ti tốp": "https://images.unsplash.com/photo-1547950515-e65383569762?w=800&fit=crop",
+  "hang sửng sốt": "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop",
+  "fansipan": "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop",
+  "cát cát": "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop",
+  "bản cát cát": "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop",
+  "tràng an": "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop",
+  "bái đính": "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"
+};
+
+const GENERIC_VN_PHOTOS = [
+  "https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop",
+  "https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop",
+  "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop",
+  "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop",
+  "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"
+];
+
+const VN_PLACES_VIDEOS = {
+  "hà nội": "35nL-Ma8OkM",
+  "hoàn kiếm": "35nL-Ma8OkM",
+  "phố cổ": "35nL-Ma8OkM",
+  "hạ long": "f9z_O9iP-84",
+  "ti tốp": "f9z_O9iP-84",
+  "sapa": "R7i_887eC-c",
+  "cát cát": "R7i_887eC-c",
+  "fansipan": "R7i_887eC-c",
+  "ninh bình": "W_q_B-O8y0A",
+  "tràng an": "W_q_B-O8y0A",
+  "đà nẵng": "1N9Ssw_D6x8",
+  "hội an": "1N9Ssw_D6x8",
+  "phú quốc": "c62mX3X3o2g",
+  "vũng tàu": "N0Z2L-d4Kx4",
+  "tp.hcm": "GexG9mE4C1s"
+};
+
+function getVNPhoto(query, idx = 0) {
+  if (!query) return GENERIC_VN_PHOTOS[idx % GENERIC_VN_PHOTOS.length];
+  const qLower = query.toLowerCase().trim();
+  for (const [key, val] of Object.entries(VN_PLACES_PHOTOS)) {
+    if (qLower.includes(key) || key.includes(qLower)) {
+      return val + `&sig=${idx}_${Math.floor(Math.random() * 100)}`;
+    }
+  }
+  return GENERIC_VN_PHOTOS[idx % GENERIC_VN_PHOTOS.length] + `&sig=${idx}_${Math.floor(Math.random() * 100)}`;
+}
+
+function getVNVideoId(query) {
+  if (!query) return '35nL-Ma8OkM';
+  const qLower = query.toLowerCase().trim();
+  for (const [key, val] of Object.entries(VN_PLACES_VIDEOS)) {
+    if (qLower.includes(key) || key.includes(qLower)) {
+      return val;
+    }
+  }
+  return '35nL-Ma8OkM';
+}
+
+window.getGPSDirections = function(destinationName, event) {
+  if (event) event.preventDefault();
+  
+  if (navigator.geolocation) {
+    if (window.WanderToast) window.WanderToast.info("📡 Đang kết nối tín hiệu GPS của bạn...");
+    else console.log("Đang kết nối GPS...");
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const url = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lon}&destination=${encodeURIComponent(destinationName)}`;
+        window.open(url, '_blank');
+      },
+      (error) => {
+        console.warn("GPS access denied, falling back to standard directions.");
+        const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destinationName)}`;
+        window.open(url, '_blank');
+      },
+      { timeout: 5000 }
+    );
+  } else {
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destinationName)}`;
+    window.open(url, '_blank');
+  }
+};
+
 const initPlanner = function () {
   if (window.WanderPlanner_Initialized) return;
   window.WanderPlanner_Initialized = true;
@@ -793,7 +884,7 @@ const initPlanner = function () {
                     <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 1.75rem; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
                       <!-- Visual Header (Map + Image) -->
                       <div style="height: 220px; display: flex; gap: 4px; position: relative; background: #000;">
-                         <div style="flex: 2.2; background: url('https://images.unsplash.com/photo-${['1528127269322-539801943592', '1555944411-9a258e7a2b0a', '1524231757912-21f4fe3a7200', '1508809159021-4171206013a2', '1599708153386-62e26066265e', '1581691101914-df07ba063852', '1623863484089-9e8c4f03943d'][Math.floor(Math.random()*7)]}?auto=format&fit=crop&w=800&q=80&sig=${Math.floor(Math.random()*9999)}') center/cover; position: relative;" class="activity-card-image-wrapper">
+                         <div style="flex: 2.2; background: url('${getVNPhoto(act.task || act.activity || act.name, aIdx)}') center/cover; position: relative;" class="activity-card-image-wrapper">
                             <div class="content-source-tag">Nguồn: WanderViet Travel Photos</div>
                          </div>
                         <div style="flex: 1; background: #0f172a; position: relative; overflow: hidden; border-left: 1px solid rgba(255,255,255,0.05);">
@@ -826,8 +917,8 @@ const initPlanner = function () {
                                <button type="button" class="btn-view-detail-v2" onclick='showActivityDetails(${JSON.stringify(act).replace(/'/g, "&apos;")})' style="background: var(--accent); border: none; color: #fff; padding: 8px 20px; border-radius: 25px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);">
                                   <span>🔍 Xem chi tiết & Video</span>
                                </button>
-                               <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(act.task || act.activity || act.name)}" target="_blank" class="btn-view-detail-v2" style="background: #3b82f6; border: none; color: #fff; padding: 8px 20px; border-radius: 25px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 5px 15px rgba(59,130,246, 0.3);">
-                                  <span>🗺️ Chỉ đường từ vị trí của bạn</span>
+                               <a href="#" onclick="window.getGPSDirections('${(act.task || act.activity || act.name || '').replace(/'/g, "\\'")}', event)" class="btn-view-detail-v2" style="background: #3b82f6; border: none; color: #fff; padding: 8px 20px; border-radius: 25px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 5px 15px rgba(59,130,246, 0.3);">
+                                  <span>🗺️ Chỉ đường GPS của bạn</span>
                                </a>
                            </div>
                            <div style="display: flex; align-items: center; gap: 8px; color: #ef4444; font-size: 0.8rem; font-weight: 800; text-transform:uppercase; letter-spacing:0.5px;">
@@ -883,15 +974,15 @@ const initPlanner = function () {
       <!-- Photo Gallery Grid -->
       <div class="modal-photo-grid" style="padding: 1rem 2rem 0;">
         <div class="modal-photo-item modal-photo-main">
-          <img class="ken-burns" src="https://source.unsplash.com/1200x800/?${query}&sig=${Math.random()}">
+          <img class="ken-burns" src="${getVNPhoto(actName, 0)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop';">
           <div class="content-source-tag">Nguồn: WanderViet Photography</div>
         </div>
         <div class="modal-photo-item">
-          <img class="ken-burns" src="https://source.unsplash.com/800x600/?${query},nature&sig=${Math.random()}">
+          <img class="ken-burns" src="${getVNPhoto(actName + ' nature', 1)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop';">
           <div class="content-source-tag">Nguồn: TripAdvisor User</div>
         </div>
         <div class="modal-photo-item">
-          <img class="ken-burns" src="https://source.unsplash.com/800x600/?${query},culture&sig=${Math.random()}">
+          <img class="ken-burns" src="${getVNPhoto(actName + ' culture', 2)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop';">
           <div class="content-source-tag">Nguồn: Instagram Community</div>
         </div>
       </div>
@@ -916,7 +1007,7 @@ const initPlanner = function () {
                   Bạn có thể dựa vào bản đồ bên dưới để quan sát khu vực xung quanh, hoặc nhấn nút <strong>Nhận Chỉ Đường GPS</strong> để mở ứng dụng Google Maps và nhận chỉ đường chi tiết từng ngã rẽ từ vị trí hiện tại của bạn.
                </p>
                <div style="margin-top: 1.2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                 <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(actName)}" target="_blank" class="btn-open-external-map" style="background: #3b82f6; border-color: #3b82f6; display: inline-flex; width: auto; padding: 10px 25px; border-radius: 30px;">
+                 <a href="#" onclick="window.getGPSDirections('${actName.replace(/'/g, "\\'")}', event)" class="btn-open-external-map" style="background: #3b82f6; border-color: #3b82f6; display: inline-flex; width: auto; padding: 10px 25px; border-radius: 30px; text-decoration: none;">
                     <span>🗺️ Nhận Chỉ Đường GPS</span>
                  </a>
                  <div style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:#fff;">
@@ -964,7 +1055,7 @@ const initPlanner = function () {
                 <iframe 
                   width="100%" 
                   height="100%" 
-                  src="https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(actName + ' du lịch vlog review')}&autoplay=0" 
+                  src="https://www.youtube.com/embed/${getVNVideoId(actName)}?autoplay=0" 
                   title="Travel Experience Video" 
                   frameborder="0" 
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 

@@ -1660,7 +1660,7 @@ const SocialHub = {
                     <div class="post-media ${post.mediaLayout ? 'media-layout-' + post.mediaLayout : (post.media.length > 1 ? 'media-grid' : '')}">
                         ${post.media.map((m, i) => {
                             console.log(`[Media] Type: ${m.type}, URL: ${m.url}`);
-                            if (m.type === 'image') return `<img src="${m.url}" alt="Ảnh bài viết" onclick="SocialHub.viewImage('${m.url}')" onerror="this.onerror=null; this.src='/assets/placeholder-image.svg';">`;
+                            if (m.type === 'image') return `<img src="${m.url}" alt="Ảnh bài viết" onclick="SocialHub.viewImage('${m.url}')" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=600&fit=crop'; this.style.opacity='0.6';">`;
                             if (m.type === 'video') return `
                                 <video 
                                     src="${m.url}" 

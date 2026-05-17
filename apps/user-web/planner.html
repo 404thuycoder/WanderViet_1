@@ -53,7 +53,7 @@
     <div class="planner-container">
       
       <!-- FORM NHẬP LIỆU - Bước 1 và Bước 2 -->
-      <aside class="planner-form-card">
+      <aside class="planner-form-card" id="plannerFormCard">
 
         <!-- HERO HEADER -->
         <div class="planner-hero-header">
@@ -467,6 +467,10 @@
               ♥️ Lưu Lịch Trình Này
             </button>
             <p id="saveTripStatus" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.75rem; display: none;"></p>
+            <div id="postSaveActions" style="display: none; justify-content: center; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
+              <a href="my-trips.html" class="btn btn--outline" style="border-radius: 12px; padding: 0.75rem 1.5rem; text-decoration: none; color: #fff;">🎒 Xem danh sách chuyến đi</a>
+              <button type="button" onclick="window.resetAIPlanner()" class="btn btn--primary" style="border-radius: 12px; padding: 0.75rem 1.5rem; font-weight: 700;">🔄 Tạo lịch trình mới</button>
+            </div>
           </div>
         </div>
 
@@ -487,8 +491,25 @@
   <script src="js/SharedUI.js?v=1778494999999" defer></script>
   <script src="js/chat-brain.js"></script>
   <script src="js/main.js?v=1778162961775" defer></script>
-  <script src="js/planner.js?v=20260516v2"></script>
+  <script src="js/planner.js?v=20260517_v17"></script>
   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const tripDate = document.getElementById('tripDate');
+      if (tripDate && !tripDate.value) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        tripDate.value = `${yyyy}-${mm}-${dd}`;
+      }
+
+      // Kích hoạt render vùng đầu tiên ngay khi tải trang
+      const activeRegion = document.querySelector('.region-card.active') || document.querySelector('.region-card');
+      if (activeRegion && typeof selectRegion === 'function') {
+        selectRegion(activeRegion);
+      }
+    });
+
     const REGION_DESTINATIONS = {
       'Miền Bắc': [
         { name: 'Hà Nội', img: 'https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=200&h=150&fit=crop', spots: ['Hồ Hoàn Kiếm', 'Lăng Bác', 'Phố Cổ'] },
@@ -627,7 +648,7 @@
 
         card.innerHTML = `
           <div class="dest-card-image">
-            <img src="${dest.img}" alt="${dest.name}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop';">
+            <img src="${typeof window.getVNPhoto === 'function' ? window.getVNPhoto(dest.name, Math.floor(Math.random()*100)) : dest.img}" alt="${dest.name}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop';">
             <div class="dest-card-overlay">
               <span class="dest-add-icon">+</span>
             </div>

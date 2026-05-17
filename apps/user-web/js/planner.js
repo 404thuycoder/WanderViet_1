@@ -1,20 +1,85 @@
 /* ===================== PLANNER.JS ===================== */
 window.WanderPlanner = window.WanderPlanner || {};
 
-const VN_PLACES_PHOTOS = {
-  "hồ hoàn kiếm": "https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop",
-  "hoàn kiếm": "https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop",
-  "lăng bác": "https://images.unsplash.com/photo-1599708153386-62e26066265e?w=800&fit=crop",
-  "phố cổ": "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop",
-  "vịnh hạ long": "https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop",
-  "hạ long": "https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop",
-  "đảo ti tốp": "https://images.unsplash.com/photo-1547950515-e65383569762?w=800&fit=crop",
-  "hang sửng sốt": "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop",
-  "fansipan": "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop",
-  "cát cát": "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop",
-  "bản cát cát": "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop",
-  "tràng an": "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop",
-  "bái đính": "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"
+const VN_DESTINATION_PHOTOS = {
+  // --- MIỀN BẮC ---
+  "hà nội": ["https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop", "https://images.unsplash.com/photo-1599708153386-62e26066265e?w=800&fit=crop", "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop"],
+  "hoàn kiếm": ["https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop"],
+  "phố cổ": ["https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop"],
+  "hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1547950515-e65383569762?w=800&fit=crop", "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop"],
+  "vịnh hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
+  "sapa": ["https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop", "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"],
+  "fansipan": ["https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"],
+  "cát cát": ["https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"],
+  "ninh bình": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"],
+  "tràng an": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
+  "hà giang": ["https://images.unsplash.com/photo-1581691101914-df07ba063852?w=800&fit=crop", "https://images.unsplash.com/photo-1625834317364-b32c140fd360?w=800&fit=crop"],
+  "đồng văn": ["https://images.unsplash.com/photo-1581691101914-df07ba063852?w=800&fit=crop"],
+  "mộc châu": ["https://images.unsplash.com/photo-1623863484089-9e8c4f03943d?w=800&fit=crop"],
+  "cao bằng": ["https://images.unsplash.com/photo-1575986767340-5d17ae767ab0?w=800&fit=crop", "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop"],
+  "mai châu": ["https://images.unsplash.com/photo-1589146162335-c340b498425d?w=800&fit=crop", "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"],
+  "tam đảo": ["https://images.unsplash.com/photo-1594910403541-610116e09c85?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  "ba vì": ["https://images.unsplash.com/photo-1616853215286-353d9154a1d8?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop"],
+  "cát bà": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1547950515-e65383569762?w=800&fit=crop"],
+  "vịnh lan hạ": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
+  "yên bái": ["https://images.unsplash.com/photo-1581177653526-70e28f309e3e?w=800&fit=crop", "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"],
+  "mù cang chải": ["https://images.unsplash.com/photo-1581177653526-70e28f309e3e?w=800&fit=crop", "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"],
+  "điện biên": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1581691101914-df07ba063852?w=800&fit=crop"],
+  "lạng sơn": ["https://images.unsplash.com/photo-1587588354456-ae376af7182f?w=800&fit=crop"],
+  "bắc kạn": ["https://images.unsplash.com/photo-1596395817260-2440f3131759?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
+  "tuyên quang": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop"],
+  "thái nguyên": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1623863484089-9e8c4f03943d?w=800&fit=crop"],
+  "đảo cô tô": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"],
+
+  // --- MIỀN TRUNG ---
+  "đà nẵng": ["https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&fit=crop", "https://images.unsplash.com/photo-1583547378393-271501b4cfa1?w=800&fit=crop", "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&fit=crop"],
+  "hội an": ["https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&fit=crop", "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
+  "huế": ["https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=800&fit=crop", "https://images.unsplash.com/photo-1605538032432-a2a0ec8c9dbb?w=800&fit=crop", "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop"],
+  "nha trang": ["https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop", "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+  "đà lạt": ["https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
+  "đà lạc": ["https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop"],
+  "quy nhơn": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1586542158380-49272304d9a5?w=800&fit=crop"],
+  "phú yên": ["https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop", "https://images.unsplash.com/photo-1587588354456-ae376af7182f?w=800&fit=crop"],
+  "tuy hòa": ["https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop", "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop"],
+  "mũi né": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1584981772656-78711422700f?w=800&fit=crop"],
+  "phan thiết": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1584981772656-78711422700f?w=800&fit=crop"],
+  "bình thuận": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop"],
+  "phong nha": ["https://images.unsplash.com/photo-1584305886638-348e3e4e9663?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
+  "quảng bình": ["https://images.unsplash.com/photo-1584305886638-348e3e4e9663?w=800&fit=crop"],
+  "bình ba": ["https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+  "pleiku": ["https://images.unsplash.com/photo-1596395817260-2440f3131759?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  "gia lai": ["https://images.unsplash.com/photo-1596395817260-2440f3131759?w=800&fit=crop"],
+  "buôn ma thuột": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop", "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"],
+  "đắk lắk": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop"],
+  "kon tum": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  "lý sơn": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
+  "quảng ngãi": ["https://images.unsplash.com/photo-1559592443-7f87a030062a?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+  "quảng trị": ["https://images.unsplash.com/photo-1587922546307-776227941871?w=800&fit=crop", "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=800&fit=crop"],
+  "vịnh vân phong": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+
+  // --- MIỀN NAM ---
+  "tp.hcm": ["https://images.unsplash.com/photo-1583547378393-271501b4cfa1?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11dc3?w=800&fit=crop", "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop"],
+  "sài gòn": ["https://images.unsplash.com/photo-1583547378393-271501b4cfa1?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11dc3?w=800&fit=crop"],
+  "vũng tàu": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"],
+  "phú quốc": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
+  "cần thơ": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"],
+  "côn đảo": ["https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+  "an giang": ["https://images.unsplash.com/photo-1563812739347-1906a5996055?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
+  "tây ninh": ["https://images.unsplash.com/photo-1596395817260-2440f3131759?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop"],
+  "bến tre": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
+  "kiên giang": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+  "đồng tháp": ["https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
+  "cà mau": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
+  "mũi cà mau": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop"],
+  "bạc liêu": ["https://images.unsplash.com/photo-1587588354456-ae376af7182f?w=800&fit=crop", "https://images.unsplash.com/photo-1543632970-d47f9ed300c3?w=800&fit=crop"],
+  "sóc trăng": ["https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop", "https://images.unsplash.com/photo-1599708153386-62e26066265e?w=800&fit=crop"],
+  "trà vinh": ["https://images.unsplash.com/photo-1590054387835-ab72678fef01?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"],
+  "hậu giang": ["https://images.unsplash.com/photo-1587922546307-776227941871?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
+  "vĩnh long": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
+  "tiền giang": ["https://images.unsplash.com/photo-1596422846543-75c6fc18a594?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
+  "đảo nam du": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"],
+  "hòn sơn": ["https://images.unsplash.com/photo-1544735724-449ad2bdd335?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+  "châu đốc": ["https://images.unsplash.com/photo-1563812739347-1906a5996055?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"]
 };
 
 const GENERIC_VN_PHOTOS = [
@@ -22,7 +87,9 @@ const GENERIC_VN_PHOTOS = [
   "https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop",
   "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop",
   "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop",
-  "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"
+  "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop",
+  "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop",
+  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop"
 ];
 
 const VN_PLACES_VIDEOS = {
@@ -46,13 +113,20 @@ const VN_PLACES_VIDEOS = {
 function getVNPhoto(query, idx = 0) {
   if (!query) return GENERIC_VN_PHOTOS[idx % GENERIC_VN_PHOTOS.length];
   const qLower = query.toLowerCase().trim();
-  for (const [key, val] of Object.entries(VN_PLACES_PHOTOS)) {
+  
+  // Kiểm tra điểm đến cụ thể trước
+  for (const [key, photos] of Object.entries(VN_DESTINATION_PHOTOS)) {
     if (qLower.includes(key) || key.includes(qLower)) {
-      return val + `&sig=${idx}_${Math.floor(Math.random() * 100)}`;
+      // Dùng hàm băm đơn giản hoặc random theo idx để chọn ảnh trong tập ảnh của địa điểm đó
+      const photoIdx = (Math.abs(idx) + qLower.length) % photos.length;
+      return photos[photoIdx];
     }
   }
-  return GENERIC_VN_PHOTOS[idx % GENERIC_VN_PHOTOS.length] + `&sig=${idx}_${Math.floor(Math.random() * 100)}`;
+  
+  return GENERIC_VN_PHOTOS[(Math.abs(idx) + qLower.length) % GENERIC_VN_PHOTOS.length];
 }
+window.getVNPhoto = getVNPhoto;
+
 
 function getVNVideoId(query) {
   if (!query) return '35nL-Ma8OkM';
@@ -794,6 +868,20 @@ const initPlanner = function () {
     }
   }
 
+  function formatCost(val) {
+    if (val === undefined || val === null || val === '') return '3.500.000 VNĐ';
+    let str = String(val).trim();
+    if (/^\d+$/.test(str)) {
+      const num = Number(str);
+      if (num < 100) return num + ' Triệu VNĐ';
+      return num.toLocaleString('vi-VN') + ' VNĐ';
+    }
+    if (!str.toLowerCase().includes('vnđ') && !str.toLowerCase().includes('vnd') && !str.toLowerCase().includes('đ') && !str.toLowerCase().includes('triệu')) {
+      str += ' VNĐ';
+    }
+    return str;
+  }
+
   function generateItineraryHtml(plan, dest, days, planNum, weather) {
     if (weather) window.currentWeatherData = weather;
     window.currentDestName = typeof dest === 'object' ? (dest.name || dest.destination) : dest;
@@ -838,17 +926,70 @@ const initPlanner = function () {
             <p class="timeline-summary-v2" style="font-size: 0.9rem; line-height: 1.6; color: rgba(255,255,255,0.7);">${plan.tripSummary || plan.summary || 'Kế hoạch du lịch được WanderAI thiết kế riêng cho bạn.'}</p>
           </div>
           
-          <div class="itinerary-stats-grid-v2" style="margin-top: 1.5rem; gap: 1rem;">
-            <div class="stat-box-v2" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
-              <span class="stat-label-v2">💰 Tổng chi phí</span>
-              <span class="stat-value-v2" style="color: var(--accent);">${plan.estimatedCost || plan.totalEstimatedCost || '---'}</span>
+          <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#KhámPháViệtNam</span>
+            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#TốiƯuBởiAI</span>
+            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#DuLịchThôngMinh</span>
+            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#${dest.split(',')[0].replace(/\s+/g, '')}</span>
+          </div>
+          
+          <div class="itinerary-stats-grid-v2" style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;">
+            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">💰 Dự toán chi phí</span>
+              <span class="stat-value-v2" style="color: var(--accent); font-size: 1.25rem; font-weight: 800; display: block;">${formatCost(plan.estimatedCost || plan.totalEstimatedCost)}</span>
             </div>
-            <div class="stat-box-v2" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
-              <span class="stat-label-v2">🚶 Tốc độ</span>
-              <span class="stat-value-v2">${plan.pace || 'Vừa phải'}</span>
+            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">🚶 Nhịp độ di chuyển</span>
+              <span class="stat-value-v2" style="color: #fff; font-size: 1.1rem; font-weight: 700; display: block;">${plan.pace || 'Vừa phải - Thư thái'}</span>
+            </div>
+            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">🎒 Phong cách / Thể loại</span>
+              <span class="stat-value-v2" style="color: #38bdf8; font-size: 1.1rem; font-weight: 700; display: block;">${plan.vibe || plan.style || 'Khám phá tự nhiên & Trải nghiệm'}</span>
+            </div>
+            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">🚗 Phương tiện đề xuất</span>
+              <span class="stat-value-v2" style="color: #f472b6; font-size: 1.1rem; font-weight: 700; display: block;">${plan.transport || plan.bestTransit || 'Ô tô / Xe máy phượt / Đi bộ'}</span>
+            </div>
+            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">🌤️ Thời tiết & Khí hậu</span>
+              <span class="stat-value-v2" style="color: #fbbf24; font-size: 1.1rem; font-weight: 700; display: block;">${weather ? `${weather.temp}°C (${weather.condition})` : '18°C - 26°C (Mát mẻ lý tưởng)'}</span>
+            </div>
+            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
+              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">💡 Lời khuyên chuẩn bị</span>
+              <span class="stat-value-v2" style="color: #a78bfa; font-size: 1.1rem; font-weight: 700; display: block;">Trang phục thoải mái, giày leo núi, áo khoác gió</span>
             </div>
           </div>
         </div>
+
+        ${plan.accommodationSuggestion ? `
+        <div class="accomm-premium-card" style="margin-top: 2rem; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(29, 78, 216, 0.2)); border: 1px solid rgba(59, 130, 246, 0.3); border-left: 4px solid #3b82f6; padding: 1.5rem; border-radius: 16px; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0,0,0,0.15);">
+          <div style="display: flex; align-items: flex-start; gap: 1.25rem;">
+            <span style="font-size: 2.5rem; line-height: 1;">${plan.accommodationSuggestion.icon || '🏨'}</span>
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #93c5fd; font-weight: 800;">🏨 GỢI Ý LƯU TRÚ • ${plan.accommodationSuggestion.typeLabel || 'Khách sạn / Homestay'}</span>
+                <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.4);">✨ AI Khuyên dùng</span>
+              </div>
+              <h3 style="font-size: 1.35rem; color: #fff; margin: 0.5rem 0 0.35rem; font-weight: 800;">${plan.accommodationSuggestion.nameAndCost || 'Khách sạn / Homestay trung tâm'}</h3>
+              <p style="margin: 0; font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.6; font-style: italic;">"${plan.accommodationSuggestion.reason || 'Vị trí đắc địa, dịch vụ chuẩn mực và không gian hòa hợp trọn vẹn với trải nghiệm chuyến đi.'}"</p>
+            </div>
+          </div>
+        </div>
+        ` : `
+        <div class="accomm-premium-card" style="margin-top: 2rem; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(29, 78, 216, 0.2)); border: 1px solid rgba(59, 130, 246, 0.3); border-left: 4px solid #3b82f6; padding: 1.5rem; border-radius: 16px; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0,0,0,0.15);">
+          <div style="display: flex; align-items: flex-start; gap: 1.25rem;">
+            <span style="font-size: 2.5rem; line-height: 1;">🏨</span>
+            <div style="flex: 1;">
+              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+                <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #93c5fd; font-weight: 800;">🏨 GỢI Ý LƯU TRÚ • Khách sạn / Resort</span>
+                <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.4);">✨ AI Khuyên dùng</span>
+              </div>
+              <h3 style="font-size: 1.35rem; color: #fff; margin: 0.5rem 0 0.35rem; font-weight: 800;">Khách sạn / Homestay trung tâm tại ${dest.split(',')[0]} (~500.000đ - 1.200.000đ/đêm)</h3>
+              <p style="margin: 0; font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.6; font-style: italic;">"Vị trí đắc địa gần khu tham quan, không gian tiện nghi, thuận lợi di chuyển và trải nghiệm trọn vẹn nhịp sống địa phương."</p>
+            </div>
+          </div>
+        </div>
+        `}
 
         <div class="timeline-container-v2" style="padding: 1.5rem 0;">
           ${itinerary.map((day, idx) => {
@@ -872,76 +1013,95 @@ const initPlanner = function () {
               
               <div class="activities-list" style="padding-left: 25px; border-left: 2px solid rgba(16, 185, 129, 0.15); margin-left: 22px;">
                 ${(day.activities || []).map((act, aIdx) => {
-                  const user = mockUsers[aIdx % mockUsers.length];
+                  const actName = act.task || act.activity || act.name || '';
+                  const actDesc = act.description || act.visualNote || '';
+                  const actCost = act.cost || '';
+                  const actTransport = act.transport || '';
+                  const actRating = parseFloat(act.rating) || 0;
+                  const actSession = act.session || '';
+                  const actLocation = act.location || '';
+                  const actAddress = act.address || act.location || '';
+                  const sessionColor = actSession === 'Sáng' ? '#f59e0b' : actSession === 'Chiều' ? '#f97316' : '#818cf8';
+                  const sessionEmoji = actSession === 'Sáng' ? '☀️' : actSession === 'Chiều' ? '⛅' : '🌙';
+                  const starHtml = actRating > 0 ? Array.from({length: 5}, (_, i) => 
+                    i < Math.floor(actRating) ? '★' : (i < actRating ? '½' : '☆')
+                  ).join('') : '';
+                  const actData = JSON.stringify(act).replace(/'/g, "&apos;").replace(/`/g, '&#96;');
+                  let actMapQuery = actLocation || actAddress || actName;
+                  if (window.currentDestName && !actMapQuery.toLowerCase().includes(window.currentDestName.toLowerCase())) {
+                    actMapQuery += ', ' + window.currentDestName;
+                  }
                   return `
-                  <div class="premium-activity-card-v2" style="padding: 0; background: transparent; border: none; margin-bottom: 2.5rem; display: flex; gap: 2rem; position: relative;">
-                    <!-- Time Column -->
-                    <div class="activity-time-slot-v2" style="min-width: 80px; font-weight: 800; color: var(--accent); padding-top: 8px; font-size: 1.1rem; letter-spacing: 0.5px;">
-                      ${act.time || '--:--'}
+                  <div class="premium-activity-card-v2" style="padding:0; background:transparent; border:none; margin-bottom:2rem; display:flex; gap:1.25rem; position:relative;">
+                    <!-- Time + Session Column -->
+                    <div style="min-width:72px; display:flex; flex-direction:column; align-items:center; padding-top:16px; gap:4px;">
+                      <span style="font-weight:900; color:var(--accent); font-size:1rem; letter-spacing:0.5px; line-height:1;">${act.time || '--:--'}</span>
+                      ${actSession ? `<span style="font-size:0.65rem; font-weight:700; color:${sessionColor}; background:${sessionColor}18; padding:2px 6px; border-radius:8px; white-space:nowrap;">${sessionEmoji} ${actSession}</span>` : ''}
                     </div>
 
-                    <!-- Content Card -->
-                    <div style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 1.75rem; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
-                      <!-- Visual Header (Map + Image) -->
-                      <div style="height: 220px; display: flex; gap: 4px; position: relative; background: #000;">
-                         <div style="flex: 2.2; background: url('${getVNPhoto(act.task || act.activity || act.name, aIdx)}') center/cover; position: relative;" class="activity-card-image-wrapper">
-                            <div class="content-source-tag">Nguồn: WanderViet Travel Photos</div>
-                         </div>
-                        <div style="flex: 1; background: #0f172a; position: relative; overflow: hidden; border-left: 1px solid rgba(255,255,255,0.05);">
-                          <!-- Real Google Maps Iframe -->
-                          <iframe 
-                            width="100%" 
-                            height="100%" 
-                            frameborder="0" 
-                            style="border:0" 
-                            src="https://maps.google.com/maps?q=${encodeURIComponent(act.task || act.activity || act.name)}&output=embed" 
-                            allowfullscreen>
-                          </iframe>
-                          <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.5); font-size: 8px; color: #fff; text-align: center; padding: 2px;">LIVE GOOGLE MAPS</div>
-                        </div>
+                    <!-- Content Card - Compact Design -->
+                    <div style="flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:1.25rem; overflow:hidden; transition:all 0.3s ease; box-shadow:0 4px 20px rgba(0,0,0,0.15);" 
+                         onmouseenter="this.style.borderColor='rgba(16,185,129,0.3)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 30px rgba(0,0,0,0.25)'"
+                         onmouseleave="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.transform=''; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.15)'">
+                      
+                      <!-- Image Banner (compact) -->
+                      <div style="height:140px; position:relative; overflow:hidden;">
+                        <img 
+                          src="${getVNPhoto(actName, aIdx)}" 
+                          alt="${actName}"
+                          loading="lazy"
+                          style="width:100%; height:100%; object-fit:cover;"
+                          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=600&fit=crop';"
+                        >
+                        <!-- Overlay gradient -->
+                        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);"></div>
+                        <!-- Location chip on image -->
+                        ${actLocation ? `<div style="position:absolute; bottom:8px; left:10px; display:flex; align-items:center; gap:4px; font-size:0.7rem; color:#fff; font-weight:600; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); padding:3px 8px; border-radius:10px; max-width:80%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📍 ${actLocation}</div>` : ''}
+                        <!-- Cost badge top-right -->
+                        ${actCost ? `<div style="position:absolute; top:8px; right:8px; background:rgba(251,191,36,0.92); color:#000; font-size:0.72rem; font-weight:900; padding:3px 10px; border-radius:10px; backdrop-filter:blur(4px);">💰 ${actCost}</div>` : `<div style="position:absolute; top:8px; right:8px; background:rgba(16,185,129,0.85); color:#fff; font-size:0.72rem; font-weight:900; padding:3px 10px; border-radius:10px;">Miễn phí</div>`}
+                        <!-- Source tag -->
+                        <div class="content-source-tag" style="position:absolute; top:8px; left:8px; font-size:0.6rem; opacity:0.6;">📸 WanderViet</div>
                       </div>
 
-                      <div style="padding: 1.5rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
-                          <h4 class="activity-name-v2" style="font-size: 1.25rem; color: #fff; margin: 0; font-weight:800;">${act.task || act.activity || act.name || ''}</h4>
-                          <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
-                             ${act.cost ? `<span style="font-size: 0.9rem; color: #fbbf24; font-weight: 800; background:rgba(251,191,36,0.1); padding:2px 10px; border-radius:10px;">💰 ${act.cost}</span>` : ''}
-                             <span style="font-size: 0.75rem; color: var(--text-muted); font-weight:600;">🚗 ${act.transport || 'Ô tô/Xe máy'}</span>
-                          </div>
-                        </div>
-                        
-                        <p class="activity-desc-v2" style="font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.8); margin-bottom: 1.5rem;">${act.description}</p>
-                        
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); flex-wrap: wrap; gap: 10px;">
-                           <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                               <button type="button" class="btn-view-detail-v2" onclick='showActivityDetails(${JSON.stringify(act).replace(/'/g, "&apos;")})' style="background: var(--accent); border: none; color: #fff; padding: 8px 20px; border-radius: 25px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);">
-                                  <span>🔍 Xem chi tiết & Video</span>
-                               </button>
-                               <a href="#" onclick="window.getGPSDirections('${(act.task || act.activity || act.name || '').replace(/'/g, "\\'")}', event)" class="btn-view-detail-v2" style="background: #3b82f6; border: none; color: #fff; padding: 8px 20px; border-radius: 25px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 8px; text-decoration: none; box-shadow: 0 5px 15px rgba(59,130,246, 0.3);">
-                                  <span>🗺️ Chỉ đường GPS của bạn</span>
-                               </a>
-                           </div>
-                           <div style="display: flex; align-items: center; gap: 8px; color: #ef4444; font-size: 0.8rem; font-weight: 800; text-transform:uppercase; letter-spacing:0.5px;">
-                              <span style="width: 8px; height: 8px; background: #ef4444; border-radius: 50%; animation: pulse 1s infinite;"></span>
-                              4K Review Available
-                           </div>
+                      <!-- Info Body -->
+                      <div style="padding:1rem 1.1rem 0.9rem;">
+                        <!-- Title Row -->
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; margin-bottom:0.5rem;">
+                          <h4 style="font-size:1rem; color:#fff; margin:0; font-weight:800; line-height:1.3; flex:1;">${actName}</h4>
+                          ${actRating > 0 ? `<div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0;">
+                            <span style="color:#fbbf24; font-size:0.7rem; letter-spacing:1px;">${starHtml}</span>
+                            <span style="color:#fbbf24; font-size:0.7rem; font-weight:800;">${actRating}/5</span>
+                          </div>` : ''}
                         </div>
 
-                        <div style="display: flex; gap: 12px; margin-top: 1rem;">
-                           <div style="display: flex; -webkit-mask-image: linear-gradient(to right, black 80%, transparent); mask-image: linear-gradient(to right, black 80%, transparent);">
-                              <img src="${user.avatar}" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #000; margin-left: 0;">
-                              <img src="https://ui-avatars.com/api/?name=Traveler&background=random" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #000; margin-left: -8px;">
-                              <img src="https://ui-avatars.com/api/?name=Explorer&background=random" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #000; margin-left: -8px;">
-                           </div>
-                           <span style="font-size: 0.75rem; color: rgba(255,255,255,0.4); font-style: italic;">"${user.text}"</span>
+                        <!-- Transport badge -->
+                        ${actTransport ? `<div style="display:inline-flex; align-items:center; gap:5px; font-size:0.72rem; color:#60a5fa; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); padding:3px 10px; border-radius:20px; margin-bottom:0.6rem; font-weight:600;">${actTransport}</div>` : ''}
+
+                        <!-- Description -->
+                        ${actDesc ? `<p style="font-size:0.82rem; line-height:1.6; color:rgba(255,255,255,0.65); margin:0 0 0.75rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${actDesc}</p>` : ''}
+
+                        <!-- Action Row -->
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; padding-top:0.75rem; border-top:1px solid rgba(255,255,255,0.06);">
+                          <button type="button" 
+                            onclick='showActivityDetails(${actData})'
+                            style="flex:1; background:var(--accent); border:none; color:#fff; padding:7px 12px; border-radius:20px; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:5px; box-shadow:0 3px 12px rgba(16,185,129,0.3);"
+                            onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform=''">
+                            🔍 Xem chi tiết & Review
+                          </button>
+                          <a href="#" 
+                            onclick="window.getGPSDirections('${actMapQuery.replace(/'/g, "\\'")}', event)"
+                            style="flex:1; background:#1d4ed8; border:none; color:#fff; padding:7px 12px; border-radius:20px; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:5px; text-decoration:none; box-shadow:0 3px 12px rgba(29,78,216,0.3);"
+                            onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform=''">
+                            🗺️ GPS
+                          </a>
                         </div>
                       </div>
                     </div>
                   </div>
                   ${act.transitToNext ? `
-                  <!-- Transit Connection Step -->
-                  <div class="transit-step-v2" style="margin: -1rem 0 1.5rem 100px; display: flex; align-items: center; gap: 12px; color: #38bdf8; font-size: 0.85rem; font-weight: 500; background: rgba(56, 189, 248, 0.05); padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(56, 189, 248, 0.2); width: fit-content; animation: fadeIn 0.5s ease;">
-                     <span style="font-size: 1.1rem;">⚡</span>
+                  <!-- Transit Connection -->
+                  <div style="margin: -0.5rem 0 1rem 97px; display:flex; align-items:center; gap:8px; color:#38bdf8; font-size:0.78rem; font-weight:600; background:rgba(56,189,248,0.05); padding:7px 14px; border-radius:20px; border:1px solid rgba(56,189,248,0.15); width:fit-content;">
+                     <span style="font-size:0.9rem;">⚡</span>
                      <span>${act.transitToNext}</span>
                   </div>
                   ` : ''}
@@ -966,9 +1126,12 @@ const initPlanner = function () {
     const vlogIds = ['35nL-Ma8OkM', 'f9z_O9iP-84', 'R7i_887eC-c', 'W_q_B-O8y0A'];
     const randomVlog = vlogIds[Math.floor(Math.random() * vlogIds.length)];
 
-    const actName = act.task || act.activity || act.name;
-
-    const query = encodeURIComponent(actName);
+    const actName = act.task || act.activity || act.name || '';
+    let mapQuery = act.location || act.address || actName;
+    if (window.currentDestName && !mapQuery.toLowerCase().includes(window.currentDestName.toLowerCase())) {
+      mapQuery += ', ' + window.currentDestName;
+    }
+    const query = encodeURIComponent(mapQuery);
 
     body.innerHTML = `
       <!-- Photo Gallery Grid -->
@@ -988,38 +1151,51 @@ const initPlanner = function () {
       </div>
       
       <div class="activity-modal-info" style="margin-top: -30px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap: wrap; gap: 10px;">
-           <h2 class="activity-modal-title" style="margin:0;">${actName}</h2>
-           <div style="display:flex; gap: 10px;">
-             ${window.currentWeatherData ? `<span style="background:rgba(59,130,246,0.1); color:#60a5fa; border:1px solid #3b82f6; padding:4px 15px; border-radius:20px; font-weight:800; font-size:0.8rem; display:flex; align-items:center;">☁️ ${window.currentWeatherData.temp}°C - ${window.currentWeatherData.condition}</span>` : ''}
-             <span style="background:rgba(251,191,36,0.1); color:#fbbf24; border:1px solid #fbbf24; padding:4px 15px; border-radius:20px; font-weight:800; font-size:0.8rem; display:flex; align-items:center;">💰 DỰ KIẾN: ${act.cost || 'Miễn phí'}</span>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; flex-wrap: wrap; gap: 10px;">
+           <div>
+             <h2 class="activity-modal-title" style="margin:0 0 0.5rem; font-size:1.75rem; font-weight:800;">${actName}</h2>
+             <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:0.9rem; color:var(--text-muted);">
+               <span>📍 ${act.address || act.location || actName}</span>
+               <span style="color:rgba(255,255,255,0.2);">•</span>
+               <div style="display:flex; align-items:center; gap:4px;">
+                 <span style="color:#fbbf24; font-size:1rem; letter-spacing:2px;">${Array.from({length: 5}, (_, i) => i < Math.floor(parseFloat(act.rating) || 4.5) ? '★' : (i < (parseFloat(act.rating) || 4.5) ? '½' : '☆')).join('')}</span>
+                 <span style="color:#fbbf24; font-weight:800; margin-left:4px;">${parseFloat(act.rating) || 4.5}/5</span>
+               </div>
+             </div>
+           </div>
+           <div style="display:flex; gap: 10px; flex-wrap:wrap;">
+             ${window.currentWeatherData ? `<span style="background:rgba(59,130,246,0.1); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); padding:6px 16px; border-radius:25px; font-weight:800; font-size:0.85rem; display:flex; align-items:center; box-shadow:0 4px 12px rgba(59,130,246,0.15);">☁️ ${window.currentWeatherData.temp}°C - ${window.currentWeatherData.condition}</span>` : ''}
+             <span style="background:rgba(251,191,36,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.4); padding:6px 16px; border-radius:25px; font-weight:900; font-size:0.85rem; display:flex; align-items:center; box-shadow:0 4px 12px rgba(251,191,36,0.15);">💰 CHI PHÍ: ${act.cost || 'Miễn phí'}</span>
            </div>
         </div>
 
-        <!-- FULL WIDTH MAP SECTION (MOVED TO TOP) -->
+        <!-- FULL WIDTH MAP SECTION -->
         <div class="full-width-map-section" style="margin-bottom: 2.5rem;">
-            <div class="detail-section-title" style="font-size: 1.25rem;">📍 Vị trí & Hướng dẫn di chuyển</div>
+            <div class="detail-section-title" style="font-size: 1.25rem; margin-top: 1.5rem;">📍 Vị trí & Hướng dẫn di chuyển</div>
             
-            <div style="background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.2); padding: 1.5rem; border-radius: 1rem; margin-bottom: 1.5rem;">
-               <h4 style="color: var(--accent); margin-top: 0; margin-bottom: 0.5rem; font-size: 1.05rem;">🧭 Chỉ dẫn di chuyển</h4>
-               <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem; line-height: 1.6; margin: 0;">
-                  Để di chuyển đến <strong>${actName}</strong>, phương tiện tối ưu nhất được đề xuất là <strong>${act.transport || 'Ô tô/Taxi'}</strong>. 
-                  Bạn có thể dựa vào bản đồ bên dưới để quan sát khu vực xung quanh, hoặc nhấn nút <strong>Nhận Chỉ Đường GPS</strong> để mở ứng dụng Google Maps và nhận chỉ đường chi tiết từng ngã rẽ từ vị trí hiện tại của bạn.
+            <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25); padding: 1.5rem; border-radius: 1.25rem; margin-bottom: 1.5rem; box-shadow:0 8px 24px rgba(0,0,0,0.15);">
+               <h4 style="color: var(--accent); margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1rem; display:flex; align-items:center; gap:8px;">
+                 <span>🧭 Hướng dẫn di chuyển chi tiết</span>
+                 <span style="background:var(--accent); color:#000; font-size:0.7rem; font-weight:900; padding:2px 8px; border-radius:10px; text-transform:uppercase;">AI Gợi ý</span>
+               </h4>
+               <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem; line-height: 1.6; margin: 0;">
+                  Phương tiện tối ưu nhất để đến <strong>${actName}</strong> là <strong>${act.transport || 'Ô tô / Taxi'}</strong>. 
+                  Bạn có thể xem trực tiếp vị trí trên bản đồ bên dưới, hoặc nhấn nút <strong>Nhận Chỉ Đường GPS</strong> để mở Google Maps với lộ trình tối ưu từ vị trí hiện tại của bạn.
                </p>
-               <div style="margin-top: 1.2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-                 <a href="#" onclick="window.getGPSDirections('${actName.replace(/'/g, "\\'")}', event)" class="btn-open-external-map" style="background: #3b82f6; border-color: #3b82f6; display: inline-flex; width: auto; padding: 10px 25px; border-radius: 30px; text-decoration: none;">
+               <div style="margin-top: 1.25rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                 <a href="#" onclick="window.getGPSDirections('${mapQuery.replace(/'/g, "\\'")}', event)" class="btn-open-external-map" style="background: #3b82f6; border:none; color:#fff; display: inline-flex; align-items:center; gap:8px; width: auto; padding: 10px 25px; border-radius: 30px; font-weight:700; text-decoration: none; box-shadow:0 6px 20px rgba(59,130,246,0.3); transition:all 0.2s;" onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform=''">
                     <span>🗺️ Nhận Chỉ Đường GPS</span>
                  </a>
-                 <div style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:#fff;">
+                 <div style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:#fff; font-weight:600;">
                     <span style="color:var(--accent);">🚗</span>
-                    <span>Khoảng cách ước tính: ~2.5 km</span>
+                    <span>${act.transitToNext || 'Khoảng cách ước tính: ~2.5 km'}</span>
                  </div>
                </div>
             </div>
 
             <div class="map-iframe-wrapper" style="height: 450px; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); width: 100%;">
               <iframe 
-                src="https://maps.google.com/maps?q=${encodeURIComponent(actName)}&t=&z=15&ie=UTF8&iwloc=&output=embed" 
+                src="https://maps.google.com/maps?q=${query}&t=&z=15&ie=UTF8&iwloc=&output=embed" 
                 allowfullscreen>
               </iframe>
               <div class="content-source-tag">Nguồn: Google Maps Live</div>
@@ -1357,6 +1533,8 @@ const initPlanner = function () {
           statusEl.style.display = 'block';
           statusEl.textContent = "Lịch trình đã được thêm vào Chuyến đi của bạn.";
         }
+        const postSave = document.getElementById('postSaveActions');
+        if (postSave) postSave.style.display = 'flex';
       } else {
         btnSaveTrip.disabled = false;
         btnSaveTrip.textContent = "Thử lại";
@@ -1368,6 +1546,52 @@ const initPlanner = function () {
     }
   });
 
+  window.resetAIPlanner = function() {
+    document.querySelector('.planner-container')?.classList.remove('show-result');
+    const plannerFormCard = document.getElementById('plannerFormCard');
+    if (plannerFormCard) plannerFormCard.style.display = 'flex';
+    
+    // Đưa các step về đúng trạng thái ban đầu: Hiện stepBasic, ẩn các step khác
+    const stepBasic = document.getElementById('stepBasic');
+    if (stepBasic) stepBasic.style.display = 'block';
+    const stepDiscovery = document.getElementById('stepDiscovery');
+    if (stepDiscovery) stepDiscovery.style.display = 'none';
+    const stepSmartWizard = document.getElementById('stepSmartWizard');
+    if (stepSmartWizard) stepSmartWizard.style.display = 'none';
+    const stepCompare = document.getElementById('stepCompare');
+    if (stepCompare) stepCompare.style.display = 'none';
+    const pathNav = document.querySelector('.planner-path-nav');
+    if (pathNav) pathNav.style.display = 'flex';
+    
+    // Đặt lại SmartWizard về trạng thái ban đầu (InputArea hiện, ConfirmationArea ẩn)
+    const smartConfirmationArea = document.getElementById('smartConfirmationArea');
+    if (smartConfirmationArea) smartConfirmationArea.style.display = 'none';
+    const smartInputArea = document.getElementById('smartInputArea');
+    if (smartInputArea) smartInputArea.style.display = 'flex';
+
+    // Đặt lại các nút chuyển mode trên cùng về active cho Form Nhập
+    document.querySelectorAll('.mode-toggle-btn').forEach(b => b.classList.remove('active'));
+    const btnModeForm = document.getElementById('btnModeForm');
+    if (btnModeForm) btnModeForm.classList.add('active');
+
+    const resultContainer = document.getElementById('timelineResult');
+    if (resultContainer) resultContainer.style.display = 'none';
+    const placeholder = document.getElementById('resultPlaceholder');
+    if (placeholder) placeholder.style.display = 'flex';
+    const btnSaveTrip = document.getElementById('btnSaveTrip');
+    if (btnSaveTrip) {
+      btnSaveTrip.disabled = false;
+      btnSaveTrip.textContent = "♥️ Lưu Lịch Trình Này";
+      btnSaveTrip.style.background = "linear-gradient(135deg, #f43f5e, #e11d48)";
+      btnSaveTrip.style.display = 'inline-flex';
+    }
+    const statusEl = document.getElementById('saveTripStatus');
+    if (statusEl) statusEl.style.display = 'none';
+    const postSave = document.getElementById('postSaveActions');
+    if (postSave) postSave.style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // --- VIEW SAVED TRIP LOGIC ---
   const urlParams = new URLSearchParams(window.location.search);
   const isViewMode = urlParams.get('view') === 'true';
@@ -1378,15 +1602,21 @@ const initPlanner = function () {
       const itinId = urlParams.get('itinId');
       
       const processPlan = (plan, destination, days) => {
-        // Hide initial state
+        // Kích hoạt show-result để CSS hiển thị timelineResult và ẩn formCard
+        document.querySelector('.planner-container')?.classList.add('show-result');
+        const plannerFormCard = document.getElementById('plannerFormCard');
+        if (plannerFormCard) plannerFormCard.style.display = 'none';
+        const btnSaveTrip = document.getElementById('btnSaveTrip');
+        if (btnSaveTrip) btnSaveTrip.style.display = 'none';
+
         if (placeholder) placeholder.style.display = 'none';
         if (loader) loader.style.display = 'none';
         
-        // Show result area
+        // Hiển thị vùng kết quả
         if (resultContainer) resultContainer.style.display = 'block';
         if (refineBox) refineBox.style.display = 'block';
         
-        // Show View Mode header if exists
+        // Hiển thị banner View Mode
         const viewModeHeader = document.getElementById('viewModeHeader');
         if (viewModeHeader) viewModeHeader.style.display = 'flex';
 
@@ -1400,8 +1630,12 @@ const initPlanner = function () {
 
         // Scroll to result
         setTimeout(() => {
-          resultContainer.scrollIntoView({ behavior: 'smooth' });
-        }, 300);
+          if (viewModeHeader && viewModeHeader.style.display !== 'none') {
+            viewModeHeader.scrollIntoView({ behavior: 'smooth' });
+          } else if (resultContainer) {
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
       };
 
       if (savedTripJson) {

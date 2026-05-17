@@ -203,7 +203,10 @@ document.addEventListener('DOMContentLoaded', function() {
       var card = document.createElement('div');
       card.style.cssText = 'background: var(--bg-elevated); border-radius: 1rem; padding: 1.5rem; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 1rem; border: 1px solid var(--border);';
 
-      var jsonStr = JSON.stringify(it.planJson || {});
+      var planData = Object.assign({}, it.planJson || {});
+      if (!planData.destination) planData.destination = it.destination || 'Chuyến đi';
+      if (!planData.days) planData.days = it.days || 3;
+      var jsonStr = JSON.stringify(planData);
       var tripDateLabel = '';
       var tripDateBadge = '';
       

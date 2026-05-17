@@ -62,7 +62,7 @@ const User = require('../models/User'); // ♥ Thêm User model để lấy thô
 // Lên lịch trình
 router.post('/generate', optionalAuth, async (req, res) => {
   try {
-    const { destination, days, budget, accommodation, pace, transport, interests, additionalInfo, companion, tripDate, vibe } = req.body;
+    const { destination, days, budget, accommodation, pace, transport, interests, additionalInfo, companion, tripDate, vibe, departureTime, sessions } = req.body;
 
     if (!destination || !days) {
       return res.status(400).json({ success: false, message: 'Vui lòng cung cấp điểm đến và số ngày.' });
@@ -105,11 +105,13 @@ router.post('/generate', optionalAuth, async (req, res) => {
 - Điểm đến: ${destination}
 ${weatherInfo ? `- THỜI TIẾT THỰC TẾ NGAY LÚC NÀY: ${weatherInfo} (HÃY sử dụng thông tin thời tiết này để miêu tả các hoạt động cho chân thực hơn)` : ''}
 - Số ngày: ${numDays} ngày
+- Giờ khởi hành mỗi ngày: ${departureTime || '08:00'} (Bắt đầu các hoạt động từ khung giờ này)
+- Buổi hoạt động mong muốn: ${Array.isArray(sessions) ? sessions.join(', ') : (sessions || 'Sáng, Chiều, Tối')}
 - Ngân sách tổng cộng: ${budget}
-- Loại lưu trú: ${accommodation}
-- Phương tiện: ${transport}
-- Đi cùng: ${companion}
-- Nhịp độ: ${pace}
+- Loại lưu trú: ${accommodation || 'Khách sạn/Homestay'}
+- Phương tiện: ${transport || 'Tự do'}
+- Đi cùng: ${companion || 'Bạn bè'}
+- Nhịp độ: ${pace || 'Vừa phải'}
 - Không khí/Vibe mong muốn: ${vibe || 'Tự do/Khám phá'}
 - Yêu cầu đặc biệt: "${interestsStr || 'Không có'}"
 
@@ -133,7 +135,7 @@ ${hasSunsetActivity ? `→ Hoàng hôn: xếp lúc 17:15–18:30 để bắt tr�
   "accommodationSuggestion": {
     "typeLabel": "Loại",
     "icon": "Emoji",
-    "nameAndCost": "Tên - Giá/đêm",
+    "nameAndCost": "Tên khách sạn/homestay cụ thể - Giá/đêm (VNĐ)",
     "reason": "Tại sao nơi này lại hợp với vibe ${vibe || 'chuyến đi'}?"
   },
   "itinerary": [
@@ -142,19 +144,29 @@ ${hasSunsetActivity ? `→ Hoàng hôn: xếp lúc 17:15–18:30 để bắt tr�
       "highlight": "Trải nghiệm đặc biệt nhất trong ngày",
       "activities": [
         { 
-          "time": "HH:MM", 
+          "time": "HH:MM",
+          "session": "Sáng|Chiều|Tối",
           "task": "Mô tả hoạt động đầy cảm hứng (Phải cực kỳ chi tiết, không ghi chung chung)", 
-          "location": "Địa chỉ cụ thể hoặc tên quán ăn/điểm đến nổi tiếng", 
-          "cost": "XXXđ",
-          "visualNote": "Gợi ý góc chụp ảnh, món nên thử hoặc cảm giác mang lại",
-          "transitToNext": "Hướng dẫn di chuyển thực tế đến điểm tiếp theo trong ngày (Thời gian, phương tiện, lộ trình ngắn)"
+          "location": "Tên địa điểm/quán ăn cụ thể tại ${destination}",
+          "address": "Địa chỉ đường phố cụ thể",
+          "cost": "XXX.000đ (hoặc 'Miễn phí')",
+          "transport": "Phương tiện di chuyển đến đây (VD: 🚕 Taxi ~10 phút, 🛵 Xe máy ~5 phút, 🚶 Đi bộ ~3 phút)",
+          "rating": 4.5,
+          "description": "Mô tả chi tiết 2-3 câu về địa điểm: lịch sử, đặc điểm nổi bật, nên làm gì ở đây",
+          "visualNote": "Gợi ý góc chụp ảnh hoặc món nên thử",
+          "transitToNext": "Hướng dẫn di chuyển đến điểm tiếp theo (phương tiện, thời gian, lộ trình ngắn)"
         }
       ]
     }
   ]
 }
 
-LƯU Ý: Số ngày phải đúng ${numDays}. Mọi chi phí phải thực tế và không vượt quá ngân sách ${budget}.`;
+LƯU Ý QUAN TRỌNG:
+- Số ngày PHẢI đúng ${numDays}. Chi phí từng hoạt động phải thực tế, tổng không vượt ${budget}.
+- Trường "transport" là phương tiện đến địa điểm đó, "transitToNext" là đi đến điểm tiếp.
+- "session" phải là một trong: "Sáng", "Chiều", "Tối" tùy theo giờ hoạt động.
+- "rating" là điểm đánh giá thực tế của địa điểm (từ 3.5 đến 5.0).
+- "cost" phải ghi rõ số tiền cụ thể, không ghi chung chung.`;
 
 
     let response;

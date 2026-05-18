@@ -20,22 +20,21 @@ const optionalAuth = (req, res, next) => {
   next();
 };
 
-// Hệ thống xoay vòng API Key để tránh Rate Limit / Hết Token
-const plannerKeys = [
-  process.env.GROQ_API_KEY_PLANNER,
-  process.env.GROQ_API_KEY_PLANNER_2
-].filter(Boolean);
+// Hệ thống xoay vòng API Key dùng chung qua Groq Rotator
+const { callGroq } = require('../utils/groq-rotator');
 
-let currentKeyIndex = 0;
-let groq = new Groq({ apiKey: plannerKeys[currentKeyIndex] });
+const groq = {
+  chat: {
+    completions: {
+      create: async (params) => {
+        return await callGroq('planner', params);
+      }
+    }
+  }
+};
 
 function rotateGroqKey() {
-  if (plannerKeys.length > 1) {
-    currentKeyIndex = (currentKeyIndex + 1) % plannerKeys.length;
-    groq = new Groq({ apiKey: plannerKeys[currentKeyIndex] });
-    console.log(`🔄 [Groq Rotation] Đã chuyển sang API Key dự phòng (Key #${currentKeyIndex + 1})`);
-    return true;
-  }
+  // Được xử lý tự động và thông minh hơn bởi groq-rotator
   return false;
 }
 

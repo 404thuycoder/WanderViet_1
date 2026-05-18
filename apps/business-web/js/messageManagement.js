@@ -1,4 +1,4 @@
-﻿/**
+/**
  * messageManagement.js — Zenith Dark Messenger
  * Advanced Chat interface for WanderViệt Business Partner Hub.
  */
@@ -25,72 +25,118 @@
         const raw = userMessage;
         const clean = normalize(raw);
 
+        // 0. Dạy trí nhớ (chỉ cho phép dạy về nghiệp vụ portal, không dạy thông tin nhạy cảm)
         if (raw.toLowerCase().startsWith('day:')) {
             const parts = raw.substring(4).split('=');
             if (parts.length === 2) {
                 const k = normalize(parts[0]);
                 const v = parts[1].trim();
+                // Từ chối ghi nhớ thông tin nhạy cảm
+                const sensitiveKeys = ['doanh thu', 'loi nhuan', 'lai lo', 'mat khau', 'password', 'cmnd', 'cccd', 'tai khoan'];
+                if (sensitiveKeys.some(sk => k.includes(sk))) {
+                    return 'Xin lỗi, em không thể ghi nhớ thông tin nhạy cảm. Chỉ có thể dạy em về nghiệp vụ sử dụng portal ạ.';
+                }
                 aiMemory[k] = v;
                 localStorage.setItem('chatbot_memory_v5', JSON.stringify(aiMemory));
-                return `Đã học! Từ giờ khi nhắc đến '${k}', em sẽ trả lời: '${v}'`;
+                return `Đã học! Khi hỏi về '${k}', em sẽ trả lời: '${v}'`;
             }
         }
 
+        // 1. PRIVACY GUARD — Chặn câu hỏi nhạy cảm tuyệt đối
+        const privacyPatterns = [
+            /doanh\s*thu|l[oợ]i\s*nhu[aậ]n|l[aã]i\s*l[oỗ]|t[ỉỷ]\s*xu[aấ]t/i,
+            /t[aà]i\s*ch[ií]nh\s*(doanh\s*nghi[eệ]p|c[oô]ng\s*ty)/i,
+            /revenue|profit|\bloss\b|margin/i,
+            /m[aậ]t\s*kh[aẩ]u|password|api\s*key|secret/i,
+            /\bcmnd\b|\bcccd\b|c[aă]n\s*c[uư][oớ]c|h[oộ]\s*chi[eế]u/i,
+            /th[oô]ng\s*tin\s*c[aá]\s*nh[aâ]n.*(?:user|ng[uư][oờ]i\s*d[uù]ng)/i,
+        ];
+        if (privacyPatterns.some(p => p.test(raw))) {
+            return 'Xin lỗi, em không thể tư vấn về thông tin đó. Em chỉ hỗ trợ vận hành Business Portal WanderViệt. Bạn cần hướng dẫn tính năng nào không ạ? 🏢';
+        }
+
+        // 2. Tra trí nhớ đã học
         for (let k in aiMemory) {
             if (clean.includes(k)) return aiMemory[k];
         }
 
+        // 3. Hướng dẫn sử dụng Business Portal
+        const portalGuide = [
+            'huong dan', 'cach dung', 'su dung', 'tinh nang', 'dashboard',
+            'quan ly', 'dich vu', 'booking', 'dat cho', 'them dich vu', 'dang dich vu',
+            'cap nhat', 'chinh sua', 'xoa dich vu', 'tin nhan', 'thong bao'
+        ];
+        if (portalGuide.some(k => clean.includes(k))) {
+            const guides = {
+                'dashboard': 'Dashboard hiển thị tổng quan: số lượt đặt, dịch vụ đang chạy và thông báo mới nhất của bạn.',
+                'them dich vu': 'Để thêm dịch vụ: vào **Quản lý Dịch vụ** → nhấn **+ Thêm mới** → điền thông tin và nhấn **Lưu**. Dịch vụ sẽ chờ Admin duyệt.',
+                'dang dich vu': 'Để đăng dịch vụ: vào **Quản lý Dịch vụ** → nhấn **+ Thêm mới** → điền thông tin và nhấn **Lưu**.',
+                'dat cho': 'Vào tab **Đặt chỗ (Bookings)** để xem danh sách đặt chỗ, xác nhận hoặc từ chối yêu cầu.',
+                'booking': 'Vào tab **Đặt chỗ (Bookings)** để xem và xử lý các yêu cầu đặt dịch vụ từ khách.',
+                'tin nhan': 'Vào tab **Tin nhắn** để giao tiếp trực tiếp với khách hàng đã đặt dịch vụ.',
+            };
+            for (const key in guides) {
+                if (clean.includes(key)) return guides[key];
+            }
+            return 'Business Portal WanderViệt gồm:\n✅ **Dashboard**: Tổng quan\n✅ **Quản lý Dịch vụ**: Thêm/sửa/xóa\n✅ **Đặt chỗ**: Xử lý booking\n✅ **Tin nhắn**: Chat với khách\nBạn cần hướng dẫn phần nào ạ?';
+        }
+
+        // 4. Xử lý flow đặt chỗ
         if (aiSession.step === 'asking_people') {
             const num = raw.match(/\d+/);
             if (num) {
                 aiSession.step = 'asking_date';
                 aiSession.data.people = num[0];
-                return `Dạ, em ghi nhận đặt cho ${num[0]} người. Vậy mình dự định khởi hành/nhận phòng vào ngày nào ạ?`;
+                return `Dạ, em ghi nhận đặt cho ${num[0]} người. Mình dự định khởi hành/nhận phòng vào ngày nào ạ?`;
             }
-            return "Dạ mình đi mấy người để em kiểm tra chỗ ạ?";
+            return 'Dạ mình đi mấy người để em kiểm tra chỗ ạ?';
         }
-
         if (aiSession.step === 'asking_date') {
             aiSession.step = 'asking_phone';
             aiSession.data.date = raw;
-            return `Ngày ${raw} bên em vẫn còn dịch vụ ạ. Bạn cho em xin số điện thoại để em giữ chỗ cho mình nhé!`;
+            return `Ngày ${raw} bên em vẫn còn dịch vụ ạ. Bạn cho em xin số điện thoại để giữ chỗ nhé!`;
         }
-
         if (aiSession.step === 'asking_phone') {
             const phone = raw.match(/\d{9,11}/);
             if (phone) {
                 aiSession = { step: 'idle', data: {} };
-                return `Tuyệt vời! Em đã nhận số ${phone[0]}. Nhân viên sẽ gọi lại tư vấn chi tiết cho mình trong ít phút nữa ạ. Cảm ơn bạn! 😊`;
+                return `Tuyệt vời! Em đã nhận số ${phone[0]}. Nhân viên sẽ gọi lại trong ít phút ạ. Cảm ơn! 😊`;
             }
-            return "Dạ cho em xin số điện thoại để liên hệ xác nhận ạ.";
+            return 'Dạ cho em xin số điện thoại để liên hệ xác nhận ạ.';
         }
 
+        // 5. Intent cơ bản
         const intents = {
-            services: ["dich vu", "co gi", "lam gi", "san pham", "tien ich"],
-            booking: ["dat phong", "thue phong", "book", "dat cho", "nghi"],
-            tour: ["tour", "du lich", "di choi"],
-            price: ["gia", "bao nhieu", "bao tien", "chi phi"]
+            services: ['dich vu', 'co gi', 'lam gi', 'san pham'],
+            booking:  ['dat phong', 'thue phong', 'book', 'dat cho', 'nghi'],
+            tour:     ['tour', 'du lich', 'di choi'],
+            price:    ['gia', 'bao nhieu', 'bao tien', 'chi phi'],
+            greeting: ['chao', 'hi', 'hello', 'oi', 'alo'],
         };
-
-        if (intents.services.some(k => clean.includes(k))) {
-            return "Dạ bên em cung cấp 2 dịch vụ chính: \n1. **Khách sạn & Resort** cao cấp. \n2. **Tour du lịch trọn gói**. \nBạn muốn tìm hiểu kỹ hơn về dịch vụ nào ạ?";
-        }
-
-        if (intents.booking.some(k => clean.includes(k)) || clean.includes("phong")) {
+        if (intents.greeting.some(k => clean.includes(k)))
+            return 'Chào bạn! Em là Trợ lý WanderViệt. Em có thể hỗ trợ bạn về dịch vụ du lịch hoặc hướng dẫn sử dụng Business Portal. Bạn cần gì ạ?';
+        if (intents.services.some(k => clean.includes(k)))
+            return 'Bên em cung cấp **Tour du lịch** và **Khách sạn & Resort** cao cấp. Bạn muốn tìm hiểu dịch vụ nào ạ?';
+        if (intents.booking.some(k => clean.includes(k)) || clean.includes('phong')) {
             aiSession.step = 'asking_people';
-            return "Dạ em hỗ trợ mình đặt phòng ạ. Mình dự định đi mấy người để em tư vấn hạng phòng phù hợp nhất?";
+            return 'Dạ em hỗ trợ đặt phòng. Mình dự định đi mấy người ạ?';
         }
-
         if (intents.tour.some(k => clean.includes(k))) {
             aiSession.step = 'asking_people';
-            return "Dạ em hỗ trợ đặt tour ạ. Mình đi đoàn mấy người để em báo giá ưu đãi nhất?";
+            return 'Dạ em hỗ trợ đặt tour. Đoàn mình mấy người để em báo giá ưu đãi ạ?';
         }
+        if (intents.price.some(k => clean.includes(k)))
+            return 'Giá dịch vụ linh hoạt theo thời điểm và hạng. Bạn quan tâm tour hay phòng khách sạn để em gửi bảng giá ạ?';
 
-        if (intents.price.some(k => clean.includes(k))) {
-            return "Dạ giá bên em rất linh hoạt tùy theo thời điểm và hạng dịch vụ. Bạn đang quan tâm đến tour hay phòng khách sạn để em gửi bảng giá mới nhất ạ?";
-        }
+        // 6. Off-topic — từ chối lịch sự
+        const offTopicPatterns = [
+            /h[oọ]c|tr[uườ]ng|b[eệ]nh|thu[oố]c|ch[ứú]ng\s*kho[aá]n/i,
+            /b[oó]ng\s*[đd][aá]|game|phim|nh[aạ]c|th[eờ]i\s*ti[eế]t/i,
+        ];
+        if (offTopicPatterns.some(p => p.test(raw)))
+            return 'Xin lỗi, em chỉ hỗ trợ về dịch vụ và vận hành Business Portal WanderViệt ạ. Bạn cần hướng dẫn gì không? 🏢';
 
-        return "Dạ em đã nhận được tin nhắn của bạn. Em là trợ lý ảo WanderViệt, bạn có thể hỏi em về đặt tour, đặt phòng hoặc báo giá ạ!";
+        return 'Dạ em là Trợ lý WanderViệt. Bạn có thể hỏi về đặt tour, đặt phòng, hoặc hướng dẫn sử dụng Business Portal ạ!';
     }
 
     // ── Styles ──────────────────────────────────────────────────

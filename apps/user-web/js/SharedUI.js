@@ -1211,7 +1211,70 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
             <div class="chat-panel__right-sidebar" id="global-chat-info-panel">
               <div class="chat-panel__right-inner">
-                <h4>💡 Mẹo trò chuyện</h4>
+                <!-- Premium Live Widgets -->
+                <div class="chat-widgets-container">
+                  <div class="chat-widget-card widget-clock">
+                    <div class="widget-clock__main">
+                      <div class="widget-clock__time" id="widget-realtime-clock">--:--:--</div>
+                      <div class="widget-clock__date" id="widget-realtime-date">--/--/----</div>
+                    </div>
+                    <div class="widget-clock__divider"></div>
+                    <div class="widget-clock__duration">
+                      <span class="widget-clock__duration-label">⏳ Thời gian online:</span>
+                      <span class="widget-clock__duration-value" id="widget-site-duration">00:00</span>
+                    </div>
+                  </div>
+                  
+                  <div class="chat-widget-card widget-weather">
+                    <div class="widget-weather__info">
+                      <span class="widget-weather__city">📍 Hà Nội</span>
+                      <span class="widget-weather__desc">Thời tiết du lịch rất đẹp ☀️</span>
+                    </div>
+                    <div class="widget-weather__temp">28°C</div>
+                  </div>
+
+                  <!-- Dynamic WanderRadio Interactive Widget -->
+                  <div class="chat-widget-card widget-radio">
+                    <div class="widget-radio__header">
+                      <span class="widget-radio__title">🎧 WanderRadio</span>
+                      <span class="widget-radio__status" id="radio-status">Đang dừng</span>
+                    </div>
+                    <div class="widget-radio__body">
+                      <div class="widget-radio__info">
+                        <span class="widget-radio__track" id="radio-track">Lo-Fi Hồ Tây ☕</span>
+                        <span class="widget-radio__author">WanderViệt Ambient</span>
+                      </div>
+                      <button type="button" class="widget-radio__play-btn" id="radio-play-btn" title="Phát nhạc">▶</button>
+                    </div>
+                    <!-- CSS Wave visualizer bars -->
+                    <div class="widget-radio__wave" id="radio-wave">
+                      <div class="wave-bar"></div>
+                      <div class="wave-bar"></div>
+                      <div class="wave-bar"></div>
+                      <div class="wave-bar"></div>
+                      <div class="wave-bar"></div>
+                      <div class="wave-bar"></div>
+                      <div class="wave-bar"></div>
+                    </div>
+                  </div>
+
+                  <!-- Dynamic WanderQuiz Interactive Widget -->
+                  <div class="chat-widget-card widget-quiz">
+                    <div class="widget-quiz__header">
+                      <span class="widget-quiz__title">🏆 WanderQuiz</span>
+                      <span class="widget-quiz__points" id="quiz-points">+100 XP</span>
+                    </div>
+                    <div class="widget-quiz__question" id="quiz-question">Phố cổ Hội An nằm ở tỉnh nào?</div>
+                    <div class="widget-quiz__options" id="quiz-options">
+                      <button type="button" class="quiz-opt-btn" onclick="WanderUI.submitQuizAnswer(this, false)">Đà Nẵng</button>
+                      <button type="button" class="quiz-opt-btn" onclick="WanderUI.submitQuizAnswer(this, true)">Quảng Nam</button>
+                      <button type="button" class="quiz-opt-btn" onclick="WanderUI.submitQuizAnswer(this, false)">Quảng Ngãi</button>
+                    </div>
+                    <div class="widget-quiz__result" id="quiz-result" hidden></div>
+                  </div>
+                </div>
+                
+                <h4 style="margin-top: 1.5rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: middle; margin-right: 4px; display: inline-block;"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg> Mẹo trò chuyện</h4>
                 <div class="chat-tips-list">
                   <div class="chat-tip-item" onclick="document.getElementById('global-chat-input').value='Lên lịch trình 3 ngày tại Đà Nẵng'; document.getElementById('global-chat-form').dispatchEvent(new Event('submit'));">📅 Lên lịch trình 3 ngày tại Đà Nẵng</div>
                   <div class="chat-tip-item" onclick="document.getElementById('global-chat-input').value='Khách sạn gần Hồ Hoàn Kiếm'; document.getElementById('global-chat-form').dispatchEvent(new Event('submit'));">🏨 Khách sạn gần Hồ Hoàn Kiếm</div>
@@ -2362,6 +2425,155 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       });
     }
 
+    // --- UPDATE LIVE WIDGETS (CLOCK & SITE DURATION) ---
+    const siteStartTime = Date.now();
+    function updateLiveWidgets() {
+      const timeEl = document.getElementById('widget-realtime-clock');
+      const dateEl = document.getElementById('widget-realtime-date');
+      const durEl = document.getElementById('widget-site-duration');
+      
+      if (!timeEl && !dateEl && !durEl) return;
+      
+      const now = new Date();
+      
+      // Update Time
+      if (timeEl) {
+        timeEl.textContent = now.toLocaleTimeString('vi-VN', { hour12: false });
+      }
+      
+      // Update Date
+      if (dateEl) {
+        const dd = String(now.getDate()).padStart(2, '0');
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        dateEl.textContent = `${dd}/${mm}/${yyyy}`;
+      }
+      
+      // Update Active Duration
+      if (durEl) {
+        const diffMs = Date.now() - siteStartTime;
+        const totalSecs = Math.floor(diffMs / 1000);
+        const mins = Math.floor(totalSecs / 60);
+        const secs = totalSecs % 60;
+        const formattedMins = String(mins).padStart(2, '0');
+        const formattedSecs = String(secs).padStart(2, '0');
+        durEl.textContent = `${formattedMins}:${formattedSecs}`;
+      }
+    }
+    
+    // Start interval
+    setInterval(updateLiveWidgets, 1000);
+    updateLiveWidgets(); // Run immediately
+
+    // --- WANDERRADIO HANDLERS ---
+    let isRadioPlaying = false;
+    let radioAudio = null;
+    
+    function initRadioHandlers() {
+      const playBtn = document.getElementById('radio-play-btn');
+      const statusEl = document.getElementById('radio-status');
+      const waveEl = document.getElementById('radio-wave');
+      
+      if (!playBtn) return;
+      
+      playBtn.addEventListener('click', () => {
+        if (!radioAudio) {
+          // Play a beautiful public-domain Lo-Fi stream
+          radioAudio = new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
+          radioAudio.loop = true;
+          radioAudio.volume = 0.35;
+        }
+        
+        if (!isRadioPlaying) {
+          radioAudio.play().then(() => {
+            isRadioPlaying = true;
+            playBtn.textContent = '⏸';
+            statusEl.textContent = 'Đang phát';
+            statusEl.classList.add('is-playing');
+            if (waveEl) waveEl.classList.add('is-active');
+            showToast('Đang phát WanderRadio: Lo-Fi Hồ Tây ☕', 'info');
+          }).catch(err => {
+            // Autoplay safety fallback (simulated active state)
+            isRadioPlaying = true;
+            playBtn.textContent = '⏸';
+            statusEl.textContent = 'Đang phát (Mute)';
+            statusEl.classList.add('is-playing');
+            if (waveEl) waveEl.classList.add('is-active');
+            showToast('Đang mô phỏng phát nhạc Ambient du lịch!', 'info');
+          });
+        } else {
+          if (radioAudio) radioAudio.pause();
+          isRadioPlaying = false;
+          playBtn.textContent = '▶';
+          statusEl.textContent = 'Đang dừng';
+          statusEl.classList.remove('is-playing');
+          if (waveEl) waveEl.classList.remove('is-active');
+          showToast('Đã tạm dừng phát nhạc.', 'info');
+        }
+      });
+    }
+    
+    setTimeout(initRadioHandlers, 200); // Wait for templates to mount
+
+    // --- WANDERQUIZ HANDLERS ---
+    const quizQuestions = [
+      { q: "Phố cổ Hội An nằm ở tỉnh nào?", options: ["Đà Nẵng", "Quảng Nam", "Quảng Ngãi"], correct: 1 },
+      { q: "Hồ Gươm gắn liền với vị vua nào trả gươm?", options: ["Lê Lợi", "Lý Thái Tổ", "Trần Hưng Đạo"], correct: 0 },
+      { q: "Món lẩu đặc sản nổi tiếng nhất ở Sa Pa là gì?", options: ["Lẩu Cá Hồi", "Lẩu Mắm", "Lẩu Thái"], correct: 0 },
+      { q: "Vịnh Hạ Long được UNESCO công nhận là di sản thế giới mấy lần?", options: ["1 lần", "2 lần", "3 lần"], correct: 1 }
+    ];
+    let currentQuizIndex = 0;
+    
+    function submitQuizAnswer(btn, isCorrect) {
+      const resultEl = document.getElementById('quiz-result');
+      const optionsEl = document.getElementById('quiz-options');
+      
+      if (!resultEl || !optionsEl) return;
+      
+      const buttons = optionsEl.querySelectorAll('.quiz-opt-btn');
+      buttons.forEach(b => b.disabled = true);
+      
+      if (isCorrect) {
+        btn.classList.add('quiz-opt-btn--correct');
+        resultEl.textContent = "🎉 Chính xác! Bạn nhận được +100 XP ⚡";
+        resultEl.style.color = "#4ade80";
+        showToast('Chúc mừng! Bạn trả lời đúng và nhận +100 XP!', 'success');
+      } else {
+        btn.classList.add('quiz-opt-btn--incorrect');
+        buttons.forEach((b, idx) => {
+          if (idx === quizQuestions[currentQuizIndex].correct) {
+            b.classList.add('quiz-opt-btn--correct');
+          }
+        });
+        resultEl.textContent = "❌ Sai rồi! Hãy thử câu tiếp theo nhé.";
+        resultEl.style.color = "#f87171";
+      }
+      
+      resultEl.removeAttribute('hidden');
+      
+      setTimeout(() => {
+        currentQuizIndex = (currentQuizIndex + 1) % quizQuestions.length;
+        const nextQ = quizQuestions[currentQuizIndex];
+        
+        const questionEl = document.getElementById('quiz-question');
+        if (questionEl) questionEl.textContent = nextQ.q;
+        
+        optionsEl.innerHTML = '';
+        nextQ.options.forEach((opt, idx) => {
+          const optBtn = document.createElement('button');
+          optBtn.type = 'button';
+          optBtn.className = 'quiz-opt-btn';
+          optBtn.textContent = opt;
+          optBtn.onclick = () => submitQuizAnswer(optBtn, idx === nextQ.correct);
+          optionsEl.appendChild(optBtn);
+        });
+        
+        resultEl.setAttribute('hidden', 'true');
+        resultEl.textContent = '';
+      }, 3500);
+    }
+    window.WanderUI.submitQuizAnswer = submitQuizAnswer;
+
     // Also support external toggle buttons (like in header or hero)
     document.querySelectorAll('[data-chat-toggle]').forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -3073,77 +3285,25 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             <button type="button" class="btn-proposal-action" style="margin-top:12px; width:100%; padding:10px; border-radius:10px; background:var(--accent); color:#000; font-weight:800; border:none; cursor:pointer; transition:all 0.2s; box-shadow: 0 4px 12px rgba(16,185,129,0.3);">Xem chi tiết & Chỉnh sửa 🚀</button>
         `;
         const btn = card.querySelector('button');
-        btn.onclick = async () => {
-            const isPlannerPage = window.location.pathname.includes('planner.html') && window.WanderPlanner;
-            
-            if (isPlannerPage) {
-                // Chuyển sang UI chính nếu đang ở trang Planner
-                btn.textContent = '🚀 Chuyển sang AI Trợ lý...';
-                btn.disabled = true;
-
-                // THÊM: Thoát fullscreen nếu đang mở rộng để thấy UI chính bên dưới
-                if (panel.classList.contains('chat-panel--fullscreen')) {
-                    panel.classList.remove('chat-panel--fullscreen');
-                    fabWrap.classList.remove('is-fullscreen');
-                    const expandBtn = document.getElementById('global-chat-expand-btn');
-                    if (expandBtn) { expandBtn.textContent = '⛶'; expandBtn.title = 'Phóng to toàn màn hình'; }
-                }
-
-                if (typeof window.WanderPlanner.loadDraft === 'function') {
-                    window.WanderPlanner.loadDraft(proposal);
-                    if (typeof togglePanel === 'function') togglePanel();
-                    return;
-                }
-            }
-
-            // Fallback: Hiện inline trong chat
-            btn.textContent = '⏳ Đang lập lịch...';
+        btn.onclick = () => {
+            btn.textContent = '🚀 Đang chuyển hướng...';
             btn.disabled = true;
 
-            try {
-                const token = localStorage.getItem('wander_token');
-                const selectedLang = localStorage.getItem('wander_chat_lang') || 'vi';
-                const prompt = `Lập lịch trình chi tiết ${proposal.days} ngày tại ${proposal.destination}. Phong cách: ${proposal.style}. Ngân sách: ${proposal.budget}. ${proposal.description}`;
-
-                // Hiện typing indicator
-                const typingDiv = document.createElement('div');
-                typingDiv.className = 'chat-message-row chat-message-row--bot';
-                typingDiv.id = 'proposal-single-typing';
-                typingDiv.innerHTML = '<div class="chat-bubble chat-bubble--bot" style="padding:0.75rem 1.25rem;"><span style="opacity:0.6;font-size:0.85rem">🤔 Đang lên kế hoạch chi tiết...</span></div>';
-                log.appendChild(typingDiv);
-                scrollToBottom();
-
-                const res = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-auth-token': token || '' },
-                    body: JSON.stringify({ message: prompt, lang: selectedLang, sessionId: currentSessionId })
-                });
-                const data = await res.json();
-
-                // Xóa typing indicator
-                const ti = document.getElementById('proposal-single-typing');
-                if (ti) ti.remove();
-
-                if (data.success) {
-                    const hasTag = data.answer && data.answer.includes('[ITIN_CARD:');
-                    appendMsg(data.answer || `✅ Đã lập lịch trình ${proposal.days} ngày tại ${proposal.destination}!`, 'bot');
-                    if (!hasTag && data.itineraryCard) {
-                        renderItineraryCard(data.itineraryCard);
-                    }
-                    if (data.sessionId) {
-                        currentSessionId = data.sessionId;
-                        localStorage.setItem('wander_current_session', currentSessionId);
-                    }
-                } else {
-                    btn.textContent = 'Xem chi tiết & Chỉnh sửa 🚀';
-                    btn.disabled = false;
-                    appendMsg('Không thể tạo lịch trình. Vui lòng thử lại.', 'bot');
-                }
-            } catch(e) {
-                btn.textContent = 'Xem chi tiết & Chỉnh sửa 🚀';
-                btn.disabled = false;
-                appendMsg('Lỗi kết nối. Vui lòng thử lại.', 'bot');
+            // Thoát fullscreen nếu có
+            if (panel.classList.contains('chat-panel--fullscreen')) {
+                panel.classList.remove('chat-panel--fullscreen');
+                fabWrap.classList.remove('is-fullscreen');
+                const expandBtn = document.getElementById('global-chat-expand-btn');
+                if (expandBtn) { expandBtn.textContent = '⛶'; expandBtn.title = 'Phóng to toàn màn hình'; }
             }
+
+            // Đóng panel chat
+            if (typeof togglePanel === 'function') {
+                togglePanel();
+            }
+
+            // Chuyển hướng trực tiếp sang AI Assistant
+            window.location.href = `/planner.html?view=true&itinId=${proposal._id}`;
         };
         log.appendChild(card);
           scrollToBottom();
@@ -3166,6 +3326,10 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                 </div>
             `;
             card.onclick = () => {
+                if (p.externalUrl) {
+                    window.open(p.externalUrl, '_blank');
+                    return;
+                }
                 if (window.WanderUI && window.WanderUI.showPlaceDetail) {
                     window.WanderUI.showPlaceDetail(p.id || p.name);
                 } else {
@@ -3191,7 +3355,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             
             card.innerHTML = `
                 <div class="chat-tour-img" style="width: 100%; height: 130px; min-height: 130px; flex-shrink: 0; background-image:url('${t.images?.[0] || t.image || 'assets/img/hero_nature.jpg'}'); background-size: cover; background-position: center; position: relative;">
-                    <div class="chat-tour-badge" style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #f43f5e, #e11d48); color: #fff; font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; box-shadow: 0 4px 10px rgba(244,63,94,0.3);">TOUR</div>
+                    <div class="chat-tour-badge" style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #f43f5e, #e11d48); color: #fff; font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; box-shadow: 0 4px 10px rgba(244,63,94,0.3);">${t.isTour ? 'TOUR' : (t.kind === 'khach-san' || t.businessCategory === 'stay' ? 'KHÁCH SẠN' : (t.kind === 'nha-hang' || t.businessCategory === 'dining' ? 'NHÀ HÀNG' : 'DỊCH VỤ'))}</div>
                 </div>
                 <div class="chat-tour-info" style="padding: 12px; flex: 1; display: flex; flex-direction: column;">
                     <div class="chat-tour-name" style="font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 6px; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${t.name}</div>
@@ -3203,6 +3367,10 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                 </div>
             `;
             card.onclick = () => {
+                if (t.externalUrl) {
+                    window.open(t.externalUrl, '_blank');
+                    return;
+                }
                 if (window.WanderUI && window.WanderUI.showPlaceDetail) {
                     window.WanderUI.showPlaceDetail(t._id || t.id);
                 } else {
@@ -3262,79 +3430,25 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                 <button type="button" class="btn-proposal-action" style="width:100%; padding:10px; border-radius:10px; background:linear-gradient(135deg, #00f0ff, #0ea5e9); color:#000; font-weight:800; border:none; cursor:pointer; transition:all 0.2s; font-size:0.8rem; letter-spacing:0.3px;">⚡ Chọn và lên lịch chi tiết →</button>
             `;
             const btn = card.querySelector('button');
-            btn.onclick = async () => {
-                const isPlannerPage = window.location.pathname.includes('planner.html') && window.WanderPlanner;
-                
-                if (isPlannerPage) {
-                    // Chuyển sang UI chính nếu đang ở trang Planner
-                    btn.textContent = '🚀 Chuyển sang AI Trợ lý...';
-                    btn.disabled = true;
-
-                    // THÊM: Thoát fullscreen nếu đang mở rộng để thấy UI chính bên dưới
-                    if (panel.classList.contains('chat-panel--fullscreen')) {
-                        panel.classList.remove('chat-panel--fullscreen');
-                        fabWrap.classList.remove('is-fullscreen');
-                        const expandBtn = document.getElementById('global-chat-expand-btn');
-                        if (expandBtn) { expandBtn.textContent = '⛶'; expandBtn.title = 'Phóng to toàn màn hình'; }
-                    }
-
-                    if (typeof window.WanderPlanner.loadDraft === 'function') {
-                        window.WanderPlanner.loadDraft(p);
-                        if (typeof togglePanel === 'function') togglePanel();
-                        return;
-                    }
-                }
-
-                // Fallback cho các trang khác: Hiện inline trong chat
-                btn.textContent = '⏳ Đang lập lịch...';
+            btn.onclick = () => {
+                btn.textContent = '🚀 Đang chuyển hướng...';
                 btn.disabled = true;
 
-                try {
-                    const token = localStorage.getItem('wander_token');
-                    const selectedLang = localStorage.getItem('wander_chat_lang') || 'vi';
-                    const prompt = `Lập lịch trình chi tiết ${p.days} ngày tại ${p.destination}. Phong cách: ${p.style}. Ngân sách: ${p.budget}. ${p.description}`;
-
-                    // Hiện typing indicator
-                    const typingDiv = document.createElement('div');
-                    typingDiv.className = 'chat-message-row chat-message-row--bot';
-                    typingDiv.id = 'proposal-typing-indicator';
-                    typingDiv.innerHTML = '<div class="chat-bubble chat-bubble--bot" style="padding:0.75rem 1.25rem;"><span style="opacity:0.6;font-size:0.85rem">🤔 Đang lên kế hoạch chi tiết...</span></div>';
-                    log.appendChild(typingDiv);
-                      scrollToBottom();
-
-                    const res = await fetch('/api/chat', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'x-auth-token': token || '' },
-                        body: JSON.stringify({ message: prompt, lang: selectedLang, sessionId: currentSessionId })
-                    });
-                    const data = await res.json();
-
-                    // Xóa typing indicator
-                    const ti = document.getElementById('proposal-typing-indicator');
-                    if (ti) ti.remove();
-
-                    if (data.success) {
-                        // appendMsg sẽ tự parse [ITIN_CARD:] và gọi renderItineraryCard nếu có tag
-                        const hasTag = data.answer && data.answer.includes('[ITIN_CARD:');
-                        appendMsg(data.answer || `✅ Đã lập lịch trình ${p.days} ngày tại ${p.destination}!`, 'bot');
-                        // Chỉ gọi renderItineraryCard thủ công nếu answer KHÔNG có tag nhúng
-                        if (!hasTag && data.itineraryCard) {
-                            renderItineraryCard(data.itineraryCard);
-                        }
-                        if (data.sessionId) {
-                            currentSessionId = data.sessionId;
-                            localStorage.setItem('wander_current_session', currentSessionId);
-                        }
-                    } else {
-                        btn.textContent = 'Chọn hành trình này →';
-                        btn.disabled = false;
-                        appendMsg('Không thể tạo lịch trình. Vui lòng thử lại.', 'bot');
-                    }
-                } catch(e) {
-                    btn.textContent = 'Chọn hành trình này →';
-                    btn.disabled = false;
-                    appendMsg('Lỗi kết nối. Vui lòng thử lại.', 'bot');
+                // Thoát fullscreen nếu có
+                if (panel.classList.contains('chat-panel--fullscreen')) {
+                    panel.classList.remove('chat-panel--fullscreen');
+                    fabWrap.classList.remove('is-fullscreen');
+                    const expandBtn = document.getElementById('global-chat-expand-btn');
+                    if (expandBtn) { expandBtn.textContent = '⛶'; expandBtn.title = 'Phóng to toàn màn hình'; }
                 }
+
+                // Đóng panel chat
+                if (typeof togglePanel === 'function') {
+                    togglePanel();
+                }
+
+                // Chuyển hướng trực tiếp sang AI Assistant
+                window.location.href = `/planner.html?view=true&itinId=${p._id}`;
             };
             container.appendChild(card);
         });

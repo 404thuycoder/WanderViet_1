@@ -74,8 +74,17 @@ function calculateRank(points, role = 'user') {
 }
 const Itinerary = require('../models/Itinerary');
 const jwt = require('jsonwebtoken');
-const Groq = require('groq-sdk');
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY_ADMIN || process.env.GROQ_API_KEY });
+const { callGroq } = require('../utils/groq-rotator');
+
+const groq = {
+  chat: {
+    completions: {
+      create: async (params) => {
+        return await callGroq('admin', params);
+      }
+    }
+  }
+};
 
 // ─────────────────────────────────────────────
 //  MIDDLEWARES PHÂN QUYỀN
@@ -1933,57 +1942,82 @@ router.post('/ai-chat', adminTokenAuth, adminAuth, async (req, res) => {
     const { message } = req.body;
     if (!message) return res.status(400).json({ success: false, message: 'Vui lòng nhập nội dung.' });
 
-    // Thu thập ngữ cảnh
+    // ═══ PRIVACY SENTINEL ═══
+    // Chặn tuyệt đối các câu hỏi vi phạm quyền riêng tư
+    const privacyBlockPatterns = [
+      /m[aậ]t\s*kh[aẩ]u\s*(c[uủ]a\s*)?(?:user|ng[uườ]i|doanh|admin)/i,
+      /password\s*(c[uủ]a\s*)?(user|doanh|admin)/i,
+      /api\s*key|secret\s*key|private\s*key/i,
+      /th[oô]ng\s*tin\s*c[aá]\s*nh[aâ]n\s*(c[uủ]a\s*)?(?:user|ng[uườ]i\s*d[uù]ng)/i,
+      /t[aà]i\s*kho[aả]n\s*ng[aâ]n\s*h[aà]ng|s[oố]\s*d[uư]/i,
+      /doanh\s*thu\s*(c[uủ]a\s*)?(?:c[oô]ng\s*ty|doanh\s*nghi[eệ]p)/i,
+      /l[oợ]i\s*nhu[aậ]n\s*(c[uủ]a\s*)?(?:c[oô]ng\s*ty|doanh\s*nghi[eệ]p)/i,
+    ];
+    if (privacyBlockPatterns.some(p => p.test(message))) {
+      return res.json({
+        success: true,
+        reply: 'Tôi là SENTINEL AI — không thể cung cấp thông tin đó do chính sách bảo mật hệ thống WanderViệt. Tôi có thể hỗ trợ bạn về vận hành Admin Panel không?',
+        action: null
+      });
+    }
+
+    // Thu thập ngữ cảnh hệ thống (chỉ thống kê tổng hợp, không lấy thông tin cá nhân)
     const [userCount, recentLogs] = await Promise.all([
       User.countDocuments(),
       SystemLog.find().sort({ timestamp: -1 }).limit(10)
     ]);
 
     const systemContext = `
-[SENTINEL CORE - REALTIME DATA]
+[DỮ LIỆU VẬN HÀNH - TỔNG HỢP]
 - Tổng User: ${userCount}
-- Nhật ký vận hành gần nhất:
-${recentLogs.map(l => `- ${l.userName || 'Hệ thống'}: ${l.action}`).join('\n')}
+- Nhật ký gần nhất:
+${recentLogs.map(l => `- ${l.action} (${new Date(l.timestamp).toLocaleTimeString('vi-VN')})`).join('\n')}
 `;
 
     const completion = await groq.chat.completions.create({
       messages: [
-        { 
-          role: "system", 
-          content: `BẠN LÀ: AI Sentinel - Cố vấn tối cao của WanderViệt.
-NHIỆM VỤ: Phân tích, so sánh thống kê, gợi ý hướng phát triển và hỗ trợ Super Admin điều hành Dashboard.
+        {
+          role: 'system',
+          content: `BẠN LÀ: SENTINEL AI — Trợ lý quản trị cấp cao của hệ thống WanderViệt.
 
-ĐIỀU KHOẢN TRẢ LỜI (QUAN TRỌNG):
-1. CHỈ trả lời các câu hỏi liên quan đến WanderViệt, dữ liệu hệ thống, quản trị Dashboard, hoặc các vấn đề du lịch/công nghệ liên quan đến dự án.
-2. Nếu người dùng hỏi về các chủ đề đời sống, cá nhân, chính trị, hoặc bất kỳ điều gì KHÔNG liên quan đến WanderViệt Admin, hãy lịch sự từ chối: "Xin lỗi, với tư cách là Sentinel Core, tôi chỉ tập trung hỗ trợ các tác vụ quản trị hệ thống WanderViệt. Vui lòng đặt câu hỏi liên quan đến Dashboard."
-3. Không trả lời các câu hỏi mang tính chất tán gẫu vô bổ.
+NHIỆM VỤ CHÍNH:
+1. Hỗ trợ Admin vận hành hệ thống WanderViệt hiệu quả
+2. Hướng dẫn sử dụng các panel: Overview, Moderation, Users, Broadcast, AI Intelligence, Places, Transactions, Analytics
+3. Gợi ý xử lý tình huống quản trị (duyệt nội dung, quản lý user, gửi broadcast)
+4. Phân tích xu hướng và đưa ra khuyến nghị vận hành
 
-ĐIỀU KHIỂN GIAO DIỆN (QUAN TRỌNG):
-- Bạn CÓ THỂ điều khiển Dashboard bằng tag: [ACTION:SWITCH_TAB:panel-name]
-- Tuy nhiên, CHỈ dùng tag này khi người dùng TRỰC TIẾP yêu cầu mở/chuyển/đi đến một trang cụ thể.
-- Ví dụ hợp lệ: "mở trang người dùng", "đưa tôi đến nhật ký", "chuyển sang AI Intelligence"
-- Tuyệt đối không tự ý chuyển tab khi người dùng chỉ hỏi bình thường.
+QUY TẮC BẮT BUỘC (KHÔNG ĐƯỢC VI PHẠM):
+- TUYỆT ĐỐI KHÔNG tiết lộ thông tin cá nhân (email, họ tên, địa chỉ, số điện thoại) của bất kỳ user hay doanh nghiệp nào
+- KHÔNG cung cấp mật khẩu, API key, secret, thông tin bảo mật hệ thống
+- KHÔNG tiết lộ dữ liệu tài chính cụ thể của từng doanh nghiệp hay cá nhân
+- KHÔNG thực thi lệnh thay đổi hệ thống trực tiếp qua chat
+- KHÔNG trả lời câu hỏi ngoài phạm vi quản trị hệ thống WanderViệt
+- Khi bị hỏi thông tin nhạy cảm: từ chối lịch sự "Thông tin đó được bảo mật theo chính sách WanderViệt."
+- Khi bị hỏi ngoài phạm vi: từ chối lịch sự và hướng về nghiệp vụ quản trị
 
-Các panel-name khả dụng: overview, users, places, moderation, ai-intelligence, feedbacks, itineraries, logs, knowledge, broadcast
+ĐIỀU KHIỂN GIAO DIỆN:
+- Có thể chuyển panel bằng tag: [ACTION:SWITCH_TAB:panel-name]
+- Chỉ dùng khi Admin trực tiếp yêu cầu chuyển trang.
+- Panels: overview, users, places, moderation, ai-intelligence, feedbacks, itineraries, logs, knowledge, broadcast
 
-DỮ LIỆU HỆ THỐNG: ${systemContext}` 
+PHONG CÁCH: Chính xác, ngắn gọn, chuyên nghiệp. Dưới 200 từ.
+
+DỮ LIỆU HỆ THỐNG: ${systemContext}`
         },
-        { role: "user", content: message }
+        { role: 'user', content: message }
       ],
-      model: "llama-3.3-70b-versatile",
-      temperature: 0.6,
-      max_tokens: 1000
+      model: 'llama-3.3-70b-versatile',
+      temperature: 0.5,
+      max_tokens: 800
     });
 
-    let reply = completion.choices[0]?.message?.content || "";
+    let reply = completion.choices[0]?.message?.content || '';
     let action = null;
 
-    // Trích xuất action nếu có
     const actionMatch = reply.match(/\[ACTION:(.*?):(.*?)\]/);
     if (actionMatch) {
       action = { type: actionMatch[1], value: actionMatch[2] };
-      // Xóa tag khỏi text hiển thị cho sạch
-      reply = reply.replace(/\[ACTION:.*?\]/g, "").trim();
+      reply = reply.replace(/\[ACTION:.*?\]/g, '').trim();
     }
 
     res.json({ success: true, reply, action });

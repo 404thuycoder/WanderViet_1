@@ -70,102 +70,116 @@
     async function processAIResponse(userInput) {
         const raw = userInput;
         const clean = normalize(raw);
-        
-        // 1. Nhận diện Ý định
+
+        // 0. PRIVACY GUARD — Chặn câu hỏi nhạy cảm
+        const privacyPatterns = [
+            /doanh\s*thu|l[oợ]i\s*nhu[aậ]n|l[aã]i\s*l[oỗ]|t[ỉỷ]\s*su[aấ]t/i,
+            /t[aà]i\s*ch[ií]nh\s*(c[uủ]a\s*)?(doanh\s*nghi[eệ]p|c[oô]ng\s*ty)/i,
+            /revenue|profit|\bloss\b/i,
+            /th[oô]ng\s*tin\s*c[aá]\s*nh[aâ]n|\bcmnd\b|\bcccd\b/i,
+            /m[aậ]t\s*kh[aẩ]u|password|api\s*key/i,
+        ];
+        if (privacyPatterns.some(p => p.test(raw))) {
+            return {
+                text: 'Xin lỗi, em không thể tư vấn về thông tin đó. Em chỉ hỗ trợ về dịch vụ và vận hành Business Portal WanderViệt. Bạn cần hướng dẫn gì không ạ? 🏢',
+                quick: ['Hướng dẫn đăng dịch vụ', 'Quản lý đặt chỗ', 'Liên hệ hỗ trợ']
+            };
+        }
+
+        // 1. Hướng dẫn sử dụng Business Portal
+        const portalGuidePatterns = [
+            /h[uướ]ng\s*d[aẫ]n|c[aá]ch\s*d[uù]ng|s[uử]\s*d[uụ]ng|t[íi]nh\s*n[aă]ng/i,
+            /dashboard|qu[aả]n\s*l[ýy]|d[iị]ch\s*v[uụ]|booking|[đd][aặ]t\s*ch[oỗ]/i,
+            /th[eê]m\s*d[iị]ch\s*v[uụ]|[đd][aă]ng\s*d[iị]ch\s*v[uụ]|c[aậ]p\s*nh[aậ]t/i,
+        ];
+        if (portalGuidePatterns.some(p => p.test(raw))) {
+            return {
+                text: pick([
+                    'Business Portal WanderViệt gồm các tính năng chính:\n- **Dashboard**: Tổng quan hoạt động\n- **Quản lý Dịch vụ**: Thêm/sửa tour, phòng\n- **Đặt chỗ (Bookings)**: Quản lý lịch đặt\n- **Tin nhắn**: Giao tiếp với khách\nBạn cần hướng dẫn phần nào ạ?',
+                    'Dạ em có thể hướng dẫn bạn:\n✅ Thêm dịch vụ mới\n✅ Xem và xử lý đặt chỗ\n✅ Nhắn tin với khách hàng\n✅ Cập nhật thông tin dịch vụ\nBạn muốn bắt đầu từ đâu ạ?',
+                ]),
+                quick: ['Cách thêm dịch vụ', 'Xem đặt chỗ', 'Nhắn tin khách hàng']
+            };
+        }
+
+        // 2. Nhận diện Ý định
         const intents = {
-            greeting: ["chao", "hi", "hello", "oi", "alo"],
-            price: ["gia", "bao nhieu", "chi phi", "dat khong", "re khong"],
-            contact: ["lien he", "so dien thoai", "hotline", "dia chi", "o dau", "email"],
-            booking: ["dat cho", "book", "thue", "mua", "dang ky"],
-            services: ["co dich vu gi", "lam gi", "san pham", "co gi"],
-            thanks: ["cam on", "thank", "ok", "tot qua"]
+            greeting: ['chao', 'hi', 'hello', 'oi', 'alo'],
+            price: ['gia', 'bao nhieu', 'chi phi', 'dat khong', 're khong'],
+            contact: ['lien he', 'so dien thoai', 'hotline', 'dia chi', 'o dau', 'email'],
+            booking: ['dat cho', 'book', 'thue', 'mua', 'dang ky'],
+            services: ['co dich vu gi', 'lam gi', 'san pham', 'co gi'],
+            thanks: ['cam on', 'thank', 'ok', 'tot qua']
         };
 
-        // 2. Tìm kiếm dữ liệu Real-time
+        // 3. Tìm kiếm dịch vụ thực tế
         let foundService = null;
-        if (clean.includes("tour") || clean.includes("khach san") || clean.includes("phong") || clean.includes("xe") || clean.includes("ve")) {
+        if (clean.includes('tour') || clean.includes('khach san') || clean.includes('phong') || clean.includes('xe') || clean.includes('ve')) {
             try {
                 const res = await window.api.get('/business/places');
                 const list = res.data || res || [];
                 foundService = list.find(s => normalize(s.name).includes(clean) || clean.includes(normalize(s.name)));
                 if (foundService) aiSession.lastService = foundService;
-            } catch (e) { console.error("AI Search Error:", e); }
+            } catch (e) { console.error('AI Search Error:', e); }
         }
 
-        // 3. Xử lý theo Context
+        // 4. Xử lý theo Context đặt chỗ
         if (aiSession.step === 'asking_people') {
             const num = raw.match(/\d+/);
             if (num) {
                 aiSession.step = 'asking_date';
                 aiSession.data.people = num[0];
-                return { text: pick([
-                    `Dạ em ghi nhận đoàn mình đi ${num[0]} người. Bạn dự kiến khởi hành/nhận phòng vào ngày nào ạ?`,
-                    `Ok ạ, đoàn ${num[0]} khách. Cho em hỏi ngày mình dự định đi là ngày mấy ạ?`,
-                    `Vâng, với đoàn ${num[0]} người thì bên em còn chỗ ạ. Mình đi vào ngày nào để em giữ chỗ nhé?`
-                ]), quick: ["Ngày mai", "Cuối tuần này", "Tháng sau"] };
+                return { text: `Dạ em ghi nhận đoàn ${num[0]} người. Bạn dự kiến ngày khởi hành/nhận phòng là ngày nào ạ?`, quick: ['Ngày mai', 'Cuối tuần này', 'Tháng sau'] };
             }
-            return { text: "Dạ mình dự kiến đi mấy người để em kiểm tra chỗ trống và áp dụng ưu đãi ạ?", quick: ["1 người", "2 người", "Đoàn đông"] };
+            return { text: 'Dạ mình dự kiến đi mấy người ạ?', quick: ['1 người', '2 người', 'Đoàn đông'] };
         }
-
         if (aiSession.step === 'asking_date') {
             aiSession.step = 'asking_phone';
             aiSession.data.date = raw;
-            return { text: pick([
-                `Ngày ${raw} hiện vẫn còn dịch vụ ạ! Bạn vui lòng để lại **Số điện thoại** để nhân viên gọi lại chốt lịch nhé.`,
-                `Dạ ngày ${raw} bên em vẫn phục vụ bình thường. Cho em xin SĐT để nhân viên tư vấn gọi lại ngay ạ!`,
-                `Vâng, ngày ${raw} đẹp quá ạ. Bạn để lại số điện thoại để em làm phiếu đăng ký giữ chỗ nhé.`
-            ]), quick: [] };
+            return { text: `Ngày ${raw} bên em vẫn còn chỗ ạ. Bạn vui lòng để lại **Số điện thoại** để nhân viên liên hệ xác nhận nhé.`, quick: [] };
         }
-
         if (aiSession.step === 'asking_phone') {
             const phone = raw.match(/\d{9,11}/);
             if (phone) {
                 aiSession.step = 'idle';
-                return { text: `Tuyệt vời! Em đã lưu thông tin. Nhân viên sẽ gọi lại số **${phone[0]}** trong ít phút nữa. Cảm ơn bạn! 😊`, quick: ["Quay lại trang chủ", "Hỏi thêm câu khác"] };
+                return { text: `Tuyệt vời! Em đã ghi nhận. Nhân viên sẽ liên hệ số **${phone[0]}** sớm nhất. Cảm ơn bạn! 😊`, quick: ['Hỏi thêm', 'Kết thúc'] };
             }
-            return { text: "Dạ cho em xin số điện thoại để liên hệ xác nhận dịch vụ cho mình ạ.", quick: [] };
+            return { text: 'Dạ cho em xin số điện thoại để liên hệ xác nhận ạ.', quick: [] };
         }
 
-        // 4. Trả lời dựa trên Intent
-        if (intents.greeting.some(k => clean.includes(k))) {
-            return { text: pick(variations.greeting), quick: ["Xem Tour nổi bật", "Tìm khách sạn", "Thông tin liên hệ"] };
-        }
-
-        if (intents.contact.some(k => clean.includes(k))) {
-            return { text: pick(variations.contact), quick: ["Gọi hotline ngay", "Gửi Email"] };
-        }
-
-        if (intents.services.some(k => clean.includes(k))) {
-            return { text: pick(variations.services), quick: ["Dịch vụ Tour", "Dịch vụ Tech"] };
-        }
-
+        // 5. Trả lời theo Intent
+        if (intents.greeting.some(k => clean.includes(k)))
+            return { text: pick(variations.greeting), quick: ['Xem Tour nổi bật', 'Tìm khách sạn', 'Hướng dẫn Portal'] };
+        if (intents.contact.some(k => clean.includes(k)))
+            return { text: pick(variations.contact), quick: ['Gọi hotline', 'Gửi Email'] };
+        if (intents.services.some(k => clean.includes(k)))
+            return { text: pick(variations.services), quick: ['Dịch vụ Tour', 'Hướng dẫn đăng dịch vụ'] };
         if (intents.price.some(k => clean.includes(k))) {
-            if (aiSession.lastService) {
-                return { text: pick([
-                    `Dịch vụ **${aiSession.lastService.name}** đang có giá là **${aiSession.lastService.price.toLocaleString()} VNĐ**. Bạn thấy mức giá này thế nào ạ?`,
-                    `Dạ, **${aiSession.lastService.name}** có giá **${aiSession.lastService.price.toLocaleString()} VNĐ**. Mình có muốn đặt ngay không?`,
-                    `Bên em đang cung cấp **${aiSession.lastService.name}** với giá ưu đãi **${aiSession.lastService.price.toLocaleString()} VNĐ**. Bạn cần thêm thông tin gì không ạ?`
-                ]), quick: ["Đặt ngay", "Tư vấn thêm"] };
-            }
-            return { text: pick(variations.price), quick: ["Báo giá Tour", "Báo giá Khách sạn"] };
+            if (aiSession.lastService)
+                return { text: `Dịch vụ **${aiSession.lastService.name}** có giá **${aiSession.lastService.price?.toLocaleString?.() || 'Liên hệ'} VNĐ**. Bạn muốn đặt không ạ?`, quick: ['Đặt ngay', 'Tư vấn thêm'] };
+            return { text: pick(variations.price), quick: ['Báo giá Tour', 'Báo giá Khách sạn'] };
         }
-
         if (intents.booking.some(k => clean.includes(k)) || foundService) {
             aiSession.step = 'asking_people';
-            const name = foundService ? foundService.name : (aiSession.lastService ? aiSession.lastService.name : "dịch vụ");
-            return { text: pick([
-                `Dạ em sẽ hỗ trợ bạn đặt **${name}**. Đoàn mình dự kiến đi bao nhiêu người ạ?`,
-                `Vâng, để đặt **${name}**, bạn cho em biết số lượng người tham gia nhé?`,
-                `Rất sẵn lòng ạ! Mình đặt cho mấy người để em kiểm tra hạng phòng/tour phù hợp cho **${name}** ạ?`
-            ]), quick: ["2 người", "4 người", "Đoàn trên 10 người"] };
+            const name = foundService?.name || aiSession.lastService?.name || 'dịch vụ';
+            return { text: `Dạ em hỗ trợ đặt **${name}**. Đoàn mình dự kiến đi bao nhiêu người ạ?`, quick: ['2 người', '4 người', 'Đoàn trên 10'] };
+        }
+        if (intents.thanks.some(k => clean.includes(k)))
+            return { text: pick(variations.thanks), quick: ['Hỏi thêm', 'Kết thúc'] };
+
+        // 6. Off-topic — hướng về Business Portal
+        const offTopicPatterns = [
+            /h[oọ]c|tr[uườ]ng|b[eệ]nh|thu[oố]c|ch[ứú]ng\s*kho[aá]n/i,
+            /th[eờ]i\s*ti[eế]t|b[oó]ng\s*[đd][aá]|game|phim/i,
+        ];
+        if (offTopicPatterns.some(p => p.test(raw))) {
+            return {
+                text: 'Xin lỗi, em chỉ hỗ trợ về dịch vụ và vận hành Business Portal WanderViệt ạ. Bạn cần hướng dẫn gì về nền tảng không? 🏢',
+                quick: ['Hướng dẫn Portal', 'Tư vấn Tour', 'Liên hệ hỗ trợ']
+            };
         }
 
-        if (intents.thanks.some(k => clean.includes(k))) {
-            return { text: pick(variations.thanks), quick: ["Hỏi thêm", "Kết thúc"] };
-        }
-
-        // 5. Fallback thông minh
-        return { text: pick(variations.fallback), quick: ["Tư vấn Tour", "Tư vấn Khách sạn", "Gặp nhân viên"] };
+        return { text: pick(variations.fallback), quick: ['Tư vấn Tour', 'Tư vấn Khách sạn', 'Hướng dẫn Portal'] };
     }
 
     // ── UI RENDERING ─────────────────────────────────────────────

@@ -28,6 +28,5 @@ const placeReviewSchema = new mongoose.Schema({
 });
 
 placeReviewSchema.index({ placeId: 1, rating: -1 });
-placeReviewSchema.index({ userId: 1 });
 
 module.exports = mongoose.models.PlaceReview || mongoose.model('PlaceReview', placeReviewSchema);

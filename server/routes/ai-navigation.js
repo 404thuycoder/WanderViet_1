@@ -1,8 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const Groq = require('groq-sdk');
+const { callGroq } = require('../utils/groq-rotator');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY_NAVIGATION });
+const groq = {
+  chat: {
+    completions: {
+      create: async (params) => {
+        return await callGroq('navigation', params);
+      }
+    }
+  }
+};
 
 const { auth } = require('./auth');
 

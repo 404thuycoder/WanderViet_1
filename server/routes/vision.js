@@ -1,10 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const Groq = require('groq-sdk');
 const fs = require('fs');
 const path = require('path');
+const { callGroq } = require('../utils/groq-rotator');
 
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const groq = {
+  chat: {
+    completions: {
+      create: async (params) => {
+        return await callGroq('user_chatbot', params);
+      }
+    }
+  }
+};
 
 router.post('/search', async (req, res) => {
   try {

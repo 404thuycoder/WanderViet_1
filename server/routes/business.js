@@ -15,8 +15,17 @@ const AIInsight = require('../models/AIInsight');
 const BusinessActivity = require('../models/BusinessActivity');
 const { syncBusinessXP } = require('../utils/rankUtils');
 const { broadcastGlobal } = require('../utils/socketManager');
-const Groq = require('groq-sdk');
-const groq = process.env.GROQ_API_KEY ? new Groq({ apiKey: process.env.GROQ_API_KEY }) : null;
+const { callGroq } = require('../utils/groq-rotator');
+
+const groq = {
+  chat: {
+    completions: {
+      create: async (params) => {
+        return await callGroq('business', params);
+      }
+    }
+  }
+};
 const { uploadFile } = require('../utils/gridfsStorage');
 
 const safeParseArray = (req, field, forceObjectArray = false) => {

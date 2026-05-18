@@ -11,7 +11,11 @@ const { initSocket } = require('./server/utils/socketManager');
 
 // Clean up environment variables
 if (process.env.GROQ_API_KEY) process.env.GROQ_API_KEY = process.env.GROQ_API_KEY.trim();
+if (process.env.GROQ_API_KEY_2) process.env.GROQ_API_KEY_2 = process.env.GROQ_API_KEY_2.trim();
+if (process.env.GROQ_API_KEY_3) process.env.GROQ_API_KEY_3 = process.env.GROQ_API_KEY_3.trim();
 if (process.env.GROQ_API_KEY_PLANNER) process.env.GROQ_API_KEY_PLANNER = process.env.GROQ_API_KEY_PLANNER.trim();
+if (process.env.GROQ_API_KEY_PLANNER_2) process.env.GROQ_API_KEY_PLANNER_2 = process.env.GROQ_API_KEY_PLANNER_2.trim();
+if (process.env.GROQ_API_KEY_PLANNER_3) process.env.GROQ_API_KEY_PLANNER_3 = process.env.GROQ_API_KEY_PLANNER_3.trim();
 if (process.env.GROQ_API_KEY_NAVIGATION) process.env.GROQ_API_KEY_NAVIGATION = process.env.GROQ_API_KEY_NAVIGATION.trim();
 if (process.env.JWT_SECRET) process.env.JWT_SECRET = process.env.JWT_SECRET.trim();
 if (process.env.MONGODB_URI) process.env.MONGODB_URI = process.env.MONGODB_URI.trim();

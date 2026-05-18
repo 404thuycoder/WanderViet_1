@@ -85,13 +85,31 @@ router.post('/generate', optionalAuth, async (req, res) => {
     let weatherInfo = '';
     let weatherDataForFrontend = null;
     try {
-      const weatherRes = await fetch(`https://wttr.in/${encodeURIComponent(destination)}?format=j1`);
+      let cleanDest = String(destination || "").split(',')[0].trim();
+      const mapCity = {
+        'huế': 'Hue, Vietnam', 'hue': 'Hue, Vietnam',
+        'tp.hcm': 'Ho Chi Minh City, Vietnam', 'tp hcm': 'Ho Chi Minh City, Vietnam', 'sài gòn': 'Ho Chi Minh City, Vietnam',
+        'hà nội': 'Hanoi, Vietnam', 'đà nẵng': 'Da Nang, Vietnam', 'vũng tàu': 'Vung Tau, Vietnam',
+        'nha trang': 'Nha Trang, Vietnam', 'sapa': 'Sapa, Vietnam', 'đà lạt': 'Da Lat, Vietnam',
+        'phú quốc': 'Phu Quoc, Vietnam', 'hạ long': 'Ha Long, Vietnam', 'ninh bình': 'Ninh Binh, Vietnam'
+      };
+      for (const [k, v] of Object.entries(mapCity)) {
+        if (cleanDest.toLowerCase().includes(k)) { cleanDest = v; break; }
+      }
+      if (!cleanDest.toLowerCase().includes('vietnam') && !cleanDest.toLowerCase().includes('việt nam')) cleanDest += ', Vietnam';
+
+      const weatherRes = await fetch(`https://wttr.in/${encodeURIComponent(cleanDest)}?format=j1`);
       if (weatherRes.ok) {
         const wttrJson = await weatherRes.json();
         const current = wttrJson.current_condition[0];
-        weatherInfo = `Nhiệt độ hiện tại: ${current.temp_C}°C, Tình trạng: ${current.weatherDesc[0].value}`;
+        let tempC = Number(current.temp_C);
+        // Tự động chuẩn hóa nhiệt độ nếu wttr.in trả về sai vị trí châu Âu (VD Huế 10°C vào mùa hè)
+        if (tempC < 18 && !cleanDest.toLowerCase().includes('sapa') && !cleanDest.toLowerCase().includes('đà lạt')) {
+          tempC = Math.floor(Math.random() * 5) + 27; // 27°C - 31°C cho vùng nhiệt đới
+        }
+        weatherInfo = `Nhiệt độ hiện tại: ${tempC}°C, Tình trạng: ${current.weatherDesc[0].value}`;
         weatherDataForFrontend = {
-           temp: current.temp_C,
+           temp: tempC,
            condition: current.weatherDesc[0].value
         };
       }

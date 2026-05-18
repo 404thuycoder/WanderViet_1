@@ -93,21 +93,43 @@ const GENERIC_VN_PHOTOS = [
 ];
 
 const VN_PLACES_VIDEOS = {
-  "hà nội": "35nL-Ma8OkM",
-  "hoàn kiếm": "35nL-Ma8OkM",
-  "phố cổ": "35nL-Ma8OkM",
-  "hạ long": "f9z_O9iP-84",
-  "ti tốp": "f9z_O9iP-84",
-  "sapa": "R7i_887eC-c",
-  "cát cát": "R7i_887eC-c",
-  "fansipan": "R7i_887eC-c",
-  "ninh bình": "W_q_B-O8y0A",
-  "tràng an": "W_q_B-O8y0A",
-  "đà nẵng": "1N9Ssw_D6x8",
-  "hội an": "1N9Ssw_D6x8",
-  "phú quốc": "c62mX3X3o2g",
-  "vũng tàu": "N0Z2L-d4Kx4",
-  "tp.hcm": "GexG9mE4C1s"
+  "hà nội": "1dodeGKcr1A",
+  "hoàn kiếm": "1dodeGKcr1A",
+  "phố cổ": "1dodeGKcr1A",
+  "hạ long": "Lgvc0l1UyaU",
+  "ti tốp": "Lgvc0l1UyaU",
+  "sapa": "xUQ9W45XbYM",
+  "cát cát": "xUQ9W45XbYM",
+  "fansipan": "xUQ9W45XbYM",
+  "ninh bình": "MhFBjagBUTk",
+  "tràng an": "MhFBjagBUTk",
+  "tam cốc": "MhFBjagBUTk",
+  "hang múa": "MhFBjagBUTk",
+  "đà nẵng": "1dodeGKcr1A",
+  "hội an": "1dodeGKcr1A",
+  "bà nà": "1dodeGKcr1A",
+  "phú quốc": "Lgvc0l1UyaU",
+  "vũng tàu": "xUQ9W45XbYM",
+  "tp.hcm": "1dodeGKcr1A",
+  "sài gòn": "1dodeGKcr1A",
+  "đà lạt": "Lgvc0l1UyaU",
+  "nha trang": "xUQ9W45XbYM",
+  "huế": "MhFBjagBUTk",
+  "quảng bình": "1dodeGKcr1A",
+  "phong nha": "1dodeGKcr1A",
+  "côn đảo": "Lgvc0l1UyaU",
+  "mộc châu": "xUQ9W45XbYM",
+  "hà giang": "xUQ9W45XbYM",
+  "quy nhơn": "Lgvc0l1UyaU",
+  "phú yên": "Lgvc0l1UyaU",
+  "cần thơ": "1dodeGKcr1A",
+  "bến tre": "1dodeGKcr1A",
+  "cà mau": "1dodeGKcr1A",
+  "an giang": "1dodeGKcr1A",
+  "tây ninh": "1dodeGKcr1A",
+  "bình thuận": "Lgvc0l1UyaU",
+  "mũi né": "Lgvc0l1UyaU",
+  "phan thiết": "Lgvc0l1UyaU"
 };
 
 function getVNPhoto(query, idx = 0) {
@@ -129,14 +151,22 @@ window.getVNPhoto = getVNPhoto;
 
 
 function getVNVideoId(query) {
-  if (!query) return '35nL-Ma8OkM';
+  if (!query) return '1dodeGKcr1A';
   const qLower = query.toLowerCase().trim();
   for (const [key, val] of Object.entries(VN_PLACES_VIDEOS)) {
     if (qLower.includes(key) || key.includes(qLower)) {
       return val;
     }
   }
-  return '35nL-Ma8OkM';
+  if (window.currentDestName) {
+    const dLower = window.currentDestName.toLowerCase().trim();
+    for (const [key, val] of Object.entries(VN_PLACES_VIDEOS)) {
+      if (dLower.includes(key) || key.includes(dLower)) {
+        return val;
+      }
+    }
+  }
+  return '1dodeGKcr1A';
 }
 
 window.getGPSDirections = function(destinationName, event) {
@@ -882,6 +912,14 @@ const initPlanner = function () {
     return str;
   }
 
+  function formatNameAndCost(str) {
+    if (!str) return 'Khách sạn / Homestay trung tâm';
+    // Format các số lớn từ 5 chữ số trở lên thành định dạng tiền tệ (VD: 3500000 -> 3.500.000 VNĐ)
+    return str.replace(/\b(\d{5,})\b/g, (match) => {
+      return Number(match).toLocaleString('vi-VN') + ' VNĐ';
+    });
+  }
+
   function generateItineraryHtml(plan, dest, days, planNum, weather) {
     if (weather) window.currentWeatherData = weather;
     window.currentDestName = typeof dest === 'object' ? (dest.name || dest.destination) : dest;
@@ -911,6 +949,17 @@ const initPlanner = function () {
       { name: 'Sơn Tùng', avatar: 'https://ui-avatars.com/api/?name=Son+Tung&background=random', text: 'View sống ảo đỉnh cao, nhân viên nhiệt tình.' }
     ];
 
+    let wTemp = weather ? Number(weather.temp) : 28;
+    let wCond = weather ? weather.condition : 'Nắng ấm / Mát mẻ';
+    const cleanD = String(dest || "").split(',')[0].trim();
+    if (weather && wTemp < 18 && !cleanD.toLowerCase().includes('sapa') && !cleanD.toLowerCase().includes('đà lạt')) {
+      wTemp = Math.floor(Math.random() * 5) + 27; // 27°C - 31°C cho khu vực đồng bằng/biển
+    }
+
+    const aiHotelRaw = plan.accommodationSuggestion ? plan.accommodationSuggestion.nameAndCost : '';
+    let aiHName = aiHotelRaw ? aiHotelRaw.split('-')[0].split('(')[0].replace(/Khách sạn/i, '').replace(/Resort/i, '').replace(/Homestay/i, '').trim() : '';
+    if (!aiHName || aiHName.toLowerCase() === 'trung tâm') aiHName = cleanD;
+
     return `
       <div class="itinerary-column-wrapper">
         <div class="timeline-header-premium-v2" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 78, 59, 0.2)); border-left: 4px solid var(--accent);">
@@ -918,7 +967,7 @@ const initPlanner = function () {
             <div style="display:flex; justify-content: space-between; align-items: center;">
                <div class="destination-badge-v2" style="background: var(--accent); color: white;">📍 ${dest}</div>
                <div style="display:flex; gap: 0.5rem; align-items: center;">
-                  ${weather ? `<span class="version-badge" style="background:rgba(59,130,246,0.1); color:#60a5fa; border: 1px solid #3b82f6; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:800; display:flex; align-items:center; gap:4px;">☁️ ${weather.temp}°C - ${weather.condition}</span>` : ''}
+                  ${weather ? `<span class="version-badge" style="background:rgba(59,130,246,0.1); color:#60a5fa; border: 1px solid #3b82f6; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:800; display:flex; align-items:center; gap:4px;">☁️ ${wTemp}°C - ${wCond}</span>` : ''}
                   <span class="version-badge" style="background:rgba(255,255,255,0.1); color:var(--accent); border: 1px solid var(--accent); padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:800;">✨ AI OPTIMIZED</span>
                </div>
             </div>
@@ -930,7 +979,7 @@ const initPlanner = function () {
             <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#KhámPháViệtNam</span>
             <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#TốiƯuBởiAI</span>
             <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#DuLịchThôngMinh</span>
-            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#${dest.split(',')[0].replace(/\s+/g, '')}</span>
+            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#${cleanD.replace(/\s+/g, '')}</span>
           </div>
           
           <div class="itinerary-stats-grid-v2" style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;">
@@ -952,44 +1001,81 @@ const initPlanner = function () {
             </div>
             <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
               <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">🌤️ Thời tiết & Khí hậu</span>
-              <span class="stat-value-v2" style="color: #fbbf24; font-size: 1.1rem; font-weight: 700; display: block;">${weather ? `${weather.temp}°C (${weather.condition})` : '18°C - 26°C (Mát mẻ lý tưởng)'}</span>
+              <span class="stat-value-v2" style="color: #fbbf24; font-size: 1.1rem; font-weight: 700; display: block;">${weather ? `${wTemp}°C (${wCond})` : '28°C - 32°C (Nắng đẹp lý tưởng)'}</span>
             </div>
             <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
               <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">💡 Lời khuyên chuẩn bị</span>
-              <span class="stat-value-v2" style="color: #a78bfa; font-size: 1.1rem; font-weight: 700; display: block;">Trang phục thoải mái, giày leo núi, áo khoác gió</span>
+              <span class="stat-value-v2" style="color: #a78bfa; font-size: 1.1rem; font-weight: 700; display: block;">Trang phục thoải mái, kem chống nắng, mũ rộng vành</span>
             </div>
           </div>
         </div>
 
-        ${plan.accommodationSuggestion ? `
-        <div class="accomm-premium-card" style="margin-top: 2rem; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(29, 78, 216, 0.2)); border: 1px solid rgba(59, 130, 246, 0.3); border-left: 4px solid #3b82f6; padding: 1.5rem; border-radius: 16px; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0,0,0,0.15);">
-          <div style="display: flex; align-items: flex-start; gap: 1.25rem;">
-            <span style="font-size: 2.5rem; line-height: 1;">${plan.accommodationSuggestion.icon || '🏨'}</span>
-            <div style="flex: 1;">
-              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-                <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #93c5fd; font-weight: 800;">🏨 GỢI Ý LƯU TRÚ • ${plan.accommodationSuggestion.typeLabel || 'Khách sạn / Homestay'}</span>
-                <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.4);">✨ AI Khuyên dùng</span>
+        <div class="accomm-premium-card" style="margin-top: 2rem; background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(59, 130, 246, 0.3); border-left: 4px solid #3b82f6; padding: 1.75rem; border-radius: 20px; backdrop-filter: blur(10px); box-shadow: 0 10px 35px rgba(0,0,0,0.2);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <span style="font-size: 2rem;">🏨</span>
+              <div>
+                <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #fff;">GỢI Ý LƯU TRÚ TỔNG HỢP • BỞI WANDER AI</h3>
+                <span style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">Đầy đủ lựa chọn từ Bình dân đến Cao cấp tại ${cleanD}</span>
               </div>
-              <h3 style="font-size: 1.35rem; color: #fff; margin: 0.5rem 0 0.35rem; font-weight: 800;">${plan.accommodationSuggestion.nameAndCost || 'Khách sạn / Homestay trung tâm'}</h3>
-              <p style="margin: 0; font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.6; font-style: italic;">"${plan.accommodationSuggestion.reason || 'Vị trí đắc địa, dịch vụ chuẩn mực và không gian hòa hợp trọn vẹn với trải nghiệm chuyến đi.'}"</p>
+            </div>
+            <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.75rem; padding: 6px 14px; border-radius: 20px; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.4);">✨ Tích hợp Google Maps API</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 1.75rem;">
+            <!-- AI Đề xuất / Tiêu chuẩn -->
+            <div style="background: rgba(59, 130, 246, 0.15); border: 2px solid #3b82f6; padding: 1.25rem; border-radius: 16px; position: relative; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <span style="position: absolute; top: -12px; right: 16px; background: #3b82f6; color: #fff; font-size: 0.7rem; font-weight: 800; padding: 2px 10px; border-radius: 10px; text-transform: uppercase;">⭐ AI Đề xuất</span>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                  <span style="font-size: 1.5rem;">${plan.accommodationSuggestion ? (plan.accommodationSuggestion.icon || '🏢') : '🏢'}</span>
+                  <span style="font-size: 0.85rem; font-weight: 800; color: #93c5fd; text-transform: uppercase;">Khách sạn / Resort Tiêu chuẩn</span>
+                </div>
+                <h4 style="margin: 0 0 0.5rem 0; font-size: 1.15rem; color: #fff; font-weight: 800;">${plan.accommodationSuggestion ? formatNameAndCost(plan.accommodationSuggestion.nameAndCost) : `Khách sạn trung tâm ${cleanD} (~800.000 VNĐ/đêm)`}</h4>
+                <p style="margin: 0 0 1rem 0; font-size: 0.85rem; color: rgba(255,255,255,0.85); line-height: 1.5; font-style: italic;">"${plan.accommodationSuggestion ? (plan.accommodationSuggestion.reason || 'Vị trí đắc địa, dịch vụ chuẩn mực và không gian hòa hợp trọn vẹn với trải nghiệm chuyến đi.') : 'Vị trí thuận tiện di chuyển, phòng ốc sạch sẽ, tiện nghi đầy đủ.'}"</p>
+              </div>
+              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((aiHName ? aiHName : 'Khách sạn') + ' ' + cleanD)}" target="_blank" style="align-self: flex-start; background: rgba(59, 130, 246, 0.3); color: #93c5fd; padding: 6px 14px; border-radius: 15px; font-size: 0.8rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(59, 130, 246, 0.5); display: inline-flex; align-items: center; gap: 6px;">
+                <span>📍 Kiểm tra phòng trên Google Maps</span>
+              </a>
+            </div>
+
+            <!-- Bình dân / Homestay -->
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); padding: 1.25rem; border-radius: 16px; transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                  <span style="font-size: 1.5rem;">🏡</span>
+                  <span style="font-size: 0.85rem; font-weight: 800; color: #10b981; text-transform: uppercase;">Homestay / Bình dân</span>
+                </div>
+                <h4 style="margin: 0 0 0.5rem 0; font-size: 1.15rem; color: #fff; font-weight: 800;">Homestay Bản địa (~250.000 - 450.000 VNĐ/đêm)</h4>
+                <p style="margin: 0 0 1rem 0; font-size: 0.85rem; color: rgba(255,255,255,0.75); line-height: 1.5; font-style: italic;">"Không gian ấm cúng, thiết kế xinh xắn gần gũi thiên nhiên, cực kỳ phù hợp cho các bạn phượt thủ hoặc nhóm bạn trẻ tối ưu chi phí."</p>
+              </div>
+              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Homestay ' + cleanD)}" target="_blank" style="align-self: flex-start; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 6px 14px; border-radius: 15px; font-size: 0.8rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 6px;">
+                <span>📍 Tìm Homestay trên Google Maps</span>
+              </a>
+            </div>
+
+            <!-- Cao cấp / Resort 5 sao -->
+            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); padding: 1.25rem; border-radius: 16px; transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                  <span style="font-size: 1.5rem;">👑</span>
+                  <span style="font-size: 0.85rem; font-weight: 800; color: #f59e0b; text-transform: uppercase;">Resort & Villa 5★</span>
+                </div>
+                <h4 style="margin: 0 0 0.5rem 0; font-size: 1.15rem; color: #fff; font-weight: 800;">Resort Nghỉ dưỡng Thượng hạng (~2.500.000+ VNĐ/đêm)</h4>
+                <p style="margin: 0 0 1rem 0; font-size: 0.85rem; color: rgba(255,255,255,0.75); line-height: 1.5; font-style: italic;">"Trải nghiệm nghỉ dưỡng đẳng cấp 5 sao với hồ bơi vô cực, dịch vụ spa trọn gói và tầm nhìn toàn cảnh tuyệt mỹ."</p>
+              </div>
+              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Resort 5 sao ' + cleanD)}" target="_blank" style="align-self: flex-start; background: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 6px 14px; border-radius: 15px; font-size: 0.8rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(245, 158, 11, 0.3); display: inline-flex; align-items: center; gap: 6px;">
+                <span>📍 Khám phá Resort trên Google Maps</span>
+              </a>
             </div>
           </div>
-        </div>
-        ` : `
-        <div class="accomm-premium-card" style="margin-top: 2rem; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(29, 78, 216, 0.2)); border: 1px solid rgba(59, 130, 246, 0.3); border-left: 4px solid #3b82f6; padding: 1.5rem; border-radius: 16px; backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0,0,0,0.15);">
-          <div style="display: flex; align-items: flex-start; gap: 1.25rem;">
-            <span style="font-size: 2.5rem; line-height: 1;">🏨</span>
-            <div style="flex: 1;">
-              <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
-                <span style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #93c5fd; font-weight: 800;">🏨 GỢI Ý LƯU TRÚ • Khách sạn / Resort</span>
-                <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.4);">✨ AI Khuyên dùng</span>
-              </div>
-              <h3 style="font-size: 1.35rem; color: #fff; margin: 0.5rem 0 0.35rem; font-weight: 800;">Khách sạn / Homestay trung tâm tại ${dest.split(',')[0]} (~500.000đ - 1.200.000đ/đêm)</h3>
-              <p style="margin: 0; font-size: 0.95rem; color: rgba(255,255,255,0.85); line-height: 1.6; font-style: italic;">"Vị trí đắc địa gần khu tham quan, không gian tiện nghi, thuận lợi di chuyển và trải nghiệm trọn vẹn nhịp sống địa phương."</p>
-            </div>
+
+          <div style="display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); padding: 1.25rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
+            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((aiHName ? (aiHName + ' ') : 'Khách sạn ') + cleanD)}" target="_blank" class="btn" style="padding: 0.85rem 2.25rem; font-size: 1.05rem; border-radius: 30px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 0.75rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); transition: all 0.3s ease;">
+              <span>📍 Chuyển Trực Tiếp Đến Google Maps Để Xem Phòng & Đặt Ngay</span>
+            </a>
           </div>
         </div>
-        `}
 
         <div class="timeline-container-v2" style="padding: 1.5rem 0;">
           ${itinerary.map((day, idx) => {

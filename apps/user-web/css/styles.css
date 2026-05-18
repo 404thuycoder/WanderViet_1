@@ -5110,7 +5110,7 @@ section[id] {
 
 .hero-v2__slide.is-active {
   opacity: 1;
-  animation: kenBurns 40s linear infinite alternate;
+  animation: kenBurns 16s ease-out forwards;
 }
 
 .hero-v2__overlay {

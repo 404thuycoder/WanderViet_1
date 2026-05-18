@@ -888,8 +888,107 @@ html {
 .feature-card:nth-child(3) { animation-delay: 0.16s; }
 .feature-card:nth-child(4) { animation-delay: 0.24s; }
 
-/* Smooth page transitions */
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
 }
+
+/* ============================================================
+   19. AUTOMATIC MINI CARD SLIDESHOW (Cross-fade)
+   ============================================================ */
+/* Applies to both Trending Destinations (.dest-card-media) and Partner Services (.svc-img) */
+.dest-card-media.has-slides,
+.svc-img.has-slides {
+  position: relative;
+  overflow: hidden;
+}
+
+.dest-card-media.has-slides .dest-card-img,
+.svc-img.has-slides .svc-card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  z-index: 1;
+  transition: opacity 0.5s ease-in-out, transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dest-card-media.has-slides .dest-card-img.slide-1,
+.svc-img.has-slides .svc-card-img.slide-1 {
+  animation: cardCrossFade3 6s infinite;
+}
+.dest-card-media.has-slides .dest-card-img.slide-2,
+.svc-img.has-slides .svc-card-img.slide-2 {
+  animation: cardCrossFade3 6s infinite;
+  animation-delay: 2s;
+}
+.dest-card-media.has-slides .dest-card-img.slide-3,
+.svc-img.has-slides .svc-card-img.slide-3 {
+  animation: cardCrossFade3 6s infinite;
+  animation-delay: 4s;
+}
+
+@keyframes cardCrossFade3 {
+  0%, 33.33% {
+    opacity: 1;
+    z-index: 2;
+  }
+  38.33%, 95% {
+    opacity: 0;
+    z-index: 1;
+  }
+  100% {
+    opacity: 1;
+    z-index: 2;
+  }
+}
+
+/* Continuous Subtle Panning for Promo and Partner cards */
+.promo-card__img {
+  animation: promoZoomPan 24s infinite ease-in-out;
+  transform-origin: center;
+}
+
+@keyframes promoZoomPan {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+/* ============================================================
+   WanderViệt User Web — UI Upgrade Additions
+   ============================================================ */
+
+/* Theme Filter Visibility */
+.is-hidden {
+  display: none !important;
+}
+
+/* Smart Search Results Card Grid Layout Overrides */
+.smart-results.dest-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
+  gap: 2rem !important;
+}
+
+.smart-results .smart-result {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  padding: 0 !important;
+  align-items: stretch !important;
+  transform: none !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+}
+
+.smart-results .smart-result:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+
 

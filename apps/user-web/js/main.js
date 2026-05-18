@@ -93,7 +93,10 @@
           return;
         }
 
-        container.innerHTML = json.data.map(biz => `
+        // Double the content to make looping perfectly seamless
+        const doubleData = [...json.data, ...json.data];
+
+        container.innerHTML = doubleData.map(biz => `
           <a href="business-profile.html?id=${biz._id || biz.customId}" class="partner-card">
             <img src="${biz.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(biz.displayName||biz.name||'WV') + '&background=6366f1&color=fff&size=80'}" class="partner-avatar" alt="${biz.displayName}" onerror="this.src='https://ui-avatars.com/api/?name=WV&background=6366f1&color=fff&size=80'" />
             <div class="partner-info">
@@ -102,6 +105,26 @@
             </div>
           </a>
         `).join('');
+
+        // Trigger continuous automatic marquee scroll
+        var scrollTimer;
+        function startScroll() {
+          scrollTimer = setInterval(function() {
+            container.scrollLeft += 1;
+            // Loop back seamlessly when halfway scrolled
+            if (container.scrollLeft >= (container.scrollWidth / 2)) {
+              container.scrollLeft = 0;
+            }
+          }, 25);
+        }
+        
+        // Start auto-scroll after a short delay for rendering
+        setTimeout(startScroll, 1000);
+
+        // Pause on hover
+        container.addEventListener('mouseenter', function() { clearInterval(scrollTimer); });
+        container.addEventListener('mouseleave', function() { startScroll(); });
+
       }).catch(err => {
         console.error('Failed to load top partners:', err);
         container.innerHTML = '<p>Lỗi tải dữ liệu đối tác.</p>';
@@ -1012,19 +1035,110 @@
     var box = document.querySelector("[data-smart-results]");
     if (!box) return;
     box.innerHTML = "";
+    
+    // Set grid class on the container to match trending destinations grid
+    box.className = "smart-results dest-grid";
+
     ranked.forEach(function (row) {
       var p = row.place;
       var el = document.createElement("article");
-      el.className = "smart-result";
-      var verifiedBadge = p.verified ? '<div class="verified-badge" style="position:static; padding:0.2rem 0.6rem; margin-bottom:0.5rem;"><span class="icon">🛡️</span> Verified' + (p.sourceName ? ' - ' + escapeHtml(p.sourceName) : '') + '</div>' : '';
-      el.innerHTML = "<div>" + verifiedBadge + "<h3 class=\"dest-card-title\" style=\"margin:0 0 0.25rem\">" + escapeHtml(p.name) + '</h3><p style="margin:0;font-size:0.85rem;color:var(--accent)">' + escapeHtml(p.region) + "</p><p>" + escapeHtml(p.text) + '</p><div class="dest-card-actions">' + '<button type="button" class="btn btn--ghost btn--small" data-smart-detail="' + escapeAttr(p.id) + '">Chi tiết</button>' + '<button type="button" class="btn btn--primary btn--small" data-add-plan="' + escapeAttr(p.id) + '">Thêm vào lịch</button></div></div>' + '<div class="smart-result__score">Điểm: ' + row.score + "</div>";
-      var sub = document.createElement("p");
-      sub.style.fontSize = "0.82rem";
-      sub.style.marginTop = "0.35rem";
-      sub.textContent = row.reasons.length ? row.reasons.join(" · ") : "Gợi ý chung";
-      el.querySelector("div").appendChild(sub);
+      el.className = "smart-result dest-card";
+
+      var verifiedBadge = p.verified ? '<div class="verified-badge"><span class="icon">🛡️</span> Verified</div>' : '';
+      
+      // Determine elegant custom/fallback images based on kinds & keywords
+      var fallbackImg = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80';
+      if (p.kind === 'khach-san' || (p.name && p.name.toLowerCase().indexOf('khách sạn') !== -1)) {
+        fallbackImg = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80';
+      } else if (p.kind === 'nha-hang' || (p.name && p.name.toLowerCase().indexOf('bữa tối') !== -1)) {
+        fallbackImg = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80';
+      } else if (p.isTour || p.kind === 'trai-nghiem' || (p.name && p.name.toLowerCase().indexOf('tour') !== -1)) {
+        fallbackImg = 'https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=600&q=80';
+      }
+
+      // Keyword based high-res specific overrides to make the UI look absolutely stunning!
+      var lowName = (p.name || '').toLowerCase();
+      if (lowName.indexOf('anh thùy') !== -1) {
+        fallbackImg = 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80';
+      } else if (lowName.indexOf('phi cơ') !== -1 || lowName.indexOf('ngắm vịnh') !== -1) {
+        fallbackImg = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80';
+      } else if (lowName.indexOf('sun world') !== -1) {
+        fallbackImg = 'https://images.unsplash.com/photo-1533038590840-1cde6b5697df?w=600&q=80';
+      } else if (lowName.indexOf('bữa tối lãng mạn') !== -1 || lowName.indexOf('luxury dinner') !== -1) {
+        fallbackImg = 'https://images.unsplash.com/photo-1515263487990-61b07816b324?w=600&q=80';
+      }
+
+      var displayImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || fallbackImg);
+      if (!displayImg || displayImg.length < 5) displayImg = fallbackImg;
+
+      // Extract up to 3 sliding images if multiple exist
+      var imagesList = [];
+      if (p.images && p.images.length > 0) {
+        imagesList = p.images.filter(function(img) { return img && img.length > 5; }).slice(0, 3);
+      }
+      if (imagesList.length === 0) {
+        imagesList = [displayImg];
+      }
+
+      // Add high-quality slides dynamically if it's one of the seeded items to maximize aesthetics!
+      if (imagesList.length === 1) {
+        if (lowName.indexOf('anh thùy') !== -1) {
+          imagesList = [
+            'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80',
+            'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80',
+            'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=80'
+          ];
+        } else if (lowName.indexOf('phi cơ') !== -1) {
+          imagesList = [
+            'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80',
+            'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80',
+            'https://images.unsplash.com/photo-1533038590840-1cde6b5697df?w=600&q=80'
+          ];
+        } else if (lowName.indexOf('sun world') !== -1) {
+          imagesList = [
+            'https://images.unsplash.com/photo-1533038590840-1cde6b5697df?w=600&q=80',
+            'https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?w=600&q=80',
+            'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600&q=80'
+          ];
+        } else if (lowName.indexOf('bữa tối lãng mạn') !== -1) {
+          imagesList = [
+            'https://images.unsplash.com/photo-1515263487990-61b07816b324?w=600&q=80',
+            'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80',
+            'https://images.unsplash.com/photo-1509722747041-074f18d68246?w=600&q=80'
+          ];
+        }
+      }
+
+      var imgHtml = '';
+      imagesList.forEach(function(imgUrl, idx) {
+        imgHtml += '<img src="' + imgUrl + '" loading="lazy" alt="' + escapeAttr(p.name || '') + '" class="dest-card-img slide-' + (idx + 1) + '" onerror="this.onerror=null;this.src=\'' + fallbackImg + '\';" />';
+      });
+
+      var hasMultiple = imagesList.length > 1;
+      var mediaClass = 'dest-card-media' + (hasMultiple ? ' has-slides' : '');
+
+      var reasonsText = row.reasons.length ? row.reasons.join(" · ") : "Gợi ý chung";
+
+      el.innerHTML = 
+        '<div class="' + mediaClass + '" onclick="openPlaceModal(\'' + escapeAttr(p.id) + '\')" style="cursor:pointer;" title="Xem chi tiết">' + 
+          imgHtml + 
+          verifiedBadge + 
+          '<div class="dest-badge" style="z-index: 10;">Điểm: ' + row.score + '</div>' +
+        '</div>' +
+        '<div class="dest-card-body">' +
+          '<div class="dest-card-meta">' + escapeHtml(p.region || 'Việt Nam') + '</div>' +
+          '<h3 class="dest-card-title">' + escapeHtml(p.name || '') + '</h3>' +
+          '<p class="dest-card-text">' + escapeHtml(p.text || 'Khám phá vẻ đẹp tiềm ẩn...') + '</p>' +
+          '<p style="margin: 0.5rem 0 0 0; font-size: 0.78rem; font-weight: 700; color: var(--accent); line-height: 1.4;">💡 ' + escapeHtml(reasonsText) + '</p>' +
+          '<div class="dest-card-actions" style="display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem;">' +
+            '<a href="javascript:void(0)" class="dest-card-link" data-smart-detail="' + escapeAttr(p.id) + '">Chi tiết →</a>' +
+            '<button type="button" class="btn btn--primary btn--small" data-add-plan="' + escapeAttr(p.id) + '"><span>+</span> Chuyến đi</button>' +
+          '</div>' +
+        '</div>';
+
       box.appendChild(el);
     });
+
     box.querySelectorAll("[data-smart-detail]").forEach(function (b) {
       b.addEventListener("click", function () {
         openPlaceModal(b.getAttribute("data-smart-detail"));
@@ -1110,8 +1224,25 @@
         var favCount = parseInt(p.favoritesCount) || 0;
         if (wishIsOn(p.id) && favCount === 0) favCount = 1;
 
-        art.innerHTML = '<div class="dest-card-media" onclick="window.location.href=\'place-detail.html?id=' + p.id + '\'" style="cursor:pointer;" title="Xem chi tiết">' + 
-                          '<img src="' + displayImg + '" loading="lazy" alt="' + escapeAttr(p.name || '') + '" class="dest-card-img" onerror="this.onerror=null;this.src=\'' + fallbackImg + '\';" />' +
+        // Build slideshow image tags
+        var imagesList = [];
+        if (p.images && p.images.length > 0) {
+          imagesList = p.images.filter(function(img) { return img && img.length > 5; }).slice(0, 3);
+        }
+        if (imagesList.length === 0) {
+          imagesList = [displayImg];
+        }
+
+        var imgHtml = '';
+        imagesList.forEach(function(imgUrl, idx) {
+          imgHtml += '<img src="' + imgUrl + '" loading="lazy" alt="' + escapeAttr(p.name || '') + '" class="dest-card-img slide-' + (idx + 1) + '" onerror="this.onerror=null;this.src=\'' + fallbackImg + '\';" />';
+        });
+
+        var hasMultiple = imagesList.length > 1;
+        var mediaClass = 'dest-card-media' + (hasMultiple ? ' has-slides' : '');
+
+        art.innerHTML = '<div class="' + mediaClass + '" onclick="window.location.href=\'place-detail.html?id=' + p.id + '\'" style="cursor:pointer;" title="Xem chi tiết">' + 
+                          imgHtml + 
                           topBadge + verifiedBadge + 
                         '</div>' +
                        '<div class="dest-card-body">' +
@@ -2971,7 +3102,7 @@
       }
     }, 8000);
 
-    setInterval(next, 5000);
+    setInterval(next, 8000);
   }
 
   // ===== Scroll Reveal via IntersectionObserver =====
@@ -3400,7 +3531,7 @@
           else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') fallbackImg = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80';
           else if (p.isTour || p.kind === 'trai-nghiem') fallbackImg = 'https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=600&q=80';
 
-          const imgUrl = (p.images && p.images[0] && p.images[0].length > 5) ? p.images[0] : (p.image && p.image.length > 5 ? p.image : fallbackImg);
+          const displayImg = (p.images && p.images[0] && p.images[0].length > 5) ? p.images[0] : (p.image && p.image.length > 5 ? p.image : fallbackImg);
           const addrStr = (p.address||'').split(',').pop().trim() || 'Việt Nam';
           const ownerName = p.ownerName || 'WanderViệt Partner';
           
@@ -3409,10 +3540,27 @@
           else if (p.isTour || p.kind === 'trai-nghiem') catLabel = 'Trải nghiệm Tour';
           else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') catLabel = 'Ẩm thực & Giải trí';
 
+          // Build slideshow image tags for partner services
+          var imagesList = [];
+          if (p.images && p.images.length > 0) {
+            imagesList = p.images.filter(function(img) { return img && img.length > 5; }).slice(0, 3);
+          }
+          if (imagesList.length === 0) {
+            imagesList = [displayImg];
+          }
+
+          var imgHtml = '';
+          imagesList.forEach(function(imgUrl, idx) {
+            imgHtml += '<img src="' + imgUrl + '" class="svc-card-img slide-' + (idx + 1) + '" onerror="this.onerror=null;this.src=\'' + fallbackImg + '\';" />';
+          });
+
+          var hasMultiple = imagesList.length > 1;
+          var svcImgClass = 'svc-img' + (hasMultiple ? ' has-slides' : '');
+
           return `
             <div class="svc-card" onclick="window.location.href='place-detail.html?id=${p._id || p.id}'">
-                <div class="svc-img">
-                  <img src="${imgUrl}" onerror="this.onerror=null;this.src='${fallbackImg}';">
+                <div class="${svcImgClass}">
+                  ${imgHtml}
                   <div class="svc-price">${priceStr}</div>
                 </div>
                 <div class="svc-info">

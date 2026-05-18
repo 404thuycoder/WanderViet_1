@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="vi">
+﻿<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
 <head>
 
     <!-- WanderViet Translation Curtain -->
@@ -33,40 +33,40 @@
   <link rel="icon" type="image/png" href="/assets/wanderviet-logo-cropped-rounded.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bản Đồ Chỉ Đường - Toàn Màn Hình</title>
+    <title>Báº£n Äá»“ Chá»‰ ÄÆ°á»ng - ToÃ n MÃ n HÃ¬nh</title>
 
-    <!-- Thư viện giao diện Bản Đồ (Leaflet CSS) -->
+    <!-- ThÆ° viá»‡n giao diá»‡n Báº£n Äá»“ (Leaflet CSS) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css?v=1776819067181" crossorigin=""/>
     <link rel="stylesheet" href="css/global-tokens.css?v=1776819067181" />
     <link rel="stylesheet" href="css/styles.css?v=1776819067181" />
 
     <style>
-        /* CSS Reset cơ bản để map tràn toàn màn hình */
+        /* CSS Reset cÆ¡ báº£n Ä‘á»ƒ map trÃ n toÃ n mÃ n hÃ¬nh */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden; /* Chặn cuộn trang */
+            overflow: hidden; /* Cháº·n cuá»™n trang */
         }
 
-        /* Vùng chứa bản đồ chiếm 100% diện tích */
+        /* VÃ¹ng chá»©a báº£n Ä‘á»“ chiáº¿m 100% diá»‡n tÃ­ch */
         #map {
             width: 100vw;
             height: 100vh;
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 1; /* Nằm dưới cùng */
+            z-index: 1; /* Náº±m dÆ°á»›i cÃ¹ng */
         }
 
-        /* Bảng điều khiển nổi lên trên bản đồ (Floating Box) */
+        /* Báº£ng Ä‘iá»u khiá»ƒn ná»•i lÃªn trÃªn báº£n Ä‘á»“ (Floating Box) */
         .search-box {
             position: absolute;
             top: 20px;
             left: 20px;
-            z-index: 999; /* Phải nổi lên trên nền bản đồ */
+            z-index: 999; /* Pháº£i ná»•i lÃªn trÃªn ná»n báº£n Ä‘á»“ */
             background: rgba(255, 255, 255, 0.95);
             padding: 20px;
             border-radius: 12px;
@@ -88,7 +88,7 @@
             font-size: 0.95rem; 
         }
 
-        /* Lựa chọn phương tiện */
+        /* Lá»±a chá»n phÆ°Æ¡ng tiá»‡n */
         .transport-modes { display: flex; gap: 5px; justify-content: space-between; margin-bottom: 15px; }
         .transport-modes label { 
             flex: 1; 
@@ -102,11 +102,11 @@
             transition: 0.2s; 
         }
         .transport-modes input[type="radio"] { display: none; }
-        /* Tích chọn (Checked state) sành điệu */
+        /* TÃ­ch chá»n (Checked state) sÃ nh Ä‘iá»‡u */
         .transport-modes input[type="radio"]:checked + span { color: #2563eb; font-weight: bold; }
         .transport-modes label:has(input[type="radio"]:checked) { border: 1px solid #2563eb; background: #eff6ff; }
 
-        /* Các nút bấm */
+        /* CÃ¡c nÃºt báº¥m */
         .btn-group { display: flex; flex-direction: column; gap: 10px; }
         button {
             padding: 10px 15px;
@@ -126,7 +126,7 @@
         .btn-danger { background: #ef4444; color: white; }
         .btn-danger:hover { background: #dc2626; }
 
-        /* Khu vực hiển thị thông tin */
+        /* Khu vá»±c hiá»ƒn thá»‹ thÃ´ng tin */
         #route-info {
             display: none;
             margin-top: 15px;
@@ -160,80 +160,80 @@
 <body style="padding-top: 60px;">
     <header class="site-header" id="header-container" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;"></header>
 
-    <!-- Khung Bản Đồ Toàn Màn Hình -->
+    <!-- Khung Báº£n Äá»“ ToÃ n MÃ n HÃ¬nh -->
     <div id="map" style="height: calc(100vh - 60px); top: 60px;"></div>
 
-    <!-- Hộp Nhập Liệu Trôi Nổi (Floating Search Box) -->
+    <!-- Há»™p Nháº­p Liá»‡u TrÃ´i Ná»•i (Floating Search Box) -->
     <div class="search-box">
-        <h3>📍 Chỉ đường Thông Minh</h3>
+        <h3>ðŸ“ Chá»‰ Ä‘Æ°á»ng ThÃ´ng Minh</h3>
 
         <div class="input-group">
-            <label>Vị trí của bạn (Tự động quét):</label>
-            <input type="text" id="origin-input" placeholder="Đang tìm vị trí hiện tại..." readonly style="background:#e2e8f0; border:none; color:#475569;" />
+            <label>Vá»‹ trÃ­ cá»§a báº¡n (Tá»± Ä‘á»™ng quÃ©t):</label>
+            <input type="text" id="origin-input" placeholder="Äang tÃ¬m vá»‹ trÃ­ hiá»‡n táº¡i..." readonly style="background:#e2e8f0; border:none; color:#475569;" />
         </div>
 
         <div class="input-group">
-            <label>Điểm Đến mong muốn:</label>
-            <input type="text" id="dest-input" placeholder="VD: Lăng Bác, Hà Nội" />
+            <label>Äiá»ƒm Äáº¿n mong muá»‘n:</label>
+            <input type="text" id="dest-input" placeholder="VD: LÄƒng BÃ¡c, HÃ  Ná»™i" />
         </div>
 
-        <!-- Chọn Phương Tiện -->
-        <label style="display:block; font-size:0.85rem; color:#64748b; margin-bottom:5px; font-weight:bold;">Phương tiện di chuyển:</label>
+        <!-- Chá»n PhÆ°Æ¡ng Tiá»‡n -->
+        <label style="display:block; font-size:0.85rem; color:#64748b; margin-bottom:5px; font-weight:bold;">PhÆ°Æ¡ng tiá»‡n di chuyá»ƒn:</label>
         <div class="transport-modes">
-            <label><input type="radio" name="mode" value="driving" checked> <span>🚗 Ô tô/Xe máy</span></label>
-            <label><input type="radio" name="mode" value="walking"> <span>🚶 Đi bộ</span></label>
-            <label><input type="radio" name="mode" value="cycling"> <span>🚴 Xe đạp</span></label>
+            <label><input type="radio" name="mode" value="driving" checked> <span>ðŸš— Ã” tÃ´/Xe mÃ¡y</span></label>
+            <label><input type="radio" name="mode" value="walking"> <span>ðŸš¶ Äi bá»™</span></label>
+            <label><input type="radio" name="mode" value="cycling"> <span>ðŸš´ Xe Ä‘áº¡p</span></label>
         </div>
 
-        <!-- Nút Tương Tác -->
+        <!-- NÃºt TÆ°Æ¡ng TÃ¡c -->
         <div class="btn-group">
-            <button class="btn-primary" onclick="calculateRoute()">🔍 Tìm Đường Đi</button>
-            <button class="btn-secondary" onclick="centerToMyLocation()">🎯 Focus vào Tọa độ của tôi</button>
-            <button class="btn-danger" id="reset-btn" style="display: none;" onclick="resetMap()">🗑️ Xóa Lộ Trình (Reset)</button>
+            <button class="btn-primary" onclick="calculateRoute()">ðŸ” TÃ¬m ÄÆ°á»ng Äi</button>
+            <button class="btn-secondary" onclick="centerToMyLocation()">ðŸŽ¯ Focus vÃ o Tá»a Ä‘á»™ cá»§a tÃ´i</button>
+            <button class="btn-danger" id="reset-btn" style="display: none;" onclick="resetMap()">ðŸ—‘ï¸ XÃ³a Lá»™ TrÃ¬nh (Reset)</button>
         </div>
 
         <div id="status-msg"></div>
 
         <div id="route-info">
-            <strong>Khoảng cách:</strong> <span id="dist-val">0 km</span><br/>
-            <strong>Thời gian ETA:</strong> <span id="time-val">0 phút</span>
+            <strong>Khoáº£ng cÃ¡ch:</strong> <span id="dist-val">0 km</span><br/>
+            <strong>Thá»i gian ETA:</strong> <span id="time-val">0 phÃºt</span>
         </div>
     </div>
 
 
-    <!-- 2. Nạp Thư viện Bản đồ Leaflet JS -->
+    <!-- 2. Náº¡p ThÆ° viá»‡n Báº£n Ä‘á»“ Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js?v=1776819067181" crossorigin=""></script>
     <script src="js/SharedUI.js?v=1778494999999"></script>
 
-    <!-- MÃ ĐIỀU KHIỂN CHÍNH (LOGIC APP) -->
+    <!-- MÃƒ ÄIá»€U KHIá»‚N CHÃNH (LOGIC APP) -->
     <script>
         // ==========================================
-        // 1. KHỞI TẠO BẢN ĐỒ
+        // 1. KHá»žI Táº O Báº¢N Äá»’
         // ==========================================
         
-        // Tạo map và set tâm mặc định vào Hà Nội, độ zoom 6 (để thấy toàn quốc)
+        // Táº¡o map vÃ  set tÃ¢m máº·c Ä‘á»‹nh vÃ o HÃ  Ná»™i, Ä‘á»™ zoom 6 (Ä‘á»ƒ tháº¥y toÃ n quá»‘c)
         let map = L.map('map', { zoomControl: false }).setView([21.0285, 105.8542], 6);
 
-        // Thêm nút zoom xuống góc phải dưới (cho đỡ vướng nút search)
+        // ThÃªm nÃºt zoom xuá»‘ng gÃ³c pháº£i dÆ°á»›i (cho Ä‘á»¡ vÆ°á»›ng nÃºt search)
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        // Nguồn dữ liệu bản đồ: OpenStreetMap (Có bản quyền đầy đủ, miễn phí)
-        // Dữ liệu OSM quốc tế mặc định ghi nhận đầy đủ Quần đảo Hoàng Sa, Trường Sa của Việt Nam
+        // Nguá»“n dá»¯ liá»‡u báº£n Ä‘á»“: OpenStreetMap (CÃ³ báº£n quyá»n Ä‘áº§y Ä‘á»§, miá»…n phÃ­)
+        // Dá»¯ liá»‡u OSM quá»‘c táº¿ máº·c Ä‘á»‹nh ghi nháº­n Ä‘áº§y Ä‘á»§ Quáº§n Ä‘áº£o HoÃ ng Sa, TrÆ°á»ng Sa cá»§a Viá»‡t Nam
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '© OpenStreetMap contributors | Dữ liệu bao trùm lãnh thổ VN'
+            attribution: 'Â© OpenStreetMap contributors | Dá»¯ liá»‡u bao trÃ¹m lÃ£nh thá»• VN'
         }).addTo(map);
 
-        // Các biến toàn cục
+        // CÃ¡c biáº¿n toÃ n cá»¥c
         let myCurrentLat = null;
         let myCurrentLon = null;
-        let watchId = null; // Quản lý ID quét vị trí thời gian thực
+        let watchId = null; // Quáº£n lÃ½ ID quÃ©t vá»‹ trÃ­ thá»i gian thá»±c
 
-        let myMarker = null;       // Đinh ghim vị trí "Tôi"
-        let targetMarker = null;   // Đinh ghim điểm "Đến"
-        let routePolyline = null;  // Đường màu xanh vẽ trên bản đồ
+        let myMarker = null;       // Äinh ghim vá»‹ trÃ­ "TÃ´i"
+        let targetMarker = null;   // Äinh ghim Ä‘iá»ƒm "Äáº¿n"
+        let routePolyline = null;  // ÄÆ°á»ng mÃ u xanh váº½ trÃªn báº£n Ä‘á»“
 
-        // Icon chấm xanh nước biển (Pulse radar) cho vị trí của tôi
+        // Icon cháº¥m xanh nÆ°á»›c biá»ƒn (Pulse radar) cho vá»‹ trÃ­ cá»§a tÃ´i
         const userIcon = L.divIcon({
             className: 'custom-div-icon',
             html: '<div class="pulse-marker"></div>',
@@ -242,66 +242,66 @@
         });
 
         // ==========================================
-        // 2. LẤY VỊ TRÍ THEO THỜI GIAN THỰC (AUTO TRACKING)
+        // 2. Láº¤Y Vá»Š TRÃ THEO THá»œI GIAN THá»°C (AUTO TRACKING)
         // ==========================================
         
         function startTrackingLocation() {
             if (!navigator.geolocation) {
-                document.getElementById('status-msg').innerText = "Trình duyệt không hỗ trợ Geolocation (Định vị).";
+                document.getElementById('status-msg').innerText = "TrÃ¬nh duyá»‡t khÃ´ng há»— trá»£ Geolocation (Äá»‹nh vá»‹).";
                 return;
             }
 
             let isFirstLoad = true;
 
-            // Lệnh watchPosition: Tự động chạy lại hàm mỗi khi người dùng di chuyển sang tọa độ mới
+            // Lá»‡nh watchPosition: Tá»± Ä‘á»™ng cháº¡y láº¡i hÃ m má»—i khi ngÆ°á»i dÃ¹ng di chuyá»ƒn sang tá»a Ä‘á»™ má»›i
             watchId = navigator.geolocation.watchPosition(
                 (position) => {
                     myCurrentLat = position.coords.latitude;
                     myCurrentLon = position.coords.longitude;
 
-                    // Nếu là lần đầu mở trang, tự động di chuyển bản đồ (focus) vào vị trí của tôi
+                    // Náº¿u lÃ  láº§n Ä‘áº§u má»Ÿ trang, tá»± Ä‘á»™ng di chuyá»ƒn báº£n Ä‘á»“ (focus) vÃ o vá»‹ trÃ­ cá»§a tÃ´i
                     if (isFirstLoad) {
                         isFirstLoad = false;
-                        document.getElementById('origin-input').value = `Đã lấy vị trí GPS thành công ✔`;
-                        map.setView([myCurrentLat, myCurrentLon], 15); // Zoom vào gẩn
+                        document.getElementById('origin-input').value = `ÄÃ£ láº¥y vá»‹ trÃ­ GPS thÃ nh cÃ´ng âœ”`;
+                        map.setView([myCurrentLat, myCurrentLon], 15); // Zoom vÃ o gáº©n
                     }
 
-                    // Cập nhật vị trí cái Đinh ghim trên bản đồ liên tục
+                    // Cáº­p nháº­t vá»‹ trÃ­ cÃ¡i Äinh ghim trÃªn báº£n Ä‘á»“ liÃªn tá»¥c
                     if (!myMarker) {
                         myMarker = L.marker([myCurrentLat, myCurrentLon], {icon: userIcon, zIndexOffset: 1000})
                             .addTo(map)
-                            .bindPopup("Vị trí hiện tại của bạn");
+                            .bindPopup("Vá»‹ trÃ­ hiá»‡n táº¡i cá»§a báº¡n");
                     } else {
                         myMarker.setLatLng([myCurrentLat, myCurrentLon]);
                     }
                 },
                 (error) => {
-                    let errMsg = "Bị từ chối quyền truy cập Vị trí.";
+                    let errMsg = "Bá»‹ tá»« chá»‘i quyá»n truy cáº­p Vá»‹ trÃ­.";
                     if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost') {
-                        errMsg += " (Bắt buộc dùng HTTPS thay vì HTTP)";
+                        errMsg += " (Báº¯t buá»™c dÃ¹ng HTTPS thay vÃ¬ HTTP)";
                     }
-                    document.getElementById('status-msg').innerText = "❌ Lỗi: " + errMsg;
-                    document.getElementById('origin-input').value = "Trình duyệt chặn lấy vị trí!";
+                    document.getElementById('status-msg').innerText = "âŒ Lá»—i: " + errMsg;
+                    document.getElementById('origin-input').value = "TrÃ¬nh duyá»‡t cháº·n láº¥y vá»‹ trÃ­!";
                 },
-                { enableHighAccuracy: true, maximumAge: 0 } // Yêu cầu GPS độ nhạy cao nhất
+                { enableHighAccuracy: true, maximumAge: 0 } // YÃªu cáº§u GPS Ä‘á»™ nháº¡y cao nháº¥t
             );
         }
 
-        // Bắt đầu chạy quét GPS ngay khi vừa load web xong
+        // Báº¯t Ä‘áº§u cháº¡y quÃ©t GPS ngay khi vá»«a load web xong
         window.onload = startTrackingLocation;
 
-        // Xử lý nút "Focus vị trí của tôi"
+        // Xá»­ lÃ½ nÃºt "Focus vá»‹ trÃ­ cá»§a tÃ´i"
         function centerToMyLocation() {
             if (myCurrentLat && myCurrentLon) {
                 map.flyTo([myCurrentLat, myCurrentLon], 16, { duration: 1 });
             } else {
-                alert("Hệ thống chưa quét được vị trí của bạn. Hãy bật GPS.");
+                alert("Há»‡ thá»‘ng chÆ°a quÃ©t Ä‘Æ°á»£c vá»‹ trÃ­ cá»§a báº¡n. HÃ£y báº­t GPS.");
             }
         }
 
 
         // ==========================================
-        // 3. XỬ LÝ TÌM ĐƯỜNG VÀ VẼ LÊN BẢN ĐỒ
+        // 3. Xá»¬ LÃ TÃŒM ÄÆ¯á»œNG VÃ€ Váº¼ LÃŠN Báº¢N Äá»’
         // ==========================================
         
         async function calculateRoute() {
@@ -309,41 +309,41 @@
             const statusBox = document.getElementById('status-msg');
             
             if (!myCurrentLat || !myCurrentLon) {
-                statusBox.innerText = "❌ Chưa có tọa độ bắt đầu. Hãy chờ GPS xác nhận vị trí hoặc cấp quyền.";
+                statusBox.innerText = "âŒ ChÆ°a cÃ³ tá»a Ä‘á»™ báº¯t Ä‘áº§u. HÃ£y chá» GPS xÃ¡c nháº­n vá»‹ trÃ­ hoáº·c cáº¥p quyá»n.";
                 return;
             }
             if (!destText) {
-                statusBox.innerText = "❌ Bạn chưa nhập mục đích đến kìa!";
+                statusBox.innerText = "âŒ Báº¡n chÆ°a nháº­p má»¥c Ä‘Ã­ch Ä‘áº¿n kÃ¬a!";
                 return;
             }
 
-            // Xóa lỗi đang hiện
-            statusBox.innerText = "Đang tra cứu dữ liệu địa điểm...";
+            // XÃ³a lá»—i Ä‘ang hiá»‡n
+            statusBox.innerText = "Äang tra cá»©u dá»¯ liá»‡u Ä‘á»‹a Ä‘iá»ƒm...";
             document.getElementById('route-info').style.display = 'none';
 
             try {
-                // A) Đổi chữ của người dùng thành Tọa độ (API Nominatim - Miễn phí)
+                // A) Äá»•i chá»¯ cá»§a ngÆ°á»i dÃ¹ng thÃ nh Tá»a Ä‘á»™ (API Nominatim - Miá»…n phÃ­)
                 const textToCoordUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destText + ', Vietnam')}&limit=1`;
                 const addressFetch = await fetch(textToCoordUrl);
                 const addressData = await addressFetch.json();
 
                 if (!addressData || addressData.length === 0) {
-                    statusBox.innerText = "❌ Không tìm thấy vùng đất này trên bản đồ. Gõ có dấu xem sao nhé.";
+                    statusBox.innerText = "âŒ KhÃ´ng tÃ¬m tháº¥y vÃ¹ng Ä‘áº¥t nÃ y trÃªn báº£n Ä‘á»“. GÃµ cÃ³ dáº¥u xem sao nhÃ©.";
                     return;
                 }
 
                 const targetLat = parseFloat(addressData[0].lat);
                 const targetLon = parseFloat(addressData[0].lon);
 
-                // Thả Marker Điểm Đến
+                // Tháº£ Marker Äiá»ƒm Äáº¿n
                 if (targetMarker) map.removeLayer(targetMarker);
-                targetMarker = L.marker([targetLat, targetLon]).addTo(map).bindPopup("<b>Điểm Đến</b><br/>" + addressData[0].display_name).openPopup();
+                targetMarker = L.marker([targetLat, targetLon]).addTo(map).bindPopup("<b>Äiá»ƒm Äáº¿n</b><br/>" + addressData[0].display_name).openPopup();
 
-                // B) Lấy chế độ đi phương tiện nào
+                // B) Láº¥y cháº¿ Ä‘á»™ Ä‘i phÆ°Æ¡ng tiá»‡n nÃ o
                 const mode = document.querySelector('input[name="mode"]:checked').value;
-                statusBox.innerText = "Đang tính toán tuyến đường ngắn nhất...";
+                statusBox.innerText = "Äang tÃ­nh toÃ¡n tuyáº¿n Ä‘Æ°á»ng ngáº¯n nháº¥t...";
 
-                // C) Xin đường đi từ trạm phát sóng định tuyến OpenRouteService / OSRM (Miễn phí)
+                // C) Xin Ä‘Æ°á»ng Ä‘i tá»« tráº¡m phÃ¡t sÃ³ng Ä‘á»‹nh tuyáº¿n OpenRouteService / OSRM (Miá»…n phÃ­)
                 // OSRM: https://router.project-osrm.org/route/v1/{mode}/{lon1},{lat1};{lon2},{lat2}
                 const routeUrl = `https://router.project-osrm.org/route/v1/${mode}/${myCurrentLon},${myCurrentLat};${targetLon},${targetLat}?overview=full&geometries=geojson`;
                 
@@ -351,28 +351,28 @@
                 const routeJson = await routeRes.json();
 
                 if (routeJson.code !== 'Ok' || routeJson.routes.length === 0) {
-                     statusBox.innerText = "❌ Máy chủ không tìm ra được con đường khả thi nào (Qua sông/biển/đảo...).";
+                     statusBox.innerText = "âŒ MÃ¡y chá»§ khÃ´ng tÃ¬m ra Ä‘Æ°á»£c con Ä‘Æ°á»ng kháº£ thi nÃ o (Qua sÃ´ng/biá»ƒn/Ä‘áº£o...).";
                      return;
                 }
 
-                // D) Tẩy đường bay cũ và Vẽ đường bay mới lên
+                // D) Táº©y Ä‘Æ°á»ng bay cÅ© vÃ  Váº½ Ä‘Æ°á»ng bay má»›i lÃªn
                 if (routePolyline) map.removeLayer(routePolyline);
                 
                 routePolyline = L.geoJSON(routeJson.routes[0].geometry, {
                     style: { color: '#0ea5e9', weight: 6, opacity: 0.9, lineCap: 'round', lineJoin: 'round' }
                 }).addTo(map);
 
-                // Zoom sao cho vừa khung nhìn từ A đến B
+                // Zoom sao cho vá»«a khung nhÃ¬n tá»« A Ä‘áº¿n B
                 map.fitBounds(routePolyline.getBounds(), { padding: [50, 50] });
 
-                // E) Show kết quả Khoảng cách, Thời gian
+                // E) Show káº¿t quáº£ Khoáº£ng cÃ¡ch, Thá»i gian
                 const totalDistKm = (routeJson.routes[0].distance / 1000).toFixed(1);
                 const rawMins = Math.round(routeJson.routes[0].duration / 60);
 
-                // Format ra giờ nếu thời gian lớn hơn 60 p
-                let timeText = rawMins + " phút";
+                // Format ra giá» náº¿u thá»i gian lá»›n hÆ¡n 60 p
+                let timeText = rawMins + " phÃºt";
                 if (rawMins > 60) {
-                    timeText = Math.floor(rawMins / 60) + " giờ " + (rawMins % 60) + " phút";
+                    timeText = Math.floor(rawMins / 60) + " giá» " + (rawMins % 60) + " phÃºt";
                 }
 
                 document.getElementById('dist-val').innerText = totalDistKm + " km";
@@ -380,34 +380,35 @@
                 
                 document.getElementById('route-info').style.display = 'block';
                 document.getElementById('reset-btn').style.display = 'block';
-                statusBox.innerText = ""; // Dọn sạch lỗi
+                statusBox.innerText = ""; // Dá»n sáº¡ch lá»—i
 
             } catch (error) {
-                console.error("Lỗi App:", error);
-                // Do SV chạy trên môi trường có thiết lập mạng khắt khe (hoặc nghẽn mạng) sẽ nhảy lỗi Fetch.
-                statusBox.innerText = `❌ Lỗi Hệ Thống: Không thể tải. Kiểm tra mạng hoặc Adblock! Chi tiết: ${error.message}`;
+                console.error("Lá»—i App:", error);
+                // Do SV cháº¡y trÃªn mÃ´i trÆ°á»ng cÃ³ thiáº¿t láº­p máº¡ng kháº¯t khe (hoáº·c ngháº½n máº¡ng) sáº½ nháº£y lá»—i Fetch.
+                statusBox.innerText = `âŒ Lá»—i Há»‡ Thá»‘ng: KhÃ´ng thá»ƒ táº£i. Kiá»ƒm tra máº¡ng hoáº·c Adblock! Chi tiáº¿t: ${error.message}`;
             }
         }
 
         // ==========================================
-        // 4. RESET BẢN ĐỒ
+        // 4. RESET Báº¢N Äá»’
         // ==========================================
         function resetMap() {
-            // Xóa đường và Marker điểm đến
+            // XÃ³a Ä‘Æ°á»ng vÃ  Marker Ä‘iá»ƒm Ä‘áº¿n
             if (routePolyline) map.removeLayer(routePolyline);
             if (targetMarker) map.removeLayer(targetMarker);
             
-            // Xóa input
+            // XÃ³a input
             document.getElementById('dest-input').value = "";
             document.getElementById('route-info').style.display = 'none';
-            document.getElementById('status-msg').innerText = "Đã dọn dẹp bản đồ.";
+            document.getElementById('status-msg').innerText = "ÄÃ£ dá»n dáº¹p báº£n Ä‘á»“.";
             document.getElementById('reset-btn').style.display = 'none';
 
-            // Đưa lại tiêu điểm về vị trí của tôi
+            // ÄÆ°a láº¡i tiÃªu Ä‘iá»ƒm vá» vá»‹ trÃ­ cá»§a tÃ´i
             centerToMyLocation();
         }
 
     </script>
 </body>
 </html>
+
 

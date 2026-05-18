@@ -644,3 +644,252 @@ select:focus {
 .badge--error   { background: rgba(252, 165, 165, 0.2); color: #dc2626; border: 1px solid rgba(252, 165, 165, 0.4); }
 .badge--info    { background: rgba(147, 197, 253, 0.2); color: #2563eb; border: 1px solid rgba(147, 197, 253, 0.4); }
 .badge--primary { background: rgba(99, 102, 241, 0.1);  color: #6366f1; border: 1px solid rgba(99, 102, 241, 0.2); }
+
+/* ============================================================
+   16. SMOOTH SCROLL & SCROLL REVEAL
+   ============================================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Scroll reveal — elements start hidden, JS will add .reveal-in */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal.reveal-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger delays for grids */
+.reveal[data-delay="1"] { transition-delay: 0.08s; }
+.reveal[data-delay="2"] { transition-delay: 0.16s; }
+.reveal[data-delay="3"] { transition-delay: 0.24s; }
+.reveal[data-delay="4"] { transition-delay: 0.32s; }
+.reveal[data-delay="5"] { transition-delay: 0.40s; }
+.reveal[data-delay="6"] { transition-delay: 0.48s; }
+
+/* Section entrance animation */
+.section-head {
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+/* ============================================================
+   17. FLOATING CARD — Premium Cinematic Effects
+   ============================================================ */
+
+/* Override existing floating-card for enhanced version */
+.floating-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Shimmer sweep overlay */
+.floating-card__shimmer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  animation: fc-shimmer 4s ease-in-out infinite;
+}
+
+@keyframes fc-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Live indicator badge */
+.floating-card__live {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.65rem;
+  border-radius: 99px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  background: #ef4444;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: live-pulse 1.4s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.8);
+}
+
+@keyframes live-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+/* Cinematic bottom gradient overlay on image */
+.floating-card__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    to bottom,
+    transparent 40%,
+    rgba(10, 15, 35, 0.92) 100%
+  );
+  pointer-events: none;
+}
+
+/* Reposition info panel to overlap image */
+.floating-card .floating-card__info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 1.25rem 1.5rem 1.4rem;
+  background: transparent;
+}
+
+/* Rating row */
+.floating-card__rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0.4rem;
+}
+
+.rating-stars {
+  color: #fbbf24;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+}
+
+.rating-count {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+/* Stats row at bottom of card */
+.floating-card__stats {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.fc-stat {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fc-stat__icon {
+  font-size: 0.75rem;
+}
+
+.fc-stat__val {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Override badge position to be inline */
+.floating-card .floating-card__badge {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 0.5rem;
+  font-size: 0.62rem;
+  padding: 0.3rem 0.75rem;
+  background: linear-gradient(135deg, #6366f1, #06b6d4);
+  box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+  border-radius: 99px;
+}
+
+/* Progress bar at bottom of card (slide timer) */
+.floating-card__progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  z-index: 20;
+}
+
+.floating-card__progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6366f1, #06b6d4);
+  transition: width 0.3s linear;
+  animation: fc-progress 5s linear infinite;
+}
+
+@keyframes fc-progress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+/* Make image fill full card height */
+.floating-card img {
+  width: 100%;
+  height: 360px !important;
+  object-fit: cover;
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+/* Hover: slight zoom with glow */
+.floating-card:hover {
+  box-shadow: 0 50px 100px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* ============================================================
+   18. SECTION SCROLL ANIMATIONS (via IntersectionObserver)
+   ============================================================ */
+
+/* Animate section titles on scroll */
+@keyframes slide-up-fade {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.section-head.is-visible {
+  animation: slide-up-fade 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Stagger feature cards */
+.feature-card:nth-child(1) { animation-delay: 0s; }
+.feature-card:nth-child(2) { animation-delay: 0.08s; }
+.feature-card:nth-child(3) { animation-delay: 0.16s; }
+.feature-card:nth-child(4) { animation-delay: 0.24s; }
+
+/* Smooth page transitions */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+

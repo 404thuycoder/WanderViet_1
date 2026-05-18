@@ -102,13 +102,44 @@
         </div>
         
         <div class="hero-v2__visual">
-          <!-- Premium Floating Card showing a destination -->
-          <div class="floating-card">
-            <img src="https://images.unsplash.com/photo-1528127269322-539801943592?w=500&q=80" alt="Hội An" />
+          <!-- Premium Floating Card — Enhanced with cinematic effects -->
+          <div class="floating-card" id="heroFloatingCard">
+            <!-- Shimmer overlay effect -->
+            <div class="floating-card__shimmer"></div>
+            <!-- Live Indicator -->
+            <div class="floating-card__live">
+              <span class="live-dot"></span> TRỰC TIẾP
+            </div>
+            <img src="https://images.unsplash.com/photo-1528127269322-539801943592?w=500&q=80" alt="Hội An" id="heroCardImg" />
+            <!-- Cinematic overlay gradient -->
+            <div class="floating-card__overlay"></div>
             <div class="floating-card__info">
-              <h4>Phố cổ Hội An</h4>
-              <p>📍 Quảng Nam</p>
-              <div class="floating-card__badge">Verified</div>
+              <div class="floating-card__rating">
+                <span class="rating-stars">★★★★★</span>
+                <span class="rating-count">4.9</span>
+              </div>
+              <h4 id="heroCardTitle">Phố cổ Hội An</h4>
+              <p id="heroCardLocation">📍 Quảng Nam</p>
+              <!-- Stats row -->
+              <div class="floating-card__stats">
+                <div class="fc-stat">
+                  <span class="fc-stat__icon">👁️</span>
+                  <span class="fc-stat__val" id="heroCardVisitors">2.3k</span>
+                </div>
+                <div class="fc-stat">
+                  <span class="fc-stat__icon">❤️</span>
+                  <span class="fc-stat__val">98%</span>
+                </div>
+                <div class="fc-stat">
+                  <span class="fc-stat__icon">📸</span>
+                  <span class="fc-stat__val">240+</span>
+                </div>
+              </div>
+              <div class="floating-card__badge" id="heroCardBadge">✓ Verified</div>
+            </div>
+            <!-- Slide progress bar -->
+            <div class="floating-card__progress">
+              <div class="floating-card__progress-bar" id="heroCardProgress"></div>
             </div>
           </div>
         </div>

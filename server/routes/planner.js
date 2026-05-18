@@ -57,6 +57,7 @@ try {
 
 const Itinerary = require('../models/Itinerary');
 const User = require('../models/User'); // ♥ Thêm User model để lấy thông tin chi tiết
+const PlannerReview = require('../models/PlannerReview'); // ⭐ Đánh giá trải nghiệm WanderAI
 
 // Lên lịch trình
 router.post('/generate', optionalAuth, async (req, res) => {
@@ -862,6 +863,85 @@ router.post('/compare', async (req, res) => {
   } catch (err) {
     console.error('Lỗi so sánh AI:', err);
     res.status(500).json({ success: false, message: 'Không thể thực hiện so sánh lúc này.' });
+  }
+});
+
+// ⭐ GỬI ĐÁNH GIÁ TRẢI NGHIỆM WANDERAI (optionalAuth: đăng nhập hoặc khách)
+router.post('/review', optionalAuth, async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ success: false, message: 'Vui lòng chọn số sao từ 1 đến 5.' });
+    }
+    if (!comment || comment.trim().length < 5) {
+      return res.status(400).json({ success: false, message: 'Cảm nhận quá ngắn. Vui lòng nhập ít nhất 5 ký tự.' });
+    }
+
+    // Lấy thông tin user nếu đang đăng nhập
+    let userName = 'Khách hàng';
+    let userEmail = '';
+    let userId = null;
+    if (req.user) {
+      userId = req.user.id;
+      const userDoc = await User.findOne({
+        $or: [
+          { customId: req.user.id },
+          { id: req.user.id }
+        ]
+      }).select('displayName name email avatar');
+      if (userDoc) {
+        userName = userDoc.displayName || userDoc.name || 'Thành viên';
+        userEmail = userDoc.email || '';
+      }
+    }
+
+    const review = new PlannerReview({
+      userId,
+      userName,
+      userEmail,
+      rating: Number(rating),
+      comment: comment.trim(),
+      source: 'planner_sidebar'
+    });
+
+    await review.save();
+
+    // Ghi log
+    if (userEmail) {
+      await logAction(userEmail, 'user', 'PLANNER_REVIEW_SUBMITTED', { rating, commentLength: comment.length });
+    }
+
+    res.json({
+      success: true,
+      message: '🎉 Cảm ơn bạn đã đánh giá trải nghiệm WanderAI!',
+      review: {
+        _id: review._id,
+        userName,
+        rating: review.rating,
+        comment: review.comment,
+        createdAt: review.createdAt
+      }
+    });
+  } catch (error) {
+    console.error('❌ Planner Review Error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi server khi gửi đánh giá.' });
+  }
+});
+
+// ⭐ LẤY DANH SÁCH ĐÁNH GIÁ WANDERAI (public, 10 mới nhất)
+router.get('/reviews', async (req, res) => {
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 10, 50);
+    const reviews = await PlannerReview.find({ isVisible: true })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .select('userName rating comment createdAt');
+
+    res.json({ success: true, data: reviews });
+  } catch (error) {
+    console.error('❌ Get Reviews Error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi server khi tải đánh giá.' });
   }
 });
 

@@ -2845,7 +2845,7 @@
 
   function initHeroSlideshow() {
     var container = document.getElementById('heroSlideshow');
-    var floatingCard = document.querySelector('.floating-card');
+    var floatingCard = document.getElementById('heroFloatingCard') || document.querySelector('.floating-card');
     if (!container) return;
 
     var slides = [];
@@ -2857,36 +2857,67 @@
         id: p.id || p._id,
         name: p.name,
         region: p.region || p.province || 'Việt Nam',
-        verified: p.verified
+        verified: p.verified,
+        rating: p.rating || (4.5 + Math.random() * 0.5).toFixed(1),
+        reviewCount: p.reviewCount || Math.floor(Math.random() * 300 + 50)
       }));
     } 
     
-    // Luôn đảm bảo có ít nhất vài slide chất lượng cao làm fallback nếu slides trống hoặc lỗi
+    // Fallback slides with extra metadata
     if (slides.length === 0) {
       slides = [
-        { url: 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200', id: null, name: 'Phố cổ Hội An', region: 'Quảng Nam', verified: true },
-        { url: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?q=80&w=1200', id: null, name: 'Vịnh Hạ Long', region: 'Quảng Ninh', verified: true },
-        { url: 'https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?q=80&w=1200', id: null, name: 'Sa Pa', region: 'Lào Cai', verified: true },
-        { url: 'https://images.unsplash.com/photo-1555431189-d58b1740006d?q=80&w=1200', id: null, name: 'Đà Nẵng', region: 'Miền Trung', verified: true }
+        { url: 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200', id: null, name: 'Phố cổ Hội An', region: 'Quảng Nam', verified: true, rating: 4.9, reviewCount: 2340 },
+        { url: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?q=80&w=1200', id: null, name: 'Vịnh Hạ Long', region: 'Quảng Ninh', verified: true, rating: 4.8, reviewCount: 5120 },
+        { url: 'https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?q=80&w=1200', id: null, name: 'Sa Pa', region: 'Lào Cai', verified: true, rating: 4.7, reviewCount: 1870 },
+        { url: 'https://images.unsplash.com/photo-1555431189-d58b1740006d?q=80&w=1200', id: null, name: 'Đà Nẵng', region: 'Miền Trung', verified: true, rating: 4.8, reviewCount: 3210 }
       ];
     }
 
     var currentIndex = 0;
     var zIndexCounter = 10;
-    
-    // Initial Setup
-    container.style.backgroundImage = 'url(' + slides[0].url + ')';
-    container.style.backgroundSize = 'cover';
-    container.style.backgroundPosition = 'center';
-    
-    if (floatingCard) {
-      floatingCard.style.transition = 'all 0.4s ease';
-      if (slides[0].id) {
-         floatingCard.onclick = function() { window.location.href = 'place-detail.html?id=' + slides[0].id; };
-         floatingCard.style.cursor = 'pointer';
-         floatingCard.title = "Xem chi tiết";
-      }
+
+    // Helper: format visitor count
+    function fmtVisitors(n) {
+      if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'k';
+      return n + '';
     }
+
+    // Update floating card content
+    function updateFloatingCard(data, animate) {
+      if (!floatingCard) return;
+      var fImg     = document.getElementById('heroCardImg')    || floatingCard.querySelector('img');
+      var fTitle   = document.getElementById('heroCardTitle')  || floatingCard.querySelector('h4');
+      var fLoc     = document.getElementById('heroCardLocation')|| floatingCard.querySelector('p');
+      var fBadge   = document.getElementById('heroCardBadge')  || floatingCard.querySelector('.floating-card__badge');
+      var fVisit   = document.getElementById('heroCardVisitors');
+      var ratingEl = floatingCard.querySelector('.rating-count');
+
+      if (animate) {
+        floatingCard.style.opacity = '0';
+        floatingCard.style.transform = 'translateY(12px) scale(0.97)';
+      }
+      setTimeout(function() {
+        if (fImg)   fImg.src = data.url;
+        if (fTitle) fTitle.textContent = data.name;
+        if (fLoc)   fLoc.textContent = '📍 ' + data.region;
+        if (fBadge) fBadge.style.display = data.verified ? 'inline-flex' : 'none';
+        if (fVisit) fVisit.textContent = fmtVisitors(data.reviewCount || 1200);
+        if (ratingEl) ratingEl.textContent = data.rating || '4.8';
+        if (data.id) {
+          floatingCard.onclick = function() { window.location.href = 'place-detail.html?id=' + data.id; };
+          floatingCard.style.cursor = 'pointer';
+          floatingCard.title = 'Xem chi tiết: ' + data.name;
+        }
+        if (animate) {
+          floatingCard.style.opacity = '1';
+          floatingCard.style.transform = 'translateY(0) scale(1)';
+        }
+      }, animate ? 380 : 0);
+    }
+    
+    // Initial floating card setup
+    floatingCard && (floatingCard.style.transition = 'opacity 0.4s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)');
+    updateFloatingCard(slides[0], false);
 
     function createSlide(url, active) {
       var slide = document.createElement('div');
@@ -2906,42 +2937,18 @@
       var nextIndex = (currentIndex + 1) % slides.length;
       var nextData = slides[nextIndex];
       
-      // Step 1: Create the next slide (it will start hidden and start loading)
       zIndexCounter++;
       var nextSlide = createSlide(nextData.url, false);
       nextSlide.style.zIndex = zIndexCounter;
       
-      // Step 2: Trigger fade in after a tiny delay to ensure DOM insertion
       requestAnimationFrame(function() {
         nextSlide.classList.add('is-active');
       });
 
-      // Update Floating Card
-      if (floatingCard) {
-        floatingCard.style.opacity = '0';
-        floatingCard.style.transform = 'translateY(10px) scale(0.98)';
-        setTimeout(function() {
-          var fImg = floatingCard.querySelector('img');
-          var fTitle = floatingCard.querySelector('h4');
-          var fLocation = floatingCard.querySelector('p');
-          var fBadge = floatingCard.querySelector('.floating-card__badge');
-          
-          if (fImg) fImg.src = nextData.url;
-          if (fTitle) fTitle.textContent = nextData.name;
-          if (fLocation) fLocation.textContent = '📍 ' + nextData.region;
-          if (fBadge) fBadge.style.display = nextData.verified ? 'inline-block' : 'none';
-          
-          if (nextData.id) {
-             floatingCard.onclick = function() { window.location.href = 'place-detail.html?id=' + nextData.id; };
-             floatingCard.style.cursor = 'pointer';
-          }
-          
-          floatingCard.style.opacity = '1';
-          floatingCard.style.transform = 'translateY(0) scale(1)';
-        }, 400);
-      }
+      // Update Floating Card with new data
+      updateFloatingCard(nextData, true);
 
-      // Step 3: Keep the old slide for a while, then clean up
+      // Clean up old slide
       var oldSlide = currentSlide;
       setTimeout(function() {
         container.style.backgroundImage = 'url(' + nextData.url + ')';
@@ -2954,8 +2961,58 @@
       currentIndex = nextIndex;
     }
 
-    // Rotation interval
+    // Animate visitor count randomly every 8s for live feel
+    setInterval(function() {
+      var el = document.getElementById('heroCardVisitors');
+      if (el && slides[currentIndex]) {
+        var base = slides[currentIndex].reviewCount || 1200;
+        var jitter = Math.floor(Math.random() * 40) - 20;
+        el.textContent = fmtVisitors(base + jitter);
+      }
+    }, 8000);
+
     setInterval(next, 5000);
+  }
+
+  // ===== Scroll Reveal via IntersectionObserver =====
+  function initScrollReveal() {
+    if (!('IntersectionObserver' in window)) return;
+
+    // Reveal .section-head elements
+    var headObs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          headObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.section-head').forEach(function(el) {
+      headObs.observe(el);
+    });
+
+    // Reveal .reveal elements (staggered)
+    var revealObs = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-in');
+          revealObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      revealObs.observe(el);
+    });
+
+    // Add reveal class to feature cards, stat items, promo cards dynamically
+    document.querySelectorAll('.feature-card, .stat-item, .promo-card, .review-card').forEach(function(el, i) {
+      el.classList.add('reveal');
+      var delay = Math.min(i + 1, 6);
+      el.setAttribute('data-delay', delay);
+      revealObs.observe(el);
+    });
   }
 
   /* ——— Boot ——— */
@@ -3050,6 +3107,7 @@
       renderStopListUI();
       initSearchSuggestions();
       initHeroSlideshow();
+      initScrollReveal();
       // --- Hero Tags ---
       document.querySelectorAll('.glass-chip').forEach(function (chip) {
         chip.onclick = function () {

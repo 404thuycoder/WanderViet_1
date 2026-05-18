@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="vi">
+﻿<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
 <head>
 
     <!-- WanderViet Translation Curtain -->
@@ -32,8 +32,8 @@
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WanderViệt — Chuyến Đi Của Tôi</title>
-  <meta name="description" content="Quản lý tour du lịch đã đặt và các chuyến đi AI lên kế hoạch của bạn." />
+  <title>WanderViá»‡t â€” Chuyáº¿n Äi Cá»§a TÃ´i</title>
+  <meta name="description" content="Quáº£n lÃ½ tour du lá»‹ch Ä‘Ã£ Ä‘áº·t vÃ  cÃ¡c chuyáº¿n Ä‘i AI lÃªn káº¿ hoáº¡ch cá»§a báº¡n." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
@@ -41,7 +41,7 @@
   <link rel="stylesheet" href="css/global-tokens.css?v=3" />
   <link rel="stylesheet" href="css/styles.css?v=3" />
   <style>
-    /* ── Page Layout ── */
+    /* â”€â”€ Page Layout â”€â”€ */
     body { background: var(--bg, #0a0f1e); color: var(--text, #e2e8f0); font-family: 'Be Vietnam Pro', sans-serif; }
 
     .trips-hero {
@@ -59,7 +59,7 @@
     .trips-hero h1 { font-family: 'Outfit', sans-serif; font-size: clamp(1.8rem,4vw,2.6rem); margin: 0 0 .5rem; }
     .trips-hero p { color: #94a3b8; font-size: .95rem; margin: 0; }
 
-    /* ── Main Tab Toggle ── */
+    /* â”€â”€ Main Tab Toggle â”€â”€ */
     .main-tab-wrap {
       display: flex; gap: .75rem;
       margin: 2rem 0 1.5rem;
@@ -83,7 +83,7 @@
     }
     .main-tab.active .tab-badge { background: #6366f1; color: #fff; }
 
-    /* ── Sub Tabs ── */
+    /* â”€â”€ Sub Tabs â”€â”€ */
     .sub-tabs { display: flex; gap: .5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .sub-tab {
       padding: .45rem 1.1rem; border-radius: 50px;
@@ -96,11 +96,11 @@
 
     .sub-tab.danger.active { background: #ef4444; color: #fff; border-color: #ef4444; }
 
-    /* ── Section Panel ── */
+    /* â”€â”€ Section Panel â”€â”€ */
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* ── Booking Card ── */
+    /* â”€â”€ Booking Card â”€â”€ */
     .booking-card {
       background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
       border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem;
@@ -128,7 +128,7 @@
     /* Payment method icon */
     .pm-icon { font-size: 1.1rem; }
 
-    /* ── Trip Card (AI) ── */
+    /* â”€â”€ Trip Card (AI) â”€â”€ */
     .trip-card {
       background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
       border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem;
@@ -136,7 +136,7 @@
     }
     .trip-card:hover { border-color: rgba(20,184,166,.3); box-shadow: 0 8px 32px rgba(0,0,0,.3); }
 
-    /* ── Action Buttons ── */
+    /* â”€â”€ Action Buttons â”€â”€ */
     .btn-sm {
       padding: .45rem 1rem; border-radius: 10px; font-size: .82rem; font-weight: 700;
       cursor: pointer; transition: all .2s; border: 1.5px solid transparent;
@@ -150,16 +150,16 @@
     .btn-success { background: transparent; border-color: rgba(16,185,129,.3); color: #10b981; }
     .btn-success:hover { background: rgba(16,185,129,.1); }
 
-    /* ── Empty State ── */
+    /* â”€â”€ Empty State â”€â”€ */
     .empty-state { text-align: center; padding: 4rem 2rem; color: #64748b; }
     .empty-state__icon { font-size: 3.5rem; margin-bottom: 1rem; }
     .empty-state h3 { font-size: 1.2rem; color: #94a3b8; margin-bottom: .5rem; }
 
-    /* ── Loading ── */
+    /* â”€â”€ Loading â”€â”€ */
     .spinner { width: 36px; height: 36px; border: 3px solid rgba(99,102,241,.15); border-top-color: #6366f1; border-radius: 50%; animation: spin .8s linear infinite; margin: 3rem auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Unauth ── */
+    /* â”€â”€ Unauth â”€â”€ */
     .unauth-box { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 20px; padding: 4rem 2rem; text-align: center; }
     .unauth-box h2 { color: #f43f5e; margin-bottom: .75rem; }
     .unauth-box p { color: #64748b; margin-bottom: 2rem; }
@@ -180,8 +180,8 @@
     <!-- Hero -->
     <section class="trips-hero">
       <div class="container" style="position:relative;z-index:1;">
-        <h1>🎒 Chuyến Đi & Dịch Vụ</h1>
-        <p>Quản lý các dịch vụ đã đặt, tour du lịch và các lịch trình do AI lên kế hoạch.</p>
+        <h1>ðŸŽ’ Chuyáº¿n Äi & Dá»‹ch Vá»¥</h1>
+        <p>Quáº£n lÃ½ cÃ¡c dá»‹ch vá»¥ Ä‘Ã£ Ä‘áº·t, tour du lá»‹ch vÃ  cÃ¡c lá»‹ch trÃ¬nh do AI lÃªn káº¿ hoáº¡ch.</p>
       </div>
     </section>
 
@@ -190,9 +190,9 @@
 
         <!-- Unauth -->
         <div id="unauthorizedMsg" style="display:none;margin-top:2rem;" class="unauth-box">
-          <h2>Bạn chưa đăng nhập!</h2>
-          <p>Vui lòng đăng nhập để xem lại các chuyến đi của bạn.</p>
-          <a href="index.html" class="btn btn--primary">Quay lại đăng nhập</a>
+          <h2>Báº¡n chÆ°a Ä‘Äƒng nháº­p!</h2>
+          <p>Vui lÃ²ng Ä‘Äƒng nháº­p Ä‘á»ƒ xem láº¡i cÃ¡c chuyáº¿n Ä‘i cá»§a báº¡n.</p>
+          <a href="index.html" class="btn btn--primary">Quay láº¡i Ä‘Äƒng nháº­p</a>
         </div>
 
         <!-- Main content -->
@@ -201,41 +201,41 @@
           <!-- Main Tabs -->
           <div class="main-tab-wrap">
             <button class="main-tab active" data-main-tab="tours">
-              🏢 Dịch vụ & Tour
+              ðŸ¢ Dá»‹ch vá»¥ & Tour
               <span class="tab-badge" id="badge-tours">0</span>
             </button>
             <button class="main-tab" data-main-tab="mytrips">
-              🤖 Chuyến Đi Của Tôi
+              ðŸ¤– Chuyáº¿n Äi Cá»§a TÃ´i
               <span class="tab-badge" id="badge-mytrips">0</span>
             </button>
           </div>
 
-          <!-- ═══ PANEL: TOUR DU LỊCH ═══ -->
+          <!-- â•â•â• PANEL: TOUR DU Lá»ŠCH â•â•â• -->
           <div class="tab-panel active" id="panel-tours">
             <div class="sub-tabs">
-              <button class="sub-tab active" data-tour-tab="pending">⏳ Chờ xác nhận</button>
-              <button class="sub-tab" data-tour-tab="confirmed">✅ Đã xác nhận</button>
-              <button class="sub-tab" data-tour-tab="completed">🏁 Hoàn thành</button>
-              <button class="sub-tab danger" data-tour-tab="cancelled">🚫 Đã hủy</button>
+              <button class="sub-tab active" data-tour-tab="pending">â³ Chá» xÃ¡c nháº­n</button>
+              <button class="sub-tab" data-tour-tab="confirmed">âœ… ÄÃ£ xÃ¡c nháº­n</button>
+              <button class="sub-tab" data-tour-tab="completed">ðŸ HoÃ n thÃ nh</button>
+              <button class="sub-tab danger" data-tour-tab="cancelled">ðŸš« ÄÃ£ há»§y</button>
             </div>
             <!-- Category filters -->
             <div class="sub-tabs" style="margin-top: -0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 1.5rem;">
-              <button class="sub-tab active" data-cat-tab="all" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">🏷️ Tất cả</button>
-              <button class="sub-tab" data-cat-tab="tour" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">🎒 Tour</button>
-              <button class="sub-tab" data-cat-tab="nha-hang" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">🥘 Nhà hàng</button>
-              <button class="sub-tab" data-cat-tab="khach-san" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">🏨 Khách sạn</button>
-              <button class="sub-tab" data-cat-tab="others" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">✨ Khác</button>
+              <button class="sub-tab active" data-cat-tab="all" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">ðŸ·ï¸ Táº¥t cáº£</button>
+              <button class="sub-tab" data-cat-tab="tour" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">ðŸŽ’ Tour</button>
+              <button class="sub-tab" data-cat-tab="nha-hang" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">ðŸ¥˜ NhÃ  hÃ ng</button>
+              <button class="sub-tab" data-cat-tab="khach-san" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">ðŸ¨ KhÃ¡ch sáº¡n</button>
+              <button class="sub-tab" data-cat-tab="others" style="font-size: 0.75rem; padding: 0.3rem 0.8rem;">âœ¨ KhÃ¡c</button>
             </div>
             <div id="toursList"><div class="spinner"></div></div>
           </div>
 
-          <!-- ═══ PANEL: CHUYẾN ĐI CỦA TÔI ═══ -->
+          <!-- â•â•â• PANEL: CHUYáº¾N ÄI Cá»¦A TÃ”I â•â•â• -->
           <div class="tab-panel" id="panel-mytrips">
             <div class="sub-tabs">
-              <button class="sub-tab active" data-trip-tab="planned">📅 Đang lên lịch</button>
-              <button class="sub-tab" data-trip-tab="experienced">✅ Đã đi</button>
-              <button class="sub-tab" data-trip-tab="missed">❌ Bỏ lỡ</button>
-              <button class="sub-tab danger" data-trip-tab="deleted">🗑️ Thùng rác</button>
+              <button class="sub-tab active" data-trip-tab="planned">ðŸ“… Äang lÃªn lá»‹ch</button>
+              <button class="sub-tab" data-trip-tab="experienced">âœ… ÄÃ£ Ä‘i</button>
+              <button class="sub-tab" data-trip-tab="missed">âŒ Bá» lá»¡</button>
+              <button class="sub-tab danger" data-trip-tab="deleted">ðŸ—‘ï¸ ThÃ¹ng rÃ¡c</button>
             </div>
             <div id="tripsList"><div class="spinner"></div></div>
           </div>
@@ -248,18 +248,18 @@
   <!-- Cancel Confirm Modal -->
   <div id="cancelModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
     <div style="background:#1e293b;border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:2rem;max-width:400px;width:90%;text-align:center;">
-      <p style="font-size:2rem;margin-bottom:.5rem;">❓</p>
-      <h3 style="margin-bottom:.75rem;font-family:'Outfit',sans-serif;">Hủy đặt lịch?</h3>
-      <p style="color:#94a3b8;margin-bottom:1.5rem;font-size:.9rem;">Bạn có chắc muốn hủy đơn này? Hành động này không thể hoàn tác.</p>
+      <p style="font-size:2rem;margin-bottom:.5rem;">â“</p>
+      <h3 style="margin-bottom:.75rem;font-family:'Outfit',sans-serif;">Há»§y Ä‘áº·t lá»‹ch?</h3>
+      <p style="color:#94a3b8;margin-bottom:1.5rem;font-size:.9rem;">Báº¡n cÃ³ cháº¯c muá»‘n há»§y Ä‘Æ¡n nÃ y? HÃ nh Ä‘á»™ng nÃ y khÃ´ng thá»ƒ hoÃ n tÃ¡c.</p>
       <div style="display:flex;gap:.75rem;justify-content:center;">
-        <button class="btn-sm btn-outline" onclick="closeCancelModal()">Không, giữ lại</button>
-        <button class="btn-sm btn-danger" id="confirmCancelBtn" style="background:#ef4444;color:#fff;border-color:#ef4444;">Xác nhận hủy</button>
+        <button class="btn-sm btn-outline" onclick="closeCancelModal()">KhÃ´ng, giá»¯ láº¡i</button>
+        <button class="btn-sm btn-danger" id="confirmCancelBtn" style="background:#ef4444;color:#fff;border-color:#ef4444;">XÃ¡c nháº­n há»§y</button>
       </div>
     </div>
   </div>
 
   <script src="js/SharedUI.js?v=1778494999999"></script>
-  <script src="js/my-trips-tabs.js?v=20260518_v28"></script>
+  <script src="js/my-trips-tabs.js?v=20260518_v29"></script>
   <script>
   (function() {
     var token = localStorage.getItem('wander_token');
@@ -275,29 +275,29 @@
     var allPlaces = [];
     var cancelTargetId = null;
 
-    // ── Payment method labels ──
-    var PM_LABELS = { contact: '📞 Liên hệ', transfer: '🏦 Chuyển khoản', momo: '💜 MoMo', zalopay: '💙 ZaloPay', card: '💳 Thẻ ngân hàng' };
+    // â”€â”€ Payment method labels â”€â”€
+    var PM_LABELS = { contact: 'ðŸ“ž LiÃªn há»‡', transfer: 'ðŸ¦ Chuyá»ƒn khoáº£n', momo: 'ðŸ’œ MoMo', zalopay: 'ðŸ’™ ZaloPay', card: 'ðŸ’³ Tháº» ngÃ¢n hÃ ng' };
 
-    // ── Format helpers ──
-    function fmtDate(d) { return d ? new Date(d).toLocaleDateString('vi-VN') : '—'; }
+    // â”€â”€ Format helpers â”€â”€
+    function fmtDate(d) { return d ? new Date(d).toLocaleDateString('vi-VN') : 'â€”'; }
     function fmtPrice(n) {
-      if (!n || n === 0) return 'Liên hệ báo giá';
-      if (n >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M ₫';
-      if (n >= 1000) return Math.round(n/1000) + 'K ₫';
-      return n.toLocaleString('vi-VN') + ' ₫';
+      if (!n || n === 0) return 'LiÃªn há»‡ bÃ¡o giÃ¡';
+      if (n >= 1000000) return (n/1000000).toFixed(1).replace('.0','') + 'M â‚«';
+      if (n >= 1000) return Math.round(n/1000) + 'K â‚«';
+      return n.toLocaleString('vi-VN') + ' â‚«';
     }
     function statusBadge(s) {
       var map = { pending:'badge-pending', confirmed:'badge-confirmed', cancelled:'badge-cancelled', completed:'badge-completed' };
-      var lbl = { pending:'⏳ Chờ xác nhận', confirmed:'✅ Đã xác nhận', cancelled:'🚫 Đã hủy', completed:'🏁 Hoàn thành' };
+      var lbl = { pending:'â³ Chá» xÃ¡c nháº­n', confirmed:'âœ… ÄÃ£ xÃ¡c nháº­n', cancelled:'ðŸš« ÄÃ£ há»§y', completed:'ðŸ HoÃ n thÃ nh' };
       return '<span class="badge-status ' + (map[s]||'badge-pending') + '">' + (lbl[s]||s) + '</span>';
     }
     function payBadge(s) {
       return s === 'paid'
-        ? '<span class="badge-status badge-paid">💰 Đã thanh toán</span>'
-        : '<span class="badge-status badge-unpaid">⚠️ Chưa thanh toán</span>';
+        ? '<span class="badge-status badge-paid">ðŸ’° ÄÃ£ thanh toÃ¡n</span>'
+        : '<span class="badge-status badge-unpaid">âš ï¸ ChÆ°a thanh toÃ¡n</span>';
     }
 
-    // ── Load Tours (bookings type=tour + service) ──
+    // â”€â”€ Load Tours (bookings type=tour + service) â”€â”€
     async function loadTours() {
       var list = document.getElementById('toursList');
       list.innerHTML = '<div class="spinner"></div>';
@@ -316,7 +316,7 @@
         document.getElementById('badge-tours').textContent = allBookings.length;
         renderTourTab(currentTourTab, currentCatTab);
       } catch (err) {
-        list.innerHTML = '<div class="empty-state"><p style="color:#ef4444;">Lỗi tải dữ liệu</p></div>';
+        list.innerHTML = '<div class="empty-state"><p style="color:#ef4444;">Lá»—i táº£i dá»¯ liá»‡u</p></div>';
       }
     }
 
@@ -339,57 +339,57 @@
       });
 
       if (filtered.length === 0) {
-        list.innerHTML = '<div class="empty-state"><div class="empty-state__icon">📭</div><h3>Chưa có đơn nào trong mục này</h3><p>Khám phá các dịch vụ trên trang <a href="business-directory.html" style="color:#6366f1;">Dịch vụ đối tác</a></p></div>';
+        list.innerHTML = '<div class="empty-state"><div class="empty-state__icon">ðŸ“­</div><h3>ChÆ°a cÃ³ Ä‘Æ¡n nÃ o trong má»¥c nÃ y</h3><p>KhÃ¡m phÃ¡ cÃ¡c dá»‹ch vá»¥ trÃªn trang <a href="business-directory.html" style="color:#6366f1;">Dá»‹ch vá»¥ Ä‘á»‘i tÃ¡c</a></p></div>';
         return;
       }
       list.innerHTML = filtered.map(function(b) {
         var actions = '';
         if (b.status === 'pending' || b.status === 'confirmed') {
-          actions += '<button class="btn-sm btn-danger" onclick="openCancelModal(\'' + b._id + '\')">Hủy đặt</button>';
+          actions += '<button class="btn-sm btn-danger" onclick="openCancelModal(\'' + b._id + '\')">Há»§y Ä‘áº·t</button>';
         }
         if (b.paymentStatus !== 'paid' && b.totalPrice > 0 && b.status !== 'cancelled') {
-          // Chỉ hiện nút thanh toán cho trường hợp "Liên hệ" (chưa chọn phương thức online lúc đặt)
+          // Chá»‰ hiá»‡n nÃºt thanh toÃ¡n cho trÆ°á»ng há»£p "LiÃªn há»‡" (chÆ°a chá»n phÆ°Æ¡ng thá»©c online lÃºc Ä‘áº·t)
           if (b.paymentMethod === 'contact') {
-            actions += '<button class="btn-sm btn-success" onclick="payBooking(\'' + b.bookingId + '\')">Thanh toán</button>';
+            actions += '<button class="btn-sm btn-success" onclick="payBooking(\'' + b.bookingId + '\')">Thanh toÃ¡n</button>';
           }
         }
         
         const place = allPlaces.find(p => p.id === b.placeId || p._id === b.placeId) || {};
-        var kindLabel = (b.bookingType === 'tour' || place.isTour) ? '🎒 Tour' : '✨ Dịch vụ';
-        if (place.kind === 'nha-hang') kindLabel = '🥘 Nhà hàng';
-        if (place.kind === 'khach-san') kindLabel = '🏨 Khách sạn';
+        var kindLabel = (b.bookingType === 'tour' || place.isTour) ? 'ðŸŽ’ Tour' : 'âœ¨ Dá»‹ch vá»¥';
+        if (place.kind === 'nha-hang') kindLabel = 'ðŸ¥˜ NhÃ  hÃ ng';
+        if (place.kind === 'khach-san') kindLabel = 'ðŸ¨ KhÃ¡ch sáº¡n';
 
         return '<div class="booking-card">' +
           '<div class="booking-card__head">' +
             '<div>' +
               '<div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-bottom:.4rem;">' +
                 '<span style="font-size:0.7rem; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; color:#94a3b8; font-weight:700;">' + kindLabel + '</span>' +
-                '<h3 class="booking-card__title">' + (b.placeName || 'Dịch vụ') + '</h3>' +
+                '<h3 class="booking-card__title">' + (b.placeName || 'Dá»‹ch vá»¥') + '</h3>' +
                 statusBadge(b.status) +
                 payBadge(b.paymentStatus || 'unpaid') +
               '</div>' +
               '<div class="booking-card__meta">' +
-                '<span>🎫 #' + b.bookingId + '</span>' +
-                '<span>👤 ' + b.customerName + '</span>' +
-                '<span>📞 ' + (b.customerPhone || '—') + '</span>' +
-                (b.tourDate ? '<span>🛫 Khởi hành: ' + fmtDate(b.tourDate) + '</span>' : '<span>📅 Ngày dùng: ' + fmtDate(b.useDate) + '</span>') +
-                '<span>👥 ' + (b.peopleCount||1) + ' người</span>' +
-                '<span class="price-hl">💰 ' + fmtPrice(b.totalPrice) + '</span>' +
-                '<span>' + (PM_LABELS[b.paymentMethod]||'📞 Liên hệ') + '</span>' +
+                '<span>ðŸŽ« #' + b.bookingId + '</span>' +
+                '<span>ðŸ‘¤ ' + b.customerName + '</span>' +
+                '<span>ðŸ“ž ' + (b.customerPhone || 'â€”') + '</span>' +
+                (b.tourDate ? '<span>ðŸ›« Khá»Ÿi hÃ nh: ' + fmtDate(b.tourDate) + '</span>' : '<span>ðŸ“… NgÃ y dÃ¹ng: ' + fmtDate(b.useDate) + '</span>') +
+                '<span>ðŸ‘¥ ' + (b.peopleCount||1) + ' ngÆ°á»i</span>' +
+                '<span class="price-hl">ðŸ’° ' + fmtPrice(b.totalPrice) + '</span>' +
+                '<span>' + (PM_LABELS[b.paymentMethod]||'ðŸ“ž LiÃªn há»‡') + '</span>' +
               '</div>' +
-              (b.specialRequests ? '<p style="margin:.5rem 0 0;font-size:.85rem;color:#94a3b8;">📝 ' + b.specialRequests + '</p>' : '') +
+              (b.specialRequests ? '<p style="margin:.5rem 0 0;font-size:.85rem;color:#94a3b8;">ðŸ“ ' + b.specialRequests + '</p>' : '') +
             '</div>' +
             '<div class="booking-card__actions">' + actions + '</div>' +
           '</div>' +
           '<div style="font-size:.78rem;color:#475569;border-top:1px solid rgba(255,255,255,.06);padding-top:.75rem;margin-top:.5rem;">' +
-            '📅 Đặt ngày ' + fmtDate(b.createdAt) +
-            (b.notes ? ' · 📌 ' + b.notes : '') +
+            'ðŸ“… Äáº·t ngÃ y ' + fmtDate(b.createdAt) +
+            (b.notes ? ' Â· ðŸ“Œ ' + b.notes : '') +
           '</div>' +
         '</div>';
       }).join('');
     }
 
-    // ── Cancel booking ──
+    // â”€â”€ Cancel booking â”€â”€
     window.openCancelModal = function(id) {
       cancelTargetId = id;
       var el = document.getElementById('cancelModal');
@@ -405,17 +405,17 @@
         .then(function(r){ return r.json(); })
         .then(function(json) {
           closeCancelModal();
-          if (json.success) { WanderUI.showToast('Đã hủy đặt lịch!', 'info'); loadTours(); }
-          else WanderUI.showToast(json.message || 'Lỗi!', 'error');
+          if (json.success) { WanderUI.showToast('ÄÃ£ há»§y Ä‘áº·t lá»‹ch!', 'info'); loadTours(); }
+          else WanderUI.showToast(json.message || 'Lá»—i!', 'error');
         });
     });
 
-    // ── Pay booking ──
+    // â”€â”€ Pay booking â”€â”€
     window.payBooking = function(bookingId) {
       window.location.href = 'payment.html?pay=' + bookingId;
     };
 
-    // ── Sub-tab wiring for tours ──
+    // â”€â”€ Sub-tab wiring for tours â”€â”€
     document.querySelectorAll('[data-tour-tab]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         document.querySelectorAll('[data-tour-tab]').forEach(function(b){ b.classList.remove('active'); });
@@ -424,7 +424,7 @@
       });
     });
 
-    // ── Sub-tab wiring for categories ──
+    // â”€â”€ Sub-tab wiring for categories â”€â”€
     document.querySelectorAll('[data-cat-tab]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         document.querySelectorAll('[data-cat-tab]').forEach(function(b){ b.classList.remove('active'); });
@@ -433,7 +433,7 @@
       });
     });
 
-    // ── Main tab toggle ──
+    // â”€â”€ Main tab toggle â”€â”€
     document.querySelectorAll('[data-main-tab]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         document.querySelectorAll('[data-main-tab]').forEach(function(b){ b.classList.remove('active'); });
@@ -444,7 +444,7 @@
       });
     });
 
-    // ── Load AI Trips (reusing my-trips-tabs.js logic) ──
+    // â”€â”€ Load AI Trips (reusing my-trips-tabs.js logic) â”€â”€
     // my-trips-tabs.js listens for data-trip-tab and renders into #tripsList
     // We just need to trigger initial load
     setTimeout(function() {
@@ -461,3 +461,4 @@
   </script>
 </body>
 </html>
+

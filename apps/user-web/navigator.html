@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
-<html lang="vi" data-theme="dark">
+<html lang="vi">
 
-<head>
+<head>`r`n  <meta charset="UTF-8" />
 
     <!-- WanderViet Translation Curtain -->
     <script>
@@ -32,10 +32,9 @@
     </style>
 
   <link rel="icon" type="image/png" href="/assets/wanderviet-logo-cropped-rounded.png">
-  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="Chá»‰ Ä‘Æ°á»ng GPS chÃ­nh xÃ¡c cao â€” WanderViá»‡t." />
-  <title>WanderViá»‡t â€” Chá»‰ Ä‘Æ°á»ng AR</title>
+  <meta name="description" content="Chỉ đường GPS chính xác cao — WanderViệt." />
+  <title>WanderViệt — Chỉ đường AR</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -53,76 +52,76 @@
 <body>
   <header class="site-header" id="header-container" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000;"></header>
   <div class="app-layout" style="height: calc(100vh - 60px); margin-top: 60px;">
-    <!-- Sidebar trÃ¡i (1/3): Chá»©c nÄƒng, thÃ´ng sá»‘ -->
+    <!-- Sidebar trái (1/3): Chức năng, thông số -->
     <aside class="sidebar-left">
       <div class="sidebar-header">
-        <div class="logo-mini">Wander<span>Viá»‡t</span></div>
-        <a href="index.html" class="back-btn-mini">âœ•</a>
+        <div class="logo-mini">Wander<span>Việt</span></div>
+        <a href="index.html" class="back-btn-mini">✕</a>
       </div>
 
       <div class="sidebar-scroll">
-        <!-- Banner hÃ nh trÃ¬nh (TÃ­ch há»£p trong sidebar) -->
+        <!-- Banner hành trình (Tích hợp trong sidebar) -->
         <div id="itinerary-banner" class="sidebar-card glass-panel" hidden>
           <div class="card-header">
-            <span id="itinerary-progress">ðŸ§­ Äiá»ƒm 1/X</span>
+            <span id="itinerary-progress">🧭 Điểm 1/X</span>
             <div class="weather-indicator" id="dest-weather">
-              <span>â˜€ï¸</span> <span id="dest-temp">24Â°C</span>
+              <span>☀️</span> <span id="dest-temp">24°C</span>
             </div>
           </div>
-          <h2 id="itinerary-current-target" class="card-title">Äang tá»›i: ...</h2>
+          <h2 id="itinerary-current-target" class="card-title">Đang tới: ...</h2>
           
           <div id="integrated-instruction" class="integrated-instruction-sidebar" style="display: none;">
-            <span id="integrated-icon">â¬†ï¸</span>
+            <span id="integrated-icon">⬆️</span>
             <div class="instruction-body">
-              <span id="integrated-text">Tiáº¿p tá»¥c di chuyá»ƒn</span>
+              <span id="integrated-text">Tiếp tục di chuyển</span>
               <span id="integrated-dist">-- m</span>
             </div>
           </div>
-          <p id="itinerary-next-target" class="card-next">Tiáº¿p: ...</p>
-          <button id="itinerary-skip-btn" class="btn btn--small" hidden>Bá» qua</button>
+          <p id="itinerary-next-target" class="card-next">Tiếp: ...</p>
+          <button id="itinerary-skip-btn" class="btn btn--small" hidden>Bỏ qua</button>
         </div>
 
-        <!-- TÃ¬m kiáº¿m (Sidebar version) -->
+        <!-- Tìm kiếm (Sidebar version) -->
         <div id="target-selector" class="sidebar-search">
-          <div class="search-title">ðŸ“ Äá»‹a Ä‘iá»ƒm tham quan</div>
+          <div class="search-title">📍 Địa điểm tham quan</div>
           <div class="search-box-sidebar">
-            <input type="text" id="target-input" placeholder="Äá»‹a Ä‘iá»ƒm hÃ nh trÃ¬nh" readonly style="cursor: default; background: rgba(0,0,0,0.02);" />
+            <input type="text" id="target-input" placeholder="Địa điểm hành trình" readonly style="cursor: default; background: rgba(0,0,0,0.02);" />
           </div>
           <ul id="autocomplete-list" class="autocomplete-list-sidebar" hidden></ul>
           
           <div class="quick-targets-sidebar" id="quick-targets-row">
-            <button class="chip" data-lat="21.028511" data-lng="105.804817">HÃ  Ná»™i</button>
-            <button class="chip" data-lat="16.054407" data-lng="108.202167">ÄÃ  Náºµng</button>
+            <button class="chip" data-lat="21.028511" data-lng="105.804817">Hà Nội</button>
+            <button class="chip" data-lat="16.054407" data-lng="108.202167">Đà Nẵng</button>
           </div>
         </div>
 
-        <!-- Báº¢NG SO SÃNH PHÆ¯Æ NG TIá»†N -->
+        <!-- BẢNG SO SÁNH PHƯƠNG TIỆN -->
         <div id="transport-compare-panel" class="transport-compare-panel" style="display:none;">
-          <div class="section-title">ðŸ§­ So sÃ¡nh phÆ°Æ¡ng tiá»‡n</div>
-          <div id="compare-route-label" class="route-label-sidebar">-- km Â· Äiá»ƒm Ä‘áº¿n</div>
+          <div class="section-title">🧭 So sánh phương tiện</div>
+          <div id="compare-route-label" class="route-label-sidebar">-- km · Điểm đến</div>
           <div class="compare-cards-vertical" id="compare-cards">
-            <!-- Render bá»Ÿi JS -->
+            <!-- Render bởi JS -->
           </div>
           <div class="compare-recommendation" id="compare-recommendation" style="display:none;">
-            <span class="rec-icon">âœ…</span>
-            <span id="rec-text" style="font-size: 0.85rem;">Äá» xuáº¥t: ...</span>
+            <span class="rec-icon">✅</span>
+            <span id="rec-text" style="font-size: 0.85rem;">Đề xuất: ...</span>
           </div>
         </div>
 
-        <!-- Thá»‘ng kÃª hÃ nh trÃ¬nh -->
+        <!-- Thống kê hành trình -->
         <div class="stats-panel" id="nav-stats" style="display: none;">
-          <div class="section-title">ðŸ“Š ThÃ´ng sá»‘ hiá»‡n táº¡i</div>
+          <div class="section-title">📊 Thông số hiện tại</div>
           <div class="stats-grid-sidebar">
             <div class="stat-item">
-              <span class="stat-label"><i class="fas fa-route" style="margin-right: 6px; color: #3b82f6;"></i>Khoáº£ng cÃ¡ch</span>
+              <span class="stat-label"><i class="fas fa-route" style="margin-right: 6px; color: #3b82f6;"></i>Khoảng cách</span>
               <span id="dtg-value" class="stat-val">-- km</span>
             </div>
             <div class="stat-item">
-              <span class="stat-label"><i class="fas fa-stopwatch" style="margin-right: 6px; color: #f59e0b;"></i>Thá»i gian Ä‘Ã£ Ä‘i</span>
-              <span id="eta-value" class="stat-val">0 phÃºt</span>
+              <span class="stat-label"><i class="fas fa-stopwatch" style="margin-right: 6px; color: #f59e0b;"></i>Thời gian đã đi</span>
+              <span id="eta-value" class="stat-val">0 phút</span>
             </div>
             <div class="stat-item">
-              <span class="stat-label"><i class="fas fa-tachometer-alt" style="margin-right: 6px; color: #10b981;"></i>Tá»‘c Ä‘á»™</span>
+              <span class="stat-label"><i class="fas fa-tachometer-alt" style="margin-right: 6px; color: #10b981;"></i>Tốc độ</span>
               <span id="speed-value" class="stat-val">0 km/h</span>
             </div>
           </div>
@@ -130,37 +129,37 @@
       </div>
 
       <div class="sidebar-footer">
-        <div id="status-text" class="status-msg">Chá» tÃ­n hiá»‡u GPS...</div>
+        <div id="status-text" class="status-msg">Chờ tín hiệu GPS...</div>
         <div class="sidebar-actions">
-          <div id="companion-toggle" class="mic-fab-sidebar" title="Trá»£ lÃ½ WanderViá»‡t">
+          <div id="companion-toggle" class="mic-fab-sidebar" title="Trợ lý WanderViệt">
             <i class="fas fa-microphone"></i>
             <div class="pulse-rings"></div>
           </div>
           <div class="main-buttons">
             <div class="button-row">
-              <button id="start-nav-btn" class="btn btn--primary" hidden><i class="fas fa-rocket"></i> Báº¯t Ä‘áº§u</button>
-              <button id="pause-nav-btn" class="btn btn--warning" hidden disabled><i class="fas fa-pause"></i> Táº¡m dá»«ng</button>
+              <button id="start-nav-btn" class="btn btn--primary" hidden><i class="fas fa-rocket"></i> Bắt đầu</button>
+              <button id="pause-nav-btn" class="btn btn--warning" hidden disabled><i class="fas fa-pause"></i> Tạm dừng</button>
             </div>
-            <button id="exit-nav-btn" class="btn btn--danger btn-full" style="margin-top: 10px;" hidden><i class="fas fa-door-open"></i> ThoÃ¡t</button>
-            <button id="arrived-btn" class="btn btn--success btn-full" style="margin-top: 10px;" hidden><i class="fas fa-check-circle"></i> Äáº¿n nÆ¡i</button>
+            <button id="exit-nav-btn" class="btn btn--danger btn-full" style="margin-top: 10px;" hidden><i class="fas fa-door-open"></i> Thoát</button>
+            <button id="arrived-btn" class="btn btn--success btn-full" style="margin-top: 10px;" hidden><i class="fas fa-check-circle"></i> Đến nơi</button>
           </div>
         </div>
       </div>
     </aside>
 
-    <!-- Map Area (2/3): Báº£n Ä‘á»“ vÃ  cÃ¡c nÃºt Ä‘á»‹nh tÃ¢m -->
+    <!-- Map Area (2/3): Bản đồ và các nút định tâm -->
     <main class="map-area-right">
       <div id="nav-map"></div>
 
       <!-- Floating Map Controls -->
       <div class="map-controls-premium">
-        <button id="recenter-btn" class="map-fab-main" title="Äá»‹nh tÃ¢m">ðŸŽ¯</button>
+        <button id="recenter-btn" class="map-fab-main" title="Định tâm">🎯</button>
         
         <div class="map-side-group">
-          <button class="map-side-btn" id="map-style-toggle-custom" title="Thay Ä‘á»•i kiá»ƒu báº£n Ä‘á»“">ðŸ—ºï¸</button>
+          <button class="map-side-btn" id="map-style-toggle-custom" title="Thay đổi kiểu bản đồ">🗺️</button>
           <div class="side-divider"></div>
-          <button class="map-side-btn" id="map-zoom-in" title="PhÃ³ng to" onclick="if(window.State && window.State.map) window.State.map.zoomIn()">âž•</button>
-          <button class="map-side-btn" id="map-zoom-out" title="Thu nhá»" onclick="if(window.State && window.State.map) window.State.map.zoomOut()">âž–</button>
+          <button class="map-side-btn" id="map-zoom-in" title="Phóng to" onclick="if(window.State && window.State.map) window.State.map.zoomIn()">➕</button>
+          <button class="map-side-btn" id="map-zoom-out" title="Thu nhỏ" onclick="if(window.State && window.State.map) window.State.map.zoomOut()">➖</button>
         </div>
       </div>
 
@@ -170,14 +169,14 @@
           <div class="radar-pulse"></div>
           <div class="radar-pulse"></div>
           <div class="radar-pulse"></div>
-          <div class="radar-core">ðŸ›°ï¸</div>
+          <div class="radar-core">🛰️</div>
         </div>
         <div class="loading-text-wrap">
-          <p class="loading-main-text">Äang káº¿t ná»‘i vá»‡ tinh...</p>
+          <p class="loading-main-text">Đang kết nối vệ tinh...</p>
           <div class="loading-bar-wrap">
             <div class="loading-bar-fill"></div>
           </div>
-          <small class="loading-sub-text">Vui lÃ²ng Ä‘á»©ng á»Ÿ nÆ¡i thoÃ¡ng Ä‘Ã£ng Ä‘á»ƒ nháº­n tÃ­n hiá»‡u GPS tá»‘t nháº¥t</small>
+          <small class="loading-sub-text">Vui lòng đứng ở nơi thoáng đãng để nhận tín hiệu GPS tốt nhất</small>
         </div>
       </div>
 
@@ -186,7 +185,7 @@
         <div class="waveform">
           <div class="bar"></div><div class="bar"></div><div class="bar"></div>
         </div>
-        <div id="live-caption">Äang nghe...</div>
+        <div id="live-caption">Đang nghe...</div>
       </div>
     </main>
   </div>
@@ -204,20 +203,20 @@
       function render(distKm, destName) {
         const c = document.getElementById('compare-cards');
         if (!c) return;
-        document.getElementById('compare-route-label').textContent = Math.round(distKm) + ' km Â· ' + (destName||'ÄÃ­ch');
+        document.getElementById('compare-route-label').textContent = Math.round(distKm) + ' km · ' + (destName||'Đích');
         c.innerHTML = '';
         
         let modes = [
-          { id: 'motorbike_own', icon: 'ðŸï¸', name: 'Xe mÃ¡y', avgSpeedKmh: 55, fuelLper100km: 3.5, roadNote: 'Linh hoáº¡t' },
-          { id: 'car_own', icon: 'ðŸš—', name: 'Ã” tÃ´', avgSpeedKmh: 80, fuelLper100km: 12.0, roadNote: 'Thoáº£i mÃ¡i' },
-          { id: 'bus', icon: 'ðŸšŒ', name: 'Xe khÃ¡ch', avgSpeedKmh: 60, ticketPer100km: 130000, roadNote: 'GiÃ¡ ráº»' }
+          { id: 'motorbike_own', icon: '🏍️', name: 'Xe máy', avgSpeedKmh: 55, fuelLper100km: 3.5, roadNote: 'Linh hoạt' },
+          { id: 'car_own', icon: '🚗', name: 'Ô tô', avgSpeedKmh: 80, fuelLper100km: 12.0, roadNote: 'Thoải mái' },
+          { id: 'bus', icon: '🚌', name: 'Xe khách', avgSpeedKmh: 60, ticketPer100km: 130000, roadNote: 'Giá rẻ' }
         ];
 
-        // Äá» xuáº¥t Combo phÆ°Æ¡ng tiá»‡n (Káº¿t há»£p xe)
+        // Đề xuất Combo phương tiện (Kết hợp xe)
         if (distKm > 400) {
-           modes.push({ id: 'airplane_bike', icon: 'âœˆï¸+ðŸï¸', name: 'Bay & ThuÃª xe', avgSpeedKmh: 500, customCost: 2200000 + (Math.round(distKm/100)*50000), roadNote: 'Combo Tá»‘i Æ°u' });
+           modes.push({ id: 'airplane_bike', icon: '✈️+🏍️', name: 'Bay & Thuê xe', avgSpeedKmh: 500, customCost: 2200000 + (Math.round(distKm/100)*50000), roadNote: 'Combo Tối ưu' });
         } else if (distKm > 150) {
-           modes.push({ id: 'bus_bike', icon: 'ðŸšŒ+ðŸï¸', name: 'Xe khÃ¡ch & ThuÃª xe', avgSpeedKmh: 60, customCost: Math.round((distKm/100)*130000) + 300000, roadNote: 'Äá»¡ má»‡t, linh hoáº¡t' });
+           modes.push({ id: 'bus_bike', icon: '🚌+🏍️', name: 'Xe khách & Thuê xe', avgSpeedKmh: 60, customCost: Math.round((distKm/100)*130000) + 300000, roadNote: 'Đỡ mệt, linh hoạt' });
         }
 
         modes.forEach(m => {
@@ -229,23 +228,23 @@
           const div = document.createElement('div');
           div.className = 'compare-card-sidebar';
           
-          // Kiá»ƒm tra xem phÆ°Æ¡ng tiá»‡n nÃ y cÃ³ Ä‘ang Ä‘Æ°á»£c chá»n khÃ´ng báº±ng ID duy nháº¥t
+          // Kiểm tra xem phương tiện này có đang được chọn không bằng ID duy nhất
           if (window.State && window.State.selectedModeId === m.id) {
             div.classList.add('active-card');
           }
 
           if (m.id.includes('_')) div.classList.add('combo-card');
           
-          div.innerHTML = `<span class="c-icon">${m.icon}</span><div class="c-info"><span class="c-name" style="${m.id.includes('_') ? 'color: var(--primary);' : ''}">${m.name}</span><span class="c-meta">${timeStr} Â· ~${Math.round(cost/1000)}k</span><span style="font-size: 0.75rem; color: #10b981; font-weight: 500; display: block; margin-top: 2px;">âœ¨ ${m.roadNote}</span></div>`;
+          div.innerHTML = `<span class="c-icon">${m.icon}</span><div class="c-info"><span class="c-name" style="${m.id.includes('_') ? 'color: var(--primary);' : ''}">${m.name}</span><span class="c-meta">${timeStr} · ~${Math.round(cost/1000)}k</span><span style="font-size: 0.75rem; color: #10b981; font-weight: 500; display: block; margin-top: 2px;">✨ ${m.roadNote}</span></div>`;
           
           div.onclick = () => {
             const isActive = div.classList.contains('active-card');
             
-            // XÃ³a táº¥t cáº£ cÃ¡c tráº¡ng thÃ¡i Ä‘ang chá»n
+            // Xóa tất cả các trạng thái đang chọn
             document.querySelectorAll('.compare-card-sidebar').forEach(el => el.classList.remove('active-card'));
             
             if (isActive) {
-              // Náº¿u Ä‘ang chá»n mÃ  áº¥n láº¡i -> Há»§y chá»n
+              // Nếu đang chọn mà ấn lại -> Hủy chọn
               if (window.State) {
                 window.State.routeMode = 'idle';
                 window.State.selectedModeId = null;
@@ -282,5 +281,4 @@
 </body>
 
 </html>
-
 

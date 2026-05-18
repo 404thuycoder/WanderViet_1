@@ -118,7 +118,13 @@ app.get('/api/public/place-photo', async (req, res) => {
 
 // Static User Web
 app.use('/assets', express.static(path.join(__dirname, 'apps/user-web/assets')));
-app.use(express.static(path.join(__dirname, 'apps/user-web')));
+app.use(express.static(path.join(__dirname, 'apps/user-web'), {
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        }
+    }
+}));
 
 app.use((req, res) => {
     const isApi = req.path.startsWith('/api/');

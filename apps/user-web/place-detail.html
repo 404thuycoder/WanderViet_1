@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -2059,7 +2059,7 @@
                 </div>
 
                 <!-- PRICE AREA WITH DISCOUNT -->
-                <div class="price-area">
+                <div class="price-area" id="default-price-area">
                     <span class="price-label" id="price-label">GIÁ TRẢI NGHIỆM</span>
                     <span class="price-discount-badge" id="price-discount-badge" style="display:none;">-20%</span>
                     <span class="price-original" id="p-price-original" style="display:none;">...</span>
@@ -2071,6 +2071,145 @@
                 </div>
 
                 <!-- VIEWERS LIVE -->
+                <!-- SMART VEHICLE BOOKING WIDGET -->
+                <style>
+                    .vehicle-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 16px;
+                        background: rgba(255, 255, 255, 0.02);
+                        border: 2px solid var(--glass-border);
+                        border-radius: 20px;
+                        padding: 16px;
+                        cursor: pointer;
+                        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                        position: relative;
+                        overflow: hidden;
+                        margin-bottom: 8px;
+                        box-sizing: border-box;
+                        width: 100%;
+                    }
+                    .vehicle-item:hover {
+                        background: rgba(255, 255, 255, 0.05);
+                        border-color: rgba(99, 102, 241, 0.4);
+                        transform: translateY(-2px);
+                    }
+                    .vehicle-item.active {
+                        background: rgba(99, 102, 241, 0.08);
+                        border-color: var(--primary);
+                        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.15);
+                    }
+                    .vehicle-item.suggested::after {
+                        content: '🌟 GỢI Ý';
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+                        color: #000;
+                        font-size: 8px;
+                        font-weight: 900;
+                        padding: 3px 8px;
+                        border-bottom-left-radius: 10px;
+                        letter-spacing: 0.5px;
+                    }
+                    .vehicle-img {
+                        width: 60px;
+                        height: 60px;
+                        border-radius: 12px;
+                        object-fit: cover;
+                        border: 1px solid var(--glass-border);
+                    }
+                    .vehicle-info {
+                        flex: 1;
+                        text-align: left;
+                    }
+                    .vehicle-name {
+                        font-weight: 700;
+                        font-size: 14px;
+                        color: var(--text-main);
+                        margin-bottom: 4px;
+                    }
+                    .vehicle-meta {
+                        font-size: 11px;
+                        color: var(--text-dim);
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                    .vehicle-price {
+                        font-size: 14px;
+                        font-weight: 800;
+                        color: var(--primary);
+                        text-align: right;
+                    }
+                </style>
+
+                <div id="vehicle-rental-widget" style="display: none; margin-top: 20px; box-sizing: border-box; width: 100%;">
+                    <!-- Step 1: Driving Mode Tab -->
+                    <div style="font-size:10px; font-weight:800; color:var(--text-dim); letter-spacing:3px; margin-bottom:14px; text-align: left;">HÌNH THỨC THUÊ XE</div>
+                    <div class="itinerary-segmented" style="width: 100%; display: flex; margin-bottom: 24px; box-sizing: border-box;">
+                        <button class="itinerary-filter active" id="mode-self" onclick="setRentalMode('self')" style="flex: 1; padding: 12px 0; font-size: 13px;">🛵 Tự lái</button>
+                        <button class="itinerary-filter" id="mode-chauffeur" onclick="setRentalMode('chauffeur')" style="flex: 1; padding: 12px 0; font-size: 13px;">🚗 Đi tỉnh</button>
+                        <button class="itinerary-filter" id="mode-charter" onclick="setRentalMode('charter')" style="flex: 1; padding: 12px 0; font-size: 13px;">🚌 Theo đoàn</button>
+                    </div>
+
+                    <!-- Dynamic Inputs Section -->
+                    <div id="rental-inputs-container" style="margin-bottom: 24px;">
+                        <!-- Inputs dynamically swapped -->
+                    </div>
+
+                    <!-- Step 2: Passenger Count and Recommendations -->
+                    <div id="passenger-selector-wrap" style="margin-bottom: 24px; text-align: left;">
+                        <div style="font-size:10px; font-weight:800; color:var(--text-dim); letter-spacing:3px; margin-bottom:12px;">SỐ HÀNH KHÁCH</div>
+                        <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 16px; padding: 8px 16px;">
+                            <span style="font-size: 18px;">👥</span>
+                            <input type="number" id="passenger-count" value="1" min="1" max="45" oninput="suggestVehicleClass()" style="flex: 1; background: transparent; border: none; color: var(--text-main); font-size: 16px; font-weight: 700; outline: none; width: 50px;">
+                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                <button onclick="changePassengerCount(1)" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 12px; font-weight: 800;">▲</button>
+                                <button onclick="changePassengerCount(-1)" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 12px; font-weight: 800;">▼</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Suggested Vehicle Alert -->
+                    <div id="vehicle-suggest-alert" style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15)); border: 1px solid var(--primary-glow); border-radius: 20px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-size: 13px; line-height: 1.5; box-sizing: border-box; text-align: left;">
+                        <span style="font-size: 24px;">✨</span>
+                        <div style="color: var(--text-main); font-weight: 500;">
+                            Hệ thống gợi ý chọn dòng <strong id="suggested-class-name" style="color: var(--primary);">Xe 4 chỗ</strong> phù hợp với đoàn khách của bạn.
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Selection List -->
+                    <div style="font-size:10px; font-weight:800; color:var(--text-dim); letter-spacing:3px; margin-bottom:14px; text-align: left;">LỰA CHỌN DÒNG XE</div>
+                    <div id="vehicle-list-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; width: 100%;">
+                        <!-- Vehicles populated dynamically -->
+                    </div>
+
+                    <!-- Price summary -->
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; margin-bottom: 24px; box-sizing: border-box; text-align: left;">
+                        <div style="font-size:10px; font-weight:800; color:var(--text-dim); letter-spacing:3px; margin-bottom:12px; text-transform: uppercase;">CHI TIẾT GIÁ TẠM TÍNH</div>
+                        <div id="price-calculation-breakdown" style="display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--text-dim);">
+                            <!-- Breakdown here -->
+                        </div>
+                        <div style="height: 1px; background: var(--glass-border); margin: 12px 0;"></div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                            <span style="font-weight: 800; font-size: 14px; color: var(--text-main);">TỔNG CỘNG:</span>
+                            <span id="rental-total-price" style="font-family: 'Space Grotesk'; font-size: 1.8rem; font-weight: 700; color: var(--primary);">0 ₫</span>
+                        </div>
+                    </div>
+
+                    <!-- Special Request -->
+                    <div style="margin-bottom: 24px; text-align: left;">
+                        <div style="font-size:10px; font-weight:800; color:var(--text-dim); letter-spacing:3px; margin-bottom:12px;">YÊU CẦU ĐẶC BIỆT</div>
+                        <textarea id="rental-special-requests" class="lux-input" placeholder="Ghi chú thêm: địa điểm đón cụ thể, giờ nhận xe, ghế trẻ em, v.v..." style="height: 80px; resize: none; font-size: 13px; border-radius: 16px; padding: 12px 16px; box-sizing: border-box; width: 100%;"></textarea>
+                    </div>
+
+                    <!-- Action button -->
+                    <div>
+                        <button class="btn-elite" id="btn-rent-now" onclick="openRentalCheckout()" style="width: 100%; text-transform: uppercase;">🚀 ĐẶT XE NGAY</button>
+                    </div>
+                </div>
+
                 <div class="viewers-live" id="viewers-live">
                     <span class="vl-dot"></span>
                     <span id="viewers-count">12 người</span> đang xem địa điểm này
@@ -2178,7 +2317,7 @@
                     </div>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div style="margin-bottom: 20px;" id="default-book-btn-box">
                     <button class="btn-elite" onclick="openPayment()">✨ ĐẶT CHỖ NGAY</button>
                 </div>
 
@@ -2318,7 +2457,7 @@
                                 </svg>
                                 <div class="confetti-wrap" id="confetti-container"></div>
                             </div>
-                            <h2 style="font-family:'Plus Jakarta Sans'; font-size:1.6rem; margin:0; font-weight:800; letter-spacing:-1px;">ĐẶT CHỖ HOÀN TẤT</h2>
+                            <h2 id="success-title-text" style="font-family:'Plus Jakarta Sans'; font-size:1.6rem; margin:0; font-weight:800; letter-spacing:-1px;">ĐẶT CHỖ HOÀN TẤT</h2>
                             <p style="color:var(--text-dim); font-size:13px; margin:8px 0 0;">Cảm ơn bạn đã lựa chọn WanderViệt Elite</p>
                             
                             <div class="booking-code" id="b-id">#WV-XXXX</div>
@@ -3018,6 +3157,9 @@
                 
                 // ── Load Community Reviews ────────────────────────────
                 loadCommunityPosts();
+                if (p.kind === 'thue-xe') {
+                    initVehicleRental(p);
+                }
 
             } catch(e) {
                 console.error("Load error:", e);
@@ -4034,6 +4176,657 @@
                 container.style.maxHeight = 'none';
                 btn.innerText = 'Thu gọn câu chuyện ▲';
             }
+        }
+
+        // ── VEHICLE RENTAL CONTROLLER ──────────────────────────────────
+        let activeRentalMode = 'self'; // self, chauffeur, charter
+        let activeVehicle = null;
+        let vehicleFleet = [];
+
+        async function pickLocationGPS(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+
+            // Micro-animation indicator
+            const originalPlaceholder = input.placeholder;
+            input.value = "";
+            input.placeholder = "📍 Đang định vị GPS...";
+            input.style.boxShadow = "0 0 12px var(--primary-glow)";
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        input.value = `📍 GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)} (Đang tải...)`;
+                        input.style.borderColor = "#10b981";
+                        input.style.boxShadow = "none";
+                        
+                        try {
+                            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+                                headers: { 'Accept-Language': 'vi,en' }
+                            });
+                            const data = await res.json();
+                            if (data && data.display_name) {
+                                // Extract readable street / area info
+                                const parts = data.display_name.split(',');
+                                const formatted = parts.slice(0, Math.min(3, parts.length)).join(',').trim();
+                                input.value = `📍 ${formatted} (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+                            }
+                        } catch(e) {
+                            input.value = `📍 GPS: ${lat.toFixed(5)}, ${lng.toFixed(5)} (Vị trí hiện tại)`;
+                        }
+                    },
+                    (error) => {
+                        alert("Không thể truy cập tọa độ GPS. Vui lòng nhập địa chỉ thủ công.");
+                        input.placeholder = originalPlaceholder;
+                        input.style.boxShadow = "none";
+                    },
+                    { enableHighAccuracy: true, timeout: 6000 }
+                );
+            } else {
+                alert("Trình duyệt của bạn không hỗ trợ Geolocation.");
+                input.placeholder = originalPlaceholder;
+                input.style.boxShadow = "none";
+            }
+        }
+        
+        let dropoffTimeoutId;
+        async function handleDropoffAutocomplete(e) {
+            const query = e.target.value.trim();
+            const suggBox = document.getElementById('dropoff-suggestions');
+            if (query.length < 3) {
+                suggBox.style.display = 'none';
+                return;
+            }
+            clearTimeout(dropoffTimeoutId);
+            dropoffTimeoutId = setTimeout(async () => {
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', Vietnam')}&limit=5`);
+                    const data = await res.json();
+                    
+                    suggBox.innerHTML = '';
+                    if (data && data.length > 0) {
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            const parts = item.display_name.split(',');
+                            const title = parts[0];
+                            const subtitle = parts.slice(1,3).join(',');
+                            div.innerHTML = `<i class="fas fa-map-marker-alt" style="margin-right:8px; color:var(--primary);"></i> <strong style="font-size:12px; color:var(--text-main);">${title}</strong> <span style="font-size:10px; color:var(--text-dim);">${subtitle}</span>`;
+                            div.style.cssText = 'padding:10px 15px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.05); transition:all 0.2s;';
+                            div.onmouseover = () => div.style.background = 'rgba(255,255,255,0.05)';
+                            div.onmouseout = () => div.style.background = 'transparent';
+                            div.onmousedown = () => {
+                                document.getElementById('rental-dropoff-loc').value = title;
+                                suggBox.style.display = 'none';
+                            };
+                            suggBox.appendChild(div);
+                        });
+                        suggBox.style.display = 'block';
+                    } else {
+                        suggBox.style.display = 'none';
+                    }
+                } catch(e) {
+                    console.error('Dropoff autocomplete err', e);
+                }
+            }, 500);
+        }
+
+        function initVehicleRental(place) {
+            // Hide standard booking sections
+            const defaultPriceArea = document.getElementById('default-price-area');
+            if (defaultPriceArea) defaultPriceArea.style.display = 'none';
+            const pkgSelector = document.getElementById('pkg-selector');
+            if (pkgSelector) pkgSelector.style.display = 'none';
+            const pkgShowCompare = document.getElementById('pkg-show-compare');
+            if (pkgShowCompare) pkgShowCompare.style.display = 'none';
+            const pkgComparison = document.getElementById('pkg-comparison');
+            if (pkgComparison) pkgComparison.style.display = 'none';
+            const cancelPolicyBox = document.getElementById('cancel-policy-box');
+            if (cancelPolicyBox) cancelPolicyBox.style.display = 'none';
+            const defaultBookBtnBox = document.getElementById('default-book-btn-box');
+            if (defaultBookBtnBox) defaultBookBtnBox.style.display = 'none';
+
+            // Show vehicle rental widget
+            const widget = document.getElementById('vehicle-rental-widget');
+            if (widget) widget.style.display = 'block';
+
+            // Dynamic text updates for vehicle rental checkout
+            const successTitle = document.getElementById('success-title-text');
+            if (successTitle) successTitle.innerText = "ĐẶT XE HOÀN TẤT";
+
+            // Initialize Fleet based on the owner/place legacyId or kind
+            const pid = place.id || place._id || '';
+            const ownerId = place.ownerId || '';
+            
+            if (pid.includes('phuquoc') || ownerId.includes('PQ')) {
+                // Phu Quoc Green Motorbike & Car Rental
+                vehicleFleet = [
+                    { id: 'v-motor-1', name: 'Xe máy số (Wave/Sirius)', type: 'motor', price: 150000, seats: 2, image: 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=400&q=80' },
+                    { id: 'v-motor-2', name: 'Xe tay ga (Vision/AirBlade)', type: 'motor', price: 200000, seats: 2, image: 'https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=400&q=80' },
+                    { id: 'v-car-4', name: 'Toyota Vios (4 chỗ)', type: 'car4', price: 800000, seats: 4, image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400&q=80' },
+                    { id: 'v-car-7', name: 'Mitsubishi Xpander (7 chỗ)', type: 'car7', price: 1000000, seats: 7, image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80' }
+                ];
+            } else if (pid.includes('saigon') || ownerId.includes('SG')) {
+                // Saigon rental
+                vehicleFleet = [
+                    { id: 'v-car-4', name: 'Honda City (4 chỗ)', type: 'car4', price: 950000, seats: 4, image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400&q=80' },
+                    { id: 'v-car-7', name: 'Mitsubishi Xpander (7 chỗ)', type: 'car7', price: 1300000, seats: 7, image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80' },
+                    { id: 'v-carnival', name: 'Kia Carnival VIP (7 chỗ)', type: 'car7', price: 2200000, seats: 7, image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=400&q=80' },
+                    { id: 'v-van-16', name: 'Hyundai Solati (16 chỗ)', type: 'car16', price: 2500000, seats: 16, image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=400&q=80' }
+                ];
+            } else {
+                // Hanoi rental (Default)
+                vehicleFleet = [
+                    { id: 'v-car-4', name: 'Toyota Vios (4 chỗ)', type: 'car4', price: 800000, seats: 4, image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400&q=80' },
+                    { id: 'v-car-7', name: 'Mitsubishi Xpander (7 chỗ)', type: 'car7', price: 1200000, seats: 7, image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400&q=80' },
+                    { id: 'v-van-16', name: 'Ford Transit (16 chỗ)', type: 'car16', price: 1800000, seats: 16, image: 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=400&q=80' }
+                ];
+            }
+
+            // Default selection
+            activeVehicle = vehicleFleet[0];
+
+            // Render default mode
+            setRentalMode('self');
+            
+            // Adjust mobile book bar values
+            const mbPrice = document.getElementById('mb-price');
+            if (mbPrice && vehicleFleet.length > 0) {
+                mbPrice.innerText = vehicleFleet[0].price.toLocaleString('vi-VN') + ' ₫';
+            }
+        }
+
+        function setRentalMode(mode) {
+            activeRentalMode = mode;
+            
+            // Update tabs active state
+            document.querySelectorAll('#vehicle-rental-widget .itinerary-filter').forEach(btn => {
+                if (btn.id === `mode-${mode}`) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            // Dynamically build input forms based on rental type
+            const container = document.getElementById('rental-inputs-container');
+            if (!container) return;
+
+            const today = new Date();
+            today.setDate(today.getDate() + 1);
+            const tomorrow = today.toISOString().split('T')[0];
+
+            if (mode === 'self') {
+                container.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; text-align: left;">
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">NGÀY NHẬN XE</label>
+                            <input type="date" id="rental-pickup-date" class="lux-input" value="${tomorrow}" onchange="calculateRentalPrice()" style="padding:12px; font-size:13px; box-sizing: border-box; width: 100%;">
+                        </div>
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">GIỜ NHẬN XE</label>
+                            <select id="rental-pickup-time" class="lux-input" style="padding:12px; font-size:13px; background: rgba(0,0,0,0.5); box-sizing: border-box; width: 100%;">
+                                <option value="08:00">08:00 AM</option>
+                                <option value="09:00" selected>09:00 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="14:00">02:00 PM</option>
+                                <option value="16:00">04:00 PM</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px; margin-bottom: 12px; text-align: left;">
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">HÌNH THỨC NHẬN</label>
+                            <select id="rental-delivery-type" class="lux-input" onchange="toggleDeliveryAddress()" style="padding:12px; font-size:13px; background: rgba(0,0,0,0.5); box-sizing: border-box; width: 100%;">
+                                <option value="headquarter">Tại văn phòng WV</option>
+                                <option value="delivery">Giao tận nơi (+100k)</option>
+                            </select>
+                        </div>
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">SỐ NGÀY THUÊ</label>
+                            <div style="display:flex; align-items:center; background: rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:12px; padding:0 8px; height: 42px; box-sizing: border-box;">
+                                <button onclick="adjustRentalDays(-1)" style="background:none; border:none; color:var(--primary); font-weight:800; font-size:18px; cursor:pointer; padding:6px 10px;">-</button>
+                                <span id="rental-days" style="flex:1; text-align:center; font-weight:800; font-size:13px;">1</span>
+                                <button onclick="adjustRentalDays(1)" style="background:none; border:none; color:var(--primary); font-weight:800; font-size:18px; cursor:pointer; padding:6px 10px;">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="delivery-address-wrap" style="display:none; text-align: left;">
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">ĐỊA CHỈ GIAO XE</label>
+                            <div style="position: relative; display: flex; align-items: center; width: 100%;">
+                                <input type="text" id="rental-delivery-address" class="lux-input" placeholder="Khách sạn, sân bay hoặc địa chỉ giao xe..." style="padding:12px 48px 12px 12px; font-size:13px; box-sizing: border-box; width: 100%;">
+                                <button onclick="pickLocationGPS('rental-delivery-address')" style="position: absolute; right: 6px; background: rgba(99,102,241,0.15); border: 1px solid var(--primary-glow); border-radius: 10px; color: var(--primary); font-size: 14px; width: 32px; height: 32px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; padding: 0;" title="Định vị GPS">📍</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (mode === 'chauffeur') {
+                container.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; text-align: left;">
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">HÀNH TRÌNH</label>
+                            <select id="rental-trip-type" class="lux-input" onchange="calculateRentalPrice()" style="padding:12px; font-size:13px; background: rgba(0,0,0,0.5); box-sizing: border-box; width: 100%;">
+                                <option value="oneway" selected>Đi 1 chiều</option>
+                                <option value="roundtrip">Khứ hồi (Đi & Về)</option>
+                            </select>
+                        </div>
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">NGÀY XUẤT PHÁT</label>
+                            <input type="date" id="rental-pickup-date" class="lux-input" value="${tomorrow}" style="padding:12px; font-size:13px; box-sizing: border-box; width: 100%;">
+                        </div>
+                    </div>
+                    <div style="text-align: left; display: flex; flex-direction: column; gap: 12px;">
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">ĐIỂM ĐÓN CỦA BẠN</label>
+                            <div style="position: relative; display: flex; align-items: center; width: 100%;">
+                                <input type="text" id="rental-pickup-loc" class="lux-input" placeholder="Ví dụ: Sân bay Nội Bài hoặc Tên khách sạn..." style="padding:12px 48px 12px 12px; font-size:13px; box-sizing: border-box; width: 100%;">
+                                <button onclick="pickLocationGPS('rental-pickup-loc')" style="position: absolute; right: 6px; background: rgba(99,102,241,0.15); border: 1px solid var(--primary-glow); border-radius: 10px; color: var(--primary); font-size: 14px; width: 32px; height: 32px; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; padding: 0;" title="Định vị GPS">📍</button>
+                            </div>
+                        </div>
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">ĐIỂM TRẢ / ĐIỂM ĐẾN</label>
+                            <div style="position: relative; display: flex; align-items: center; width: 100%;">
+                                <input type="text" id="rental-dropoff-loc" class="lux-input" placeholder="Ví dụ: Hạ Long, Quảng Ninh..." autocomplete="off" oninput="handleDropoffAutocomplete(event)" onblur="setTimeout(()=>document.getElementById('dropoff-suggestions').style.display='none',200)" style="padding:12px; font-size:13px; box-sizing: border-box; width: 100%;">
+                                <div id="dropoff-suggestions" style="display:none; position:absolute; top:100%; left:0; right:0; background:var(--glass-bg); backdrop-filter:blur(10px); border:1px solid var(--glass-border); border-radius:12px; margin-top:4px; z-index:100; max-height:200px; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.3);"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else { // charter
+                container.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px; margin-bottom: 12px; text-align: left;">
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">NGÀY KHỞI HÀNH</label>
+                            <input type="date" id="rental-pickup-date" class="lux-input" value="${tomorrow}" style="padding:12px; font-size:13px; box-sizing: border-box; width: 100%;">
+                        </div>
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">SỐ NGÀY ĐI</label>
+                            <div style="display:flex; align-items:center; background: rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:12px; padding:0 8px; height: 42px; box-sizing: border-box;">
+                                <button onclick="adjustRentalDays(-1)" style="background:none; border:none; color:var(--primary); font-weight:800; font-size:18px; cursor:pointer; padding:6px 10px;">-</button>
+                                <span id="rental-days" style="flex:1; text-align:center; font-weight:800; font-size:13px;">2</span>
+                                <button onclick="adjustRentalDays(1)" style="background:none; border:none; color:var(--primary); font-weight:800; font-size:18px; cursor:pointer; padding:6px 10px;">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: left;">
+                        <div class="lux-field" style="margin:0;">
+                            <label style="font-size:9px; font-weight: 700; color: var(--text-dim);">LỘ TRÌNH DỰ KIẾN (ĐOÀN ĐI ĐÂU?)</label>
+                            <textarea id="rental-charter-route" class="lux-input" placeholder="Ví dụ: Hà Nội - Sapa - Hà Nội (Tham quan Fansipan & Bản Cát Cát)..." style="height: 60px; resize: none; padding:12px; font-size:13px; border-radius: 12px; box-sizing: border-box; width: 100%;"></textarea>
+                        </div>
+                    </div>
+                `;
+            }
+
+            suggestVehicleClass();
+        }
+
+        function toggleDeliveryAddress() {
+            const deliveryType = document.getElementById('rental-delivery-type').value;
+            const wrap = document.getElementById('delivery-address-wrap');
+            if (wrap) {
+                wrap.style.display = (deliveryType === 'delivery') ? 'block' : 'none';
+            }
+            calculateRentalPrice();
+        }
+
+        function adjustRentalDays(amount) {
+            const el = document.getElementById('rental-days');
+            if (el) {
+                let val = parseInt(el.innerText) + amount;
+                if (val < 1) val = 1;
+                if (val > 30) val = 30;
+                el.innerText = val;
+                calculateRentalPrice();
+            }
+        }
+
+        function changePassengerCount(amount) {
+            const el = document.getElementById('passenger-count');
+            if (el) {
+                let val = parseInt(el.value) + amount;
+                if (val < 1) val = 1;
+                if (val > 45) val = 45;
+                el.value = val;
+                suggestVehicleClass();
+            }
+        }
+
+        function suggestVehicleClass() {
+            const pCountEl = document.getElementById('passenger-count');
+            if (!pCountEl) return;
+            const count = parseInt(pCountEl.value) || 1;
+            
+            let suggestedType = 'car4';
+            let label = 'Xe 4 chỗ';
+
+            if (count > 16) {
+                suggestedType = 'car16';
+                label = 'Xe 16-29 chỗ';
+            } else if (count > 7) {
+                suggestedType = 'car16';
+                label = 'Xe 16 chỗ';
+            } else if (count > 4) {
+                suggestedType = 'car7';
+                label = 'Xe 7 chỗ';
+            }
+
+            // Update advice text
+            const labelEl = document.getElementById('suggested-class-name');
+            if (labelEl) labelEl.innerText = label;
+
+            // Render fleet with suggestion active
+            renderVehicleFleet(suggestedType);
+        }
+
+        function renderVehicleFleet(suggestedType) {
+            const container = document.getElementById('vehicle-list-container');
+            if (!container) return;
+
+            // Filter fleet based on driving mode (no motorbikes for chauffeur or charter)
+            let filteredFleet = vehicleFleet;
+            if (activeRentalMode === 'chauffeur' || activeRentalMode === 'charter') {
+                filteredFleet = vehicleFleet.filter(v => v.type !== 'motor');
+            }
+
+            container.innerHTML = filteredFleet.map(vehicle => {
+                const isSuggested = vehicle.type === suggestedType;
+                const isActive = activeVehicle && activeVehicle.id === vehicle.id;
+                
+                return `
+                    <div class="vehicle-item ${isSuggested ? 'suggested' : ''} ${isActive ? 'active' : ''}" onclick="selectVehicle('${vehicle.id}')">
+                        <img src="${vehicle.image || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=200&q=80'}" class="vehicle-img" onerror="this.src='https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=200&q=80'">
+                        <div class="vehicle-info">
+                            <div class="vehicle-name">${vehicle.name}</div>
+                            <div class="vehicle-meta">
+                                <span>👥 ${vehicle.seats} chỗ</span>
+                                <span>⚡ Động cơ khỏe</span>
+                            </div>
+                        </div>
+                        <div class="vehicle-price">
+                            ${vehicle.price.toLocaleString('vi-VN')} ₫
+                            <div style="font-size: 9px; color: var(--text-dim); font-weight: 500; margin-top: 2px;">/ ngày</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // If active vehicle is not in filtered list, select first available
+            if (filteredFleet.length > 0) {
+                const exists = filteredFleet.find(v => v.id === activeVehicle.id);
+                if (!exists) {
+                    selectVehicle(filteredFleet[0].id);
+                }
+            }
+
+            calculateRentalPrice();
+        }
+
+        function selectVehicle(id) {
+            const found = vehicleFleet.find(v => v.id === id);
+            if (found) {
+                activeVehicle = found;
+                
+                // Re-render fleet to update active border style
+                const suggestedType = document.getElementById('passenger-count')?.value > 7 ? 'car16' : (document.getElementById('passenger-count')?.value > 4 ? 'car7' : 'car4');
+                renderVehicleFleet(suggestedType);
+            }
+        }
+
+        function calculateRentalPrice() {
+            if (!activeVehicle) return;
+
+            const breakdown = document.getElementById('price-calculation-breakdown');
+            const totalDisplay = document.getElementById('rental-total-price');
+            if (!breakdown || !totalDisplay) return;
+
+            let priceDetails = '';
+            let total = 0;
+
+            const daysEl = document.getElementById('rental-days');
+            const days = daysEl ? parseInt(daysEl.innerText) : 1;
+
+            if (activeRentalMode === 'self') {
+                const deliveryType = document.getElementById('rental-delivery-type')?.value || 'headquarter';
+                const baseFee = activeVehicle.price * days;
+                let deliveryFee = 0;
+
+                priceDetails += `
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>Đơn giá dòng xe:</span>
+                        <b style="color:var(--text-main);">${activeVehicle.price.toLocaleString('vi-VN')} ₫ × ${days} ngày</b>
+                    </div>
+                `;
+
+                if (deliveryType === 'delivery') {
+                    deliveryFee = 100000;
+                    priceDetails += `
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>Phí giao nhận tận nơi:</span>
+                            <b style="color:var(--text-main);">100.000 ₫</b>
+                        </div>
+                    `;
+                }
+
+                total = baseFee + deliveryFee;
+            } else if (activeRentalMode === 'chauffeur') {
+                // With Driver: Trip Type multipliers
+                const tripType = document.getElementById('rental-trip-type')?.value || 'oneway';
+                let multiplier = 1.3; // base driver surcharge multiplier (1.3x for standard sedan 1 way)
+                let multiplierLabel = 'Đi 1 chiều (Bao gồm xe + tài xế)';
+                
+                if (tripType === 'roundtrip') {
+                    multiplier = 1.9; // 1.9x for roundtrip
+                    multiplierLabel = 'Khứ hồi trọn gói (Bao gồm xe + tài xế)';
+                }
+
+                if (activeVehicle.type === 'car16') multiplier += 0.4; // van driver surcharge extra
+
+                total = Math.round(activeVehicle.price * multiplier);
+                
+                priceDetails += `
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>Gói dịch vụ:</span>
+                        <b style="color:var(--text-main);">${multiplierLabel}</b>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; margin-top:4px;">
+                        <span>Phí tài xế & Cầu đường:</span>
+                        <b style="color:#10b981;">Đã bao gồm</b>
+                    </div>
+                `;
+            } else { // charter
+                // Group charter: Vehicle price * days + driver surcharge (500k/day)
+                const baseFee = activeVehicle.price * days;
+                const driverSurcharge = 600000 * days;
+
+                priceDetails += `
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>Thuê xe trọn gói:</span>
+                        <b style="color:var(--text-main);">${activeVehicle.price.toLocaleString('vi-VN')} ₫ × ${days} ngày</b>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>Tài xế theo đoàn (24/7):</span>
+                        <b style="color:var(--text-main);">600.000 ₫ × ${days} ngày</b>
+                    </div>
+                `;
+
+                total = baseFee + driverSurcharge;
+            }
+
+            // Discount check (10% off for first booking WV)
+            const discount = Math.round(total * 0.1); // 10% promotional elite discount
+            total = total - discount;
+
+            priceDetails += `
+                <div style="display:flex; justify-content:space-between; color:var(--primary); font-weight:700;">
+                    <span>Ưu đãi WanderViệt Elite (10%):</span>
+                    <b>-${discount.toLocaleString('vi-VN')} ₫</b>
+                </div>
+            `;
+
+            breakdown.innerHTML = priceDetails;
+            totalDisplay.innerText = total.toLocaleString('vi-VN') + ' ₫';
+            
+            // Sync with global billing parameters for checkout modal
+            window.rentalCalculatedTotal = total;
+        }
+
+        function openRentalCheckout() {
+            if (!activeVehicle) {
+                alert("Vui lòng lựa chọn một dòng xe!");
+                return;
+            }
+
+            // Construct booking details for specialRequests
+            const pickupDate = document.getElementById('rental-pickup-date')?.value || '';
+            const passengerCount = document.getElementById('passenger-count')?.value || 1;
+            const extraNotes = document.getElementById('rental-special-requests')?.value || '';
+
+            let detailsText = `DÒNG XE: ${activeVehicle.name} (${activeVehicle.seats} chỗ)\n`;
+            detailsText += `HÌNH THỨC: ${activeRentalMode === 'self' ? 'Tự lái' : (activeRentalMode === 'chauffeur' ? 'Có tài xế đi tỉnh' : 'Đi theo đoàn trọn gói')}\n`;
+            
+            if (activeRentalMode === 'self') {
+                const days = document.getElementById('rental-days')?.innerText || '1';
+                const pickupTime = document.getElementById('rental-pickup-time')?.value || '09:00';
+                const delType = document.getElementById('rental-delivery-type')?.value || 'headquarter';
+                const delAddr = document.getElementById('rental-delivery-address')?.value || '';
+                
+                detailsText += `THỜI GIAN: Nhận lúc ${pickupTime} ngày ${pickupDate} (${days} ngày)\n`;
+                detailsText += `HÌNH THỨC NHẬN XE: ${delType === 'headquarter' ? 'Nhận tại văn phòng' : 'Giao tận nơi: ' + delAddr}\n`;
+            } else if (activeRentalMode === 'chauffeur') {
+                const tripType = document.getElementById('rental-trip-type')?.value === 'oneway' ? '1 chiều' : 'Khứ hồi';
+                const pickLoc = document.getElementById('rental-pickup-loc')?.value || '';
+                const dropLoc = document.getElementById('rental-dropoff-loc')?.value || '';
+                
+                detailsText += `HÀNH TRÌNH: ${tripType}\n`;
+                detailsText += `ĐIỂM ĐÓN: ${pickLoc}\n`;
+                detailsText += `ĐIỂM ĐẾN: ${dropLoc}\n`;
+                detailsText += `NGÀY KHỞI HÀNH: ${pickupDate}\n`;
+            } else { // charter
+                const days = document.getElementById('rental-days')?.innerText || '2';
+                const route = document.getElementById('rental-charter-route')?.value || '';
+                
+                detailsText += `NGÀY KHỞI HÀNH: ${pickupDate} (${days} ngày)\n`;
+                detailsText += `LỘ TRÌNH DỰ KIẾN: ${route}\n`;
+            }
+
+            detailsText += `SỐ HÀNH KHÁCH: ${passengerCount} người\n`;
+            if (extraNotes.trim() !== '') {
+                detailsText += `GHI CHÚ THÊM: ${extraNotes}\n`;
+            }
+
+            // Populate checkout modal
+            const nameInput = document.getElementById('c-name');
+            const phoneInput = document.getElementById('c-phone');
+            const dateInput = document.getElementById('c-date');
+            
+            if (dateInput) dateInput.value = pickupDate;
+
+            // Save calculated values to a global checkout state
+            window.rentalCheckoutDetails = {
+                specialRequests: detailsText,
+                totalPrice: window.rentalCalculatedTotal,
+                peopleCount: parseInt(passengerCount) || 1,
+                useDate: pickupDate
+            };
+
+            // Force checkout modal price updates
+            const sumTitle = document.getElementById('sum-title');
+            if (sumTitle) {
+                sumTitle.innerText = `${window.currentPlace.name} - ${activeVehicle.name}`;
+            }
+            const sumPrice = document.getElementById('sum-price');
+            if (sumPrice) {
+                sumPrice.innerText = window.rentalCalculatedTotal.toLocaleString('vi-VN') + ' ₫';
+            }
+
+            // Hook doPay to support custom pricing
+            const oldDoPay = window.doPay;
+            window.doPay = async function() {
+                const name = document.getElementById('c-name').value;
+                const phone = document.getElementById('c-phone').value;
+                if(!name) { alert("Vui lòng nhập họ tên!"); return; }
+                if(!phone) { alert("Vui lòng nhập số điện thoại liên hệ!"); return; }
+
+                const btn = document.getElementById('btn-pay-main');
+                btn.disabled = true;
+                btn.innerText = 'ĐANG XỬ LÝ...';
+
+                document.getElementById('p-form').style.display = 'none';
+                document.getElementById('p-status').style.display = 'flex';
+                document.getElementById('st-loading').style.display = 'block';
+                document.getElementById('st-success').style.display = 'none';
+                document.querySelector('.modal-content').scrollTop = 0;
+
+                try {
+                    let pMethod = currentM;
+                    if (currentM === 'counter') pMethod = 'contact';
+                    if (currentM === 'qr') pMethod = 'transfer';
+
+                    const payload = {
+                        placeId: window.currentPlace.id || window.currentPlace._id,
+                        customerName: name,
+                        customerPhone: phone,
+                        useDate: window.rentalCheckoutDetails.useDate,
+                        peopleCount: window.rentalCheckoutDetails.peopleCount,
+                        totalPrice: window.rentalCheckoutDetails.totalPrice,
+                        specialRequests: window.rentalCheckoutDetails.specialRequests,
+                        paymentMethod: pMethod,
+                        bookingType: 'service'
+                    };
+
+                    const r = await fetch('/api/bookings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('wander_token')}` },
+                        body: JSON.stringify(payload)
+                    });
+                    const j = await r.json();
+                    
+                    if(j.success) {
+                        setTimeout(() => {
+                            document.getElementById('st-loading').style.display = 'none';
+                            document.getElementById('st-success').style.display = 'block';
+                            document.getElementById('b-id').innerText = '#WV-' + j.data.bookingId.split('-').pop().toUpperCase();
+                            
+                            const chime = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+                            chime.volume = 0.5;
+                            chime.play().catch(e=>console.log('Audio wait'));
+                            
+                            document.getElementById('success-card').classList.add('success-pulse');
+                            setTimeout(() => document.getElementById('lux-shimmer').classList.add('shimmer-active'), 500);
+                            
+                            const container = document.getElementById('confetti-container');
+                            const colors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#ffffff'];
+                            
+                            for(let i=0; i<32; i++) {
+                                const p = document.createElement('div');
+                                p.className = 'p-confetti';
+                                const angle = Math.random() * Math.PI * 2;
+                                const dist = 60 + Math.random() * 120;
+                                p.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+                                p.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+                                p.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+                                p.style.left = '50%'; p.style.top = '50%';
+                                p.style.animationDelay = (Math.random() * 0.3) + 's';
+                                container.appendChild(p);
+                            }
+                        }, 800);
+                    } else { 
+                        alert(j.message); 
+                        document.getElementById('p-status').style.display = 'none'; 
+                        document.getElementById('p-form').style.display = 'block'; 
+                        btn.disabled = false;
+                        btn.innerText = 'XÁC NHẬN & THANH TOÁN';
+                    }
+                } catch(e) { 
+                    document.getElementById('p-status').style.display = 'none'; 
+                    document.getElementById('p-form').style.display = 'block'; 
+                    btn.disabled = false;
+                    btn.innerText = 'XÁC NHẬN & THANH TOÁN';
+                }
+            };
+
+            // Open standard payment modal
+            openPayment();
         }
 
         window.onload = load;

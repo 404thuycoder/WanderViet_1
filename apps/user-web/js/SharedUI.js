@@ -1427,6 +1427,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                 <li><a href="index.html#top-partners" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🤝 Đối tác</a></li>
                 <li><a href="index.html#offers" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🎁 Ưu đãi</a></li>
                 <li><a href="index.html#business-services" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🏨 Dịch vụ</a></li>
+                <li><a href="business-directory.html?cat=Thuê xe" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🚗 Thuê xe du lịch</a></li>
                 <li><a href="index.html#smart-search" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🔍 Tìm kiếm thông minh</a></li>
                 <li><a href="index.html#planner" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">📅 Lập kế hoạch</a></li>
                 <li><a href="index.html#itineraries" onclick="this.closest('.floating-toc-container').classList.remove('is-open')">🗺️ Lộ trình</a></li>

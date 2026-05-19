@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -236,6 +236,11 @@
                             <span>Hoạt động giải trí & Vé</span>
                             <span class="f-count" id="cnt-ent">0</span>
                         </label>
+                        <label class="f-item" onclick="setFilter('cat', 'Thuê xe', this)">
+                            <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+                            <span>Thuê xe & Di chuyển</span>
+                            <span class="f-count" id="cnt-rental">0</span>
+                        </label>
                         <label class="f-item" onclick="setFilter('cat', 'Ẩm thực', this)">
                             <div class="f-checkbox"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
                             <span>Ăn uống & Ẩm thực</span>
@@ -344,7 +349,18 @@
                 // Chỉ hiển thị các địa điểm được quản lý bởi doanh nghiệp
                 rawData = j.data.filter(p => p.ownerId);
                 updateStats();
-                syncFilters();
+                const urlParams = new URLSearchParams(window.location.search);
+                const defaultCat = urlParams.get('cat');
+                if (defaultCat) {
+                    const label = Array.from(document.querySelectorAll('#cat-list .f-item')).find(el => el.textContent.includes(defaultCat));
+                    if (label) {
+                        setFilter('cat', defaultCat, label);
+                    } else {
+                        syncFilters();
+                    }
+                } else {
+                    syncFilters();
+                }
             } catch(e) {}
         }
 
@@ -355,6 +371,7 @@
             const n = (p.name || '').toLowerCase();
             
             for (let cat of cats) {
+                if (cat === 'Thuê xe' && (k === 'thue-xe' || p.businessCategory === 'rental' || c.includes('thuê xe') || c.includes('tự lái') || c.includes('xe tự lái') || n.includes('thuê xe') || n.includes('nhà xe'))) return true;
                 if (cat === 'Khách sạn' && (k === 'khach-san' || c.includes('khách sạn') || c.includes('resort') || c.includes('hotel') || n.includes('khách sạn') || n.includes('resort'))) return true;
                 if (cat === 'Tour' && (p.isTour || k === 'trai-nghiem' || k === 'diem-du-lich' || c.includes('tour') || c.includes('trải nghiệm') || n.includes('tour') || n.includes('trải nghiệm'))) return true;
                 if (cat === 'Ẩm thực' && (k === 'nha-hang' || k === 'giai-tri' || c.includes('ẩm thực') || c.includes('nhà hàng') || c.includes('dining') || n.includes('nhà hàng') || n.includes('quán ăn') || c.includes('ăn uống'))) return true;
@@ -367,6 +384,7 @@
 
         function updateStats() {
             document.getElementById('cnt-all').innerText = rawData.length;
+            document.getElementById('cnt-rental').innerText = rawData.filter(p => isMatch(p, new Set(['Thuê xe']))).length;
             document.getElementById('cnt-hotel').innerText = rawData.filter(p => isMatch(p, new Set(['Khách sạn']))).length;
             document.getElementById('cnt-tour').innerText = rawData.filter(p => isMatch(p, new Set(['Tour']))).length;
             document.getElementById('cnt-food').innerText = rawData.filter(p => isMatch(p, new Set(['Ẩm thực']))).length;

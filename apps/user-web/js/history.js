@@ -52,7 +52,15 @@
         fetch('/api/payments/transactions', { headers:{'x-auth-token':T} }).then(r=>r.json())
       ]);
       if (rB.success) {
-        $('#count-bookings').textContent = rB.data.length;
+        const isRental = (b) => {
+          if (b.businessCategory === 'rental') return true;
+          const pl = placeMap[b.placeId] || {};
+          return pl.businessCategory === 'rental' || pl.kind === 'thue-xe';
+        };
+        const nonRentals = rB.data.filter(b => !isRental(b));
+        const rentals = rB.data.filter(b => isRental(b));
+        $('#count-bookings').textContent = nonRentals.length;
+        $('#count-rentals').textContent = rentals.length;
         rB.data.forEach(b => { bookingMap[b.bookingId] = b; bookingMap[b._id] = b; });
         if (rB.data.some(b => b.status === 'pending')) $('#pending-dot').style.display = 'block';
       }
@@ -75,7 +83,7 @@
   function switchTab(next) {
     tab = next; fCat = 'all'; fStat = 'all'; fRegion = 'all'; fPay = 'all'; fTime = 'all';
     document.querySelectorAll('.nav-item[data-tab]').forEach(el => el.classList.toggle('is-active', el.dataset.tab === tab));
-    $('#tab-title').textContent = { wishlist:'Yêu thích', bookings:'Đặt chỗ', trips:'Hành trình AI', transactions:'Giao dịch', activities:'Hoạt động' }[tab];
+    $('#tab-title').textContent = { wishlist:'Yêu thích', bookings:'Đặt chỗ', rentals:'Thuê xe / Đặt xe', trips:'Hành trình AI', transactions:'Giao dịch', activities:'Hoạt động' }[tab];
     updateDynamicSidebar();
     loadTab();
   }
@@ -90,6 +98,9 @@
     if (tab==='bookings') {
       addS('Dịch vụ', [{id:'all',lb:'Tất cả'},{id:'Lưu trú Elite',lb:'Khách sạn'},{id:'Ẩm thực & Giải trí',lb:'Nhà hàng'},{id:'Trải nghiệm Tour',lb:'Tour'}], fCat,'cat');
       addS('Thanh toán', [{id:'all',lb:'Tất cả'},{id:'paid',lb:'Đã thanh toán'},{id:'unpaid',lb:'Chưa thanh toán'}], fPay,'pay');
+    } else if (tab==='rentals') {
+      addS('Loại xe', [{id:'all',lb:'Tất cả'},{id:'motorbike',lb:'Xe máy'},{id:'car',lb:'Ô tô'},{id:'electric',lb:'Xe điện'}], fCat,'cat');
+      addS('Thanh toán', [{id:'all',lb:'Tất cả'},{id:'paid',lb:'Đã thanh toán'},{id:'unpaid',lb:'Chưa thanh toán'}], fPay,'pay');
     } else if (tab==='trips') {
       addS('Vùng miền', [{id:'all',lb:'Toàn quốc'},{id:'Bắc',lb:'Miền Bắc'},{id:'Trung',lb:'Miền Trung'},{id:'Nam',lb:'Miền Nam'}], fRegion,'region');
     }
@@ -102,13 +113,27 @@
 
   async function loadTab() {
     $('#list-area').innerHTML = '<div class="empty-box">Đang kiểm tra dữ liệu...</div>';
-    const EP = { bookings:'/api/bookings/my', trips:'/api/planner/my-trips', transactions:'/api/payments/transactions', activities:'/api/activities/my' };
+    const EP = { bookings:'/api/bookings/my', rentals:'/api/bookings/my', trips:'/api/planner/my-trips', transactions:'/api/payments/transactions', activities:'/api/activities/my' };
     try {
       if (tab === 'wishlist') allData = (user?.favorites||[]).map(id => placeMap[id]).filter(Boolean);
       else {
-        const r = await fetch(EP[tab], { headers:{'x-auth-token':T} });
+        const r = await fetch(EP[tab] || EP['bookings'], { headers:{'x-auth-token':T} });
         const j = await r.json();
-        allData = j.success ? j.data : [];
+        if (tab === 'rentals') {
+          allData = j.success ? j.data.filter(b => {
+            if (b.businessCategory === 'rental') return true;
+            const pl = placeMap[b.placeId] || {};
+            return pl.businessCategory === 'rental' || pl.kind === 'thue-xe';
+          }) : [];
+        } else if (tab === 'bookings') {
+          allData = j.success ? j.data.filter(b => {
+            if (b.businessCategory === 'rental') return false;
+            const pl = placeMap[b.placeId] || {};
+            return !(pl.businessCategory === 'rental' || pl.kind === 'thue-xe');
+          }) : [];
+        } else {
+          allData = j.success ? j.data : [];
+        }
       }
     } catch(e) {}
     renderList();
@@ -128,6 +153,7 @@
       data.map(item => {
         if(tab==='wishlist') return cardV(item);
         if(tab==='bookings') return cardB(item);
+        if(tab==='rentals') return cardR(item);
         if(tab==='trips')    return cardT(item);
         if(tab==='transactions') return cardX(item);
         if(tab==='activities') return cardA(item);
@@ -138,7 +164,7 @@
   // --- HÀNH ĐỘNG THỰC TẾ ---
   window.doAction = (action, id) => {
     if (action === 'pay') window.location.href = `payment.html?bookingId=${id}`;
-    if (action === 'view_place') window.location.href = `navigator.html?placeId=${id}`;
+    if (action === 'view_place') window.location.href = `place-detail.html?id=${id}`;
     if (action === 'view_trip') window.location.href = `planner.html?itinId=${id}`;
     if (action === 'review') WanderUI.showToast('Chức năng đánh giá đang được chuẩn bị...', 'info');
   };
@@ -195,6 +221,32 @@
           <button style="width:100%; background:var(--accent); color:#fff; border:none; padding:10px; border-radius:10px; font-weight:800; cursor:pointer;" onclick="doAction('view_trip','${t._id}')">MỞ BẢN ĐỒ</button>
         </div>
       </div>`; 
+  }
+
+
+  function cardR(b) {
+    const pl = placeMap[b.placeId] || {};
+    const [l, c] = STATUS[b.status] || [b.status, 'info'];
+    const isUnpaid = b.paymentStatus === 'unpaid' && b.status !== 'cancelled';
+    const isDone = b.status === 'completed';
+    return `
+      <div class="v-card">
+        <div class="v-img-wrap"><img src="${pl.image || LOGO}"><div class="v-status-tag tag-${c}">${l}</div><div class="v-badge-top">🚗 Thuê xe</div></div>
+        <div class="v-body">
+          <p class="v-cat" style="color:#f59e0b">THUÊ XE / ĐẶT XE</p>
+          <h4 class="v-title">${b.placeName}</h4>
+          <div class="v-meta">
+            <span>📅 ${fmtD(b.useDate)}</span>
+            <span>👥 ${b.peopleCount || 1} người</span>
+            <span style="color:${isUnpaid ? '#ef4444' : '#10b981'}">${b.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
+          </div>
+          ${b.totalPrice > 0 ? `<div style="margin-top:10px; font-size:1.1rem; font-weight:800; color:#0f172a">${fmtVND(b.totalPrice)}</div>` : ''}
+        </div>
+        <div class="v-footer">
+          ${isUnpaid ? `<button class="btn-action" style="background:#ef4444; color:#fff; border:none; padding:8px 15px; border-radius:8px; font-weight:800; cursor:pointer; flex:1;" onclick="doAction('pay','${b._id}')">THANH TOÁN NGAY</button>` : `<button class="btn-action" style="background:#f1f5f9; color:#1e293b; border:none; padding:8px 15px; border-radius:8px; font-weight:700; cursor:pointer; flex:1;" onclick="doAction('view_place','${b.placeId}')">Xem dịch vụ</button>`}
+          ${isDone ? `<button class="btn-action" style="background:#fff7ed; color:#f59e0b; border:none; padding:8px 15px; border-radius:8px; font-weight:700; cursor:pointer; margin-left:10px;" onclick="doAction('review','${b.bookingId}')">Đánh giá</button>` : ''}
+        </div>
+      </div>`;
   }
 
   function cardX(t) { 

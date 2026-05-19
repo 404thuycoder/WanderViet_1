@@ -23,27 +23,30 @@ router.post('/', auth, async (req, res) => {
 
     if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
 
-    const totalPrice = (place.price || place.priceFrom || 0) * (peopleCount || 1);
+    const totalPrice = req.body.totalPrice !== undefined ? Number(req.body.totalPrice) : ((place.price || place.priceFrom || 0) * (peopleCount || 1));
     const type = bookingType || (place.isTour ? 'tour' : 'service');
+    // Tự động set businessCategory từ Place để phân loại Đặt chỗ / Thuê xe
+    const bizCat = place.businessCategory || (place.kind === 'thue-xe' ? 'rental' : 'other');
 
     const newBooking = new Booking({
-      bookingId:      'BK-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
-      bookingType:    type,
+      bookingId:        'BK-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+      bookingType:      type,
+      businessCategory: bizCat,
       placeId,
-      placeName:      place.name,
-      userId:         req.user.id,
+      placeName:        place.name,
+      userId:           req.user.id,
       customerName,
-      customerEmail:  customerEmail || req.user.email,
+      customerEmail:    customerEmail || req.user.email,
       customerPhone,
-      useDate:        new Date(useDate || Date.now()),
-      tourDate:       tourDate ? new Date(tourDate) : null,
-      peopleCount:    peopleCount || 1,
+      useDate:          new Date(useDate || Date.now()),
+      tourDate:         tourDate ? new Date(tourDate) : null,
+      peopleCount:      peopleCount || 1,
       totalPrice,
-      specialRequests: specialRequests || '',
-      paymentMethod:  paymentMethod || 'contact',
-      paymentStatus:  paymentMethod === 'contact' ? 'unpaid' : 'pending',
-      ownerId:        place.ownerId || 'system',
-      status:         'pending'
+      specialRequests:  specialRequests || '',
+      paymentMethod:    paymentMethod || 'contact',
+      paymentStatus:    paymentMethod === 'contact' ? 'unpaid' : 'pending',
+      ownerId:          place.ownerId || 'system',
+      status:           'pending'
     });
 
     await newBooking.save();

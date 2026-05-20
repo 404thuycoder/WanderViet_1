@@ -13,6 +13,8 @@ const Conversation = require('../models/Conversation');
 const Place = require('../models/Place');
 const Post = require('../models/Post');
 const Friendship = require('../models/Friendship');
+const OtpVerification = require('../models/OtpVerification');
+const { sendOtpEmail } = require('../utils/email');
 
 const JWT_SECRET = (process.env.JWT_SECRET || 'wander-viet-secret-key-123').trim();
 const DEFAULT_ADMIN_EMAIL = process.env.DEFAULT_ADMIN_EMAIL || 'admin@wanderviet.com';
@@ -1023,6 +1025,282 @@ router.post('/reset-password/:token', async (req, res) => {
     res.json({ success: true, message: 'Mật khẩu của bạn đã được cập nhật thành công!' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// ==========================================
+// EMAIL OTP AUTHENTICATION & PASSWORD RECOVERY
+// ==========================================
+
+router.post('/send-otp', async (req, res) => {
+  try {
+    const { email, purpose, portal } = req.body;
+    if (!email || !purpose || !portal) {
+      return res.status(400).json({ success: false, message: 'Thiếu thông tin bắt buộc (email, purpose, portal)' });
+    }
+    
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRx.test(normalizedEmail)) {
+      return res.status(400).json({ success: false, message: 'Định dạng email không hợp lệ.' });
+    }
+
+    const Model = portal === 'business' ? BusinessAccount : (portal === 'admin' ? AdminAccount : User);
+
+    // Validation based on purpose
+    if (purpose === 'register') {
+      const exists = await Model.findOne({ email: normalizedEmail });
+      if (exists) {
+        return res.status(400).json({ success: false, message: 'Email này đã được đăng ký tài khoản.' });
+      }
+    } else if (purpose === 'forgot_password') {
+      const exists = await Model.findOne({ email: normalizedEmail });
+      if (!exists) {
+        return res.status(404).json({ success: false, message: 'Email này chưa được đăng ký trong hệ thống.' });
+      }
+    } else {
+      return res.status(400).json({ success: false, message: 'Mục đích (purpose) xác thực không hợp lệ.' });
+    }
+
+    // Cooldown check (60 seconds)
+    const sixtySecsAgo = new Date(Date.now() - 60 * 1000);
+    const recentOtp = await OtpVerification.findOne({
+      email: normalizedEmail,
+      purpose,
+      portal,
+      createdAt: { $gte: sixtySecsAgo }
+    });
+    if (recentOtp) {
+      const waitSecs = Math.max(0, Math.ceil((60 * 1000 - (Date.now() - recentOtp.createdAt.getTime())) / 1000));
+      return res.status(429).json({
+        success: false,
+        message: `Vui lòng đợi ${waitSecs} giây trước khi yêu cầu mã OTP tiếp theo.`
+      });
+    }
+
+    // Hourly Rate limit check (5 requests/hour)
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const hourOtpCount = await OtpVerification.countDocuments({
+      email: normalizedEmail,
+      purpose,
+      portal,
+      createdAt: { $gte: oneHourAgo }
+    });
+    if (hourOtpCount >= 5) {
+      return res.status(429).json({
+        success: false,
+        message: 'Bạn đã vượt quá giới hạn yêu cầu OTP (tối đa 5 lần/giờ). Vui lòng thử lại sau.'
+      });
+    }
+
+    // Generate 6-digit OTP
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    
+    // Save to DB (expires in 5 mins)
+    const otpDoc = new OtpVerification({
+      email: normalizedEmail,
+      otp,
+      purpose,
+      portal,
+      expiresAt: new Date(Date.now() + 5 * 60 * 1000)
+    });
+    await otpDoc.save();
+
+    // Send email
+    try {
+      await sendOtpEmail(normalizedEmail, otp, purpose);
+      return res.json({ 
+        success: true, 
+        message: 'Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.' 
+      });
+    } catch (mailErr) {
+      console.warn('[Nodemailer Fail] Could not send real email:', mailErr.message);
+      // Fallback for easy dev testing: return OTP in response
+      return res.json({
+        success: true,
+        message: `Email server đang bảo trì. Mã OTP test: ${otp}`,
+        otp
+      });
+    }
+  } catch (err) {
+    console.error('Send OTP error:', err);
+    return res.status(500).json({ success: false, message: 'Đã xảy ra lỗi hệ thống.' });
+  }
+});
+
+router.post('/verify-otp', async (req, res) => {
+  try {
+    const { email, otp, purpose, portal } = req.body;
+    if (!email || !otp || !purpose || !portal) {
+      return res.status(400).json({ success: false, message: 'Thiếu thông tin bắt buộc (email, otp, purpose, portal)' });
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+
+    // Find valid OTP
+    const otpRecord = await OtpVerification.findOne({
+      email: normalizedEmail,
+      purpose,
+      portal,
+      expiresAt: { $gt: new Date() }
+    }).sort({ createdAt: -1 });
+
+    if (!otpRecord) {
+      return res.status(400).json({ success: false, message: 'Mã OTP không đúng hoặc đã hết hạn.' });
+    }
+
+    // Increment attempts
+    otpRecord.attempts = (otpRecord.attempts || 0) + 1;
+    await otpRecord.save();
+
+    if (otpRecord.attempts > 5) {
+      await OtpVerification.deleteOne({ _id: otpRecord._id });
+      return res.status(400).json({ success: false, message: 'Quá số lần thử cho phép. Vui lòng yêu cầu mã OTP mới.' });
+    }
+
+    if (otpRecord.otp !== String(otp).trim()) {
+      return res.status(400).json({ success: false, message: 'Mã OTP không chính xác.' });
+    }
+
+    return res.json({ success: true, message: 'Mã OTP chính xác!' });
+  } catch (err) {
+    console.error('Verify OTP error:', err);
+    return res.status(500).json({ success: false, message: 'Đã xảy ra lỗi hệ thống.' });
+  }
+});
+
+router.post('/register-with-otp', async (req, res) => {
+  try {
+    const { name, email, password, otp, portal } = req.body;
+    if (!name || !email || !password || !otp || !portal) {
+      return res.status(400).json({ success: false, message: 'Thiếu thông tin đăng ký hoặc mã OTP.' });
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+    
+    // Verify OTP first
+    const otpRecord = await OtpVerification.findOne({
+      email: normalizedEmail,
+      purpose: 'register',
+      portal,
+      expiresAt: { $gt: new Date() }
+    }).sort({ createdAt: -1 });
+
+    if (!otpRecord) {
+      return res.status(400).json({ success: false, message: 'Mã OTP không tồn tại hoặc đã hết hạn.' });
+    }
+
+    if (otpRecord.otp !== String(otp).trim()) {
+      return res.status(400).json({ success: false, message: 'Mã OTP không chính xác.' });
+    }
+
+    // Check email double allocation
+    const Model = portal === 'business' ? BusinessAccount : User;
+    const exists = await Model.findOne({ email: normalizedEmail });
+    if (exists) {
+      return res.status(400).json({ success: false, message: 'Email đã được đăng ký tài khoản.' });
+    }
+
+    // Delete OTP document to prevent reuse
+    await OtpVerification.deleteMany({ email: normalizedEmail, purpose: 'register', portal });
+
+    // Create Account
+    let account;
+    if (portal === 'business') {
+      account = new BusinessAccount({
+        customId: generateCustomId('business'),
+        name,
+        displayName: name,
+        email: normalizedEmail,
+        password: await bcrypt.hash(password, 10),
+        status: 'active',
+        isVerified: true
+      });
+      await account.save();
+      await logAction(account.email, 'business', 'BUSINESS_REGISTER', { email: account.email, id: account._id }, req.ip, req.headers['user-agent']);
+    } else {
+      account = new User({
+        customId: generateCustomId('user'),
+        name,
+        email: normalizedEmail,
+        password: await bcrypt.hash(password, 10),
+        displayName: name,
+        role: 'user',
+        status: 'active',
+        isVerified: true
+      });
+      await account.save();
+      await logAction(account.email, 'user', 'USER_REGISTER', { user: { id: account.id, email: account.email, displayName: account.name, role: account.role } }, req.ip, req.headers['user-agent']);
+    }
+
+    const token = signPortalToken(account, portal, portal);
+    return res.json({ 
+      success: true, 
+      token, 
+      user: { 
+        _id: account._id.toString(),
+        customId: account.customId || account.id,
+        id: account.customId || account.id || account._id.toString(), 
+        email: account.email, 
+        name: account.name, 
+        role: portal, 
+        avatar: account.avatar || '', 
+        status: account.status 
+      } 
+    });
+  } catch (err) {
+    console.error('Register with OTP error:', err);
+    return res.status(500).json({ success: false, message: err.message || 'Đã xảy ra lỗi hệ thống.' });
+  }
+});
+
+router.post('/reset-password-with-otp', async (req, res) => {
+  try {
+    const { email, otp, password, portal } = req.body;
+    if (!email || !otp || !password || !portal) {
+      return res.status(400).json({ success: false, message: 'Thiếu thông tin yêu cầu đặt lại mật khẩu.' });
+    }
+
+    const normalizedEmail = String(email).trim().toLowerCase();
+
+    // Verify OTP first
+    const otpRecord = await OtpVerification.findOne({
+      email: normalizedEmail,
+      purpose: 'forgot_password',
+      portal,
+      expiresAt: { $gt: new Date() }
+    }).sort({ createdAt: -1 });
+
+    if (!otpRecord) {
+      return res.status(400).json({ success: false, message: 'Mã OTP không tồn tại hoặc đã hết hạn.' });
+    }
+
+    if (otpRecord.otp !== String(otp).trim()) {
+      return res.status(400).json({ success: false, message: 'Mã OTP không chính xác.' });
+    }
+
+    // Delete OTP document to prevent reuse
+    await OtpVerification.deleteMany({ email: normalizedEmail, purpose: 'forgot_password', portal });
+
+    // Update password
+    const Model = portal === 'business' ? BusinessAccount : (portal === 'admin' ? AdminAccount : User);
+    const account = await Model.findOne({ email: normalizedEmail });
+    if (!account) {
+      return res.status(404).json({ success: false, message: 'Tài khoản không tồn tại.' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    account.password = await bcrypt.hash(password, salt);
+    account.resetPasswordToken = undefined;
+    account.resetPasswordExpires = undefined;
+    await account.save();
+
+    await logAction(account.email, portal, 'RESET_PASSWORD_OTP', { email: account.email }, req.ip, req.headers['user-agent']);
+
+    return res.json({ success: true, message: 'Mật khẩu của bạn đã được cập nhật thành công!' });
+  } catch (err) {
+    console.error('Reset password with OTP error:', err);
+    return res.status(500).json({ success: false, message: err.message || 'Đã xảy ra lỗi hệ thống.' });
   }
 });
 

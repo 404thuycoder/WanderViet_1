@@ -23,6 +23,7 @@ const userSchema = new mongoose.Schema({
     enum: ['active', 'suspended', 'pending'], 
     default: 'active' 
   },
+  isVerified: { type: Boolean, default: false },
   displayName: String,
   notes: String,
   preferences: {

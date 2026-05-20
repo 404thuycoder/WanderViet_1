@@ -126,34 +126,62 @@
         });
       },
       forgotPassword(email) {
-        // Mock: chấp nhận mọi email hợp lệ, trả OTP 6 số
-        return new Promise(resolve => setTimeout(() => {
-          const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-          if (!emailRx.test(email)) {
-            resolve({ success: false, message: 'Email không hợp lệ.' });
-          } else {
-            const otp = String(Math.floor(100000 + Math.random() * 900000));
-            // Lưu tạm vào sessionStorage để bước sau verify
+        return fetch('/api/auth/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, purpose: 'forgot_password', portal: 'business' })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
             sessionStorage.setItem('biz_reset_email', email);
-            sessionStorage.setItem('biz_reset_otp', otp);
-            console.info('[DEV] OTP:', otp); // Chỉ hiện trong dev console
-            resolve({ success: true, otp }); // Trả về để hiện demo
+            if (data.otp) {
+              sessionStorage.setItem('biz_reset_otp', data.otp);
+            }
           }
-        }, 1000));
+          return data;
+        })
+        .catch(err => {
+          return { success: false, message: 'Lỗi kết nối máy chủ.' };
+        });
       },
       verifyOtp(inputOtp) {
-        return new Promise(resolve => setTimeout(() => {
-          const saved = sessionStorage.getItem('biz_reset_otp');
-          if (inputOtp === saved) resolve({ success: true });
-          else resolve({ success: false, message: 'Mã OTP không đúng hoặc đã hết hạn.' });
-        }, 600));
+        var email = sessionStorage.getItem('biz_reset_email');
+        return fetch('/api/auth/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, otp: inputOtp, purpose: 'forgot_password', portal: 'business' })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            sessionStorage.setItem('biz_reset_otp', inputOtp);
+          }
+          return data;
+        })
+        .catch(err => {
+          return { success: false, message: 'Lỗi kết nối máy chủ.' };
+        });
       },
       resetPassword(newPassword) {
-        return new Promise(resolve => setTimeout(() => {
-          sessionStorage.removeItem('biz_reset_otp');
-          sessionStorage.removeItem('biz_reset_email');
-          resolve({ success: true });
-        }, 800));
+        var email = sessionStorage.getItem('biz_reset_email');
+        var otp = sessionStorage.getItem('biz_reset_otp');
+        return fetch('/api/auth/reset-password-with-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email, otp: otp, password: newPassword, portal: 'business' })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            sessionStorage.removeItem('biz_reset_otp');
+            sessionStorage.removeItem('biz_reset_email');
+          }
+          return data;
+        })
+        .catch(err => {
+          return { success: false, message: 'Lỗi kết nối máy chủ.' };
+        });
       }
     };
 

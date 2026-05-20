@@ -596,19 +596,74 @@
           <button type="button" class="auth-tab is-active" role="tab" data-auth-tab="login" aria-selected="true" style="padding:0.4rem; font-size:0.9rem">Đăng nhập</button>
           <button type="button" class="auth-tab" role="tab" data-auth-tab="register" aria-selected="false" style="padding:0.4rem; font-size:0.9rem">Đăng ký mới</button>
         </div>
+        
+        <!-- LOGIN PANEL -->
         <form class="auth-panel" data-auth-panel="login">
           <label class="field"><span class="field-label">Email</span><input type="email" name="email" required autocomplete="email" /></label>
           <label class="field"><span class="field-label">Mật khẩu</span><input type="password" name="password" required autocomplete="current-password" /></label>
           <button type="submit" class="btn btn--primary btn--block">Đăng nhập</button>
+          <div style="text-align: right; margin-top: 10px;">
+            <button type="button" class="btn btn--text" data-auth-forgot-trigger style="font-size: 0.85rem; color: var(--accent); cursor: pointer; background: none; border: none; padding: 0;">Quên mật khẩu?</button>
+          </div>
           <p class="auth-msg" data-auth-msg-login role="status"></p>
         </form>
+        
+        <!-- REGISTER PANEL -->
         <form class="auth-panel" data-auth-panel="register" hidden>
           <label class="field"><span class="field-label">Họ tên</span><input type="text" name="name" required autocomplete="name" /></label>
           <label class="field"><span class="field-label">Email</span><input type="email" name="email" required autocomplete="email" /></label>
           <label class="field"><span class="field-label">Mật khẩu</span><input type="password" name="password" required autocomplete="new-password" minlength="4" /></label>
           <input type="hidden" name="isBusiness" value="false" />
-          <button type="submit" class="btn btn--primary btn--block">Tạo tài khoản Khách hàng</button>
+          <button type="submit" class="btn btn--primary btn--block">Gửi yêu cầu & Nhận OTP</button>
           <p class="auth-msg" data-auth-msg-register role="status"></p>
+        </form>
+
+        <!-- REGISTER OTP PANEL -->
+        <form class="auth-panel" data-auth-panel="register-otp" hidden>
+          <p style="font-size: 0.88rem; color: #94a3b8; margin: 0 0 1.25rem 0; line-height: 1.5; text-align: center;">
+            Mã OTP xác thực đã được gửi tới email của bạn. Vui lòng nhập để hoàn tất tạo tài khoản.
+          </p>
+          <label class="field">
+            <span class="field-label">Mã OTP (6 chữ số)</span>
+            <input type="text" name="otp" required maxlength="6" placeholder="______" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.3em; font-weight: bold;" />
+          </label>
+          <button type="submit" class="btn btn--primary btn--block">Hoàn tất đăng ký</button>
+          <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+            <button type="button" class="btn btn--text" data-auth-register-otp-back style="font-size: 0.85rem; color: #64748b; background: none; border: none; padding: 0; cursor: pointer;">← Quay lại</button>
+            <button type="button" class="btn btn--text" data-auth-register-otp-resend style="font-size: 0.85rem; color: var(--accent); font-weight: 600; background: none; border: none; padding: 0; cursor: pointer;">Gửi lại OTP</button>
+          </div>
+          <p class="auth-msg" data-auth-msg-register-otp role="status"></p>
+        </form>
+
+        <!-- FORGOT PASSWORD PANEL -->
+        <form class="auth-panel" data-auth-panel="forgot" hidden>
+          <p style="font-size: 0.88rem; color: #94a3b8; margin: 0 0 1.25rem 0; line-height: 1.5; text-align: center;">
+            Nhập email đăng ký của bạn. Chúng tôi sẽ gửi mã OTP xác thực để đặt lại mật khẩu.
+          </p>
+          <label class="field"><span class="field-label">Email đăng ký</span><input type="email" name="email" required autocomplete="email" /></label>
+          <button type="submit" class="btn btn--primary btn--block">Gửi mã OTP</button>
+          <div style="text-align: center; margin-top: 15px;">
+            <button type="button" class="btn btn--text" data-auth-forgot-back style="font-size: 0.85rem; color: #64748b; background: none; border: none; padding: 0; cursor: pointer;">← Quay lại đăng nhập</button>
+          </div>
+          <p class="auth-msg" data-auth-msg-forgot role="status"></p>
+        </form>
+
+        <!-- RESET PASSWORD OTP PANEL -->
+        <form class="auth-panel" data-auth-panel="forgot-otp" hidden>
+          <p style="font-size: 0.88rem; color: #94a3b8; margin: 0 0 1.25rem 0; line-height: 1.5; text-align: center;">
+            Nhập mã OTP 6 chữ số vừa nhận và thiết lập mật khẩu mới.
+          </p>
+          <label class="field">
+            <span class="field-label">Mã OTP (6 chữ số)</span>
+            <input type="text" name="otp" required maxlength="6" placeholder="______" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.3em; font-weight: bold;" />
+          </label>
+          <label class="field"><span class="field-label">Mật khẩu mới</span><input type="password" name="password" required minlength="4" /></label>
+          <button type="submit" class="btn btn--primary btn--block">Xác nhận & Cập nhật mật khẩu</button>
+          <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+            <button type="button" class="btn btn--text" data-auth-forgot-otp-back style="font-size: 0.85rem; color: #64748b; background: none; border: none; padding: 0; cursor: pointer;">← Quay lại</button>
+            <button type="button" class="btn btn--text" data-auth-forgot-otp-resend style="font-size: 0.85rem; color: var(--accent); font-weight: 600; background: none; border: none; padding: 0; cursor: pointer;">Gửi lại OTP</button>
+          </div>
+          <p class="auth-msg" data-auth-msg-forgot-otp role="status"></p>
         </form>
       </div>
     </div>

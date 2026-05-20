@@ -522,6 +522,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       }
       data[key] = Math.max(data[key] || 0, value || 1);
       localStorage.setItem(storeKey, JSON.stringify(data));
+      // Dispatch event for real-time updates
+      window.dispatchEvent(new CustomEvent('questActivityUpdated'));
     } catch (e) { }
   }
 
@@ -535,6 +537,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       return data[key] || 0;
     } catch (e) { return 0; }
   }
+
+  window.WanderUI.trackQuestActivity = trackQuestActivity;
+  window.WanderUI.getQuestActivity = getQuestActivity;
 
   // ─── Auth Sync ──────────────────────────────────────────────────
   function toggleUserMenu(open) {
@@ -599,6 +604,11 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       }
       const data = await r.json();
       const freshUser = data.success ? data : u;
+
+      // Track quest activity: Đăng nhập hàng ngày
+      if (window.WanderUI && window.WanderUI.trackQuestActivity) {
+        window.WanderUI.trackQuestActivity('dailyLogin', 1);
+      }
 
       // Sync Language Preference if logged in
       if (freshUser.preferences && freshUser.preferences.language) {
@@ -3089,6 +3099,11 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             
             // appendMsg xử lý hiển thị tin nhắn văn bản + embed [ITIN_CARD/PROPOSALS] cho lịch sử
             appendMsg(aiReply, 'bot');
+
+            // Track quest activity: Trò chuyện với Trợ lý AI
+            if (window.WanderUI && window.WanderUI.trackQuestActivity) {
+              window.WanderUI.trackQuestActivity('dailyChat');
+            }
 
             // AI TALK BACK — chỉ đọc to khi user dùng giọng nói
             if (wasVoice && window.voiceGuide && aiReply) {

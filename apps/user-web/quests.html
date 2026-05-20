@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
@@ -557,30 +557,61 @@
       var todayStr = dtz.toISOString().split('T')[0];
       return [
         // ☀️ Hàng ngày & Ngắn hạn
-        { id:'daily_login_' + todayStr,  cat:'daily',   icon:'☀️', title:'Đăng nhập hàng ngày',          desc:'Mở ứng dụng và đăng nhập tài khoản.',                    xp:2,  max:1, key:'dailyLogin',     link:'index.html' },
-        { id:'daily_chat_' + todayStr,   cat:'daily',   icon:'💬', title:'Trò chuyện với Trợ lý AI',     desc:'Gửi 1 tin nhắn tới Trợ lý WanderViệt hôm nay.',         xp:2,  max:1, key:'dailyChat',      link:'index.html' },
-        { id:'daily_search_' + todayStr, cat:'daily',   icon:'🔍', title:'Tìm kiếm điểm đến',            desc:'Sử dụng công cụ tìm kiếm thông minh hôm nay.',          xp:1,  max:1, key:'dailySearch',    link:'index.html' },
+        { id:'daily_login_' + todayStr,  cat:'daily',   icon:'☀️', title:'Đăng nhập hàng ngày',          desc:'Mở ứng dụng và đăng nhập tài khoản.',                    xp:5,  max:1, key:'dailyLogin',     link:'index.html' },
+        { id:'daily_chat_' + todayStr,   cat:'daily',   icon:'💬', title:'Trò chuyện với Trợ lý AI',     desc:'Gửi 1 tin nhắn tới Trợ lý WanderViệt hôm nay.',         xp:5,  max:1, key:'dailyChat',      link:'index.html#chat' },
+        { id:'daily_search_' + todayStr, cat:'daily',   icon:'🔍', title:'Tìm kiếm điểm đến',            desc:'Sử dụng công cụ tìm kiếm thông minh hôm nay.',          xp:4,  max:1, key:'dailySearch',    link:'index.html#search' },
+        { id:'daily_history_' + todayStr,cat:'daily',   icon:'⌛', title:'Kiểm tra lịch sử',            desc:'Xem lại lịch sử hoạt động của bạn hôm nay.',             xp:4,  max:1, key:'dailyHistory',   link:'history.html' },
+        { id:'daily_quiz_' + todayStr,   cat:'daily',   icon:'🏆', title:'Tham gia WanderQuiz',         desc:'Trả lời câu hỏi trắc nghiệm trong khung chat.',          xp:5,  max:1, key:'dailyQuiz',      link:'index.html#chat' },
+        { id:'daily_radio_' + todayStr,  cat:'daily',   icon:'🎧', title:'Nghe WanderRadio',          desc:'Thư giãn với âm nhạc Lo-Fi trong khung chat.',         xp:5,  max:1, key:'dailyRadio',     link:'index.html#chat' },
+        { id:'daily_weather_' + todayStr,cat:'daily',   icon:'🌤️', title:'Xem dự báo thời tiết',        desc:'Kiểm tra thời tiết cho chuyến đi.',                     xp:4,  max:1, key:'dailyWeather',   link:'index.html#destinations' },
+        { id:'daily_map_' + todayStr,    cat:'daily',   icon:'🗺️', title:'Mở bản đồ du lịch',           desc:'Khám phá các điểm đến trên bản đồ.',                    xp:4,  max:1, key:'dailyMap',       link:'index.html#destinations' },
 
         // 🗺️ Chuyến đi – Hành trình của bạn
-        { id:'trip_create_ai',  cat:'trip',    icon:'🤖', title:'Lập lịch trình bằng AI',       desc:'Dùng AI Planner để tạo chuyến đi thông minh.',           xp:5,  max:1, key:'tripCreateAI',   link:'planner.html' },
-        { id:'trip_pro_planner',cat:'trip',    icon:'🧠', title:'Chuyên gia lên lịch',          desc:'Tích lũy 10 lịch trình du lịch thông minh.',            xp:20, max:10, key:'tripCreateAI',   link:'planner.html' },
-        { id:'trip_save',       cat:'trip',    icon:'💾', title:'Lưu chuyến đi',                desc:'Lưu lại lịch trình trong mục Chuyến đi.',               xp:2,  max:1, key:'tripSave',       link:'planner.html' },
-        { id:'trip_complete',   cat:'trip',    icon:'✅', title:'Hoàn thành chuyến đi',         desc:'Đánh dấu "Đã trải nghiệm" cho 1 chuyến đi.',            xp:10, max:1, key:'tripComplete',   link:'my-trips.html' },
-        { id:'trip_veteran',    cat:'trip',    icon:'🎖️', title:'Kẻ lữ hành đại thụ',          desc:'Hoàn thành 5 chuyến đi thực tế.',                       xp:50, max:5, key:'tripComplete',   link:'my-trips.html' },
+        { id:'trip_create_ai',  cat:'trip',    icon:'🤖', title:'Lập lịch trình bằng AI',       desc:'Dùng AI Planner để tạo chuyến đi thông minh.',           xp:15, max:1, key:'tripCreateAI',   link:'planner.html' },
+        { id:'trip_pro_planner',cat:'trip',    icon:'🧠', title:'Chuyên gia lên lịch',          desc:'Tích lũy 10 lịch trình du lịch thông minh.',            xp:50, max:10, key:'tripCreateAI',   link:'planner.html' },
+        { id:'trip_save',       cat:'trip',    icon:'💾', title:'Lưu chuyến đi',                desc:'Lưu lại lịch trình trong mục Chuyến đi.',               xp:5,  max:1, key:'tripSave',       link:'planner.html' },
+        { id:'trip_complete',   cat:'trip',    icon:'✅', title:'Hoàn thành chuyến đi',         desc:'Đánh dấu "Đã trải nghiệm" cho 1 chuyến đi.',            xp:25, max:1, key:'tripComplete',   link:'my-trips.html' },
+        { id:'trip_veteran',    cat:'trip',    icon:'🎖️', title:'Kẻ lữ hành đại thụ',          desc:'Hoàn thành 5 chuyến đi thực tế.',                       xp:100,max:5, key:'tripComplete',   link:'my-trips.html' },
+        { id:'trip_share',      cat:'trip',    icon:'🔗', title:'Chia sẻ lịch trình',           desc:'Chia sẻ chuyến đi của bạn với bạn bè.',                  xp:20, max:1, key:'tripShare',      link:'planner.html' },
+        { id:'trip_add_stop',   cat:'trip',    icon:'📍', title:'Thêm điểm dừng',              desc:'Thêm 1 điểm dừng vào lịch trình.',                     xp:10, max:1, key:'tripAddStop',    link:'planner.html' },
+        { id:'trip_custom',     cat:'trip',    icon:'🎨', title:'Tự thiết kế lịch trình',       desc:'Tạo lịch trình thủ công không dùng AI.',                xp:15, max:1, key:'tripCustom',     link:'planner.html' },
+        { id:'trip_master',     cat:'trip',    icon:'👑', title:'Bậc thầy hành trình',          desc:'Tích lũy 20 lịch trình du lịch.',                      xp:150,max:20, key:'tripCreateAI',   link:'planner.html' },
 
         // 🔭 Khám phá – Tìm tòi cái mới
-        { id:'explore_favorite',cat:'explore', icon:'❤️', title:'Lưu địa điểm yêu thích',       desc:'Bấm ❤️ để lưu điểm đến vào danh sách.',                xp:2,  max:1, key:'expFavorite',    link:'index.html' },
-        { id:'explore_collector',cat:'explore',icon:'📚', title:'Nhà sưu tầm địa danh',          desc:'Lưu trữ 10 địa điểm bạn yêu thích nhất.',               xp:15, max:10, key:'expFavorite',    link:'index.html' },
-        { id:'explore_contact', cat:'explore', icon:'📞', title:'Liên hệ đặt tour',              desc:'Gửi thông tin liên hệ để được tư vấn.',                 xp:5,  max:1, key:'expContact',     link:'index.html' },
-        { id:'explore_offers',  cat:'explore', icon:'🎁', title:'Săn tìm ưu đãi',               desc:'Khám phá các chương trình khuyến mãi.',                  xp:2,  max:1, key:'expOffers',      link:'index.html' },
+        { id:'explore_favorite',cat:'explore', icon:'❤️', title:'Lưu địa điểm yêu thích',       desc:'Bấm ❤️ để lưu điểm đến vào danh sách.',                xp:5,  max:1, key:'expFavorite',    link:'index.html#destinations' },
+        { id:'explore_collector',cat:'explore',icon:'📚', title:'Nhà sưu tầm địa danh',          desc:'Lưu trữ 10 địa điểm bạn yêu thích nhất.',               xp:35, max:10, key:'expFavorite',    link:'index.html#destinations' },
+        { id:'explore_contact', cat:'explore', icon:'📞', title:'Liên hệ đặt tour',              desc:'Gửi thông tin liên hệ để được tư vấn.',                 xp:15, max:1, key:'expContact',     link:'index.html' },
+        { id:'explore_offers',  cat:'explore', icon:'🎁', title:'Săn tìm ưu đãi',               desc:'Khám phá các chương trình khuyến mãi.',                  xp:5,  max:1, key:'expOffers',      link:'index.html#offers' },
+        { id:'explore_business',cat:'explore', icon:'🏨', title:'Khám phá doanh nghiệp',         desc:'Xem danh sách doanh nghiệp đối tác.',                    xp:5,  max:1, key:'expBusiness',    link:'business-directory.html' },
+        { id:'explore_feedback',cat:'explore', icon:'✍️', title:'Góp ý hệ thống',               desc:'Gửi phản hồi để cải thiện ứng dụng.',                   xp:25, max:1, key:'expFeedback',    link:'feedback.html' },
+        { id:'explore_filter',  cat:'explore', icon:'🧹', title:'Sử dụng bộ lọc',              desc:'Lọc địa điểm theo danh mục.',                           xp:8,  max:1, key:'expFilter',      link:'index.html#destinations' },
+        { id:'explore_search_voice',cat:'explore',icon:'🎙️', title:'Tìm kiếm giọng nói',         desc:'Dùng mic để tìm kiếm điểm đến.',                        xp:15, max:1, key:'expVoiceSearch', link:'index.html#search' },
+        { id:'explore_top_rated',cat:'explore',icon:'⭐', title:'Xem điểm đến hàng đầu',        desc:'Khám phá các địa điểm được đánh giá cao.',               xp:8,  max:1, key:'expTopRated',    link:'index.html#destinations' },
 
         // 🌟 Cộng đồng – Kết nối & Chia sẻ
-        { id:'social_avatar',   cat:'social',  icon:'🖼️', title:'Thêm ảnh đại diện',            desc:'Tải lên ảnh hồ sơ của bạn trong phần hồ sơ.',          xp:5,  max:1, key:'socAvatar',      link:'profile.html' },
-        { id:'social_profile',  cat:'social',  icon:'👤', title:'Hoàn thiện hồ sơ',             desc:'Điền tên hiển thị và thông tin cá nhân.',                xp:5,  max:1, key:'socProfile',     link:'profile.html' },
-        { id:'social_board',    cat:'social',  icon:'🏆', title:'Xem bảng xếp hạng',            desc:'Truy cập trang BXH để xem vị trí của bạn.',             xp:2,  max:1, key:'socLeaderboard', link:'leaderboard.html' },
-        { id:'social_influencer',cat:'social', icon:'✍️', title:'Người truyền cảm hứng',        desc:'Viết 5 đánh giá đóng góp cho cộng đồng.',               xp:25, max:5, key:'reviewWrite',     link:'index.html' }
+        { id:'social_avatar',   cat:'social',  icon:'🖼️', title:'Thêm ảnh đại diện',            desc:'Tải lên ảnh hồ sơ của bạn trong phần hồ sơ.',          xp:15, max:1, key:'socAvatar',      link:'profile.html' },
+        { id:'social_profile',  cat:'social',  icon:'👤', title:'Hoàn thiện hồ sơ',             desc:'Điền tên hiển thị và thông tin cá nhân.',                xp:15, max:1, key:'socProfile',     link:'profile.html' },
+        { id:'social_board',    cat:'social',  icon:'🏆', title:'Xem bảng xếp hạng',            desc:'Truy cập trang BXH để xem vị trí của bạn.',             xp:5,  max:1, key:'socLeaderboard', link:'leaderboard.html' },
+        { id:'social_influencer',cat:'social', icon:'✍️', title:'Người truyền cảm hứng',        desc:'Viết 5 đánh giá đóng góp cho cộng đồng.',               xp:50, max:5, key:'reviewWrite',     link:'index.html#reviews' },
+        { id:'social_hub_visit',cat:'social',  icon:'👥', title:'Ghé thăm Cộng đồng',            desc:'Ghé thăm trang Cộng đồng WanderViệt.',                  xp:5,  max:1, key:'socHubVisit',    link:'social-hub.html' },
+        { id:'social_like',     cat:'social',  icon:'👍', title:'Thích bài viết',               desc:'Bấm thích 1 bài viết trên Social Hub.',                  xp:5,  max:1, key:'socLike',       link:'social-hub.html' },
+        { id:'social_comment',  cat:'social',  icon:'💬', title:'Bình luận bài viết',            desc:'Để lại bình luận trên Social Hub.',                      xp:10, max:1, key:'socComment',    link:'social-hub.html' },
+        { id:'social_share',    cat:'social',  icon:'📤', title:'Chia sẻ bài viết',              desc:'Chia sẻ bài viết cộng đồng.',                           xp:10, max:1, key:'socShare',      link:'social-hub.html' },
+        { id:'social_star',     cat:'social',  icon:'🌟', title:'Ngôi sao cộng đồng',            desc:'Đạt 100 lượt thích từ cộng đồng.',                       xp:200,max:100,key:'socLikesReceived',link:'profile.html' }
       ];
     }
+
+    window.trackClickTask = function(key) {
+      const trackableKeys = [
+        'dailyHistory', 'socHubVisit', 'expBusiness', 'socLeaderboard', 'expOffers', 'expFavorite', 'dailySearch', 'dailyQuiz', 'dailyRadio', 'tripShare', 'expFeedback',
+        'dailyWeather', 'dailyMap', 'tripAddStop', 'tripCustom', 'expFilter', 'expVoiceSearch', 'expTopRated', 'socLike', 'socComment', 'socShare'
+      ];
+      if (trackableKeys.includes(key)) {
+        if (window.WanderUI && window.WanderUI.trackQuestActivity) {
+          window.WanderUI.trackQuestActivity(key, 1);
+        }
+      }
+    };
 
     function renderQuests(filter, userStats, dbClaimedQuests) {
       var grid = document.getElementById('questGrid');
@@ -634,7 +665,7 @@
         } else if (q.link === '#') {
           actionHtml = '<button class="btn-quest-action" data-open-profile>🎯 Làm nhiệm vụ</button>';
         } else {
-          actionHtml = '<a href="' + q.link + '" class="btn-quest-action">🎯 Làm nhiệm vụ</a>';
+          actionHtml = '<a href="' + q.link + '" class="btn-quest-action" onclick="trackClickTask(\'' + q.key + '\')">🎯 Làm nhiệm vụ</a>';
         }
 
         var iconBg = q.cat === 'daily' ? 'rgba(251, 191, 36, 0.15)' : (q.cat === 'trip' ? 'rgba(168, 85, 247, 0.15)' : 'rgba(59, 130, 246, 0.15)');
@@ -687,16 +718,30 @@
         dailyLogin:    1,                               // Auto: luôn là 1 khi đã đăng nhập
         dailyChat:     getQuestActivity('dailyChat'),   // Ghi nhận khi gửi tin nhắn AI
         dailySearch:   getQuestActivity('dailySearch'), // Ghi nhận khi tìm kiếm
+        dailyHistory:  getQuestActivity('dailyHistory'),// Ghi nhận khi xem lịch sử
+        dailyQuiz:     getQuestActivity('dailyQuiz'),
+        dailyRadio:    getQuestActivity('dailyRadio'),
+        dailyWeather:  getQuestActivity('dailyWeather'),
+        dailyMap:      getQuestActivity('dailyMap'),
         tripCreateAI:  aiTrips,                         // Số chuyến đi AI đã tạo
         tripSave:      totalTrips,                      // Bất kỳ chuyến đi nào đã lưu
         tripComplete:  expCount,                        // Chuyến đi có status 'experienced'
+        tripShare:     getQuestActivity('tripShare'),
+        tripAddStop:   getQuestActivity('tripAddStop'),
+        tripCustom:    getQuestActivity('tripCustom'),
         expFavorite:   wishlist.length,                 // Địa điểm yêu thích
         expContact:    getQuestActivity('expContact'),  // Ghi nhận khi gửi form thành công
         expOffers:     getQuestActivity('expOffers'),   // Ghi nhận khi xem ưu đãi
+        expBusiness:   getQuestActivity('expBusiness'), // Ghi nhận khi xem doanh nghiệp
+        expFeedback:   getQuestActivity('expFeedback'),
+        expFilter:     getQuestActivity('expFilter'),
+        expVoiceSearch:getQuestActivity('expVoiceSearch'),
+        expTopRated:   getQuestActivity('expTopRated'),
         socAvatar:     (userData && userData.avatar && userData.avatar.length > 0) ? 1 : 0,
         socProfile:    (userData && (userData.displayName || userData.name)) ? 1 : 0,
         socLeaderboard:getQuestActivity('socLeaderboard'), // Ghi nhận khi vào trang BXH
-        reviewWrite:   getQuestActivity('reviewWrite')  // Ghi nhận khi viết đánh giá
+        reviewWrite:   getQuestActivity('reviewWrite'),  // Ghi nhận khi viết đánh giá
+        socHubVisit:   getQuestActivity('socHubVisit')   // Ghi nhận khi vào trang cộng đồng
       };
     }
 
@@ -862,6 +907,14 @@
         }
       });
     }
+
+    window.addEventListener('questActivityUpdated', function() {
+      loadPage();
+    });
+
+    window.addEventListener('focus', function() {
+      loadPage();
+    });
 
     loadPage();
   })();

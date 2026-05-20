@@ -1014,9 +1014,9 @@
       renderPersonalSection();
       // Track quest activity: Tìm kiếm (Smart)
       try {
-        var qa = JSON.parse(localStorage.getItem('wv_quest_activity') || '{}');
-        qa.dailySearch = (qa.dailySearch || 0) + 1;
-        localStorage.setItem('wv_quest_activity', JSON.stringify(qa));
+        if (window.WanderUI && window.WanderUI.trackQuestActivity) {
+          window.WanderUI.trackQuestActivity('dailySearch', (window.WanderUI.getQuestActivity('dailySearch') || 0) + 1);
+        }
       } catch(e) {}
     });
   }
@@ -1381,9 +1381,9 @@
       applyDestFilters();
       // Track quest activity: Tìm kiếm (General)
       try {
-        var qa = JSON.parse(localStorage.getItem('wv_quest_activity') || '{}');
-        qa.dailySearch = (qa.dailySearch || 0) + 1;
-        localStorage.setItem('wv_quest_activity', JSON.stringify(qa));
+        if (window.WanderUI && window.WanderUI.trackQuestActivity) {
+          window.WanderUI.trackQuestActivity('dailySearch', (window.WanderUI.getQuestActivity('dailySearch') || 0) + 1);
+        }
       } catch(e) {}
     });
   }
@@ -1413,9 +1413,9 @@
     promoBtns.forEach(function(btn) {
       btn.addEventListener('click', function() {
         try {
-          var qa = JSON.parse(localStorage.getItem('wv_quest_activity') || '{}');
-          qa.expOffers = 1;
-          localStorage.setItem('wv_quest_activity', JSON.stringify(qa));
+          if (window.WanderUI && window.WanderUI.trackQuestActivity) {
+            window.WanderUI.trackQuestActivity('expOffers', 1);
+          }
         } catch(e) {}
       });
     });
@@ -3350,6 +3350,10 @@
     loadPublicStats();
     loadPublicReviews();
     
+    // Handle Quests Hash Actions
+    handleHashActions();
+    window.addEventListener('hashchange', handleHashActions);
+    
     // Auto-open settings or place modal if requested via URL
     var urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('openSettings') === 'true') {
@@ -3374,32 +3378,70 @@
   // Handle Hash Actions (for Quests redirection)
   function handleHashActions() {
     var hash = window.location.hash;
+    
+    // Inject pulse style if not present
+    if (!document.getElementById('wv-pulse-style')) {
+      var style = document.createElement('style');
+      style.id = 'wv-pulse-style';
+      style.innerHTML = `
+        .highlight-pulse {
+          animation: pulseHighlight 2s ease;
+          border-radius: 12px;
+        }
+        @keyframes pulseHighlight {
+          0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+          70% { box-shadow: 0 0 0 15px rgba(59, 130, 246, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    function pulse(el) {
+      if (!el) return;
+      el.classList.add('highlight-pulse');
+      setTimeout(function() { el.classList.remove('highlight-pulse'); }, 2000);
+    }
+
     if (hash === '#chat') {
-      var chatBtn = document.querySelector('.chat-brain-toggle');
+      var chatBtn = document.getElementById('global-chat-fab') || document.querySelector('.chat-brain-toggle');
       if (chatBtn) {
         chatBtn.click();
         setTimeout(function() {
-          var chatInput = document.querySelector('.chat-brain-input');
+          var chatInput = document.getElementById('global-chat-input') || document.querySelector('.chat-brain-input');
           if (chatInput) chatInput.focus();
         }, 300);
       }
     } else if (hash === '#destinations') {
       var destSec = document.getElementById('destinations');
-      if (destSec) destSec.scrollIntoView({ behavior: 'smooth' });
+      if (destSec) {
+        destSec.scrollIntoView({ behavior: 'smooth' });
+        pulse(destSec);
+      }
     } else if (hash === '#search') {
       var searchSec = document.getElementById('smart-search');
-      if (searchSec) searchSec.scrollIntoView({ behavior: 'smooth' });
+      if (searchSec) {
+        searchSec.scrollIntoView({ behavior: 'smooth' });
+        pulse(searchSec);
+      }
     } else if (hash === '#reviews') {
       var revSec = document.getElementById('reviews');
-      if (revSec) revSec.scrollIntoView({ behavior: 'smooth' });
+      if (revSec) {
+        revSec.scrollIntoView({ behavior: 'smooth' });
+        pulse(revSec);
+      }
     } else if (hash === '#offers') {
       var offerSec = document.getElementById('offers');
-      if (offerSec) offerSec.scrollIntoView({ behavior: 'smooth' });
+      if (offerSec) {
+        offerSec.scrollIntoView({ behavior: 'smooth' });
+        pulse(offerSec);
+      }
     } else if (hash === '#planner') {
       var plannerSec = document.getElementById('planner');
       if (plannerSec) {
         plannerSec.hidden = false;
         plannerSec.scrollIntoView({ behavior: 'smooth' });
+        pulse(plannerSec);
       }
     }
   }

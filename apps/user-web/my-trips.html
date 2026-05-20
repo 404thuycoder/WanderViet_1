@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -291,8 +291,13 @@
       var lbl = { pending:'⏳ Chờ xác nhận', confirmed:'✅ Đã xác nhận', cancelled:'🚫 Đã hủy', completed:'🏁 Hoàn thành' };
       return '<span class="badge-status ' + (map[s]||'badge-pending') + '">' + (lbl[s]||s) + '</span>';
     }
-    function payBadge(s) {
-      return s === 'paid'
+    // Phương thức thanh toán online → coi là đã thanh toán ngay khi đặt
+    var ONLINE_METHODS = ['transfer', 'momo', 'zalopay', 'card', 'bank', 'vnpay', 'international_card'];
+    function isOnlinePaid(b) {
+      return b.paymentStatus === 'paid' || ONLINE_METHODS.includes(b.paymentMethod);
+    }
+    function payBadge(b) {
+      return isOnlinePaid(b)
         ? '<span class="badge-status badge-paid">💰 Đã thanh toán</span>'
         : '<span class="badge-status badge-unpaid">⚠️ Chưa thanh toán</span>';
     }
@@ -347,11 +352,9 @@
         if (b.status === 'pending' || b.status === 'confirmed') {
           actions += '<button class="btn-sm btn-danger" onclick="openCancelModal(\'' + b._id + '\')">Hủy đặt</button>';
         }
-        if (b.paymentStatus !== 'paid' && b.totalPrice > 0 && b.status !== 'cancelled') {
-          // Chỉ hiện nút thanh toán cho trường hợp "Liên hệ" (chưa chọn phương thức online lúc đặt)
-          if (b.paymentMethod === 'contact') {
-            actions += '<button class="btn-sm btn-success" onclick="payBooking(\'' + b.bookingId + '\')">Thanh toán</button>';
-          }
+        // Chỉ hiện nút thanh toán nếu chưa paid và là phương thức offline (liên hệ / tiền mặt / tại quầy)
+        if (!isOnlinePaid(b) && b.totalPrice > 0 && b.status !== 'cancelled') {
+          actions += '<button class="btn-sm btn-success" onclick="payBooking(\'' + b.bookingId + '\')">Thanh toán</button>';
         }
         
         const place = allPlaces.find(p => p.id === b.placeId || p._id === b.placeId) || {};
@@ -366,7 +369,7 @@
                 '<span style="font-size:0.7rem; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; color:#94a3b8; font-weight:700;">' + kindLabel + '</span>' +
                 '<h3 class="booking-card__title">' + (b.placeName || 'Dịch vụ') + '</h3>' +
                 statusBadge(b.status) +
-                payBadge(b.paymentStatus || 'unpaid') +
+                payBadge(b) +
               '</div>' +
               '<div class="booking-card__meta">' +
                 '<span>🎫 #' + b.bookingId + '</span>' +

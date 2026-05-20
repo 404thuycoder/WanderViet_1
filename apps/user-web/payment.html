@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
@@ -33,7 +33,7 @@
 
   <link rel="icon" type="image/png" href="/assets/wanderviet-logo-cropped-rounded.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cá»•ng thanh toÃ¡n â€” WanderViá»‡t</title>
+  <title>Cổng thanh toán  -  WanderViệt</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -99,7 +99,7 @@
       overflow: hidden; color: #fff;
       background: linear-gradient(135deg, #1a237e 0%, #283593 25%, #1565c0 60%, #0d47a1 100%);
     }
-    /* Decorative circles (ngÃ¢n hÃ ng style) */
+    /* Decorative circles (ngÃ¢n hàng style) */
     .card-deco-circle1 {
       position: absolute; width: 260%; aspect-ratio: 1;
       border-radius: 50%;
@@ -367,22 +367,22 @@
           <path  class="success-check-mark" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
         </svg>
       </div>
-      <div class="success-label">Giao dá»‹ch hoÃ n táº¥t</div>
-      <div class="success-title">Thanh toÃ¡n thÃ nh cÃ´ng! ðŸŽ‰</div>
+      <div class="success-label">Giao dịch hoàn tất</div>
+      <div class="success-title">Thanh toán thành công! 🎉</div>
       <div class="success-amount" id="success-amount-txt"></div>
-      <div class="success-sub">Äang chuyá»ƒn vá» trang chuyáº¿n Ä‘i cá»§a báº¡n...</div>
+      <div class="success-sub">Đang chuyển về trang chuyến đi của bạn...</div>
       <div class="success-redirect-bar"><div class="success-redirect-fill"></div></div>
     </div>
     
     <div id="main-view" style="display: none;">
-        <h1 style="font-size:1.6rem; font-weight:800; color:#fff; margin-bottom:0.5rem;">Cá»•ng thanh toÃ¡n quá»‘c táº¿</h1>
-        <p style="font-size:1rem; color:#94a3b8; margin-bottom:2rem;">Giao dá»‹ch Ä‘Æ°á»£c báº£o máº­t bá»Ÿi há»‡ thá»‘ng WanderViá»‡t</p>
+        <h1 style="font-size:1.6rem; font-weight:800; color:#fff; margin-bottom:0.5rem;">Cổng thanh toán quốc tế</h1>
+        <p style="font-size:1rem; color:#94a3b8; margin-bottom:2rem;">Giao dịch được bảo mật bởi hệ thống WanderViệt</p>
         
         <div class="bill-summary">
-            <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; color:#94a3b8;"><span>ÄÆ¡n hÃ ng:</span> <b id="bill-id-txt" style="color:#fff; font-family:'Space Grotesk'">...</b></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:1rem; color:#94a3b8;"><span>Dá»‹ch vá»¥:</span> <b id="bill-name-txt" style="color:#fff;">...</b></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; color:#94a3b8;"><span>Đơn hàng:</span> <b id="bill-id-txt" style="color:#fff; font-family:'Space Grotesk'">...</b></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:1rem; color:#94a3b8;"><span>Dịch vụ:</span> <b id="bill-name-txt" style="color:#fff;">...</b></div>
             <div style="border-top:1px solid rgba(255,255,255,0.1); padding-top:1.2rem; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:0.9rem; font-weight:600; color:#64748b;">Tá»”NG Cá»˜NG</span>
+                <span style="font-size:0.9rem; font-weight:600; color:#64748b;">TỔNG CỘNG</span>
                 <b id="bill-amount-txt" style="font-size:1.6rem; color:#fbbf24; font-weight:800;">...</b>
             </div>
         </div>
@@ -393,13 +393,13 @@
                     <div class="method-card-icon" style="padding:0; background:transparent;">
                         <img src="https://www.google.com/s2/favicons?domain=momo.vn&sz=128" onerror="this.src='https://logo.clearbit.com/momo.vn'" style="width:100%; height:100%; object-fit:cover; border-radius:14px;">
                     </div>
-                    <div style="flex:1; text-align:left;"><span style="font-weight:700; color:#fff; font-size:1.1rem;">VÃ­ MoMo</span><div style="font-size:0.8rem; color:#94a3b8;">Thanh toÃ¡n siÃªu tá»‘c</div></div>
+                    <div style="flex:1; text-align:left;"><span style="font-weight:700; color:#fff; font-size:1.1rem;">Ví MoMo</span><div style="font-size:0.8rem; color:#94a3b8;">Thanh toán siêu tốc</div></div>
                 </div>
                 <div class="method-card" data-method="zalopay" onclick="switchMethod('zalopay')">
                     <div class="method-card-icon" style="padding:0; background:transparent;">
                         <img src="https://www.google.com/s2/favicons?domain=zalopay.vn&sz=128" onerror="this.src='https://logo.clearbit.com/zalopay.vn'" style="width:100%; height:100%; object-fit:cover; border-radius:14px;">
                     </div>
-                    <div style="flex:1; text-align:left;"><span style="font-weight:700; color:#fff; font-size:1.1rem;">ZaloPay</span><div style="font-size:0.8rem; color:#94a3b8;">VÃ­ Ä‘iá»‡n tá»­ Zalo an toÃ n</div></div>
+                    <div style="flex:1; text-align:left;"><span style="font-weight:700; color:#fff; font-size:1.1rem;">ZaloPay</span><div style="font-size:0.8rem; color:#94a3b8;">Ví điện tử Zalo an toàn</div></div>
                 </div>
                 <div class="method-card" data-method="bank-selector" onclick="toggleBanks()">
                     <div class="method-card-icon" id="main-bank-icon" style="padding:0; background:#1e293b;">
@@ -407,7 +407,7 @@
                           <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" />
                         </svg>
                     </div>
-                    <div style="flex:1; text-align:left;"><span style="font-weight:700; color:#fff; font-size:1.1rem;" id="current-bank-label">NgÃ¢n hÃ ng ná»™i Ä‘á»‹a</span><div style="font-size:0.8rem; color:#94a3b8;">Chuyá»ƒn khoáº£n VietQR 24/7</div></div>
+                    <div style="flex:1; text-align:left;"><span style="font-weight:700; color:#fff; font-size:1.1rem;" id="current-bank-label">Ngân hàng nội địa</span><div style="font-size:0.8rem; color:#94a3b8;">Chuyển khoản VietQR 24/7</div></div>
                 </div>
                 <div class="bank-hub-v3" id="banks-grid" style="display: none;">
                     <div class="bank-grid-v3">
@@ -443,7 +443,7 @@
                           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
                         </svg>
                     </div>
-                    <div style="flex:1; text-align:left;"><span style="font-weight:700; color:#fff; font-size:1.1rem;">Tháº» Quá»‘c táº¿</span><div style="font-size:0.8rem; color:#94a3b8;">Visa, Mastercard, JCB</div></div>
+                    <div style="flex:1; text-align:left;"><span style="font-weight:700; color:#fff; font-size:1.1rem;">Thẻ Quốc tế</span><div style="font-size:0.8rem; color:#94a3b8;">Visa, Mastercard, JCB</div></div>
                 </div>
             </div>
         </div>
@@ -458,7 +458,7 @@
                         </div>
                     </div>
                 </div>
-                <p style="margin-top: 1.5rem; font-size: 0.95rem; color: #94a3b8; font-weight: 500;">DÃ¹ng á»©ng dá»¥ng Ä‘á»ƒ quÃ©t mÃ£ thanh toÃ¡n VietQR</p>
+                <p style="margin-top: 1.5rem; font-size: 0.95rem; color: #94a3b8; font-weight: 500;">Dùng ứng dụng để quét mã thanh toán VietQR</p>
             </div>
         </div>
 
@@ -478,7 +478,7 @@
                             <div class="cn-dot"></div>
                             <div class="cn-dot"></div>
                         </div>
-                        <div class="card-bank-name">ACB<span>â—</span></div>
+                        <div class="card-bank-name">ACB<span>●</span></div>
                     </div>
 
                     <!-- CHIP ROW -->
@@ -516,7 +516,7 @@
                         </div>
                         <div class="card-expiry-block">
                             <div class="card-label-tiny">Expires</div>
-                            <div class="card-expiry-val">â€¢â€¢/â€¢â€¢</div>
+                            <div class="card-expiry-val">••/••</div>
                         </div>
                         <!-- VISA wordmark inline SVG -->
                         <div>
@@ -532,12 +532,12 @@
                 </div><!-- /.card-inner -->
             </div>
             <p style="margin-top:1.2rem; font-size:0.9rem; color:#64748b; font-weight:500; text-align:center;">
-                ðŸ”’ ThÃ´ng tin tháº» Ä‘Æ°á»£c mÃ£ hÃ³a &amp; báº£o máº­t an toÃ n
+                🔒 Thông tin thẻ được mã hóa &amp; bảo mật an toàn
             </p>
         </div>
         
-        <button class="btn-submit btn-pay-submit" id="submit-btn">XÃC NHáº¬N THANH TOÃN</button>
-        <button class="btn-submit" style="background:transparent; color:#64748b;" onclick="window.history.back()">Há»§y bá» giao dá»‹ch</button>
+        <button class="btn-submit btn-pay-submit" id="submit-btn">XÁC NHẬN THANH TOÁN</button>
+        <button class="btn-submit" style="background:transparent; color:#64748b;" onclick="window.history.back()">Hủy bỏ giao dịch</button>
     </div>
   </div>
 
@@ -603,7 +603,7 @@
             mainBankIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:26px; height:26px; color:#fff;">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0012 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75z" />
                                       </svg>`;
-            document.getElementById('current-bank-label').textContent = 'NgÃ¢n hÃ ng ná»™i Ä‘á»‹a';
+            document.getElementById('current-bank-label').textContent = 'Ngân hàng nội địa';
         }
         
         const qrFrame = document.getElementById('qr-branding-box');
@@ -662,7 +662,7 @@
 
           btnSubmit.onclick = () => {
             btnSubmit.disabled = true;
-            btnSubmit.innerHTML = '<span style="display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.8s infinite linear; vertical-align:middle; margin-right:12px;"></span> Äang xá»­ lÃ½...';
+            btnSubmit.innerHTML = '<span style="display:inline-block; width:20px; height:20px; border:3px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.8s infinite linear; vertical-align:middle; margin-right:12px;"></span> Đang xử lý...';
             
             fetch('/api/payments/pay-booking', {
               method: 'POST',
@@ -689,13 +689,13 @@
                     wrap.appendChild(d);
                   }
                 }
-                WanderUI.showToast('Thanh toÃ¡n thÃ nh cÃ´ng! ðŸŽ‰', 'success');
+                WanderUI.showToast('Thanh toán thành công! 🎉', 'success');
                 setTimeout(() => window.location.href = 'my-trips.html', 3800);
               } else throw new Error(resJson.message);
             })
             .catch(err => {
               btnSubmit.disabled = false;
-              btnSubmit.textContent = 'Thá»­ láº¡i giao dá»‹ch';
+              btnSubmit.textContent = 'Thử lại giao dịch';
               WanderUI.showToast(err.message, 'error');
             });
           };

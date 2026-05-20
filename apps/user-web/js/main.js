@@ -415,7 +415,6 @@
   if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
   /* ——— Modals ——— */
-  var backdrop = document.querySelector("[data-modal-backdrop]");
   window.openModal = function(name) {
     var m = document.querySelector('[data-modal="' + name + '"]');
     if (!m) return;
@@ -434,7 +433,8 @@
     } else {
       document.documentElement.style.overflow = "hidden";
     }
-    if (backdrop && useBackdrop) backdrop.hidden = false;
+    var activeBackdrop = document.querySelector("[data-modal-backdrop]");
+    if (activeBackdrop && useBackdrop) activeBackdrop.hidden = false;
     var closeBtn = m.querySelector("[data-modal-close]");
     if (closeBtn) closeBtn.focus();
   }
@@ -449,7 +449,8 @@
         m.hidden = true;
       }
     });
-    if (backdrop) backdrop.hidden = true;
+    var activeBackdrop = document.querySelector("[data-modal-backdrop]");
+    if (activeBackdrop) activeBackdrop.hidden = true;
     document.documentElement.style.overflow = "";
   }
 
@@ -526,7 +527,8 @@
       closeModals();
     });
   });
-  if (backdrop) backdrop.addEventListener("click", closeModals);
+  var activeBackdrop = document.querySelector("[data-modal-backdrop]");
+  if (activeBackdrop) activeBackdrop.addEventListener("click", closeModals);
   // Dùng event delegation để hỗ trợ các phần tử được thêm động (như trong Leaderboard)
   document.addEventListener("click", function(e) {
     var authBtn = e.target.closest("[data-auth-open]");
@@ -544,12 +546,15 @@
     }
   });
 
-  /* Auth tabs */
-  var authTabs = document.querySelectorAll("[data-auth-tab]");
-  var authPanels = document.querySelectorAll("[data-auth-panel]");
-  authTabs.forEach(function (tab) {
-    tab.addEventListener("click", function () {
+  /* Event-Delegated Auth tabs and clicks */
+  document.addEventListener("click", function (e) {
+    // Auth Tab Click
+    var tab = e.target.closest("[data-auth-tab]");
+    if (tab) {
+      e.preventDefault();
       var id = tab.getAttribute("data-auth-tab");
+      var authTabs = document.querySelectorAll("[data-auth-tab]");
+      var authPanels = document.querySelectorAll("[data-auth-panel]");
       authTabs.forEach(function (t) {
         var on = t === tab;
         t.classList.toggle("is-active", on);
@@ -558,64 +563,90 @@
       authPanels.forEach(function (p) {
         p.hidden = p.getAttribute("data-auth-panel") !== id;
       });
-    });
+      return;
+    }
+
+    // Forgot password triggers & Back buttons
+    if (e.target.closest("[data-auth-forgot-trigger]")) {
+      switchAuthPanel("forgot", true);
+      return;
+    }
+    if (e.target.closest("[data-auth-forgot-back]")) {
+      switchAuthPanel("login", false);
+      return;
+    }
+    if (e.target.closest("[data-auth-forgot-otp-back]")) {
+      switchAuthPanel("forgot", true);
+      return;
+    }
+    if (e.target.closest("[data-auth-register-otp-back]")) {
+      switchAuthPanel("register", false);
+      return;
+    }
+
+    // Resend OTP actions
+    var regOtpResend = e.target.closest("[data-auth-register-otp-resend]");
+    if (regOtpResend) {
+      e.preventDefault();
+      if (!registerEmail) return;
+      var msg = document.querySelector("[data-auth-msg-register-otp]");
+      showAuthMsg(msg, "Đang gửi lại mã OTP...", true);
+      fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: registerEmail, purpose: 'register', portal: 'user' })
+      })
+      .then(function (res) { return res.json(); })
+      .then(function (json) {
+        if (json.success) {
+          var hint = json.otp ? " (Mã OTP test: " + json.otp + ")" : "";
+          showAuthMsg(msg, "Đã gửi lại mã OTP thành công!" + hint, true);
+        } else {
+          showAuthMsg(msg, json.message || "Không thể gửi lại mã OTP.", false);
+        }
+      })
+      .catch(function () {
+        showAuthMsg(msg, "Lỗi kết nối máy chủ.", false);
+      });
+      return;
+    }
+
+    var forgotOtpResend = e.target.closest("[data-auth-forgot-otp-resend]");
+    if (forgotOtpResend) {
+      e.preventDefault();
+      if (!forgotEmail) return;
+      var msg = document.querySelector("[data-auth-msg-forgot-otp]");
+      showAuthMsg(msg, "Đang gửi lại mã OTP...", true);
+      fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotEmail, purpose: 'forgot_password', portal: 'user' })
+      })
+      .then(function (res) { return res.json(); })
+      .then(function (json) {
+        if (json.success) {
+          var hint = json.otp ? " (Mã OTP test: " + json.otp + ")" : "";
+          showAuthMsg(msg, "Đã gửi lại mã OTP thành công!" + hint, true);
+        } else {
+          showAuthMsg(msg, json.message || "Không thể gửi lại mã OTP.", false);
+        }
+      })
+      .catch(function () {
+        showAuthMsg(msg, "Lỗi kết nối máy chủ.", false);
+      });
+      return;
+    }
   });
+
   function showAuthMsg(el, text, ok) {
     if (!el) return;
     el.textContent = text || "";
     el.classList.toggle("is-error", !ok && !!text);
     el.classList.toggle("is-ok", !!ok && !!text);
   }
+  
   var isSubmitting = false;
-  var loginForm = document.querySelector('[data-auth-panel="login"]');
-  if (loginForm) {
-    loginForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (isSubmitting) return;
-      
-      var btn = loginForm.querySelector('button[type="submit"]');
-      isSubmitting = true;
-      WanderUI.setButtonLoading(btn, true);
-      var fd = new FormData(loginForm);
-      var email = String(fd.get("email") || "").trim().toLowerCase();
-      var password = String(fd.get("password") || "");
-      var msg = loginForm.querySelector("[data-auth-msg-login]");
-      fetch('/api/auth/user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-          requiredRole: 'user'
-        })
-      }).then(function (res) {
-        return res.json();
-      }).then(function (json) {
-        if (!json.success) {
-          showAuthMsg(msg, json.message || "Đăng nhập thất bại.", false);
-        } else {
-          setSession(email);
-          localStorage.setItem("wander_token", json.token);
-          saveProfileForUser(email, json.user);
-          WanderUI.showToast("Đăng nhập thành công!", "success");
-          window.setTimeout(function () {
-            closeModals();
-            loginForm.reset();
-            showAuthMsg(msg, "", true);
-            refreshAuthUI();
-            handleLoginRedirection(json.user);
-          }, 400);
-        }
-      }).catch(function (err) {
-        showAuthMsg(msg, "Lỗi kết nối máy chủ.", false);
-      }).finally(function () {
-        isSubmitting = false;
-        WanderUI.setButtonLoading(btn, false);
-      });
-    });
-  }
+  
   // Temporary authentication states for multi-step OTP flows
   var registerName = "";
   var registerEmail = "";
@@ -639,100 +670,62 @@
     });
   }
 
-  // Bind Forgot password triggers & Back buttons
-  var forgotTrigger = document.querySelector("[data-auth-forgot-trigger]");
-  if (forgotTrigger) {
-    forgotTrigger.addEventListener("click", function () {
-      switchAuthPanel("forgot", true);
-    });
-  }
+  /* Event-Delegated Auth Form Submissions */
+  document.addEventListener("submit", function (e) {
+    var form = e.target;
+    var panelType = form.getAttribute("data-auth-panel");
+    if (!panelType) return;
 
-  var forgotBack = document.querySelector("[data-auth-forgot-back]");
-  if (forgotBack) {
-    forgotBack.addEventListener("click", function () {
-      switchAuthPanel("login", false);
-    });
-  }
+    e.preventDefault();
+    if (isSubmitting) return;
 
-  var forgotOtpBack = document.querySelector("[data-auth-forgot-otp-back]");
-  if (forgotOtpBack) {
-    forgotOtpBack.addEventListener("click", function () {
-      switchAuthPanel("forgot", true);
-    });
-  }
+    var btn = form.querySelector('button[type="submit"]');
 
-  var regOtpBack = document.querySelector("[data-auth-register-otp-back]");
-  if (regOtpBack) {
-    regOtpBack.addEventListener("click", function () {
-      switchAuthPanel("register", false);
-    });
-  }
-
-  // Resend OTP actions
-  var regOtpResend = document.querySelector("[data-auth-register-otp-resend]");
-  if (regOtpResend) {
-    regOtpResend.addEventListener("click", function (e) {
-      e.preventDefault();
-      if (!registerEmail) return;
-      var msg = document.querySelector("[data-auth-msg-register-otp]");
-      showAuthMsg(msg, "Đang gửi lại mã OTP...", true);
-      fetch('/api/auth/send-otp', {
+    if (panelType === "login") {
+      var msg = form.querySelector("[data-auth-msg-login]");
+      isSubmitting = true;
+      WanderUI.setButtonLoading(btn, true);
+      var fd = new FormData(form);
+      var email = String(fd.get("email") || "").trim().toLowerCase();
+      var password = String(fd.get("password") || "");
+      fetch('/api/auth/user/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: registerEmail, purpose: 'register', portal: 'user' })
-      })
-      .then(function (res) { return res.json(); })
-      .then(function (json) {
-        if (json.success) {
-          var hint = json.otp ? " (Mã OTP test: " + json.otp + ")" : "";
-          showAuthMsg(msg, "Đã gửi lại mã OTP thành công!" + hint, true);
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          requiredRole: 'user'
+        })
+      }).then(function (res) {
+        return res.json();
+      }).then(function (json) {
+        if (!json.success) {
+          showAuthMsg(msg, json.message || "Đăng nhập thất bại.", false);
         } else {
-          showAuthMsg(msg, json.message || "Không thể gửi lại mã OTP.", false);
+          setSession(email);
+          localStorage.setItem("wander_token", json.token);
+          saveProfileForUser(email, json.user);
+          WanderUI.showToast("Đăng nhập thành công!", "success");
+          window.setTimeout(function () {
+            closeModals();
+            form.reset();
+            showAuthMsg(msg, "", true);
+            refreshAuthUI();
+            handleLoginRedirection(json.user);
+          }, 400);
         }
-      })
-      .catch(function () {
+      }).catch(function (err) {
         showAuthMsg(msg, "Lỗi kết nối máy chủ.", false);
+      }).finally(function () {
+        isSubmitting = false;
+        WanderUI.setButtonLoading(btn, false);
       });
-    });
-  }
-
-  var forgotOtpResend = document.querySelector("[data-auth-forgot-otp-resend]");
-  if (forgotOtpResend) {
-    forgotOtpResend.addEventListener("click", function (e) {
-      e.preventDefault();
-      if (!forgotEmail) return;
-      var msg = document.querySelector("[data-auth-msg-forgot-otp]");
-      showAuthMsg(msg, "Đang gửi lại mã OTP...", true);
-      fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: forgotEmail, purpose: 'forgot_password', portal: 'user' })
-      })
-      .then(function (res) { return res.json(); })
-      .then(function (json) {
-        if (json.success) {
-          var hint = json.otp ? " (Mã OTP test: " + json.otp + ")" : "";
-          showAuthMsg(msg, "Đã gửi lại mã OTP thành công!" + hint, true);
-        } else {
-          showAuthMsg(msg, json.message || "Không thể gửi lại mã OTP.", false);
-        }
-      })
-      .catch(function () {
-        showAuthMsg(msg, "Lỗi kết nối máy chủ.", false);
-      });
-    });
-  }
-
-  // Registration step 1: Requesting OTP
-  var regForm = document.querySelector('[data-auth-panel="register"]');
-  if (regForm) {
-    regForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (isSubmitting) return;
-
-      var btn = regForm.querySelector('button[type="submit"]');
-      var msg = regForm.querySelector("[data-auth-msg-register]");
-      var fd = new FormData(regForm);
+      
+    } else if (panelType === "register") {
+      var msg = form.querySelector("[data-auth-msg-register]");
+      var fd = new FormData(form);
       var name = String(fd.get("name") || "").trim();
       var email = String(fd.get("email") || "").trim().toLowerCase();
       var password = String(fd.get("password") || "");
@@ -745,7 +738,6 @@
       isSubmitting = true;
       WanderUI.setButtonLoading(btn, true);
       
-      // Step 1: Send OTP to verify email first
       fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -756,12 +748,10 @@
         if (!json.success) {
           showAuthMsg(msg, json.message || "Không thể gửi mã OTP xác thực.", false);
         } else {
-          // Save parameters in memory
           registerName = name;
           registerEmail = email;
           registerPassword = password;
           
-          // Switch to OTP panel
           switchAuthPanel("register-otp", true);
           var msgOtp = document.querySelector("[data-auth-msg-register-otp]");
           var hint = json.otp ? " Mã test: " + json.otp : "";
@@ -775,19 +765,10 @@
         isSubmitting = false;
         WanderUI.setButtonLoading(btn, false);
       });
-    });
-  }
 
-  // Registration step 2: Verifying OTP and completing registration
-  var registerOtpForm = document.querySelector('[data-auth-panel="register-otp"]');
-  if (registerOtpForm) {
-    registerOtpForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (isSubmitting) return;
-
-      var btn = registerOtpForm.querySelector('button[type="submit"]');
-      var msg = registerOtpForm.querySelector("[data-auth-msg-register-otp]");
-      var fd = new FormData(registerOtpForm);
+    } else if (panelType === "register-otp") {
+      var msg = form.querySelector("[data-auth-msg-register-otp]");
+      var fd = new FormData(form);
       var otp = String(fd.get("otp") || "").trim();
 
       if (otp.length !== 6) {
@@ -820,8 +801,9 @@
           WanderUI.showToast("Tạo tài khoản thành công!", "success");
           window.setTimeout(function () {
             closeModals();
-            regForm.reset();
-            registerOtpForm.reset();
+            var regFormEl = document.querySelector('[data-auth-panel="register"]');
+            if (regFormEl) regFormEl.reset();
+            form.reset();
             switchAuthPanel("login", false);
             refreshAuthUI();
           }, 500);
@@ -834,19 +816,10 @@
         isSubmitting = false;
         WanderUI.setButtonLoading(btn, false);
       });
-    });
-  }
 
-  // Forgot password step 1: Requesting OTP
-  var forgotForm = document.querySelector('[data-auth-panel="forgot"]');
-  if (forgotForm) {
-    forgotForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (isSubmitting) return;
-
-      var btn = forgotForm.querySelector('button[type="submit"]');
-      var msg = forgotForm.querySelector("[data-auth-msg-forgot]");
-      var fd = new FormData(forgotForm);
+    } else if (panelType === "forgot") {
+      var msg = form.querySelector("[data-auth-msg-forgot]");
+      var fd = new FormData(form);
       var email = String(fd.get("email") || "").trim().toLowerCase();
 
       if (!email) {
@@ -881,19 +854,10 @@
         isSubmitting = false;
         WanderUI.setButtonLoading(btn, false);
       });
-    });
-  }
 
-  // Forgot password step 2: Verifying OTP and resetting password
-  var forgotOtpForm = document.querySelector('[data-auth-panel="forgot-otp"]');
-  if (forgotOtpForm) {
-    forgotOtpForm.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (isSubmitting) return;
-
-      var btn = forgotOtpForm.querySelector('button[type="submit"]');
-      var msg = forgotOtpForm.querySelector("[data-auth-msg-forgot-otp]");
-      var fd = new FormData(forgotOtpForm);
+    } else if (panelType === "forgot-otp") {
+      var msg = form.querySelector("[data-auth-msg-forgot-otp]");
+      var fd = new FormData(form);
       var otp = String(fd.get("otp") || "").trim();
       var password = String(fd.get("password") || "");
 
@@ -922,8 +886,9 @@
         } else {
           WanderUI.showToast("Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.", "success");
           window.setTimeout(function () {
-            forgotForm.reset();
-            forgotOtpForm.reset();
+            var forgotFormEl = document.querySelector('[data-auth-panel="forgot"]');
+            if (forgotFormEl) forgotFormEl.reset();
+            form.reset();
             switchAuthPanel("login", false);
           }, 500);
         }
@@ -935,8 +900,8 @@
         isSubmitting = false;
         WanderUI.setButtonLoading(btn, false);
       });
-    });
-  }
+    }
+  });
 
 
   // Helper: Cập nhật preview trong modal hồ sơ

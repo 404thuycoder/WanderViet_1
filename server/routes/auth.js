@@ -1062,35 +1062,38 @@ router.post('/send-otp', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Mục đích (purpose) xác thực không hợp lệ.' });
     }
 
-    // Cooldown check (60 seconds)
-    const sixtySecsAgo = new Date(Date.now() - 60 * 1000);
-    const recentOtp = await OtpVerification.findOne({
-      email: normalizedEmail,
-      purpose,
-      portal,
-      createdAt: { $gte: sixtySecsAgo }
-    });
-    if (recentOtp) {
-      const waitSecs = Math.max(0, Math.ceil((60 * 1000 - (Date.now() - recentOtp.createdAt.getTime())) / 1000));
-      return res.status(429).json({
-        success: false,
-        message: `Vui lòng đợi ${waitSecs} giây trước khi yêu cầu mã OTP tiếp theo.`
+    // Cooldown & Rate limit checks (Skip in development for friction-free testing)
+    if (process.env.NODE_ENV === 'production') {
+      // Cooldown check (60 seconds)
+      const sixtySecsAgo = new Date(Date.now() - 60 * 1000);
+      const recentOtp = await OtpVerification.findOne({
+        email: normalizedEmail,
+        purpose,
+        portal,
+        createdAt: { $gte: sixtySecsAgo }
       });
-    }
+      if (recentOtp) {
+        const waitSecs = Math.max(0, Math.ceil((60 * 1000 - (Date.now() - recentOtp.createdAt.getTime())) / 1000));
+        return res.status(429).json({
+          success: false,
+          message: `Vui lòng đợi ${waitSecs} giây trước khi yêu cầu mã OTP tiếp theo.`
+        });
+      }
 
-    // Hourly Rate limit check (5 requests/hour)
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    const hourOtpCount = await OtpVerification.countDocuments({
-      email: normalizedEmail,
-      purpose,
-      portal,
-      createdAt: { $gte: oneHourAgo }
-    });
-    if (hourOtpCount >= 5) {
-      return res.status(429).json({
-        success: false,
-        message: 'Bạn đã vượt quá giới hạn yêu cầu OTP (tối đa 5 lần/giờ). Vui lòng thử lại sau.'
+      // Hourly Rate limit check (5 requests/hour)
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      const hourOtpCount = await OtpVerification.countDocuments({
+        email: normalizedEmail,
+        purpose,
+        portal,
+        createdAt: { $gte: oneHourAgo }
       });
+      if (hourOtpCount >= 5) {
+        return res.status(429).json({
+          success: false,
+          message: 'Bạn đã vượt quá giới hạn yêu cầu OTP (tối đa 5 lần/giờ). Vui lòng thử lại sau.'
+        });
+      }
     }
 
     // Generate 6-digit OTP
@@ -1109,10 +1112,14 @@ router.post('/send-otp', async (req, res) => {
     // Send email
     try {
       await sendOtpEmail(normalizedEmail, otp, purpose);
-      return res.json({ 
+      const resp = { 
         success: true, 
         message: 'Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.' 
-      });
+      };
+      if (process.env.NODE_ENV !== 'production') {
+        resp.otp = otp;
+      }
+      return res.json(resp);
     } catch (mailErr) {
       console.warn('[Nodemailer Fail] Could not send real email:', mailErr.message);
       // Fallback for easy dev testing: return OTP in response

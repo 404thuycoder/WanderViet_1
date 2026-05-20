@@ -12,6 +12,10 @@
   const fmtDT = d => d ? new Date(d).toLocaleString('vi-VN', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit', second:'2-digit'}) : '—';
   const LOGO = '/assets/wanderviet-logo-cropped-rounded.png';
 
+  // Phương thức thanh toán online → coi là đã thanh toán ngay khi đặt
+  const ONLINE_METHODS = ['transfer', 'momo', 'zalopay', 'card', 'bank', 'vnpay', 'international_card'];
+  const isOnlinePaid = b => b.paymentStatus === 'paid' || ONLINE_METHODS.includes(b.paymentMethod);
+
   const STATUS = {
     pending:   ['Chờ duyệt', 'warn'],
     confirmed: ['Đã duyệt',  'info'],
@@ -187,7 +191,7 @@
 
   function cardB(b) { 
     const pl=placeMap[b.placeId]||{}; const [l,c]=STATUS[b.status]||[b.status,'info'];
-    const isUnpaid = b.paymentStatus === 'unpaid' && b.status !== 'cancelled';
+    const isUnpaid = !isOnlinePaid(b) && b.status !== 'cancelled';
     const isDone = b.status === 'completed';
     return `
       <div class="v-card">
@@ -195,7 +199,7 @@
         <div class="v-body">
           <p class="v-cat">${pl.category||'Dịch vụ'}</p>
           <h4 class="v-title">${b.placeName}</h4>
-          <div class="v-meta"><span>📅 ${fmtD(b.useDate)}</span><span style="color:${isUnpaid?'#ef4444':'#10b981'}">${b.paymentStatus==='paid'?'Đã thanh toán':'Chưa thanh toán'}</span></div>
+          <div class="v-meta"><span>📅 ${fmtD(b.useDate)}</span><span style="color:${isUnpaid?'#ef4444':'#10b981'}">${isOnlinePaid(b)?'\u0110\u00e3 thanh to\u00e1n':'Ch\u01b0a thanh to\u00e1n'}</span></div>
         </div>
         <div class="v-footer">
           ${isUnpaid ? `<button class="btn-action" style="background:#ef4444; color:#fff; border:none; padding:8px 15px; border-radius:8px; font-weight:800; cursor:pointer; flex:1;" onclick="doAction('pay','${b._id}')">THANH TOÁN NGAY</button>` : `<button class="btn-action" style="background:#f1f5f9; color:#1e293b; border:none; padding:8px 15px; border-radius:8px; font-weight:700; cursor:pointer; flex:1;" onclick="doAction('view_place','${b.placeId}')">Xem dịch vụ</button>`}
@@ -227,7 +231,7 @@
   function cardR(b) {
     const pl = placeMap[b.placeId] || {};
     const [l, c] = STATUS[b.status] || [b.status, 'info'];
-    const isUnpaid = b.paymentStatus === 'unpaid' && b.status !== 'cancelled';
+    const isUnpaid = !isOnlinePaid(b) && b.status !== 'cancelled';
     const isDone = b.status === 'completed';
     return `
       <div class="v-card">
@@ -238,7 +242,7 @@
           <div class="v-meta">
             <span>📅 ${fmtD(b.useDate)}</span>
             <span>👥 ${b.peopleCount || 1} người</span>
-            <span style="color:${isUnpaid ? '#ef4444' : '#10b981'}">${b.paymentStatus === 'paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
+            <span style="color:${isUnpaid ? '#ef4444' : '#10b981'}">${isOnlinePaid(b) ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
           </div>
           ${b.totalPrice > 0 ? `<div style="margin-top:10px; font-size:1.1rem; font-weight:800; color:#0f172a">${fmtVND(b.totalPrice)}</div>` : ''}
         </div>

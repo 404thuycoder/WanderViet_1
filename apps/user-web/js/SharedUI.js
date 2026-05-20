@@ -1145,10 +1145,88 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         </div>
       </div>
       </div>
-      <div class="modal" id="modal-auth" data-modal="auth" hidden>
+      <div class="modal" id="modal-auth" data-modal="auth" role="dialog" aria-modal="true" aria-labelledby="auth-title" hidden>
         <div class="modal__inner">
-          <div class="modal__header"><h3>Tài khoản</h3><button class="modal__close" data-modal-close>×</button></div>
-          <div class="modal__body"><p>Đăng nhập để tiếp tục hành trình của bạn.</p></div>
+          <div class="modal__header">
+            <h2 id="auth-title" class="modal__title">Tài khoản WanderViệt</h2>
+            <button type="button" class="modal__close" data-modal-close aria-label="Đóng">×</button>
+          </div>
+          <div class="modal__body">
+            <p class="modal__lede">Hệ thống bảo mật WanderViệt. Đăng nhập để đồng bộ lịch trình và ưu đãi của bạn.</p>
+            <div class="auth-tabs" role="tablist" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem">
+              <button type="button" class="auth-tab is-active" role="tab" data-auth-tab="login" aria-selected="true" style="padding:0.4rem; font-size:0.9rem">Đăng nhập</button>
+              <button type="button" class="auth-tab" role="tab" data-auth-tab="register" aria-selected="false" style="padding:0.4rem; font-size:0.9rem">Đăng ký mới</button>
+            </div>
+
+            <!-- LOGIN PANEL -->
+            <form class="auth-panel" data-auth-panel="login">
+              <label class="field"><span class="field-label">Email</span><input type="email" name="email" required autocomplete="email" /></label>
+              <label class="field"><span class="field-label">Mật khẩu</span><input type="password" name="password" required autocomplete="current-password" /></label>
+              <button type="submit" class="btn btn--primary btn--block">Đăng nhập</button>
+              <div style="text-align: right; margin-top: 10px;">
+                <button type="button" class="btn btn--text" data-auth-forgot-trigger style="font-size: 0.85rem; color: var(--accent); cursor: pointer; background: none; border: none; padding: 0;">Quên mật khẩu?</button>
+              </div>
+              <p class="auth-msg" data-auth-msg-login role="status"></p>
+            </form>
+
+            <!-- REGISTER PANEL -->
+            <form class="auth-panel" data-auth-panel="register" hidden>
+              <label class="field"><span class="field-label">Họ tên</span><input type="text" name="name" required autocomplete="name" /></label>
+              <label class="field"><span class="field-label">Email</span><input type="email" name="email" required autocomplete="email" /></label>
+              <label class="field"><span class="field-label">Mật khẩu</span><input type="password" name="password" required autocomplete="new-password" minlength="4" /></label>
+              <input type="hidden" name="isBusiness" value="false" />
+              <button type="submit" class="btn btn--primary btn--block">Gửi yêu cầu &amp; Nhận OTP</button>
+              <p class="auth-msg" data-auth-msg-register role="status"></p>
+            </form>
+
+            <!-- REGISTER OTP PANEL -->
+            <form class="auth-panel" data-auth-panel="register-otp" hidden>
+              <p style="font-size: 0.88rem; color: #94a3b8; margin: 0 0 1.25rem 0; line-height: 1.5; text-align: center;">
+                Mã OTP xác thực đã được gửi tới email của bạn. Vui lòng nhập để hoàn tất tạo tài khoản.
+              </p>
+              <label class="field">
+                <span class="field-label">Mã OTP (6 chữ số)</span>
+                <input type="text" name="otp" required maxlength="6" placeholder="______" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.3em; font-weight: bold;" />
+              </label>
+              <button type="submit" class="btn btn--primary btn--block">Hoàn tất đăng ký</button>
+              <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                <button type="button" class="btn btn--text" data-auth-register-otp-back style="font-size: 0.85rem; color: #64748b; background: none; border: none; padding: 0; cursor: pointer;">← Quay lại</button>
+                <button type="button" class="btn btn--text" data-auth-register-otp-resend style="font-size: 0.85rem; color: var(--accent); font-weight: 600; background: none; border: none; padding: 0; cursor: pointer;">Gửi lại OTP</button>
+              </div>
+              <p class="auth-msg" data-auth-msg-register-otp role="status"></p>
+            </form>
+
+            <!-- FORGOT PASSWORD PANEL -->
+            <form class="auth-panel" data-auth-panel="forgot" hidden>
+              <p style="font-size: 0.88rem; color: #94a3b8; margin: 0 0 1.25rem 0; line-height: 1.5; text-align: center;">
+                Nhập email đăng ký của bạn. Chúng tôi sẽ gửi mã OTP xác thực để đặt lại mật khẩu.
+              </p>
+              <label class="field"><span class="field-label">Email đăng ký</span><input type="email" name="email" required autocomplete="email" /></label>
+              <button type="submit" class="btn btn--primary btn--block">Gửi mã OTP</button>
+              <div style="text-align: center; margin-top: 15px;">
+                <button type="button" class="btn btn--text" data-auth-forgot-back style="font-size: 0.85rem; color: #64748b; background: none; border: none; padding: 0; cursor: pointer;">← Quay lại đăng nhập</button>
+              </div>
+              <p class="auth-msg" data-auth-msg-forgot role="status"></p>
+            </form>
+
+            <!-- RESET PASSWORD OTP PANEL -->
+            <form class="auth-panel" data-auth-panel="forgot-otp" hidden>
+              <p style="font-size: 0.88rem; color: #94a3b8; margin: 0 0 1.25rem 0; line-height: 1.5; text-align: center;">
+                Nhập mã OTP 6 chữ số vừa nhận và thiết lập mật khẩu mới.
+              </p>
+              <label class="field">
+                <span class="field-label">Mã OTP (6 chữ số)</span>
+                <input type="text" name="otp" required maxlength="6" placeholder="______" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.3em; font-weight: bold;" />
+              </label>
+              <label class="field"><span class="field-label">Mật khẩu mới</span><input type="password" name="password" required minlength="4" /></label>
+              <button type="submit" class="btn btn--primary btn--block">Xác nhận &amp; Cập nhật mật khẩu</button>
+              <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                <button type="button" class="btn btn--text" data-auth-forgot-otp-back style="font-size: 0.85rem; color: #64748b; background: none; border: none; padding: 0; cursor: pointer;">← Quay lại</button>
+                <button type="button" class="btn btn--text" data-auth-forgot-otp-resend style="font-size: 0.85rem; color: var(--accent); font-weight: 600; background: none; border: none; padding: 0; cursor: pointer;">Gửi lại OTP</button>
+              </div>
+              <p class="auth-msg" data-auth-msg-forgot-otp role="status"></p>
+            </form>
+          </div>
         </div>
       </div>
       <!-- Global Chatbot FAB -->
@@ -1330,12 +1408,44 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             <div class="settings-main">
               <!-- Security Panel -->
               <div class="settings-panel is-active" data-settings-panel="security">
-                <h3>Tài khoản & Bảo mật</h3>
-                <form data-password-form-v2>
-                  <label class="field"><span class="field-label">Mật khẩu cũ</span><input type="password" name="oldPassword" required /></label>
-                  <label class="field"><span class="field-label">Mật khẩu mới</span><input type="password" name="newPassword" required minlength="6" /></label>
-                  <button type="submit" class="btn btn--primary">Đổi mật khẩu</button>
-                  <p data-password-status-v2 role="status" style="margin-top:0.5rem; font-size:0.9rem"></p>
+                <h3>Tài khoản &amp; Bảo mật</h3>
+
+                <!-- Step 1: Request OTP -->
+                <div data-pwd-step="1">
+                  <p style="font-size:0.88rem; color:#94a3b8; margin:0 0 1.25rem; line-height:1.6;">
+                    Để bảo vệ tài khoản, chúng tôi sẽ gửi mã xác thực OTP đến email đăng ký của bạn trước khi đổi mật khẩu.
+                  </p>
+                  <button type="button" class="btn btn--primary" data-pwd-request-otp>📧 Gửi mã OTP để đổi mật khẩu</button>
+                  <p data-pwd-msg-step1 role="status" style="margin-top:0.75rem; font-size:0.9rem;"></p>
+                </div>
+
+                <!-- Step 2: Enter OTP + New Password (hidden by default) -->
+                <form data-pwd-otp-form hidden>
+                  <p style="font-size:0.88rem; color:#94a3b8; margin:0 0 1.25rem; line-height:1.5; text-align:center;">
+                    Mã OTP đã gửi đến email của bạn. Vui lòng nhập mã và mật khẩu mới.
+                  </p>
+                  <label class="field">
+                    <span class="field-label">Mã OTP (6 chữ số)</span>
+                    <input type="text" name="otp" required maxlength="6" autocomplete="one-time-code"
+                           placeholder="______" style="text-align:center; font-size:1.5rem; letter-spacing:0.3em; font-weight:bold;" />
+                  </label>
+                  <label class="field">
+                    <span class="field-label">Mật khẩu mới</span>
+                    <input type="password" name="newPassword" required minlength="6" autocomplete="new-password" />
+                  </label>
+                  <label class="field">
+                    <span class="field-label">Xác nhận mật khẩu mới</span>
+                    <input type="password" name="confirmPassword" required minlength="6" autocomplete="new-password" />
+                  </label>
+                  <div style="display:flex; justify-content:space-between; gap:0.75rem; margin-top:0.75rem;">
+                    <button type="button" class="btn btn--outline" data-pwd-back-step1 style="flex:1;">← Quay lại</button>
+                    <button type="submit" class="btn btn--primary" style="flex:2;">✅ Xác nhận đổi mật khẩu</button>
+                  </div>
+                  <div style="text-align:center; margin-top:0.75rem;">
+                    <button type="button" class="btn btn--text" data-pwd-resend-otp
+                            style="font-size:0.85rem; color:var(--accent); background:none; border:none; cursor:pointer; padding:0;">Gửi lại mã OTP</button>
+                  </div>
+                  <p data-pwd-msg-otp role="status" style="margin-top:0.5rem; font-size:0.9rem;"></p>
                 </form>
               </div>
               <!-- Appearance Panel -->
@@ -4012,40 +4122,148 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
   // --- Settings Form Handlers ---
   function initSettingsHandlers() {
-    // Password Form
-    const pwdForm = document.querySelector('[data-password-form-v2]');
-    if (pwdForm) {
-      pwdForm.onsubmit = async (e) => {
+    // OTP-based Password Change Flow
+    const step1El = document.querySelector('[data-pwd-step="1"]');
+    const otpForm = document.querySelector('[data-pwd-otp-form]');
+    const requestOtpBtn = document.querySelector('[data-pwd-request-otp]');
+    const backStep1Btn = document.querySelector('[data-pwd-back-step1]');
+    const resendOtpBtn = document.querySelector('[data-pwd-resend-otp]');
+    const msgStep1 = document.querySelector('[data-pwd-msg-step1]');
+    const msgOtp = document.querySelector('[data-pwd-msg-otp]');
+
+    function showPwdMsg(el, text, isOk) {
+      if (!el) return;
+      el.textContent = text || '';
+      el.style.color = isOk ? 'var(--success, #22c55e)' : 'var(--danger, #f87171)';
+    }
+
+    function getUserEmail() {
+      try {
+        const sess = JSON.parse(localStorage.getItem('wander_session') || '{}');
+        if (sess && sess.email) return sess.email;
+        const user = JSON.parse(localStorage.getItem('wander_user') || '{}');
+        if (user && user.email) return user.email;
+        return '';
+      } catch (e) { return ''; }
+    }
+
+    async function sendPwdOtp(targetMsgEl) {
+      const msgEl = targetMsgEl || msgStep1;
+      const email = getUserEmail();
+      if (!email) {
+        showPwdMsg(msgEl, 'Không tìm thấy email tài khoản. Vui lòng đăng nhập lại.', false);
+        return false;
+      }
+      showPwdMsg(msgEl, 'Đang gửi mã OTP...', true);
+      try {
+        const res = await fetch('/api/auth/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, purpose: 'forgot_password', portal: 'user' })
+        });
+
+        if (res.status === 429) {
+          showPwdMsg(msgEl, 'Bạn gửi yêu cầu quá nhanh. Vui lòng thử lại sau ít phút.', false);
+          return false;
+        }
+
+        const json = await res.json();
+        if (json.success) {
+          const hint = json.otp ? ` (Mã test: ${json.otp})` : '';
+          showPwdMsg(msgEl, `Mã OTP đã gửi đến ${email}.${hint}`, true);
+          return true;
+        } else {
+          showPwdMsg(msgEl, json.message || 'Không thể gửi mã OTP.', false);
+          return false;
+        }
+      } catch (err) {
+        showPwdMsg(msgEl, 'Lỗi kết nối máy chủ.', false);
+        return false;
+      }
+    }
+
+    if (requestOtpBtn) {
+      requestOtpBtn.onclick = async () => {
+        setButtonLoading(requestOtpBtn, true);
+        const ok = await sendPwdOtp(msgStep1);
+        setButtonLoading(requestOtpBtn, false);
+        if (ok && step1El && otpForm) {
+          step1El.hidden = true;
+          otpForm.hidden = false;
+          otpForm.reset();
+          if (msgOtp) msgOtp.textContent = '';
+          const otpInput = otpForm.querySelector('input[name="otp"]');
+          if (otpInput) otpInput.focus();
+        }
+      };
+    }
+
+    if (backStep1Btn) {
+      backStep1Btn.onclick = () => {
+        if (step1El) step1El.hidden = false;
+        if (otpForm) otpForm.hidden = true;
+        showPwdMsg(msgStep1, '', true);
+      };
+    }
+
+    if (resendOtpBtn) {
+      resendOtpBtn.onclick = async () => {
+        setButtonLoading(resendOtpBtn, true);
+        await sendPwdOtp(msgOtp);
+        setButtonLoading(resendOtpBtn, false);
+      };
+    }
+
+    if (otpForm) {
+      otpForm.onsubmit = async (e) => {
         e.preventDefault();
-        const status = document.querySelector('[data-password-status-v2]');
-        const btn = pwdForm.querySelector('button[type="submit"]');
-        const fd = new FormData(pwdForm);
-        const data = Object.fromEntries(fd.entries());
+        const submitBtn = otpForm.querySelector('button[type="submit"]');
+        const fd = new FormData(otpForm);
+        const otp = String(fd.get('otp') || '').trim();
+        const newPassword = String(fd.get('newPassword') || '');
+        const confirmPassword = String(fd.get('confirmPassword') || '');
 
-        setButtonLoading(btn, true);
-        if (status) status.textContent = "";
+        if (otp.length !== 6) {
+          showPwdMsg(msgOtp, 'Mã OTP phải chứa đúng 6 chữ số.', false);
+          return;
+        }
+        if (newPassword.length < 6) {
+          showPwdMsg(msgOtp, 'Mật khẩu mới phải có ít nhất 6 ký tự.', false);
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          showPwdMsg(msgOtp, 'Mật khẩu xác nhận không khớp.', false);
+          return;
+        }
 
+        const email = getUserEmail();
+        if (!email) {
+          showPwdMsg(msgOtp, 'Không tìm thấy email tài khoản.', false);
+          return;
+        }
+
+        setButtonLoading(submitBtn, true);
+        showPwdMsg(msgOtp, '', true);
         try {
-          const token = localStorage.getItem('wander_token');
-          const res = await fetch('/api/auth/change-password', {
+          const res = await fetch('/api/auth/reset-password-with-otp', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-            body: JSON.stringify(data)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, otp, password: newPassword, portal: 'user' })
           });
           const json = await res.json();
           if (json.success) {
-            showToast("Đổi mật khẩu thành công!", "success");
-            pwdForm.reset();
+            showToast('Đổi mật khẩu thành công!', 'success');
+            otpForm.reset();
+            otpForm.hidden = true;
+            if (step1El) step1El.hidden = false;
+            showPwdMsg(msgStep1, '', true);
           } else {
-            if (status) {
-              status.style.color = "var(--danger)";
-              status.textContent = json.message || "Lỗi đổi mật khẩu";
-            }
+            showPwdMsg(msgOtp, json.message || 'Mã OTP không đúng hoặc đã hết hạn.', false);
           }
         } catch (err) {
-          showToast("Lỗi kết nối máy chủ", "error");
+          showPwdMsg(msgOtp, 'Lỗi kết nối máy chủ.', false);
         } finally {
-          setButtonLoading(btn, false);
+          setButtonLoading(submitBtn, false);
         }
       };
     }

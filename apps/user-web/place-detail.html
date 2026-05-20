@@ -2566,16 +2566,30 @@
             const filtersContainer = document.getElementById('gallery-filters');
             if (!galleryGrid) return;
 
-            // ELITE: Merge legacy images and new gallery system
-            allGalleryItems = (place.gallery && place.gallery.length > 0) 
-                ? place.gallery 
-                : (place.images || []).map(img => ({ url: img, category: 'general', type: 'image' }));
+            // ELITE: Merge legacy images and new gallery system & DEDUPLICATE URLS
+            const uniqueMap = new Map();
+            (place.gallery || []).forEach(item => {
+                if (item && item.url) uniqueMap.set(item.url, item);
+            });
+            (place.images || []).forEach(url => {
+                if(url && !uniqueMap.has(url)) uniqueMap.set(url, { url: url, category: 'general', type: 'image' });
+            });
+            allGalleryItems = Array.from(uniqueMap.values());
             
             if (allGalleryItems.length === 0) {
                 if (gallerySec) gallerySec.style.display = 'none';
                 return;
             }
             if (gallerySec) gallerySec.style.display = 'block';
+
+            // Khởi tạo Slideshow tự động thay đổi ảnh đẹp
+            slideItems = allGalleryItems.filter(it => it.type !== 'video').slice(0, 8); // Top 8 ảnh đẹp nhất
+            if (slideItems.length > 0) {
+                const el = document.getElementById('gallery-slideshow');
+                if(el) el.style.display = 'block';
+                updateSlide();
+                startSlideshow();
+            }
 
             // Generate Filters
             const coreCategories = [

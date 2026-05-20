@@ -1217,6 +1217,7 @@
         var fallbackImg = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80';
         if (p.kind === 'khach-san') fallbackImg = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80';
         else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') fallbackImg = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80';
+          else if (p.kind === 'thue-xe' || p.businessCategory === 'rental') fallbackImg = 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&q=80';
         else if (p.isTour || p.kind === 'trai-nghiem') fallbackImg = 'https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=600&q=80';
         
         if (!displayImg || displayImg.length < 5) displayImg = fallbackImg;
@@ -3512,6 +3513,7 @@
                 if (filter === 'tour') return p.isTour || p.kind === 'trai-nghiem';
                 if (filter === 'khach-san') return p.kind === 'khach-san';
                 if (filter === 'nha-hang') return p.kind === 'nha-hang';
+                if (filter === 'thue-xe') return p.kind === 'thue-xe' || p.businessCategory === 'rental';
                 return true;
             });
         }
@@ -3539,6 +3541,7 @@
           if (p.kind === 'khach-san') catLabel = 'Lưu trú Elite';
           else if (p.isTour || p.kind === 'trai-nghiem') catLabel = 'Trải nghiệm Tour';
           else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') catLabel = 'Ẩm thực & Giải trí';
+          else if (p.kind === 'thue-xe' || p.businessCategory === 'rental') catLabel = 'Thuê xe Dịch vụ';
 
           // Build slideshow image tags for partner services
           var imagesList = [];

@@ -503,6 +503,7 @@
             <button class="vibrant-tab" data-tab="explore">Khám phá</button>
             <button class="vibrant-tab" data-tab="social">Cộng đồng</button>
             <button class="vibrant-tab" data-tab="completed">Đã nhận</button>
+            <button class="vibrant-tab" data-tab="vouchers">🎁 Ưu đãi</button>
           </div>
         </div>
 
@@ -511,6 +512,20 @@
         <div class="loading-wrap" id="questsLoading">
           <div class="loading-spinner"></div>
           <p>Đang chuẩn bị hành trình nhiệm vụ...</p>
+        </div>
+      </div>
+
+      <!-- Voucher Panel -->
+      <div id="voucherPanel" style="display:none; padding: 0.5rem 0;">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;">
+          <div style="font-size:2rem;">🎁</div>
+          <div>
+            <div style="font-size:1.1rem; font-weight:800; color:var(--text);">Ưu đãi dành cho bạn</div>
+            <div style="font-size:0.85rem; color:var(--text-muted);">Mã giảm giá dựa trên hạng thành viên và trạng thái tài khoản của bạn</div>
+          </div>
+        </div>
+        <div id="voucherGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:1.25rem;">
+          <div class="loading-wrap"><div class="loading-spinner"></div><p>Đang tải ưu đãi...</p></div>
         </div>
       </div>
     </div>
@@ -830,13 +845,100 @@
         document.querySelectorAll('.vibrant-tab').forEach(function(t) { t.classList.remove('is-active'); });
         tab.classList.add('is-active');
         const tabKey = tab.getAttribute('data-tab');
-        if (globalStats) {
-            renderQuests(tabKey, globalStats, globalClaimed);
+        
+        const questGrid = document.getElementById('questGrid');
+        const voucherPanel = document.getElementById('voucherPanel');
+        
+        if (tabKey === 'vouchers') {
+          if (questGrid) questGrid.style.display = 'none';
+          if (voucherPanel) voucherPanel.style.display = 'block';
+          loadVouchers();
         } else {
+          if (questGrid) questGrid.style.display = 'grid';
+          if (voucherPanel) voucherPanel.style.display = 'none';
+          if (globalStats) {
+            renderQuests(tabKey, globalStats, globalClaimed);
+          } else {
             loadPage();
+          }
         }
       });
     });
+
+    function loadVouchers() {
+      const grid = document.getElementById('voucherGrid');
+      if (!grid) return;
+      grid.innerHTML = '<div class="loading-wrap"><div class="loading-spinner"></div><p>Đang tải ưu đãi...</p></div>';
+      
+      if (!token) {
+        grid.innerHTML = '<div style="text-align:center; padding:3rem; color:var(--text-muted);">🔒 Vui lòng đăng nhập để xem ưu đãi</div>';
+        return;
+      }
+
+      fetch('/api/vouchers/available', { headers: { 'x-auth-token': token } })
+        .then(r => r.json())
+        .then(json => {
+          if (!json.success || !json.data || json.data.length === 0) {
+            grid.innerHTML = `
+              <div style="grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-muted); background:var(--bg-card); border-radius:20px; border:1px dashed var(--border);">
+                <div style="font-size:3rem; margin-bottom:1rem;">🎟️</div>
+                <div style="font-weight:700; margin-bottom:0.5rem;">Chưa có ưu đãi nào</div>
+                <div style="font-size:0.85rem;">Tiếp tục tích XP và lên hạng để mở khóa mã giảm giá độc quyền!</div>
+              </div>`;
+            return;
+          }
+          
+          const RANK_COLORS = {
+            'Đồng': '#cd7f32', 'Bạc': '#94a3b8', 'Vàng': '#f59e0b',
+            'Bạch Kim': '#60a5fa', 'Kim Cương': '#8b5cf6', 'Huyền Thoại': '#ec4899'
+          };
+
+          grid.innerHTML = json.data.map(v => {
+            const valText = v.discountType === 'percent'
+              ? `Giảm ${v.discountValue}%`
+              : `Giảm ${Number(v.discountValue).toLocaleString('vi-VN')}đ`;
+            const capText = (v.discountType === 'percent' && v.maxDiscount > 0)
+              ? ` (tối đa ${Number(v.maxDiscount).toLocaleString('vi-VN')}đ)` : '';
+            const minText = v.minOrderValue > 0
+              ? `Đơn tối thiểu ${Number(v.minOrderValue).toLocaleString('vi-VN')}đ` : 'Mọi đơn hàng';
+            const rankColor = v.minRank ? (RANK_COLORS[v.minRank] || '#6366f1') : '#10b981';
+            const byLabel = v.createdBy === 'admin' ? '🏛️ WanderViệt' : `🏢 ${v.ownerName || 'Đối tác'}`;
+            const rankBadge = v.minRank
+              ? `<span style="font-size:0.7rem; font-weight:800; background:${rankColor}22; color:${rankColor}; border:1px solid ${rankColor}44; padding:2px 8px; border-radius:20px;">Hạng ${v.minRank}+</span>`
+              : (v.forNewUsers ? '<span style="font-size:0.7rem; font-weight:800; background:#10b98122; color:#10b981; border:1px solid #10b98144; padding:2px 8px; border-radius:20px;">Thành viên mới</span>' : '<span style="font-size:0.7rem; font-weight:800; background:#6366f122; color:#6366f1; border:1px solid #6366f144; padding:2px 8px; border-radius:20px;">Cho tất cả</span>');
+            
+            return `
+              <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:1.25rem; position:relative; overflow:hidden; transition:all 0.3s ease;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                <!-- Decorative left bar -->
+                <div style="position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg, #6366f1, #a855f7);"></div>
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+                  <div style="font-family:var(--font-mono, monospace); font-size:1.2rem; font-weight:900; color:#a78bfa; letter-spacing:2px;">${v.code}</div>
+                  ${rankBadge}
+                </div>
+                <div style="font-size:1rem; font-weight:700; color:var(--text); margin-bottom:0.25rem;">${valText}${capText}</div>
+                <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.75rem;">${minText} &bull; ${byLabel}</div>
+                <div style="display:flex; gap:8px; margin-top:1rem;">
+                  <button onclick="copyVoucherCode('${v.code}', this)" style="flex:1; padding:0.55rem 0.75rem; background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff; border:none; border-radius:10px; font-size:0.85rem; font-weight:700; cursor:pointer;">📋 Sao chép mã</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        })
+        .catch(() => {
+          grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; color:#ef4444; padding:2rem;">Lỗi tải ưu đãi</div>';
+        });
+    }
+
+    window.copyVoucherCode = function(code, btn) {
+      navigator.clipboard.writeText(code).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '✅ Đã sao chép!';
+        btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+        setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+      }).catch(() => {
+        WanderUI.showToast('Mã: ' + code, 'info');
+      });
+    };
 
     // Event delegation for quest claim buttons
     document.addEventListener('click', function(e) {

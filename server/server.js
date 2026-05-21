@@ -38,6 +38,7 @@ const notifications = require('./routes/notifications');
 const payments = require('./routes/payments');
 const placeReviews = require('./routes/placeReviews');
 const files = require('./routes/files');
+const vouchers = require('./routes/vouchers');
 
 // Mount routers
 app.use('/api/auth', auth);
@@ -55,6 +56,7 @@ app.use('/api/notifications', notifications);
 app.use('/api/payments', payments);
 app.use('/api/place-reviews', placeReviews);
 app.use('/api/files', files);
+app.use('/api/vouchers', vouchers);
 
 // Root endpoint
 app.get('/', (req, res) => {

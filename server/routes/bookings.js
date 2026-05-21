@@ -7,8 +7,13 @@ const Place = require('../models/Place');
 const { auth, businessAuth, sharedAuth } = require('./auth');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const Voucher = require('../models/Voucher');
+const VoucherUsage = require('../models/VoucherUsage');
 
 // 1. User: Create a booking (service OR tour)
+// DEV: helper route to reproduce booking creation without auth (temporary)
+// (dev route removed)
+
 router.post('/', auth, async (req, res) => {
   try {
     const {
@@ -28,6 +33,73 @@ router.post('/', auth, async (req, res) => {
     // Tự động set businessCategory từ Place để phân loại Đặt chỗ / Thuê xe
     const bizCat = place.businessCategory || (place.kind === 'thue-xe' ? 'rental' : 'other');
 
+    let finalPrice = totalPrice;
+    let discountAmount = 0;
+    let appliedVoucher = null;
+
+    if (req.body.voucherCode) {
+      const vCode = req.body.voucherCode.trim().toUpperCase();
+      const voucher = await Voucher.findOne({ code: vCode, status: 'active' });
+      if (!voucher) {
+        return res.status(400).json({ success: false, message: 'Mã giảm giá không tồn tại hoặc đã hết hạn' });
+      }
+
+      const now = new Date();
+      if (voucher.startDate && now < voucher.startDate) {
+        return res.status(400).json({ success: false, message: 'Mã giảm giá chưa có hiệu lực' });
+      }
+      if (voucher.endDate && now > voucher.endDate) {
+        return res.status(400).json({ success: false, message: 'Mã giảm giá đã hết hạn' });
+      }
+      if (voucher.totalLimit > 0 && voucher.usedCount >= voucher.totalLimit) {
+        return res.status(400).json({ success: false, message: 'Mã giảm giá đã hết lượt sử dụng' });
+      }
+
+      const userUsed = await VoucherUsage.countDocuments({ voucherId: voucher._id, userId: req.user.id });
+      if (userUsed >= voucher.perUserLimit) {
+        return res.status(400).json({ success: false, message: 'Bạn đã sử dụng mã này rồi' });
+      }
+
+      if (voucher.minRank) {
+        const userQuery = { $or: [ { customId: req.user.id }, { id: req.user.id } ] };
+        if (mongoose.Types.ObjectId.isValid(req.user.id)) userQuery.$or.push({ _id: req.user.id });
+        const userObj = await User.findOne(userQuery).select('rank');
+        const RANK_ORDER = ['Đồng', 'Bạc', 'Vàng', 'Bạch Kim', 'Kim Cương', 'Huyền Thoại'];
+        const userIdx = RANK_ORDER.indexOf(userObj?.rank || 'Đồng');
+        const reqIdx = RANK_ORDER.indexOf(voucher.minRank);
+        if (userIdx < reqIdx) {
+          return res.status(400).json({ success: false, message: `Mã này chỉ dành cho hạng ${voucher.minRank} trở lên` });
+        }
+      }
+
+      if (voucher.minOrderValue > 0 && totalPrice < voucher.minOrderValue) {
+        return res.status(400).json({ 
+          success: false, 
+          message: `Đơn hàng tối thiểu ${voucher.minOrderValue.toLocaleString('vi-VN')}đ để sử dụng mã này` 
+        });
+      }
+
+      if (voucher.createdBy === 'business' && voucher.scope === 'specific_services') {
+        if (voucher.applicablePlaces.length > 0 && !voucher.applicablePlaces.includes(placeId)) {
+          return res.status(400).json({ success: false, message: 'Mã không áp dụng cho dịch vụ này' });
+        }
+      }
+
+      // Calculate discount
+      if (voucher.discountType === 'percent') {
+        discountAmount = Math.round(totalPrice * voucher.discountValue / 100);
+        if (voucher.maxDiscount > 0 && discountAmount > voucher.maxDiscount) {
+          discountAmount = voucher.maxDiscount;
+        }
+      } else {
+        discountAmount = voucher.discountValue;
+      }
+
+      if (discountAmount > totalPrice) discountAmount = totalPrice;
+      finalPrice = totalPrice - discountAmount;
+      appliedVoucher = voucher;
+    }
+
     const newBooking = new Booking({
       bookingId:        'BK-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
       bookingType:      type,
@@ -41,15 +113,35 @@ router.post('/', auth, async (req, res) => {
       useDate:          new Date(useDate || Date.now()),
       tourDate:         tourDate ? new Date(tourDate) : null,
       peopleCount:      peopleCount || 1,
-      totalPrice,
+      totalPrice:       finalPrice,
       specialRequests:  specialRequests || '',
       paymentMethod:    paymentMethod || 'contact',
       paymentStatus:    paymentMethod === 'contact' ? 'unpaid' : 'pending',
       ownerId:          place.ownerId || 'system',
+      voucherCode:      appliedVoucher ? appliedVoucher.code : null,
+      discountAmount:   discountAmount,
       status:           'pending'
     });
 
     await newBooking.save();
+
+    if (appliedVoucher) {
+      appliedVoucher.usedCount += 1;
+      if (appliedVoucher.totalLimit > 0 && appliedVoucher.usedCount >= appliedVoucher.totalLimit) {
+        appliedVoucher.status = 'expired';
+      }
+      await appliedVoucher.save();
+
+      const usage = new VoucherUsage({
+        voucherId: appliedVoucher._id,
+        voucherCode: appliedVoucher.code,
+        userId: req.user.id,
+        bookingId: newBooking._id,
+        discountAmount: discountAmount,
+        originalPrice: totalPrice
+      });
+      await usage.save();
+    }
 
     // Log Activity for Business
     try {
@@ -88,6 +180,7 @@ router.post('/', auth, async (req, res) => {
 
     res.json({ success: true, data: newBooking });
   } catch (err) {
+    console.error('[Bookings] Error in POST /api/bookings:', err.stack || err.message);
     res.status(500).json({ success: false, message: err.message });
   }
 });

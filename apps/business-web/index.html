@@ -248,6 +248,7 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
     <a class="nav-item" href="#" data-view="home">🏢 <span>Tổng quan Dashboard</span></a>
     <a class="nav-item" href="#" data-view="services">⚙️ <span>Dịch vụ của tôi</span></a>
     <a class="nav-item" href="#" data-view="bookings">📋 <span>Quản lý đơn hàng</span></a>
+    <a class="nav-item" href="#" data-view="promotions">🎫 <span>Mã khuyến mãi</span></a>
     <a class="nav-item" href="#" data-view="messages">💬 <span>Tin nhắn CSKH</span></a>
     
     <div class="nav-header">⚙️ Hệ thống</div>
@@ -352,6 +353,15 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
             <div style="font-size: 40px; margin-bottom: 16px;">💬</div>
             <h2>Đang tải tin nhắn khách hàng...</h2>
         </div>
+    </div>
+  </div>
+
+  <div id="promotions-view" class="biz-view" style="display:none; padding: 24px;">
+    <div id="promo-mgmt-container">
+      <div style="text-align: center; padding: 100px; color: #888;">
+        <div style="font-size: 40px; margin-bottom: 16px;">🎫</div>
+        <h2>Đang tải trang quản lý khuyến mãi...</h2>
+      </div>
     </div>
   </div>
 
@@ -532,6 +542,7 @@ nav { flex: 1; padding: 10px 16px; overflow-y: auto; }
 <script src="/js/userAnalytics.js?v=7"></script>
 <script src="/js/businessOverview.js?v=14"></script>
 <script src="/js/serviceManagement.js?v=7"></script>
+<script src="/js/promotionManagement.js?v=5"></script>
 <script src="/js/reviewManagement.js?v=5"></script>
 <script src="/js/bookingManagement.js?v=5"></script>
 <script src="/js/messageManagement.js?v=5"></script>

@@ -66,9 +66,11 @@ async function addXP(userId, xpAmount, questId = null) {
       user.claimedQuests.push(questId);
     }
 
+    const oldRank = user.rank;
     user.points = Number(user.points || 0) + Number(xpAmount);
     const { rank, tier } = calculateRank(user.points);
     
+    const rankChanged = oldRank !== rank;
     user.rank = rank;
     user.rankTier = tier;
     
@@ -77,6 +79,58 @@ async function addXP(userId, xpAmount, questId = null) {
     }
     
     await user.save();
+
+    // Trigger auto-granting vouchers on rank up
+    if (rankChanged) {
+      try {
+        const Voucher = require('../models/Voucher');
+        const Notification = require('../models/Notification');
+
+        const vouchersToGrant = await Voucher.find({ autoGrantOnRank: rank, status: 'active' });
+        for (const orig of vouchersToGrant) {
+          const userSuffix = userId.toString().slice(-4);
+          const personalCode = `${orig.code}_${userSuffix}`;
+
+          // Check if already granted
+          const exists = await Voucher.findOne({ code: personalCode });
+          if (!exists) {
+            const personalVoucher = new Voucher({
+              code: personalCode,
+              title: `[Quà Hạng ${rank}] ${orig.title}`,
+              description: `Quà tặng tri ân đặc quyền thăng hạng ${rank}!`,
+              discountType: orig.discountType,
+              discountValue: orig.discountValue,
+              maxDiscount: orig.maxDiscount,
+              minOrderValue: orig.minOrderValue,
+              createdBy: orig.createdBy,
+              ownerId: orig.ownerId,
+              ownerName: orig.ownerName,
+              scope: orig.scope,
+              applicablePlaces: orig.applicablePlaces,
+              minRank: null, // Personal voucher, no rank gate needed
+              totalLimit: 1,
+              perUserLimit: 1,
+              recipientId: userId.toString(),
+              status: 'active'
+            });
+            await personalVoucher.save();
+
+            // Send custom achievement notification
+            const notif = new Notification({
+              recipientId: userId.toString(),
+              type: 'success',
+              title: `🏆 Thăng hạng ${rank} & Nhận quà!`,
+              message: `Chúc mừng bạn đã thăng cấp lên hạng ${rank}! Bạn đã nhận được mã giảm giá độc quyền: ${personalCode} (${orig.title}). Hãy sử dụng ngay trong các chuyến đi tiếp theo!`,
+              link: 'quests.html'
+            });
+            await notif.save();
+          }
+        }
+      } catch (errGrant) {
+        console.error('Error auto-granting voucher on rank up:', errGrant);
+      }
+    }
+
     return user;
   } catch (err) {
     console.error('Error adding XP for user', userId, ':', err);

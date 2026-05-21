@@ -377,9 +377,18 @@
             </label>
           </div>
         </div>
+        <div id="bk-voucher-wrap" style="margin-bottom:1rem;">
+          <label style="display:block;font-size:.85rem;font-weight:600;color:#94a3b8;margin-bottom:.6rem;">🎟️ Mã giảm giá / Voucher</label>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;margin-bottom:.75rem;">
+            <input type="text" id="bk-voucher-code" placeholder="Nhập mã giảm giá..." style="flex:1;min-width:180px;padding:.75rem;border-radius:10px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;font-size:.95rem;text-transform:uppercase;">
+            <button type="button" id="bk-apply-voucher-btn" style="padding:.75rem 1rem;border:none;border-radius:10px;background:linear-gradient(135deg,#6366f1,#a855f7);color:#fff;font-weight:700;cursor:pointer;">Áp dụng</button>
+          </div>
+          <div id="bk-voucher-msg" style="font-size:.85rem;min-height:1.2rem;color:#94a3b8;"></div>
+        </div>
         <div id="bk-price-summary" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:.9rem 1rem;margin-bottom:1.25rem;display:none;">
           <div style="display:flex;justify-content:space-between;font-size:.85rem;color:#94a3b8;"><span>Đơn giá:</span><span id="bk-unit-price">—</span></div>
           <div style="display:flex;justify-content:space-between;font-size:.85rem;color:#94a3b8;"><span>Số khách:</span><span id="bk-people-count">1</span></div>
+          <div id="bk-discount-line" style="display:none;justify-content:space-between;font-size:.85rem;color:#6ee7b7;margin-top:.25rem;"><span>Giảm giá:</span><span id="bk-discount-amount">0 ₫</span></div>
           <div style="display:flex;justify-content:space-between;font-weight:800;font-size:1.05rem;color:#f59e0b;margin-top:.4rem;"><span>Tổng dự kiến:</span><span id="bk-total-price">—</span></div>
         </div>
         <div id="bk-error" style="color:#f87171;font-size:.85rem;margin-bottom:.75rem;display:none;"></div>
@@ -481,10 +490,18 @@
         document.getElementById('bk-name').value = pl.name || '';
       }
     } catch(e){}
+    // Reset voucher state for every new booking modal open
+    _bkVoucherCode = null;
+    _bkVoucherDiscount = 0;
+    var voucherInput = document.getElementById('bk-voucher-code');
+    var voucherMsg = document.getElementById('bk-voucher-msg');
+    if (voucherInput) voucherInput.value = '';
+    if (voucherMsg) { voucherMsg.textContent = ''; }
+
     // Price summary
-    if (place.priceFrom) {
+    if (place.priceFrom || place.price) {
       document.getElementById('bk-price-summary').style.display = 'block';
-      document.getElementById('bk-unit-price').textContent = fmtPriceVN(place.priceFrom);
+      document.getElementById('bk-unit-price').textContent = fmtPriceVN(place.priceFrom || place.price);
       updateBkTotal();
     } else {
       document.getElementById('bk-price-summary').style.display = 'none';
@@ -586,16 +603,118 @@
     `).join('');
   }
 
+  var _bkVoucherCode = null;
+  var _bkVoucherDiscount = 0;
+
+  function formatMoney(n) {
+    return (Number(n) || 0).toLocaleString('vi-VN') + ' ₫';
+  }
+
   function updateBkTotal() {
-    if (!_bkPlace || !_bkPlace.priceFrom) return;
+    if (!_bkPlace || (!_bkPlace.priceFrom && !_bkPlace.price)) return;
     var p = parseInt(document.getElementById('bk-people').value)||1;
     document.getElementById('bk-people-count').textContent = p;
-    document.getElementById('bk-total-price').textContent = fmtPriceVN(_bkPlace.priceFrom * p);
+    var unit = _bkPlace.priceFrom || _bkPlace.price || 0;
+    var total = unit * p;
+    document.getElementById('bk-total-price').textContent = formatMoney(Math.max(0, total - _bkVoucherDiscount));
+    if (_bkVoucherDiscount > 0) {
+      document.getElementById('bk-discount-line').style.display = 'flex';
+      document.getElementById('bk-discount-amount').textContent = '-' + formatMoney(_bkVoucherDiscount);
+    } else {
+      document.getElementById('bk-discount-line').style.display = 'none';
+    }
+  }
+
+  function clearBkVoucherState(message, isError) {
+    _bkVoucherCode = null;
+    _bkVoucherDiscount = 0;
+    var msgEl = document.getElementById('bk-voucher-msg');
+    if (msgEl) {
+      if (message) {
+        msgEl.style.color = isError ? '#f87171' : '#10b981';
+        msgEl.textContent = message;
+      } else {
+        msgEl.textContent = '';
+      }
+    }
+    updateBkTotal();
+  }
+
+  function applyBkVoucher() {
+    var codeInput = document.getElementById('bk-voucher-code');
+    if (!codeInput) return;
+    var code = codeInput.value.trim().toUpperCase();
+    var msgEl = document.getElementById('bk-voucher-msg');
+    if (!code) {
+      if (msgEl) {
+        msgEl.style.color = '#f87171';
+        msgEl.textContent = 'Vui lòng nhập mã giảm giá';
+      }
+      return;
+    }
+    var token = localStorage.getItem('wander_token');
+    if (!token) {
+      if (msgEl) {
+        msgEl.style.color = '#f87171';
+        msgEl.textContent = 'Vui lòng đăng nhập để áp dụng mã giảm giá';
+      }
+      return;
+    }
+    var p = parseInt(document.getElementById('bk-people').value)||1;
+    var unit = _bkPlace ? (_bkPlace.priceFrom || _bkPlace.price || 0) : 0;
+    var total = unit * p;
+
+    if (msgEl) {
+      msgEl.style.color = '#94a3b8';
+      msgEl.textContent = 'Đang kiểm tra mã...';
+    }
+
+    fetch('/api/vouchers/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+      body: JSON.stringify({ code: code, placeId: _bkPlace ? (_bkPlace.id || _bkPlace._id) : null, orderTotal: total })
+    }).then(function(r){return r.json();})
+      .then(function(json){
+        if (json.success) {
+          _bkVoucherCode = code;
+          _bkVoucherDiscount = Number(json.data.discountAmount) || 0;
+          if (msgEl) {
+            msgEl.style.color = '#10b981';
+            msgEl.textContent = json.message || 'Áp dụng mã thành công';
+          }
+        } else {
+          _bkVoucherCode = null;
+          _bkVoucherDiscount = 0;
+          if (msgEl) {
+            msgEl.style.color = '#f87171';
+            msgEl.textContent = json.message || 'Mã giảm giá không hợp lệ';
+          }
+        }
+        updateBkTotal();
+      }).catch(function(){
+        _bkVoucherCode = null;
+        _bkVoucherDiscount = 0;
+        if (msgEl) {
+          msgEl.style.color = '#f87171';
+          msgEl.textContent = 'Lỗi kết nối. Vui lòng thử lại';
+        }
+        updateBkTotal();
+      });
   }
 
   document.addEventListener('DOMContentLoaded', function(){
     var pepEl = document.getElementById('bk-people');
-    if (pepEl) pepEl.addEventListener('input', updateBkTotal);
+    if (pepEl) pepEl.addEventListener('input', function(){ updateBkTotal(); _bkVoucherCode = null; _bkVoucherDiscount = 0; clearBkVoucherState(''); });
+    var voucherBtn = document.getElementById('bk-apply-voucher-btn');
+    if (voucherBtn) voucherBtn.addEventListener('click', applyBkVoucher);
+    var voucherInput = document.getElementById('bk-voucher-code');
+    if (voucherInput) voucherInput.addEventListener('input', function(){
+      _bkVoucherCode = null;
+      _bkVoucherDiscount = 0;
+      var msgEl = document.getElementById('bk-voucher-msg');
+      if (msgEl) msgEl.textContent = '';
+      updateBkTotal();
+    });
     // Payment radio highlight
     document.querySelectorAll('input[name="bk-payment"]').forEach(function(r){
       r.addEventListener('change', function(){
@@ -619,16 +738,20 @@
         btn.disabled = true; btn.textContent = '⌛ Đang gửi...';
         errEl.style.display='none';
         var pmVal = document.querySelector('input[name="bk-payment"]:checked');
+        var peopleCount = parseInt(document.getElementById('bk-people').value)||1;
+        var unitPrice = _bkPlace ? (_bkPlace.priceFrom || _bkPlace.price || 0) : 0;
         var payload = {
           placeId: document.getElementById('bk-place-id').value,
           useDate: document.getElementById('bk-date').value,
           tourDate: document.getElementById('bk-tour-date').value || null,
-          peopleCount: parseInt(document.getElementById('bk-people').value)||1,
+          peopleCount: peopleCount,
           customerName: document.getElementById('bk-name').value.trim(),
           customerPhone: document.getElementById('bk-phone').value.trim(),
           specialRequests: document.getElementById('bk-notes').value.trim(),
           paymentMethod: pmVal ? pmVal.value : 'contact',
-          bookingType: document.getElementById('bk-is-tour').value==='1'?'tour':'service'
+          bookingType: document.getElementById('bk-is-tour').value==='1'?'tour':'service',
+          totalPrice: unitPrice * peopleCount,
+          voucherCode: _bkVoucherCode || ''
         };
         fetch('/api/bookings', {
           method:'POST',

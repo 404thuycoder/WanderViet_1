@@ -20,6 +20,8 @@ const bookingSchema = new mongoose.Schema({
   status:         { type: String, enum: ['pending', 'confirmed', 'cancelled', 'completed'], default: 'pending' },
   ownerId:        { type: String, required: true, index: true }, // Business ID
   notes:          { type: String, default: '' },  // Ghi chú từ business
+  voucherCode:    { type: String, default: null }, // Voucher applied
+  discountAmount: { type: Number, default: 0 },  // Discount amount in VND
   createdAt:      { type: Date, default: Date.now }
 });
 

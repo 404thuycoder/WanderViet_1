@@ -5148,34 +5148,275 @@
   async function loadVouchers() {
     const tbody = document.getElementById('vouchers-tbody');
     if (!tbody) return;
-    
-    // Mock data for demo
-    const mockVouchers = [
-      { code: 'WANDER2024', name: 'Chào hè rực rỡ', value: 'Giảm 20%', limit: '100/500', status: 'active' },
-      { code: 'BIZPARTNER', name: 'Ưu đãi đối tác', value: '500,000đ', limit: '50/100', status: 'active' },
-      { code: 'FIRSTTRIP', name: 'Chuyến đi đầu tiên', value: 'Giảm 10%', limit: 'Unlimited', status: 'active' }
-    ];
 
-    tbody.innerHTML = mockVouchers.map(v => `
-      <tr>
-        <td>
-          <div style="font-weight:700; color:var(--admin-primary);">${v.code}</div>
-          <div style="font-size:0.8rem; color:var(--admin-text-muted);">${v.name}</div>
-        </td>
-        <td style="font-weight:600;">${v.value}</td>
-        <td>
-          <div style="font-size:0.9rem;">${v.limit}</div>
-          <div class="geo-progress-bg" style="height:4px; margin-top:4px; width:100px;">
-            <div class="geo-progress-bar bar--blue" style="width: 20%;"></div>
-          </div>
-        </td>
-        <td style="text-align:right">
-          <button class="btn btn--ghost btn--small" style="color:var(--admin-primary);">Sửa</button>
-          <button class="btn btn--ghost btn--small" style="color:#ef4444;">Xóa</button>
-        </td>
-      </tr>
-    `).join('');
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:3rem;color:var(--admin-text-muted)">Đang tải...</td></tr>';
+
+    try {
+      const res = await apiFetch('/api/vouchers/admin');
+      if (!res || !res.success) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:3rem;color:#ef4444">Lỗi tải dữ liệu voucher</td></tr>';
+        return;
+      }
+
+      const vouchers = res.data || [];
+      if (vouchers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:3rem;color:var(--admin-text-muted)">Chưa có mã khuyến mãi nào. Nhấn "+ Thêm mã mới" để tạo.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = vouchers.map(v => {
+        const valLabel = v.discountType === 'percent' 
+          ? `Giảm ${v.discountValue}%${v.maxDiscount ? ' (tối đa ' + v.maxDiscount.toLocaleString('vi-VN') + 'đ)' : ''}`
+          : `${v.discountValue.toLocaleString('vi-VN')}đ`;
+        const limitLabel = v.totalLimit > 0 ? `${v.usedCount}/${v.totalLimit}` : 'Không giới hạn';
+        const pct = v.totalLimit > 0 ? Math.min(100, Math.round(v.usedCount / v.totalLimit * 100)) : 0;
+        const statusBadge = v.status === 'active' 
+          ? '<span style="color:#10b981;font-size:0.75rem;font-weight:700">● ACTIVE</span>'
+          : v.status === 'paused' 
+            ? '<span style="color:#f59e0b;font-size:0.75rem;font-weight:700">● TẠM DỪNG</span>'
+            : '<span style="color:#ef4444;font-size:0.75rem;font-weight:700">● HẾT HẠN</span>';
+        const dateLabel = v.endDate ? new Date(v.endDate).toLocaleDateString('vi-VN') : '∞';
+        const tags = [];
+        if (v.forNewUsers) tags.push('👶 Khách mới');
+        if (v.minRank) tags.push('🏅 ' + v.minRank + '+');
+        if (v.autoGrantOnRank) tags.push('🎁 Auto@' + v.autoGrantOnRank);
+        if (v.createdBy === 'business') tags.push('🏢 ' + (v.ownerName || 'Business'));
+        const tagsHtml = tags.length ? `<div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${tags.map(t => `<span style="font-size:0.65rem;padding:2px 6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:var(--admin-text-muted)">${t}</span>`).join('')}</div>` : '';
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--admin-primary); font-size:0.95rem;">${v.code}</div>
+              <div style="font-size:0.8rem; color:var(--admin-text-muted);">${v.title}</div>
+              ${tagsHtml}
+            </td>
+            <td>
+              <div style="font-weight:600;">${valLabel}</div>
+              ${v.minOrderValue > 0 ? `<div style="font-size:0.7rem;color:var(--admin-text-muted)">Đơn tối thiểu: ${v.minOrderValue.toLocaleString('vi-VN')}đ</div>` : ''}
+            </td>
+            <td>
+              <div style="display:flex;align-items:center;gap:8px">
+                <div>
+                  <div style="font-size:0.9rem;">${limitLabel}</div>
+                  <div style="font-size:0.7rem;color:var(--admin-text-muted)">HSD: ${dateLabel}</div>
+                </div>
+                ${statusBadge}
+              </div>
+              ${v.totalLimit > 0 ? `<div class="geo-progress-bg" style="height:4px; margin-top:4px; width:100px;"><div class="geo-progress-bar bar--blue" style="width:${pct}%"></div></div>` : ''}
+            </td>
+            <td style="text-align:right">
+              <button class="btn btn--ghost btn--small" style="color:var(--admin-primary);" onclick="WanderAdmin.editVoucher('${v._id}')">Sửa</button>
+              <button class="btn btn--ghost btn--small" style="color:#ef4444;" onclick="WanderAdmin.deleteVoucher('${v._id}','${v.code}')">Xóa</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    } catch (err) {
+      console.error('loadVouchers error:', err);
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:3rem;color:#ef4444">Lỗi kết nối máy chủ</td></tr>';
+    }
   }
+
+  // ── Voucher Modal: Tạo / Sửa ──
+  WanderAdmin.showVoucherModal = function(editData = null) {
+    const isEdit = !!editData;
+    const d = editData || {};
+    const modalId = 'voucher-modal-overlay';
+    
+    // Remove existing modal
+    document.getElementById(modalId)?.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = modalId;
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)';
+    overlay.innerHTML = `
+      <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:20px;width:600px;max-width:95vw;max-height:90vh;overflow-y:auto;padding:2rem;box-shadow:0 40px 100px rgba(0,0,0,0.8)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+          <h2 style="margin:0;font-size:1.3rem;color:#fff">${isEdit ? '✏️ Sửa mã khuyến mãi' : '🎫 Tạo mã khuyến mãi mới'}</h2>
+          <button onclick="document.getElementById('${modalId}').remove()" style="background:none;border:none;color:#94a3b8;font-size:1.5rem;cursor:pointer">×</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <label class="field"><span class="field-label">Mã Code *</span>
+            <input type="text" id="vm-code" value="${d.code || ''}" placeholder="VD: SUMMER2026" style="text-transform:uppercase" ${isEdit ? 'disabled' : ''}>
+          </label>
+          <label class="field"><span class="field-label">Tên chương trình *</span>
+            <input type="text" id="vm-title" value="${d.title || ''}" placeholder="VD: Ưu đãi mùa hè">
+          </label>
+        </div>
+
+        <label class="field" style="margin-top:1rem"><span class="field-label">Mô tả</span>
+          <input type="text" id="vm-desc" value="${d.description || ''}" placeholder="Mô tả ngắn về chương trình...">
+        </label>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1rem">
+          <label class="field"><span class="field-label">Loại giảm *</span>
+            <select id="vm-type">
+              <option value="percent" ${d.discountType === 'percent' ? 'selected' : ''}>Phần trăm (%)</option>
+              <option value="fixed" ${d.discountType === 'fixed' ? 'selected' : ''}>Số tiền cố định (đ)</option>
+            </select>
+          </label>
+          <label class="field"><span class="field-label">Giá trị giảm *</span>
+            <input type="number" id="vm-value" value="${d.discountValue || ''}" placeholder="VD: 10 hoặc 50000">
+          </label>
+          <label class="field"><span class="field-label">Giảm tối đa (đ)</span>
+            <input type="number" id="vm-max" value="${d.maxDiscount || 0}" placeholder="0 = không giới hạn">
+          </label>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1rem">
+          <label class="field"><span class="field-label">Đơn tối thiểu (đ)</span>
+            <input type="number" id="vm-min-order" value="${d.minOrderValue || 0}" placeholder="0">
+          </label>
+          <label class="field"><span class="field-label">Tổng lượt dùng</span>
+            <input type="number" id="vm-total" value="${d.totalLimit || 0}" placeholder="0 = Unlimited">
+          </label>
+          <label class="field"><span class="field-label">Lượt/người</span>
+            <input type="number" id="vm-per-user" value="${d.perUserLimit || 1}" placeholder="1">
+          </label>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem">
+          <label class="field"><span class="field-label">Bắt đầu</span>
+            <input type="datetime-local" id="vm-start" value="${d.startDate ? new Date(d.startDate).toISOString().slice(0,16) : ''}">
+          </label>
+          <label class="field"><span class="field-label">Kết thúc (bỏ trống = vĩnh viễn)</span>
+            <input type="datetime-local" id="vm-end" value="${d.endDate ? new Date(d.endDate).toISOString().slice(0,16) : ''}">
+          </label>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:1rem">
+          <label class="field"><span class="field-label">Hạng tối thiểu</span>
+            <select id="vm-rank">
+              <option value="">Tất cả hạng</option>
+              <option value="Đồng" ${d.minRank === 'Đồng' ? 'selected' : ''}>Đồng</option>
+              <option value="Bạc" ${d.minRank === 'Bạc' ? 'selected' : ''}>Bạc</option>
+              <option value="Vàng" ${d.minRank === 'Vàng' ? 'selected' : ''}>Vàng</option>
+              <option value="Bạch Kim" ${d.minRank === 'Bạch Kim' ? 'selected' : ''}>Bạch Kim</option>
+              <option value="Kim Cương" ${d.minRank === 'Kim Cương' ? 'selected' : ''}>Kim Cương</option>
+              <option value="Huyền Thoại" ${d.minRank === 'Huyền Thoại' ? 'selected' : ''}>Huyền Thoại</option>
+            </select>
+          </label>
+          <label class="field"><span class="field-label">Auto cấp khi lên hạng</span>
+            <select id="vm-auto-rank">
+              <option value="">Không</option>
+              <option value="Bạc" ${d.autoGrantOnRank === 'Bạc' ? 'selected' : ''}>Bạc</option>
+              <option value="Vàng" ${d.autoGrantOnRank === 'Vàng' ? 'selected' : ''}>Vàng</option>
+              <option value="Bạch Kim" ${d.autoGrantOnRank === 'Bạch Kim' ? 'selected' : ''}>Bạch Kim</option>
+              <option value="Kim Cương" ${d.autoGrantOnRank === 'Kim Cương' ? 'selected' : ''}>Kim Cương</option>
+            </select>
+          </label>
+          <label class="field"><span class="field-label">Trạng thái</span>
+            <select id="vm-status">
+              <option value="active" ${(!d.status || d.status === 'active') ? 'selected' : ''}>Hoạt động</option>
+              <option value="paused" ${d.status === 'paused' ? 'selected' : ''}>Tạm dừng</option>
+              <option value="expired" ${d.status === 'expired' ? 'selected' : ''}>Hết hạn</option>
+            </select>
+          </label>
+        </div>
+
+        <div style="margin-top:1rem">
+          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;color:#cbd5e1;font-size:0.9rem">
+            <input type="checkbox" id="vm-new-user" ${d.forNewUsers ? 'checked' : ''}> Chỉ dành cho khách hàng mới (đăng ký trong 7 ngày)
+          </label>
+        </div>
+
+        <div style="margin-top:2rem;display:flex;justify-content:flex-end;gap:0.75rem">
+          <button class="btn btn--ghost" onclick="document.getElementById('${modalId}').remove()">Hủy</button>
+          <button class="btn btn--primary" id="vm-submit-btn" style="min-width:140px">${isEdit ? 'Lưu thay đổi' : 'Tạo mã'}</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    // Close on overlay click
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+    // Submit handler
+    document.getElementById('vm-submit-btn').onclick = async () => {
+      const payload = {
+        code: document.getElementById('vm-code').value.trim(),
+        title: document.getElementById('vm-title').value.trim(),
+        description: document.getElementById('vm-desc').value.trim(),
+        discountType: document.getElementById('vm-type').value,
+        discountValue: document.getElementById('vm-value').value,
+        maxDiscount: document.getElementById('vm-max').value,
+        minOrderValue: document.getElementById('vm-min-order').value,
+        totalLimit: document.getElementById('vm-total').value,
+        perUserLimit: document.getElementById('vm-per-user').value,
+        startDate: document.getElementById('vm-start').value || null,
+        endDate: document.getElementById('vm-end').value || null,
+        minRank: document.getElementById('vm-rank').value || null,
+        autoGrantOnRank: document.getElementById('vm-auto-rank').value || null,
+        status: document.getElementById('vm-status').value,
+        forNewUsers: document.getElementById('vm-new-user').checked
+      };
+
+      if (!payload.code || !payload.title || !payload.discountValue) {
+        WanderToast.warn('Vui lòng điền đầy đủ các trường bắt buộc (*)');
+        return;
+      }
+
+      const btn = document.getElementById('vm-submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Đang xử lý...';
+
+      try {
+        let result;
+        if (isEdit) {
+          result = await apiFetch(`/api/vouchers/admin/${d._id}`, { method: 'PUT', body: JSON.stringify(payload) });
+        } else {
+          result = await apiFetch('/api/vouchers/admin', { method: 'POST', body: JSON.stringify(payload) });
+        }
+
+        if (result && result.success) {
+          WanderToast.success(result.message || 'Thành công!');
+          overlay.remove();
+          loadVouchers();
+        } else {
+          WanderToast.error(result?.message || 'Lỗi khi lưu');
+          btn.disabled = false;
+          btn.textContent = isEdit ? 'Lưu thay đổi' : 'Tạo mã';
+        }
+      } catch (err) {
+        WanderToast.error('Lỗi kết nối máy chủ');
+        btn.disabled = false;
+        btn.textContent = isEdit ? 'Lưu thay đổi' : 'Tạo mã';
+      }
+    };
+  };
+
+  WanderAdmin.editVoucher = async function(id) {
+    try {
+      const res = await apiFetch('/api/vouchers/admin');
+      if (res && res.success) {
+        const v = res.data.find(x => x._id === id);
+        if (v) WanderAdmin.showVoucherModal(v);
+        else WanderToast.error('Không tìm thấy voucher');
+      }
+    } catch (e) { WanderToast.error('Lỗi tải dữ liệu'); }
+  };
+
+  WanderAdmin.deleteVoucher = async function(id, code) {
+    if (!confirm(`Bạn có chắc muốn xóa mã "${code}"? Thao tác này không thể hoàn tác.`)) return;
+    try {
+      const res = await apiFetch(`/api/vouchers/admin/${id}`, { method: 'DELETE' });
+      if (res && res.success) {
+        WanderToast.success(res.message);
+        loadVouchers();
+      } else {
+        WanderToast.error(res?.message || 'Lỗi khi xóa');
+      }
+    } catch (e) { WanderToast.error('Lỗi kết nối'); }
+  };
+
+  // Bind "Thêm mã mới" buttons in both voucher panels
+  document.querySelectorAll('[id$="btn-add-voucher"], .btn--primary').forEach(btn => {
+    if (btn.textContent.includes('Thêm mã mới') || btn.innerHTML.includes('Thêm mã mới')) {
+      btn.onclick = () => WanderAdmin.showVoucherModal(null);
+    }
+  });
 
   async function loadCampaigns() {
     const activeList = document.getElementById('campaign-active-list');

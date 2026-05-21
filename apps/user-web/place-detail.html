@@ -942,6 +942,16 @@
             .content-container {
                 grid-template-columns: 1fr;
                 padding: 0 24px 80px;
+                max-height: none;
+                overflow: visible;
+            }
+            .left-col, aside {
+                max-height: none;
+                overflow: visible;
+            }
+            .side-sticky {
+                position: relative;
+                top: auto;
             }
 
             .bento-card {
@@ -1005,8 +1015,16 @@
             }
         }
 
-        .content-container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 440px; gap: 60px; padding: 0 50px 120px; margin-top: -80px; position: relative; z-index: 10; }
-        
+        .content-container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 440px; gap: 50px; padding: 0 50px 120px; margin-top: -80px; position: relative; z-index: 10; align-items: start; max-height: calc(100vh - 140px); overflow: hidden; overflow-x: hidden; }
+        .left-col, aside { max-height: calc(100vh - 140px); overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(99,102,241,0.35) transparent; }
+        .left-col { padding-right: 12px; }
+        aside { padding-left: 12px; }
+        .left-col::-webkit-scrollbar, aside::-webkit-scrollbar { width: 8px; }
+        .left-col::-webkit-scrollbar-track, aside::-webkit-scrollbar-track { background: transparent; }
+        .left-col::-webkit-scrollbar-thumb, aside::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 999px; }
+        .left-col::-webkit-scrollbar-thumb:hover, aside::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.45); }
+        .side-sticky { position: relative; top: auto; }
+
         /* Premium Sections */
         .bento-card { 
             background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-xl); 
@@ -2070,12 +2088,24 @@
                 <div class="price-area" id="default-price-area">
                     <span class="price-label" id="price-label">GIÁ TRẢI NGHIỆM</span>
                     <span class="price-discount-badge" id="price-discount-badge" style="display:none;">-20%</span>
+                    <span class="price-discount-badge" id="price-voucher-badge" style="display:none; margin-left:8px; background:#6366f1;">-5%</span>
                     <span class="price-original" id="p-price-original" style="display:none;">...</span>
                     <div>
                         <span class="price-display" id="p-price">...</span>
                         <span id="p-price-unit" style="font-size:14px; color:var(--text-dim); font-weight:600; margin-left:4px;"></span>
                     </div>
                     <span class="price-savings" id="price-savings" style="display:none;">✅ Tiết kiệm 200.000 ₫ so với đặt trực tiếp</span>
+                    <span class="price-savings" id="price-voucher-savings" style="display:none;"></span>
+                </div>
+
+                <!-- VOUCHER INPUT ON DETAIL PANEL -->
+                <div class="price-area" id="voucher-panel" style="margin-top:16px;">
+                    <span class="price-label">MÃ GIẢM GIÁ / VOUCHER</span>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <input id="p-voucher-code" type="text" placeholder="Nhập mã giảm giá" style="flex:1; min-width:160px; padding:14px 16px; border-radius:18px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.03); color:var(--text-main); text-transform:uppercase; outline:none;">
+                        <button type="button" id="p-voucher-apply-btn" style="padding:14px 18px; border:none; border-radius:18px; background:linear-gradient(135deg,var(--primary),#818cf8); color:#fff; font-weight:700; cursor:pointer; white-space:nowrap;">Áp dụng</button>
+                    </div>
+                    <div id="p-voucher-msg" style="font-size:0.82rem; color:var(--text-dim); margin-top:10px; min-height:18px;"></div>
                 </div>
 
                 <!-- VIEWERS LIVE -->
@@ -2392,6 +2422,25 @@
                         <input type="text" id="c-name" class="lux-input" placeholder="Tên của bạn" style="padding:12px 16px; font-size:14px;">
                     </div>
 
+                    <!-- VOUCHER PROMOTION SECTION -->
+                    <div class="card-label" style="margin-bottom:8px; font-size:10px;">MÃ KHUYẾN MÃI / DISCOUNTS</div>
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:18px; padding:16px; margin-bottom:20px; text-align:left;">
+                        <div style="display:flex; gap:10px; margin-bottom:12px;">
+                            <input type="text" id="v-code-input" class="lux-input" placeholder="Nhập mã giảm giá..." style="padding:10px 14px; font-size:13px; margin:0; text-transform:uppercase; flex:1;">
+                            <button type="button" onclick="applyVoucherCode()" style="background:linear-gradient(135deg,#6366f1,#a855f7); color:#fff; border:none; border-radius:10px; padding:0 16px; font-size:12px; font-weight:700; cursor:pointer; min-width:80px;">Áp dụng</button>
+                        </div>
+                        <div id="v-status-msg" style="font-size:11px; margin-bottom:10px; display:none;"></div>
+                        
+                        <!-- Toggle to view available vouchers -->
+                        <div id="v-available-toggle" onclick="toggleAvailableVouchers()" style="font-size:12px; color:#a78bfa; cursor:pointer; display:flex; align-items:center; justify-content:space-between; font-weight:600;">
+                            <span>🎁 Chọn ưu đãi từ tài khoản</span>
+                            <span id="v-toggle-arrow">▼</span>
+                        </div>
+                        <div id="v-available-list" style="display:none; max-height:160px; overflow-y:auto; margin-top:12px; flex-direction:column; gap:8px;">
+                            <div style="color:#64748b; font-size:11px; text-align:center; padding:10px;">Đang tải danh sách ưu đãi...</div>
+                        </div>
+                    </div>
+
                     <div class="card-label" style="margin-bottom:12px; font-size:10px;">THANH TOÁN</div>
                     <div class="pay-list">
                         <div class="pay-item is-active" id="m-qr" onclick="setM('qr', this)">
@@ -2674,6 +2723,122 @@
             renderItems();
         }
 
+        let appliedVoucherCode = null;
+        let discountAmount = 0;
+        let originalBookingPrice = 0;
+        let detailBaseDiscountedPrice = 0;
+        let sideVoucherCode = null;
+        let sideVoucherDiscount = 0;
+        let sideVoucherType = null;
+        let sideVoucherValue = 0;
+
+        function parsePriceValue(text) {
+            return parseInt((text || '').replace(/[^0-9]/g, '')) || 0;
+        }
+
+        function updateDetailPriceAfterVoucher() {
+            const originalEl = document.getElementById('p-price-original');
+            const savingsEl = document.getElementById('price-savings');
+            const voucherBadgeEl = document.getElementById('price-voucher-badge');
+            const voucherSavingsEl = document.getElementById('price-voucher-savings');
+            if (!sideVoucherCode || sideVoucherDiscount <= 0) {
+                if (voucherBadgeEl) voucherBadgeEl.style.display = 'none';
+                if (voucherSavingsEl) voucherSavingsEl.style.display = 'none';
+                if (savingsEl && savingsEl.innerText) savingsEl.style.display = 'block';
+                if (!detailBaseDiscountedPrice) {
+                    detailBaseDiscountedPrice = parsePriceValue(document.getElementById('p-price').innerText);
+                }
+                document.getElementById('p-price').innerText = detailBaseDiscountedPrice.toLocaleString('vi-VN') + ' ₫';
+                return;
+            }
+            if (!detailBaseDiscountedPrice) {
+                detailBaseDiscountedPrice = parsePriceValue(document.getElementById('p-price').innerText);
+            }
+            const finalPrice = Math.max(0, detailBaseDiscountedPrice - sideVoucherDiscount);
+            if (voucherBadgeEl) {
+                if (sideVoucherType === 'percent') {
+                    voucherBadgeEl.innerText = `-${sideVoucherValue}%`;
+                } else {
+                    voucherBadgeEl.innerText = `- ${sideVoucherDiscount.toLocaleString('vi-VN')} ₫`;
+                }
+                voucherBadgeEl.style.display = 'inline-block';
+            }
+            if (voucherSavingsEl) {
+                voucherSavingsEl.textContent = `✅ Giảm ${sideVoucherDiscount.toLocaleString('vi-VN')} ₫ với mã ${sideVoucherCode}`;
+                voucherSavingsEl.style.display = 'block';
+            }
+            if (savingsEl && savingsEl.innerText) {
+                savingsEl.style.display = 'block';
+            }
+            document.getElementById('p-price').innerText = finalPrice.toLocaleString('vi-VN') + ' ₫';
+        }
+
+        function clearDetailVoucherState(message, isError) {
+            sideVoucherCode = null;
+            sideVoucherDiscount = 0;
+            sideVoucherType = null;
+            sideVoucherValue = 0;
+            const msgEl = document.getElementById('p-voucher-msg');
+            if (msgEl) {
+                msgEl.style.color = isError ? '#ef4444' : '#10b981';
+                msgEl.textContent = message || '';
+            }
+            if (!message && msgEl) msgEl.textContent = '';
+            const savingsEl = document.getElementById('price-savings');
+            const voucherBadgeEl = document.getElementById('price-voucher-badge');
+            const voucherSavingsEl = document.getElementById('price-voucher-savings');
+            if (voucherBadgeEl) voucherBadgeEl.style.display = 'none';
+            if (voucherSavingsEl) voucherSavingsEl.style.display = 'none';
+            if (detailBaseDiscountedPrice) {
+                document.getElementById('p-price').innerText = detailBaseDiscountedPrice.toLocaleString('vi-VN') + ' ₫';
+            }
+            if (savingsEl && savingsEl.innerText) savingsEl.style.display = 'block';
+        }
+
+        async function applyDetailVoucher() {
+            const codeInput = document.getElementById('p-voucher-code');
+            const msgEl = document.getElementById('p-voucher-msg');
+            if (!codeInput) return;
+            const code = codeInput.value.trim().toUpperCase();
+            if (!code) {
+                if (msgEl) {
+                    msgEl.style.color = '#ef4444';
+                    msgEl.textContent = 'Vui lòng nhập mã giảm giá';
+                }
+                return;
+            }
+            const currentPrice = parsePriceValue(document.getElementById('p-price').innerText);
+            const total = detailBaseDiscountedPrice || currentPrice;
+            if (msgEl) {
+                msgEl.style.color = '#94a3b8';
+                msgEl.textContent = 'Đang kiểm tra mã...';
+            }
+            try {
+                const res = await fetch('/api/vouchers/apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-auth-token': localStorage.getItem('wander_token') || '' },
+                    body: JSON.stringify({ code: code, placeId: pid, orderTotal: total })
+                });
+                const json = await res.json();
+                if (json.success) {
+                            sideVoucherCode = code;
+                    sideVoucherDiscount = Number(json.data.discountAmount) || 0;
+                    sideVoucherType = json.data.voucher?.discountType || null;
+                    sideVoucherValue = Number(json.data.voucher?.discountValue) || 0;
+                    appliedVoucherCode = code;
+                    if (msgEl) {
+                        msgEl.style.color = '#10b981';
+                        msgEl.textContent = json.message || `Mã ${code} đã được áp dụng`;
+                    }
+                    updateDetailPriceAfterVoucher();
+                } else {
+                    clearDetailVoucherState(json.message || 'Mã giảm giá không hợp lệ', true);
+                }
+            } catch (err) {
+                clearDetailVoucherState('Lỗi kết nối. Vui lòng thử lại.', true);
+            }
+        }
+
         function openPayment() { 
             document.getElementById('p-form').style.display = 'block';
             document.getElementById('p-status').style.display = 'none';
@@ -2685,6 +2850,169 @@
             document.querySelector('.modal-content').scrollTop = 0;
             const btn = document.getElementById('btn-pay-main');
             if(btn) { btn.disabled = false; btn.innerText = 'XÁC NHẬN & THANH TOÁN'; }
+
+            // Dynamic Price extraction
+            const presentPrice = parsePriceValue(document.getElementById('p-price').innerText);
+            originalBookingPrice = detailBaseDiscountedPrice || presentPrice;
+            
+            // Reset voucher state
+            appliedVoucherCode = null;
+            discountAmount = 0;
+            const vInput = document.getElementById('v-code-input');
+            if (sideVoucherCode && vInput) {
+                vInput.value = sideVoucherCode;
+                appliedVoucherCode = sideVoucherCode;
+                discountAmount = sideVoucherDiscount;
+            } else if(vInput) {
+                vInput.value = '';
+            }
+            const vMsg = document.getElementById('v-status-msg');
+            if(vMsg) vMsg.style.display = 'none';
+            updateSummaryPrice();
+
+            if (sideVoucherCode) {
+                if (vMsg) {
+                    vMsg.style.display = 'block';
+                    vMsg.style.color = '#10b981';
+                    vMsg.innerText = `Mã ${sideVoucherCode} đã được áp dụng.`;
+                }
+            }
+
+            // Load vouchers
+            loadAvailableVouchers();
+        }
+
+        function updateSummaryPrice() {
+            const finalPrice = originalBookingPrice - discountAmount;
+            const sumPriceEl = document.getElementById('sum-price');
+            if (!sumPriceEl) return;
+            if (discountAmount > 0) {
+                sumPriceEl.innerHTML = `
+                    <span style="text-decoration:line-through; color:var(--text-dim); margin-right:8px;">${originalBookingPrice.toLocaleString('vi-VN')} ₫</span>
+                    <span style="color:#10b981; font-weight:800;">${finalPrice.toLocaleString('vi-VN')} ₫</span>
+                `;
+            } else {
+                sumPriceEl.innerText = originalBookingPrice.toLocaleString('vi-VN') + ' ₫';
+            }
+        }
+
+        async function loadAvailableVouchers() {
+            const listEl = document.getElementById('v-available-list');
+            if (!listEl) return;
+            listEl.innerHTML = '<div style="color:#64748b; font-size:11px; text-align:center; padding:10px;">Đang tải danh sách ưu đãi...</div>';
+
+            const token = localStorage.getItem('wander_token');
+            if (!token) {
+                listEl.innerHTML = '<div style="color:#64748b; font-size:11px; text-align:center; padding:10px;">Đăng nhập để xem các ưu đãi dành riêng cho bạn</div>';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/vouchers/available?placeId=${pid}`, {
+                    headers: { 'x-auth-token': token }
+                });
+                const json = await res.json();
+                if (json.success && json.data && json.data.length > 0) {
+                    listEl.innerHTML = json.data.map(v => {
+                        const valText = v.discountType === 'percent' 
+                            ? `Giảm ${v.discountValue}%` 
+                            : `Giảm ${v.discountValue.toLocaleString('vi-VN')}đ`;
+                        const conditionText = v.minOrderValue > 0 
+                            ? `đơn từ ${v.minOrderValue.toLocaleString('vi-VN')}đ` 
+                            : 'mọi đơn hàng';
+                        return `
+                            <div onclick="selectVoucher('${v.code}')" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px dashed rgba(255,255,255,0.1); border-radius:10px; padding:10px 14px; cursor:pointer; transition:0.2s;" onmouseover="this.style.background='rgba(99,102,241,0.05)';" onmouseout="this.style.background='rgba(255,255,255,0.02)';">
+                                <div>
+                                    <div style="font-weight:700; color:#a78bfa; font-size:13px;">${v.code}</div>
+                                    <div style="font-size:10px; color:var(--text-dim); margin-top:2px;">${valText} - ${conditionText}</div>
+                                </div>
+                                <span style="font-size:11px; font-weight:700; color:#6366f1; background:rgba(99,102,241,0.1); padding:2px 8px; border-radius:6px;">Dùng</span>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    listEl.innerHTML = '<div style="color:#64748b; font-size:11px; text-align:center; padding:10px;">Không có mã giảm giá khả dụng nào</div>';
+                }
+            } catch (err) {
+                listEl.innerHTML = '<div style="color:#ef4444; font-size:11px; text-align:center; padding:10px;">Lỗi tải mã giảm giá</div>';
+            }
+        }
+
+        function selectVoucher(code) {
+            const vInput = document.getElementById('v-code-input');
+            if(vInput) vInput.value = code;
+            applyVoucherCode();
+        }
+
+        async function applyVoucherCode() {
+            const vInput = document.getElementById('v-code-input');
+            if(!vInput) return;
+            const code = vInput.value.trim();
+            const msgEl = document.getElementById('v-status-msg');
+            if (!code) {
+                if(msgEl) {
+                    msgEl.style.display = 'block';
+                    msgEl.style.color = '#ef4444';
+                    msgEl.innerText = 'Vui lòng nhập mã giảm giá';
+                }
+                return;
+            }
+
+            const token = localStorage.getItem('wander_token');
+            if (!token) {
+                if(msgEl) {
+                    msgEl.style.display = 'block';
+                    msgEl.style.color = '#ef4444';
+                    msgEl.innerText = 'Vui lòng đăng nhập để áp dụng mã giảm giá';
+                }
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/vouchers/apply', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
+                    body: JSON.stringify({ code: code, placeId: pid, orderTotal: originalBookingPrice })
+                });
+                const json = await res.json();
+                if (json.success) {
+                    appliedVoucherCode = json.data.voucher.code;
+                    discountAmount = json.data.discountAmount;
+                    if(msgEl) {
+                        msgEl.style.display = 'block';
+                        msgEl.style.color = '#10b981';
+                        msgEl.innerText = json.message;
+                    }
+                    updateSummaryPrice();
+                } else {
+                    appliedVoucherCode = null;
+                    discountAmount = 0;
+                    if(msgEl) {
+                        msgEl.style.display = 'block';
+                        msgEl.style.color = '#ef4444';
+                        msgEl.innerText = json.message;
+                    }
+                    updateSummaryPrice();
+                }
+            } catch (err) {
+                appliedVoucherCode = null;
+                discountAmount = 0;
+                if(msgEl) {
+                    msgEl.style.display = 'block';
+                    msgEl.style.color = '#ef4444';
+                    msgEl.innerText = 'Lỗi kết nối';
+                }
+                updateSummaryPrice();
+            }
+        }
+
+        function toggleAvailableVouchers() {
+            const listEl = document.getElementById('v-available-list');
+            const arrowEl = document.getElementById('v-toggle-arrow');
+            if(!listEl || !arrowEl) return;
+            const isHidden = listEl.style.display === 'none';
+            listEl.style.display = isHidden ? 'flex' : 'none';
+            arrowEl.innerText = isHidden ? '▲' : '▼';
         }
         function closePayment() { 
             document.getElementById('p-modal').classList.remove('is-active'); 
@@ -2709,6 +3037,11 @@
             tg.innerText = isHidden ? 'Ít hơn' : 'Khác';
         }
 
+        const detailVoucherBtn = document.getElementById('p-voucher-apply-btn');
+        if (detailVoucherBtn) {
+            detailVoucherBtn.addEventListener('click', applyDetailVoucher);
+        }
+
         async function doPay() {
             const name = document.getElementById('c-name').value;
             if(!name) { alert("Vui lòng nhập tên!"); return; }
@@ -2731,7 +3064,15 @@
                 const r = await fetch('/api/bookings', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('wander_token')}` },
-                    body: JSON.stringify({ placeId: pid, customerName: name, customerPhone: document.getElementById('c-phone').value, useDate: document.getElementById('c-date').value, paymentMethod: pMethod })
+                    body: JSON.stringify({ 
+                        placeId: pid, 
+                        customerName: name, 
+                        customerPhone: document.getElementById('c-phone').value, 
+                        useDate: document.getElementById('c-date').value, 
+                        paymentMethod: pMethod,
+                        voucherCode: appliedVoucherCode,
+                        totalPrice: originalBookingPrice
+                    })
                 });
                 const j = await r.json();
                 if(j.success) {
@@ -4135,6 +4476,8 @@
             const multiplier = type === 'premium' ? 1.5 : type === 'luxury' ? 2.2 : 1;
             const newPrice = Math.round(basePriceValue * multiplier);
             document.getElementById('p-price').innerText = newPrice.toLocaleString('vi-VN') + ' ₫';
+            detailBaseDiscountedPrice = newPrice;
+            if (sideVoucherCode) updateDetailPriceAfterVoucher();
         }
 
         function initPricing(basePrice) {
@@ -4159,6 +4502,7 @@
                 document.getElementById('price-discount-badge').innerText = `-${discountPct}%`;
                 document.getElementById('price-savings').innerText = `✅ Tiết kiệm ${fmt(savings)} so với đặt trực tiếp`;
                 document.getElementById('price-savings').style.display = 'block';
+                detailBaseDiscountedPrice = standard;
             }
         }
 

@@ -56,6 +56,7 @@
     dashboard: { el: 'dashboard-view', label: 'Bảng điều khiển' },
     services:  { el: 'services-view',  label: 'Quản lý dịch vụ',     load: function() { if(window.initServiceManagement) window.initServiceManagement(); } },
     bookings:  { el: 'bookings-view',  label: 'Quản lý đơn hàng',    load: function() { if(window.initBookingManagement) window.initBookingManagement(); } },
+    promotions: { el: 'promotions-view',  label: 'Mã khuyến mãi',       load: function() { if(window.BizPromo && window.BizPromo.init) window.BizPromo.init(); } },
     messages:  { el: 'messages-view',  label: 'Tin nhắn khách hàng',  load: function() { if(window.initMessageManagement) window.initMessageManagement(); } },
     reviews:   { el: 'reviews-view',   label: 'Đánh giá dịch vụ',       load: function() { if(window.initReviewManagement) window.initReviewManagement(); } },
     'user-activity': { el: 'user-activity-view', label: 'Hoạt động người dùng', load: function() { if(window.initUserActivity) window.initUserActivity(); } },

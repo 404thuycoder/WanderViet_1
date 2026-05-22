@@ -1,0 +1,6 @@
+.spot-detail-panel{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:0.75rem;padding:0.6rem;display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem}
+.spot-detail-gallery{display:flex;gap:0.4rem;overflow-x:auto}
+.spot-detail-gallery img{width:120px;height:80px;object-fit:cover;border-radius:0.45rem}
+.spot-detail-ratings{display:flex;gap:0.5rem;align-items:center}
+.spot-detail-ratings .rating-item{background:rgba(255,255,255,0.03);padding:0.35rem 0.5rem;border-radius:0.45rem;font-size:0.8rem}
+.spot-review-item{border-top:1px dashed rgba(255,255,255,0.04);padding-top:0.45rem;font-size:0.9rem;color:var(--text-muted)}

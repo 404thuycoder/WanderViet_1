@@ -220,6 +220,21 @@ a {
   margin-top: 1rem;
 }
 
+/* --- Force sidebars visible on desktop (override accidental hides) --- */
+@media (min-width: 901px) {
+  .planner-3col-layout { grid-template-columns: 240px minmax(0, 1fr) 240px !important; }
+  .planner-sidebar { display: flex !important; min-width: 240px !important; width: 240px !important; box-sizing: border-box !important; position: relative !important; z-index: 100 !important; }
+}
+
+/* Prevent main content cards overlapping sidebars */
+@media (min-width: 901px) {
+  .planner-3col-layout { gap: 1rem !important; }
+  .planner-sidebar { background-clip: padding-box; }
+  .planner-form-body, .planner-result { min-width: 0 !important; position: relative !important; z-index: 1 !important; }
+  .v2-dest-grid-layout { z-index: 1; }
+  .v2-dest-card { position: relative; z-index: 2; }
+}
+
 .compare-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
@@ -3098,8 +3113,23 @@ a {
 
 /* ── 3-Col Layout ── */
 .planner-3col-layout {
-  grid-template-columns: 240px 1fr 240px !important;
+  display: grid !important;
+  grid-template-columns: 240px minmax(0, 1fr) 240px !important;
   gap: 1.5rem;
+  position: relative;
+}
+.planner-sidebar {
+  min-width: 0 !important;
+  flex: 0 0 240px !important;
+  width: 240px !important;
+  position: relative !important;
+  z-index: 100 !important;
+}
+.planner-form-body,
+.planner-result {
+  min-width: 0 !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 /* ── Sidebars — Polished Dark ── */

@@ -20,7 +20,7 @@ if (process.env.GROQ_API_KEY_NAVIGATION) process.env.GROQ_API_KEY_NAVIGATION = p
 if (process.env.JWT_SECRET) process.env.JWT_SECRET = process.env.JWT_SECRET.trim();
 if (process.env.MONGODB_URI) process.env.MONGODB_URI = process.env.MONGODB_URI.trim();
 
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const app = express();
 app.set('trust proxy', true);
 
@@ -84,6 +84,7 @@ app.use('/api/business', require('./server/routes/business'));
 app.use('/api/services', require('./server/routes/business'));
 app.use('/api/feedback', require('./server/routes/feedback'));
 app.use('/api/planner', require('./server/routes/planner'));
+app.use('/api/place-info', require('./server/routes/placeInfo'));
 app.use('/api/directions', require('./server/routes/directions'));
 app.use('/api/navi', require('./server/routes/ai-navigation'));
 app.use('/api/notifications', require('./server/routes/notifications'));

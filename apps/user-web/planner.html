@@ -42,6 +42,8 @@
     rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=4" />
   <link rel="stylesheet" href="css/planner.css?v=20260518_v36" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="/planner_spot_detail_css_helper.css?v=1" />
   <style id="hotfix-cache-buster">
     /* FORCE remove old map image from ALL potential places in hero */
     .planner-hero-header::before,
@@ -170,11 +172,654 @@
       }
     }
 
-    @media (min-width: 1400px) {
-       .planner-container {
-          max-width: 1440px !important; 
-       }
+    /* --- v2DestReviewPanel CSS (Adaptive Light/Dark Theme Aesthetics) --- */
+    #v2DestReviewPanel {
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      /* Light mode defaults */
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      color: #0f172a !important;
     }
+    .v2-age-title {
+      color: #0f172a !important;
+    }
+    .v2-age-text {
+      color: #334155 !important;
+    }
+    .v2-age-bold {
+      color: #1e293b !important;
+      font-weight: 600;
+    }
+    .v2-filter-title {
+      color: #0f172a !important;
+    }
+    .v2-filter-label {
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #334155 !important;
+      transition: all 0.2s !important;
+    }
+    .v2-filter-label:hover {
+      background: #f1f5f9 !important;
+      color: #0f172a !important;
+      border-color: #94a3b8 !important;
+    }
+    .review-spot-card {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      color: #0f172a !important;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .review-spot-card .spot-card-name {
+      color: #0f172a !important;
+    }
+    .review-spot-card .spot-card-desc {
+      color: #64748b !important;
+    }
+    .review-spot-card:hover {
+      transform: translateY(-2px);
+      background: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+    }
+    .review-spot-card.selected {
+      background: linear-gradient(135deg, #eff6ff, #ecfeff) !important;
+      border-color: #06b6d4 !important;
+      box-shadow: 0 4px 12px rgba(6,182,212,0.18) !important;
+    }
+    .review-spot-card.selected .spot-card-name {
+      color: #0891b2 !important;
+    }
+    #reviewPanelSpots::-webkit-scrollbar {
+      width: 4px;
+    }
+    #reviewPanelSpots::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.02);
+    }
+    #reviewPanelSpots::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.1);
+      border-radius: 4px;
+    }
+    #reviewPanelSpots::-webkit-scrollbar-thumb:hover {
+      background: rgba(0,0,0,0.2);
+    }
+    .v2-filter-label input[type="checkbox"] {
+      cursor: pointer;
+    }
+
+    /* ── Dark Theme (Adaptive Selector) ── */
+    [data-theme="dark"] #v2DestReviewPanel,
+    html[data-theme="dark"] #v2DestReviewPanel {
+      background: rgba(15, 23, 42, 0.45) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      color: #f1f5f9 !important;
+    }
+    [data-theme="dark"] .v2-age-title,
+    html[data-theme="dark"] .v2-age-title {
+      color: #00e5ff !important;
+    }
+    [data-theme="dark"] .v2-age-text,
+    html[data-theme="dark"] .v2-age-text {
+      color: var(--text-muted, #94a3b8) !important;
+    }
+    [data-theme="dark"] .v2-age-bold,
+    html[data-theme="dark"] .v2-age-bold {
+      color: #f1f5f9 !important;
+    }
+    [data-theme="dark"] .v2-filter-title,
+    html[data-theme="dark"] .v2-filter-title {
+      color: #fff !important;
+    }
+    [data-theme="dark"] .v2-filter-label,
+    html[data-theme="dark"] .v2-filter-label {
+      background: rgba(255,255,255,0.02) !important;
+      border: 1px solid rgba(255,255,255,0.05) !important;
+      color: var(--text, #f1f5f9) !important;
+    }
+    [data-theme="dark"] .v2-filter-label:hover,
+    html[data-theme="dark"] .v2-filter-label:hover {
+      background: rgba(255,255,255,0.06) !important;
+      color: #fff !important;
+      border-color: rgba(255,255,255,0.12) !important;
+    }
+    [data-theme="dark"] .review-spot-card,
+    html[data-theme="dark"] .review-spot-card {
+      background: rgba(255, 255, 255, 0.02) !important;
+      border: 1px solid rgba(255, 255, 255, 0.05) !important;
+      color: #f1f5f9 !important;
+    }
+    [data-theme="dark"] .review-spot-card .spot-card-name,
+    html[data-theme="dark"] .review-spot-card .spot-card-name {
+      color: #fff !important;
+    }
+    [data-theme="dark"] .review-spot-card .spot-card-desc,
+    html[data-theme="dark"] .review-spot-card .spot-card-desc {
+      color: var(--text-muted, #94a3b8) !important;
+    }
+    [data-theme="dark"] .review-spot-card:hover,
+    html[data-theme="dark"] .review-spot-card:hover {
+      background: rgba(255,255,255,0.06) !important;
+      border-color: rgba(255,255,255,0.12) !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+    }
+    [data-theme="dark"] .review-spot-card.selected,
+    html[data-theme="dark"] .review-spot-card.selected {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(0, 229, 255, 0.18)) !important;
+      border-color: #00e5ff !important;
+      box-shadow: 0 4px 15px rgba(0, 229, 255, 0.25) !important;
+    }
+    [data-theme="dark"] .review-spot-card.selected .spot-card-name,
+    html[data-theme="dark"] .review-spot-card.selected .spot-card-name {
+      color: #00e5ff !important;
+    }
+    [data-theme="dark"] #reviewPanelSpots::-webkit-scrollbar-track,
+    html[data-theme="dark"] #reviewPanelSpots::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.01);
+    }
+    [data-theme="dark"] #reviewPanelSpots::-webkit-scrollbar-thumb,
+    html[data-theme="dark"] #reviewPanelSpots::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.1);
+    }
+    [data-theme="dark"] #reviewPanelSpots::-webkit-scrollbar-thumb:hover,
+    html[data-theme="dark"] #reviewPanelSpots::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* --- Region Destination Grid (large cards like screenshot 2) --- */
+    .region-dest-scroll {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      padding: 0.6rem 0.2rem;
+      align-items: start;
+      max-height: 520px; /* allow taller grid */
+      overflow-y: auto;
+    }
+    .region-dest-card {
+      background: var(--card-bg, rgba(255,255,255,0.03));
+      border: 1px solid var(--border, rgba(0,0,0,0.06));
+      border-radius: 0.9rem;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 320px;
+      box-shadow: 0 8px 24px rgba(2,6,23,0.35);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .region-dest-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,23,0.5); }
+    .dest-card-image { position:relative; height:150px; overflow:hidden; }
+    .dest-card-image img { width:100%; height:100%; object-fit:cover; display:block; }
+    .dest-card-badge { position:absolute; left:0.6rem; top:0.6rem; background: #ff4d8b; color:#fff; padding:0.28rem 0.5rem; border-radius:0.5rem; font-weight:700; font-size:0.72rem; }
+    .dest-card-verified { position:absolute; right:0.6rem; top:0.6rem; background: rgba(0,0,0,0.35); color:#d1fae5; padding:0.18rem 0.45rem; border-radius:0.5rem; font-size:0.68rem; }
+    .dest-card-info { padding:0.8rem; display:flex; flex-direction:column; gap:0.5rem; flex:1; }
+    /* spot-review-tab style moved to premium adaptive styles */
+    .spot-review-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+    .spot-review-title {
+      font-size: 1.18rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+    .spot-review-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      align-items: center;
+    }
+    .spot-review-pill {
+      padding: 0.45rem 0.8rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: #dbeafe;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .spot-review-close {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #fff;
+      padding: 0.55rem 0.95rem;
+      border-radius: 0.9rem;
+      cursor: pointer;
+      font-size: 0.92rem;
+      align-self: flex-start;
+    }
+    .spot-review-content { display: grid; grid-template-columns: 1fr 0.95fr; gap: 1rem; }
+    .spot-review-summary { color: #e2e8f0; line-height: 1.75; font-size: 1rem; margin: 0; }
+    .spot-review-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem; margin-top: 1rem; }
+    .spot-review-gallery img { width: 100%; height: 150px; object-fit: cover; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.14); }
+    .spot-review-ratings { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; }
+    .spot-review-rating { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 1rem; padding: 0.6rem 0.9rem; min-width: 140px; font-size: 0.95rem; color: #f8fafc; }
+    .spot-review-list { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.2rem; }
+    .spot-review-item { display: flex; gap: 0.85rem; align-items: flex-start; }
+    .spot-review-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(96, 165, 250, 0.2); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 0.95rem; }
+    .spot-review-meta { flex: 1; }
+    .spot-review-meta-header { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; font-weight: 700; color: #fff; font-size: 0.95rem; }
+    .spot-review-text { margin: 0.25rem 0 0 0; color: #d1d5db; line-height: 1.65; font-size: 0.92rem; }
+    @media (max-width: 900px) {
+      .spot-review-content { grid-template-columns: 1fr; }
+      .spot-review-gallery img { height: 120px; }
+    }
+    .dest-card-location { color:var(--text-muted); font-size:0.75rem; }
+    .dest-card-name { font-weight:800; font-size:1rem; color:var(--text); }
+    .dest-card-desc { color:var(--text-muted); font-size:0.85rem; line-height:1.2; flex:1; }
+    .dest-card-actions { display:flex; justify-content:space-between; align-items:center; gap:0.5rem; margin-top:0.25rem; }
+    .dest-card-actions .link-detail { color:var(--link, #60a5fa); font-weight:700; text-decoration:none; }
+    .dest-card-actions .btn-go { background: linear-gradient(90deg,#7c3aed,#06b6d4); color:#fff; border:none; padding:0.45rem 0.7rem; border-radius:0.6rem; cursor:pointer; }
+    .spot-action-btn, .spot-select-btn {
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: #f8fafc;
+      border-radius: 0.95rem;
+      font-size: 0.88rem;
+      padding: 0.6rem 0.8rem;
+      min-width: 110px;
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+    .spot-action-btn:hover, .spot-select-btn:hover {
+      background: rgba(255,255,255,0.12);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    }
+    .spot-detail-panel {
+      background: rgba(8, 15, 30, 0.96);
+      border: 1px solid rgba(96, 165, 250, 0.18);
+      border-radius: 1.25rem;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
+      padding: 1.2rem;
+      margin-top: 1rem;
+      color: #f8fafc;
+      font-size: 0.97rem;
+    }
+    .spot-detail-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .spot-detail-title {
+      font-size: 1.06rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.35rem;
+    }
+    .spot-detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      color: #94a3b8;
+      font-size: 0.88rem;
+    }
+    .spot-detail-badge,
+    .spot-detail-score,
+    .spot-detail-tag {
+      padding: 0.45rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+    }
+    .spot-detail-badge { color: #7dd3fc; }
+    .spot-detail-score { color: #fde047; }
+    .spot-detail-tag { color: #a7f3d0; }
+    .spot-detail-close {
+      background: rgba(255,255,255,0.06);
+      color: #f8fafc;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 0.85rem;
+      padding: 0.55rem 0.95rem;
+      cursor: pointer;
+      font-size: 0.88rem;
+    }
+    .spot-detail-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+    }
+    .spot-detail-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.85rem;
+      overflow: hidden;
+      padding-bottom: 0.15rem;
+    }
+    .spot-detail-gallery img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 1.1rem;
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+    .spot-detail-summary {
+      margin: 0;
+      line-height: 1.8;
+      color: #e2e8f0;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    .spot-detail-ratings {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.85rem;
+    }
+    .spot-detail-ratings .rating-pill {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #f8fafc;
+      border-radius: 0.95rem;
+      padding: 0.55rem 0.9rem;
+      font-size: 0.92rem;
+      min-width: 130px;
+    }
+    .spot-detail-reviews {
+      display: flex;
+      flex-direction: column;
+      gap: 0.9rem;
+      margin-top: 0.85rem;
+    }
+    .spot-detail-review-item {
+      display:flex;
+      gap:0.85rem;
+      align-items:flex-start;
+    }
+    .spot-detail-review-avatar {
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      background: rgba(96,165,250,0.18);
+      color: #fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:0.92rem;
+      font-weight:700;
+      flex-shrink:0;
+    }
+    .spot-detail-review-name {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:0.6rem;
+      font-size:0.94rem;
+      font-weight:700;
+      color:#fff;
+    }
+    .spot-detail-review-stars { color:#fbbf24; font-size:0.96rem; }
+    .spot-detail-review-text { margin:0.2rem 0 0 0; color:#d1d5db; font-size:0.9rem; line-height:1.65; }
+    @media (max-width: 900px) {
+      .spot-detail-body { grid-template-columns: 1fr; }
+      .spot-detail-gallery img { width: 118px; height: 88px; }
+    }
+    .spot-detail-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .spot-detail-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.35rem;
+    }
+    .spot-detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      color: #94a3b8;
+      font-size: 0.8rem;
+    }
+    .spot-detail-badge,
+    .spot-detail-score,
+    .spot-detail-tag {
+      padding: 0.38rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+    }
+    .spot-detail-badge { color: #7dd3fc; }
+    .spot-detail-score { color: #fde047; }
+    .spot-detail-tag { color: #a7f3d0; }
+    .spot-detail-close {
+      background: rgba(255,255,255,0.05);
+      color: #f8fafc;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 0.75rem;
+      padding: 0.45rem 0.85rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .spot-detail-body {
+      display: grid;
+      grid-template-columns: 1.4fr 0.9fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    .spot-detail-gallery {
+      display: flex;
+      gap: 0.65rem;
+      overflow-x: auto;
+      padding-bottom: 0.35rem;
+    }
+    .spot-detail-gallery img {
+      width: 120px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 0.8rem;
+      border: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
+    }
+    .spot-detail-info { display: flex; flex-direction: column; gap: 0.85rem; }
+    .spot-detail-summary { margin: 0; line-height: 1.6; color: #cbd5e1; font-size: 0.92rem; }
+    .spot-detail-ratings { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+    .spot-detail-ratings .rating-pill {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #f8fafc;
+      border-radius: 0.85rem;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.85rem;
+      min-width: 120px;
+    }
+    .spot-detail-reviews { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.85rem; }
+    .spot-detail-review-item { display:flex; gap:0.8rem; align-items:flex-start; }
+    .spot-detail-review-avatar { width:34px; height:34px; border-radius:50%; background: rgba(255,255,255,0.08); color: #fff; display:flex; align-items:center; justify-content:center; font-size:0.85rem; font-weight:700; }
+    .spot-detail-review-content { flex:1; }
+    .spot-detail-review-name { display:flex; align-items:center; justify-content:space-between; gap:0.5rem; font-size:0.9rem; font-weight:700; color:#fff; }
+    .spot-detail-review-stars { color:#fbbf24; font-size:0.9rem; }
+    .spot-detail-review-text { margin:0.15rem 0 0 0; color:#cbd5e1; font-size:0.88rem; line-height:1.5; }
+    @media (max-width: 900px) {
+      .region-dest-scroll { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+      .region-dest-card { min-height: 260px; }
+      .dest-card-image { height:120px; }
+      .spot-detail-body { grid-template-columns: 1fr; }
+      .spot-detail-gallery img { width: 100px; height: 72px; }
+    }
+
+    /* --- Premium Adaptive Spot Review Tab & Layout Overlay --- */
+    #v2DestReviewPanel {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin-top: 2rem !important;
+      box-sizing: border-box !important;
+    }
+    .v2-dest-grid {
+      grid-template-columns: 1.15fr 0.85fr !important;
+      gap: 1.5rem !important;
+    }
+    #reviewPanelSpots {
+      max-height: 320px !important;
+    }
+    .spot-review-tab {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      z-index: 100 !important;
+      border-radius: 1.25rem !important;
+      padding: 1.5rem !important;
+      display: none !important; /* Ẩn mặc định để tránh chèn ép layout */
+      flex-direction: column !important;
+      gap: 1.2rem !important;
+      overflow-y: auto !important;
+      backdrop-filter: blur(20px) !important;
+      
+      /* Light theme (Default) */
+      background: rgba(255, 255, 255, 0.98) !important;
+      color: #0f172a !important;
+      border: 1px solid #cbd5e1 !important;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1) !important;
+    }
+    .spot-review-tab.active {
+      display: flex !important;
+      animation: fadeInUpPremium 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    }
+    
+    @keyframes fadeInUpPremium {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .spot-review-tab .spot-review-title {
+      font-size: 1.25rem !important;
+      font-weight: 800 !important;
+      color: #0f172a !important;
+      margin-bottom: 0.4rem !important;
+    }
+    .spot-review-tab .spot-review-close {
+      background: #f1f5f9 !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #334155 !important;
+      padding: 0.5rem 1rem !important;
+      border-radius: 0.75rem !important;
+      cursor: pointer !important;
+      font-size: 0.85rem !important;
+      font-weight: 600 !important;
+      transition: all 0.2s !important;
+    }
+    .spot-review-tab .spot-review-close:hover {
+      background: #e2e8f0 !important;
+      color: #0f172a !important;
+      transform: translateY(-1px) !important;
+    }
+    .spot-review-tab .spot-review-pill {
+      padding: 0.35rem 0.75rem !important;
+      border-radius: 999px !important;
+      font-size: 0.8rem !important;
+      font-weight: 600 !important;
+      background: #f1f5f9 !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #1e293b !important;
+    }
+    .spot-review-tab .spot-review-rating {
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      color: #334155 !important;
+      border-radius: 0.75rem !important;
+      padding: 0.5rem 0.8rem !important;
+      font-size: 0.88rem !important;
+      min-width: 120px !important;
+    }
+    .spot-review-tab .spot-review-summary {
+      color: #475569 !important;
+      line-height: 1.7 !important;
+      font-size: 0.92rem !important;
+    }
+    .spot-review-tab .spot-review-text {
+      color: #475569 !important;
+      font-size: 0.88rem !important;
+      line-height: 1.55 !important;
+    }
+    .spot-review-tab .spot-review-avatar {
+      width: 36px !important;
+      height: 36px !important;
+      border-radius: 50% !important;
+      background: #eff6ff !important;
+      color: #1e40af !important;
+      font-weight: 700 !important;
+      display: grid !important;
+      place-items: center !important;
+    }
+    .spot-review-tab .spot-review-meta-header {
+      color: #1e293b !important;
+      font-weight: 700 !important;
+    }
+    .spot-review-tab .spot-review-review-stars {
+      color: #f59e0b !important;
+    }
+
+    /* ── Dark Theme (Adaptive Spot Review Tab) ── */
+    [data-theme="dark"] .spot-review-tab,
+    html[data-theme="dark"] .spot-review-tab {
+      background: rgba(15, 23, 42, 0.98) !important;
+      color: #f8fafc !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3) !important;
+    }
+    [data-theme="dark"] .spot-review-tab .spot-review-title,
+    html[data-theme="dark"] .spot-review-tab .spot-review-title {
+      color: #fff !important;
+    }
+    [data-theme="dark"] .spot-review-tab .spot-review-close,
+    html[data-theme="dark"] .spot-review-tab .spot-review-close {
+      background: rgba(255, 255, 255, 0.06) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      color: #f8fafc !important;
+    }
+    [data-theme="dark"] .spot-review-tab .spot-review-close:hover,
+    html[data-theme="dark"] .spot-review-tab .spot-review-close:hover {
+      background: rgba(255, 255, 255, 0.12) !important;
+      color: #fff !important;
+    }
+    [data-theme="dark"] .spot-review-tab .spot-review-pill,
+    html[data-theme="dark"] .spot-review-tab .spot-review-pill {
+      background: rgba(255, 255, 255, 0.04) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      color: #dbeafe !important;
+    }
+    [data-theme="dark"] .spot-review-tab .spot-review-rating,
+    html[data-theme="dark"] .spot-review-tab .spot-review-rating {
+      background: rgba(255, 255, 255, 0.04) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      color: #f8fafc !important;
+    }
+    [data-theme="dark"] .spot-review-tab .spot-review-summary,
+    html[data-theme="dark"] .spot-review-tab .spot-review-summary {
+      color: #cbd5e1 !important;
+    }
+    [data-theme="dark"] .spot-review-tab .spot-review-text,
+    html[data-theme="dark"] .spot-review-tab .spot-review-text {
+      color: #94a3b8 !important;
+    }
+    [data-theme="dark"] .spot-review-tab .spot-review-avatar,
+    html[data-theme="dark"] .spot-review-tab .spot-review-avatar {
+      background: rgba(96, 165, 250, 0.15) !important;
+      color: #60a5fa !important;
+    }
+    [data-theme="dark"] .spot-review-tab .spot-review-meta-header,
+    html[data-theme="dark"] .spot-review-tab .spot-review-meta-header {
+      color: #fff !important;
+    }
+
   </style>
 </head>
 
@@ -482,16 +1127,120 @@
                 </button>
               </div>
               <div id="regionDestCards" class="region-dest-scroll"></div>
+              
 
-              <!-- ĐỊA ĐIỂM CHI TIẾT KHI CLICK CHỌN TỈNH -->
-              <div id="cityAttractionsContainer" class="city-attractions-container" style="display:none; margin-top:1.25rem; border-top:1px dashed rgba(255,255,255,0.1); padding-top:1.25rem;">
-                <div class="attractions-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.875rem; flex-wrap:wrap; gap:0.5rem;">
-                  <span class="region-dest-label" style="color:#00e5ff; font-size:0.75rem;">
-                    ✨ Khám phá địa điểm tại <span id="attractionCityName" style="color:#fff; text-decoration:underline;">Hà Nội</span>
-                  </span>
-                  <span style="font-size:0.68rem; color:var(--text-muted); font-style:italic;">Bấm chọn những điểm bạn thực sự muốn ghé thăm!</span>
+              <!-- PREMIUM DESTINATION DISCOVERY PANEL -->
+              <div id="v2DestReviewPanel" style="display:none; position:relative; margin-top:1.5rem; border-radius:1.25rem; padding:1.25rem; box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+                <div class="v2-dest-grid" style="display:grid; grid-template-columns: 1.1fr 0.9fr; gap:1.25rem;">
+                  
+                  <!-- COLUMN 1: Travel Brochure & Age Suggestions -->
+                  <div class="v2-dest-brochure" style="display:flex; flex-direction:column; gap:0.85rem; border-right:1px solid var(--border, #e2e8f0); padding-right:1.25rem;">
+                    <!-- Banner Image -->
+                    <div id="v2DestBanner" style="height:120px; border-radius:0.75rem; overflow:hidden; position:relative; background:rgba(255,255,255,0.03);">
+                      <img id="v2DestBannerImg" src="" alt="Banner" style="width:100%; height:100%; object-fit:cover; filter:brightness(0.85); transition:all 0.4s ease;">
+                      <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding:0.5rem 0.75rem;">
+                        <h4 id="v2DestTitle" style="margin:0; font-size:1.25rem; font-weight:800; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.5);">Đà Lạt</h4>
+                      </div>
+                    </div>
+                                        <!-- Map preview + quick reviews (Tối ưu hàng ngang gọn gàng) -->
+                    <div class="v2-map-reviews-row" style="display:grid; grid-template-columns: 1.1fr 0.9fr; gap:0.75rem; margin-top:0.6rem;">
+                      <div id="v2DestMap" style="height:120px; border-radius:0.75rem; overflow:hidden; border:1px solid rgba(0,0,0,0.06);"></div>
+                      <div id="v2DestReviews" style="height:120px; overflow-y:auto; padding:0.4rem; background:var(--bg-card, rgba(0,0,0,0.02)); border-radius:0.75rem; border:1px solid var(--border, rgba(0,0,0,0.05)); font-size:0.7rem; line-height:1.45;"></div>
+                    </div>
+                    
+                    <!-- General Scores Grid -->
+                    <div class="v2-dest-scores" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:0.4rem;">
+                      <div class="score-card" style="background:var(--bg-card, #f1f5f9); border:1px solid var(--border, #e2e8f0); padding:0.4rem; border-radius:0.5rem; text-align:center;">
+                        <span class="v2-age-text" style="display:block; font-size:0.55rem; text-transform:uppercase; margin-bottom:2px;">Chất lượng</span>
+                        <span id="v2ScoreQuality" style="font-weight:800; color:#3b82f6; font-size:0.85rem;">⭐ 4.9</span>
+                      </div>
+                      <div class="score-card" style="background:var(--bg-card, #f1f5f9); border:1px solid var(--border, #e2e8f0); padding:0.4rem; border-radius:0.5rem; text-align:center;">
+                        <span class="v2-age-text" style="display:block; font-size:0.55rem; text-transform:uppercase; margin-bottom:2px;">An toàn</span>
+                        <span id="v2ScoreSafety" style="font-weight:800; color:#10b981; font-size:0.75rem;">Tốt</span>
+                      </div>
+                      <div class="score-card" style="background:var(--bg-card, #f1f5f9); border:1px solid var(--border, #e2e8f0); padding:0.4rem; border-radius:0.5rem; text-align:center;">
+                        <span class="v2-age-text" style="display:block; font-size:0.55rem; text-transform:uppercase; margin-bottom:2px;">Xu hướng</span>
+                        <span id="v2ScoreTrend" style="font-weight:800; color:#f59e0b; font-size:0.75rem;">Cực hot</span>
+                      </div>
+                      <div class="score-card" style="background:var(--bg-card, #f1f5f9); border:1px solid var(--border, #e2e8f0); padding:0.4rem; border-radius:0.5rem; text-align:center;">
+                        <span class="v2-age-text" style="display:block; font-size:0.55rem; text-transform:uppercase; margin-bottom:2px;">Chi phí</span>
+                        <span id="v2ScoreCost" style="font-weight:800; color:#ec4899; font-size:0.75rem;">Hợp lý</span>
+                      </div>
+                    </div>
+
+                    <!-- Khuyên dùng theo độ tuổi -->
+                    <div style="background:var(--bg-card, #f1f5f9); border:1px solid var(--border, #e2e8f0); padding:0.75rem; border-radius:0.75rem;">
+                      <h5 class="v2-age-title" style="margin:0 0 0.5rem 0; font-size:0.75rem; display:flex; align-items:center; gap:0.3rem; text-transform:uppercase; letter-spacing:0.5px;">
+                        <span>👶</span> Mẹo lý tưởng theo độ tuổi
+                      </h5>
+                      <div class="age-suggestions-container" style="display:flex; flex-direction:column; gap:0.5rem;">
+                        <!-- Kids -->
+                        <div class="age-suggestion-item" style="border-bottom:1px solid rgba(255,255,255,0.04); padding-bottom:0.4rem;">
+                          <div style="font-weight:700; font-size:0.7rem; color:#fff; display:flex; justify-content:space-between; margin-bottom:0.15rem;">
+                            <span>🧸 Trẻ nhỏ & Gia đình</span>
+                          </div>
+                          <div class="v2-age-text" style="font-size:0.65rem; line-height:1.3;">
+                            📍 <span id="v2AgeKidSpot" class="v2-age-bold">...</span> | 🍜 <span id="v2AgeKidFood" class="v2-age-bold">...</span> | 🎡 <span id="v2AgeKidPlay" class="v2-age-bold">...</span>
+                          </div>
+                        </div>
+                        <!-- Adults -->
+                        <div class="age-suggestion-item" style="border-bottom:1px solid rgba(255,255,255,0.04); padding-bottom:0.4rem;">
+                          <div style="font-weight:700; font-size:0.7rem; color:#fff; display:flex; justify-content:space-between; margin-bottom:0.15rem;">
+                            <span>🏃 Người lớn & Cặp đôi</span>
+                          </div>
+                          <div class="v2-age-text" style="font-size:0.65rem; line-height:1.3;">
+                            📍 <span id="v2AgeAdultSpot" class="v2-age-bold">...</span> | 🍜 <span id="v2AgeAdultFood" class="v2-age-bold">...</span> | 🧗 <span id="v2AgeAdultPlay" class="v2-age-bold">...</span>
+                          </div>
+                        </div>
+                        <!-- Elderly -->
+                        <div class="age-suggestion-item" style="padding-bottom:0;">
+                          <div class="v2-age-bold" style="font-size:0.7rem; display:flex; justify-content:space-between; margin-bottom:0.15rem;">
+                            <span>🍵 Người cao tuổi</span>
+                          </div>
+                          <div class="v2-age-text" style="font-size:0.65rem; line-height:1.3;">
+                            📍 <span id="v2AgeElderSpot" class="v2-age-bold">...</span> | 🍜 <span id="v2AgeElderFood" class="v2-age-bold">...</span> | 🧘 <span id="v2AgeElderPlay" class="v2-age-bold">...</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- COLUMN 2: Spot Directory & Dynamic Category Filter -->
+                  <div class="v2-dest-directory" style="display:flex; flex-direction:column; gap:0.5rem; overflow:hidden;">
+                    <div style="display:flex; flex-direction:column; gap:0.4rem;">
+                      <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="v2-filter-title" style="font-size:0.75rem; font-weight:700;">✨ Địa điểm nổi bật & Trải nghiệm</span>
+                        <span style="font-size:0.6rem; color:var(--text-muted); font-style:italic;">Bấm để tích chọn</span>
+                      </div>
+                      
+                      <!-- Filter Checkboxes -->
+                      <div class="v2-unified-filters" style="display:flex; gap:0.25rem; padding:0.25rem; border-radius:0.5rem;">
+                        <label class="v2-filter-label" style="display:inline-flex; align-items:center; gap:0.25rem; padding:0.25rem 0.4rem; border-radius:0.35rem; font-size:0.65rem; color:var(--text); cursor:pointer; transition:all 0.2s; user-select:none; background:rgba(255,255,255,0.03); flex:1; justify-content:center;">
+                          <input type="checkbox" id="prefCategoryAttraction" checked onchange="applyReviewFilters()">
+                          <span>🏛️ Điểm chơi</span>
+                        </label>
+                        <label class="v2-filter-label" style="display:inline-flex; align-items:center; gap:0.25rem; padding:0.25rem 0.4rem; border-radius:0.35rem; font-size:0.65rem; color:var(--text); cursor:pointer; transition:all 0.2s; user-select:none; background:rgba(255,255,255,0.03); flex:1; justify-content:center;">
+                          <input type="checkbox" id="prefCategoryRestaurant" checked onchange="applyReviewFilters()">
+                          <span>🍜 Quán ăn</span>
+                        </label>
+                        <label class="v2-filter-label" style="display:inline-flex; align-items:center; gap:0.25rem; padding:0.25rem 0.4rem; border-radius:0.35rem; font-size:0.65rem; color:var(--text); cursor:pointer; transition:all 0.2s; user-select:none; background:rgba(255,255,255,0.03); flex:1; justify-content:center;">
+                          <input type="checkbox" id="prefCategoryExperience" checked onchange="applyReviewFilters()">
+                          <span>✨ Trải nghiệm</span>
+                        </label>
+                      </div>
+                    </div>
+                    
+                    <!-- Spot list scroll container -->
+                    <div id="reviewPanelSpots" style="flex:1; max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:0.4rem; padding-right:2px; margin-top:0.25rem;">
+                      <!-- Injected via JS -->
+                    </div>
+                  </div>
+                  <!-- PREMIUM OVERLAY DETAIL PANEL -->
+                  <div id="spotReviewTab" class="spot-review-tab" style="display:none;"></div>
+                  <!-- PREMIUM OVERLAY DETAIL PANEL -->
+                  
+                  
                 </div>
-                <div id="cityAttractionsList" class="city-attractions-list" style="display:flex; flex-wrap:wrap; gap:0.5rem; max-height:220px; overflow-y:auto; padding-right:4px;"></div>
               </div>
             </div>
 
@@ -882,6 +1631,7 @@
 
   <script src="js/chat-brain.js"></script>
   <script src="js/main.js?v=1778162961775" defer></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="js/planner.js?v=20260518_v29"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -1028,25 +1778,30 @@
       scrollContainer.innerHTML = '';
 
       const allDest = REGION_DESTINATIONS[currentRegion] || [];
-      // Hiện thị toàn bộ để vuốt
+      // Render as a larger grid of cards (tile view)
       allDest.forEach(dest => {
         const card = document.createElement('div');
         card.className = 'region-dest-card';
-        // HTML hiển thị thêm các địa điểm du lịch bên trong
-        const spotsHtml = dest.spots && dest.spots.length > 0 
-          ? `<span class="dest-card-spots" style="display:block; font-size:0.68rem; color:var(--text-muted); margin-top:0.25rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${dest.spots.join(', ')}">📍 ${dest.spots.slice(0, 2).join(', ')}...</span>`
-          : `<span class="dest-card-spots" style="display:block; font-size:0.68rem; color:var(--text-muted); margin-top:0.25rem;">📍 Điểm đến nổi tiếng</span>`;
+        const spotsHtml = dest.spots && dest.spots.length > 0
+          ? `${dest.spots.slice(0,2).join(', ')}...`
+          : 'Khám phá điểm nổi bật';
+
+        const imgSrc = (typeof window.getVNPhoto === 'function') ? window.getVNPhoto(dest.name, Math.floor(Math.random()*100)) : (dest.img || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop');
 
         card.innerHTML = `
           <div class="dest-card-image">
-            <img src="${typeof window.getVNPhoto === 'function' ? window.getVNPhoto(dest.name, Math.floor(Math.random()*100)) : dest.img}" alt="${dest.name}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop';">
-            <div class="dest-card-overlay">
-              <span class="dest-add-icon">+</span>
-            </div>
+            <img src="${imgSrc}" alt="${dest.name}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop';">
+            <div class="dest-card-badge">ĐIỂM: 5</div>
+            <div class="dest-card-verified">Verified</div>
           </div>
-          <div class="dest-card-info" style="padding: 0.6rem 0.75rem;">
-            <span class="dest-card-name" style="font-weight:700; font-size:0.85rem;">${dest.name}</span>
-            ${spotsHtml}
+          <div class="dest-card-info">
+            <div class="dest-card-location">${currentRegion || ''}</div>
+            <div class="dest-card-name">${dest.name}</div>
+            <div class="dest-card-desc">${spotsHtml}</div>
+            <div class="dest-card-actions">
+              <a href="#" class="link-detail" onclick="event.preventDefault(); selectDestination('${dest.name.replace("'","\'")}', this.closest('.region-dest-card'))">Chi tiết →</a>
+              <button class="btn-go" onclick="event.stopPropagation(); selectDestination('${dest.name.replace("'","\'")}', this.closest('.region-dest-card'))">+ Chuyến đi</button>
+            </div>
           </div>
         `;
         card.onclick = () => selectDestination(dest.name, card);
@@ -1074,26 +1829,260 @@
     // Chọn điểm cụ thể → điền vào ô input và hiển thị địa điểm chi tiết bên trong
     window.selectedAttractions = [];
 
-    function toggleAttractionChoice(name, element) {
+    const detailsMap = {
+      "Hà Nội": {
+        rating: "4.9",
+        banner: "https://images.unsplash.com/photo-1509060464153-44667396260f?auto=format&fit=crop&w=600&q=80",
+        safety: "Rất tốt",
+        popularity: "Xu hướng",
+        cost: "Hợp lý",
+        ageTips: {
+          kids: { spot: "Công viên Thủ Lệ", food: "Phở cuốn Ngũ Xã", play: "Xem múa rối nước" },
+          adults: { spot: "Phố cổ Hà Nội", food: "Bún chả Hương Liên", play: "Cà phê đường tàu" },
+          elderly: { spot: "Hồ Hoàn Kiếm", food: "Bún thang Giảng", play: "Trà đạo Yên Thái" }
+        },
+        spots: [
+          { name: "Lăng Bác & Chùa Một Cột", category: "attraction", desc: "Khu di tích lịch sử văn hóa thiêng liêng quốc gia." },
+          { name: "Hồ Hoàn Kiếm & Đền Ngọc Sơn", category: "attraction", desc: "Biểu tượng lịch sử, trái tim của thủ đô Hà Nội." },
+          { name: "Phở Thìn Bờ Hồ", category: "restaurant", desc: "Hương vị phở bò gia truyền thơm ngon đậm vị." },
+          { name: "Bún Chả Đắc Kim", category: "restaurant", desc: "Bún chả gia truyền nổi tiếng phố Hàng Mành." },
+          { name: "Xem Múa Rối Nước Bông Sen", category: "experience", desc: "Nghệ thuật sân khấu dân gian độc đáo của Việt Nam." },
+          { name: "Tour Đêm Nhà Tù Hỏa Lò", category: "experience", desc: "Trải nghiệm nhập vai lịch sử đầy cảm xúc và ý nghĩa." }
+        ]
+      },
+      "TP. Hồ Chí Minh": {
+        rating: "4.8",
+        banner: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=600&q=80",
+        safety: "Tốt",
+        popularity: "Cực hot",
+        cost: "Trung bình",
+        ageTips: {
+          kids: { spot: "Thảo Cầm Viên", food: "Kem Bạch Đằng", play: "Khu vui chơi tiNiWorld" },
+          adults: { spot: "Phố đi bộ Nguyễn Huệ", food: "Cơm tấm Ba Ghiền", play: "Bar sân thượng Q.1" },
+          elderly: { spot: "Hội quán Ôn Lăng", food: "Hủ tiếu Nam Vang", play: "Dạo công viên Tao Đàn" }
+        },
+        spots: [
+          { name: "Dinh Độc Lập", category: "attraction", desc: "Di tích lịch sử quốc gia đặc biệt, minh chứng ngày giải phóng." },
+          { name: "Nhà Thờ Đức Bà", category: "attraction", desc: "Kiến trúc cổ kính kiểu Pháp đặc trưng giữa lòng Sài Gòn." },
+          { name: "Cơm Tấm Nguyễn Văn Cừ", category: "restaurant", desc: "Đĩa cơm tấm sườn bì chả nướng ngon nức tiếng." },
+          { name: "Hủ Tiếu Thanh Xuân", category: "restaurant", desc: "Quán hủ tiếu gia truyền hơn 70 năm đậm đà." },
+          { name: "Du Thuyền Sông Sài Gòn", category: "experience", desc: "Ngắm thành phố lung linh về đêm từ sông Sài Gòn." },
+          { name: "Bóng Nước Kịch Nói Sân Khấu", category: "experience", desc: "Xem những vở kịch nghệ thuật đầy sắc màu." }
+        ]
+      },
+      "Đà Nẵng": {
+        rating: "4.9",
+        banner: "https://images.unsplash.com/photo-1559592413-7ece350ac12a?auto=format&fit=crop&w=600&q=80",
+        safety: "Tuyệt vời",
+        popularity: "Yêu thích nhất",
+        cost: "Bình dân",
+        ageTips: {
+          kids: { spot: "Công viên Châu Á", food: "Bánh tráng cuốn thịt heo", play: "Tắm biển Mỹ Khê" },
+          adults: { spot: "Bà Nà Hills", food: "Hải sản Năm Đảnh", play: "Chơi nhảy dù lượn Sơn Trà" },
+          elderly: { spot: "Chùa Linh Ứng", food: "Mì Quảng Ếch", play: "Ngắm Cầu Rồng phun lửa" }
+        },
+        spots: [
+          { name: "Ngũ Hành Sơn", category: "attraction", desc: "Năm ngọn núi đá vôi tâm linh huyền bí." },
+          { name: "Cầu Vàng Bà Nà Hills", category: "attraction", desc: "Kỳ quan kiến trúc nổi tiếng được nâng bởi đôi tay khổng lồ." },
+          { name: "Bánh Tráng Trần", category: "restaurant", desc: "Thương hiệu bánh tráng cuốn thịt heo nổi tiếng nhất Đà Thành." },
+          { name: "Mì Quảng Bà Mua", category: "restaurant", desc: "Hương vị mì Quảng gia truyền chuẩn vị miền Trung." },
+          { name: "Dù Lượn Trên Bán Đảo Sơn Trà", category: "experience", desc: "Bay lượn trên bầu trời ngắm toàn cảnh biển Đà Nẵng từ trên cao." },
+          { name: "Du Thuyền Sông Hàn Ngắm Cầu Rồng", category: "experience", desc: "Trải nghiệm ngắm Cầu Rồng phun lửa, nước sống động về đêm." }
+        ]
+      },
+      "Nha Trang": {
+        rating: "4.7",
+        banner: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+        safety: "Rất tốt",
+        popularity: "Hot hè",
+        cost: "Hợp lý",
+        ageTips: {
+          kids: { spot: "VinWonders Nha Trang", food: "Bánh căn mực", play: "Vui chơi công viên nước" },
+          adults: { spot: "Đảo Hòn Mun", food: "Hải sản làng chài", play: "Lặn biển ngắm san hô" },
+          elderly: { spot: "Tháp Bà Ponagar", food: "Bún sứa Nha Trang", play: "Tắm bùn khoáng nóng" }
+        },
+        spots: [
+          { name: "Tháp Bà Ponagar", category: "attraction", desc: "Kiến trúc văn hóa Chăm Pa cổ kính nguyên vẹn." },
+          { name: "Nhà Thờ Đá Nha Trang", category: "attraction", desc: "Ngôi nhà thờ cổ kính mang lối kiến trúc Gothic Pháp độc đáo." },
+          { name: "Nem Nướng Đặng Văn Quyên", category: "restaurant", desc: "Món nem nướng đặc sản Nha Trang ăn kèm rau sống hảo hạng." },
+          { name: "Hải Sản Thanh Sương", category: "restaurant", desc: "Địa điểm ăn hải sản tươi sống giá cả bình dân uy tín." },
+          { name: "Lặn Biển Ngắm San Hô Hòn Mun", category: "experience", desc: "Khám phá thế giới đại dương rực rỡ sắc màu dưới biển." },
+          { name: "Tắm Bùn Khoáng Tháp Bà", category: "experience", desc: "Trải nghiệm thư giãn, chăm sóc sức khỏe tự nhiên tốt cho cơ thể." }
+        ]
+      },
+      "Phú Quốc": {
+        rating: "4.8",
+        banner: "https://images.unsplash.com/photo-1540206395-68808572332f?auto=format&fit=crop&w=600&q=80",
+        safety: "Tốt",
+        popularity: "Thiên đường",
+        cost: "Khá cao",
+        ageTips: {
+          kids: { spot: "Vinpearl Safari", food: "Bún quậy Kiến Xây", play: "Xem biểu diễn động vật" },
+          adults: { spot: "Bãi Sao", food: "Gỏi cá trích", play: "Chèo thuyền Kayak biển" },
+          elderly: { spot: "Chùa Hộ Quốc", food: "Nước mắm Phú Quốc", play: "Ngắm hoàng hôn Dinh Cậu" }
+        },
+        spots: [
+          { name: "Bãi Sao", category: "attraction", desc: "Bãi biển cát trắng mịn màng như kem, nước biển xanh ngọc bích." },
+          { name: "Grand World Phú Quốc", category: "attraction", desc: "Thành phố không ngủ sầm uất với kênh đào Venice lãng mạn." },
+          { name: "Bún Quậy Thanh Hùng", category: "restaurant", desc: "Món ăn đặc sản độc đáo tự quậy nước chấm tươi ngon." },
+          { name: "Nhà Ghẹ Hàm Ninh", category: "restaurant", desc: "Ghẹ Hàm Ninh tươi ngọt luộc chấm muối tiêu chanh chuẩn vị." },
+          { name: "Ngắm Hoàng Hôn Sunset Sanato", category: "experience", desc: "Check-in hoàng hôn rực rỡ với các công trình nghệ thuật độc đáo bên biển." },
+          { name: "Tour 4 Đảo Cano Phú Quốc", category: "experience", desc: "Hành trình đi cano khám phá các hòn đảo hoang sơ tuyệt đẹp." }
+        ]
+      },
+      "Đà Lạt": {
+        rating: "4.9",
+        banner: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+        safety: "Tuyệt vời",
+        popularity: "Yêu thích nhất",
+        cost: "Hợp lý",
+        ageTips: {
+          kids: { spot: "Thung lũng Tình yêu", food: "Bánh tráng nướng", play: "Đi xe trượt Alpine Coaster" },
+          adults: { spot: "Đỉnh Langbiang", food: "Lẩu gà lá é", play: "Săn mây đồi chè Cầu Đất" },
+          elderly: { spot: "Thiền Viện Trúc Lâm", food: "Bánh căn Lệ", play: "Ngắm hoa quanh Hồ Xuân Hương" }
+        },
+        spots: [
+          { name: "Hồ Tuyền Lâm & Thiền Viện Trúc Lâm", category: "attraction", desc: "Hồ nước ngọt thơ mộng nằm cạnh ngôi thiền viện lớn thanh tịnh." },
+          { name: "Thác Datanla", category: "attraction", desc: "Ngọn thác hùng vĩ tích hợp hệ thống xe trượt máng băng qua rừng thông mát mẻ." },
+          { name: "Lẩu Gà Lá É Tao Ngộ", category: "restaurant", desc: "Nồi lẩu gà nóng hổi thơm nồng hương vị lá é sảng khoái ngày se lạnh." },
+          { name: "Bánh Căn Tăng Bạt Hổ", category: "restaurant", desc: "Món bánh căn nóng giòn giòn kèm nước chấm xíu mại đậm đà." },
+          { name: "Săn Mây Đồi Chè Cầu Đất", category: "experience", desc: "Trải nghiệm thức giấc sớm đón bình minh giữa biển mây trắng ngập tràn thung lũng." },
+          { name: "Cắm Trại Đồi Đa Phú", category: "experience", desc: "Trải nghiệm ngủ lều giữa rừng thông ngắm thành phố lên đèn lung linh." }
+        ]
+      },
+      "Sapa": {
+        rating: "4.8",
+        banner: "https://images.unsplash.com/photo-1524230572899-a752b3835840?auto=format&fit=crop&w=600&q=80",
+        safety: "Tốt",
+        popularity: "Khám phá",
+        cost: "Trung bình",
+        ageTips: {
+          kids: { spot: "Bản Cát Cát", food: "Thịt trâu gác bếp", play: "Thuê váy áo thổ cẩm chụp ảnh" },
+          adults: { spot: "Đỉnh Fansipan", food: "Lẩu cá hồi Sapa", play: "Trekking qua thung lũng Mường Hoa" },
+          elderly: { spot: "Nhà thờ Đá Sapa", food: "Thắng cố A Quỳnh", play: "Tắm lá thuốc người Dao đỏ" }
+        },
+        spots: [
+          { name: "Bản Cát Cát", category: "attraction", desc: "Bản làng cổ của người H'Mông với guồng nước cổ kính bên thác chảy rì rào." },
+          { name: "Đỉnh Fansipan", category: "attraction", desc: "Nóc nhà Đông Dương hùng vĩ phủ mây trắng bồng bềnh." },
+          { name: "Lẩu Cá Hồi Song Nhi", category: "restaurant", desc: "Cá hồi tươi sống nuôi tại Sapa chế biến lẩu nóng hổi ngon khó cưỡng." },
+          { name: "Nhà Hàng A Phủ", category: "restaurant", desc: "Nơi phục vụ các món ăn đặc sản đậm đà hương vị Tây Bắc." },
+          { name: "Tắm Lá Thuốc Dao Đỏ Ta Phìn", category: "experience", desc: "Trải nghiệm ngâm bồn lá thuốc thảo dược tự nhiên vô cùng sảng khoái và tốt sức khỏe." },
+          { name: "Chợ Tình Sapa Đêm Thứ Bảy", category: "experience", desc: "Trải nghiệm văn hóa chợ tình truyền thống rực rỡ sắc màu dân tộc vùng cao." }
+        ]
+      },
+      "Huế": {
+        rating: "4.7",
+        banner: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=600&q=80",
+        safety: "Tuyệt vời",
+        popularity: "Văn hóa",
+        cost: "Bình dân",
+        ageTips: {
+          kids: { spot: "Trường Quốc học Huế", food: "Bánh bột lọc", play: "Thả diều Phu Văn Lâu" },
+          adults: { spot: "Đại Nội Huế", food: "Cơm hến Vĩ Dạ", play: "Khám phá phá Tam Giang" },
+          elderly: { spot: "Chùa Thiên Mụ", food: "Chè hẻm Huế", play: "Nghe ca Huế trên sông Hương" }
+        },
+        spots: [
+          { name: "Đại Nội Huế (Hoàng Thành)", category: "attraction", desc: "Quần thể di tích cung điện triều Nguyễn cổ kính tôn nghiêm kỳ vĩ." },
+          { name: "Lăng Khải Định", category: "attraction", desc: "Kiến trúc lăng tẩm kết hợp hài hòa phong cách Đông - Tây đỉnh cao." },
+          { name: "Nhà Hàng Cung Đình", category: "restaurant", desc: "Thưởng thức ẩm thực cung đình Huế tái hiện nghi lễ vua chúa độc đáo." },
+          { name: "Cơm Hến Hoa Đông", category: "restaurant", desc: "Địa điểm cơm hến bình dân thơm cay đậm đà chuẩn vị gốc Huế." },
+          { name: "Nghe Ca Huế Trên Sông Hương", category: "experience", desc: "Du thuyền thả hoa đăng và nghe ca Huế trữ tình sâu lắng trong màn đêm tĩnh lặng." },
+          { name: "Đi Xích Lô Vòng Quanh Phố Cổ", category: "experience", desc: "Trải nghiệm thong dong ngắm phố phường Huế xưa cũ yên bình." }
+        ]
+      },
+      "Hội An": {
+        rating: "4.9",
+        banner: "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=600&q=80",
+        safety: "Tuyệt vời",
+        popularity: "Cực hot",
+        cost: "Hợp lý",
+        ageTips: {
+          kids: { spot: "VinWonders Nam Hội An", food: "Bánh mì Phượng", play: "Đi thuyền thúng rừng dừa" },
+          adults: { spot: "Phố cổ Hội An", food: "Cao lầu Thanh", play: "Học làm đèn lồng giấy" },
+          elderly: { spot: "Chùa Cầu", food: "Hoành thánh Vạn Lộc", play: "Thả đèn hoa đăng sông Hoài" }
+        },
+        spots: [
+          { name: "Chùa Cầu Nhật Bản", category: "attraction", desc: "Biểu tượng giao thoa kiến trúc Nhật - Việt độc đáo bên dòng sông Hoài thơ mộng." },
+          { name: "Rừng Dừa Bảy Mẫu", category: "attraction", desc: "Trải nghiệm chèo thuyền thúng xoay vòng độc đáo thú vị giữa rừng dừa mát mẻ." },
+          { name: "Bánh Mì Phượng", category: "restaurant", desc: "Ổ bánh mì ngon nhất thế giới với nước sốt đặc biệt đậm đà thơm ngậy." },
+          { name: "Cao Lầu Thanh", category: "restaurant", desc: "Hương vị sợi cao lầu dai giòn giòn hòa quyện xá xíu đậm đà chuẩn Hội An." },
+          { name: "Thả Hoa Đăng Dòng Sông Hoài", category: "experience", desc: "Trải nghiệm ngồi thuyền gỗ thả đèn hoa đăng lung linh gửi gắm ước nguyện cầu may mắn." },
+          { name: "Học Làm Đèn Lồng Truyền Thống", category: "experience", desc: "Tự tay làm và trang trí chiếc đèn lồng sắc màu mang về làm kỷ niệm độc đáo." }
+        ]
+      },
+      "Ninh Bình": {
+        rating: "4.8",
+        banner: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+        safety: "Tốt",
+        popularity: "Thơ mộng",
+        cost: "Hợp lý",
+        ageTips: {
+          kids: { spot: "Hang Múa", food: "Cơm cháy chà bông", play: "Đi đò Tràng An luồn hang động" },
+          adults: { spot: "Tam Cốc - Bích Động", food: "Dê núi nướng", play: "Đạp xe quanh cánh đồng lúa" },
+          elderly: { spot: "Chùa Bái Đính", food: "Canh cua rau đay", play: "Viếng đền vua Đinh vua Lê" }
+        },
+        spots: [
+          { name: "Khu du lịch sinh thái Tràng An", category: "attraction", desc: "Hệ thống thung lũng, hang động núi đá vôi ngập nước kỳ vĩ được UNESCO công nhận." },
+          { name: "Hang Múa", category: "attraction", desc: "Leo 486 bậc đá ngắm toàn cảnh dòng sông Ngô Đồng uốn lượn rực rỡ mùa lúa chín." },
+          { name: "Nhà Hàng Thăng Long Ninh Bình", category: "restaurant", desc: "Nổi tiếng với món dê núi tươi ngon cơm cháy giòn tan đặc trưng Ninh Bình." },
+          { name: "Nhà Hàng Ba Cửa", category: "restaurant", desc: "Quán ăn phục vụ đặc sản dê núi đá ngon rẻ chất lượng hàng đầu." },
+          { name: "Đi Đò Chèo Tràng An Hóa Thân Phim Ảnh", category: "experience", desc: "Ngồi thuyền tay thong dong luồn lách qua các hang động đá vôi kỳ bí." },
+          { name: "Đạp Xe Qua Các Bản Làng Tam Cốc", category: "experience", desc: "Thư giãn đạp xe ngắm cánh đồng lúa chín vàng óng yên ả thanh bình." }
+        ]
+      },
+      "Hạ Long": {
+        rating: "4.9",
+        banner: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80",
+        safety: "Rất tốt",
+        popularity: "Kỳ quan",
+        cost: "Khá cao",
+        ageTips: {
+          kids: { spot: "Sun World Ha Long", food: "Chả mực giã tay", play: "Đi cáp treo Nữ Hoàng" },
+          adults: { spot: "Vịnh Hạ Long", food: "Hải sản tươi sống", play: "Chèo thuyền Kayak quanh đảo đá" },
+          elderly: { spot: "Bảo tàng Quảng Ninh", food: "Hàu nướng mỡ hành", play: "Nghỉ dưỡng du thuyền 5 sao" }
+        },
+        spots: [
+          { name: "Vịnh Hạ Long (Động Thiên Cung - Hang Sửng Sốt)", category: "attraction", desc: "Kỳ quan thiên nhiên thế giới với hàng ngàn đảo đá vôi nhấp nhô tuyệt đẹp." },
+          { name: "Sun World Hạ Long Complex", category: "attraction", desc: "Tổ hợp công viên giải trí đẳng cấp quốc tế ven bờ biển Bãi Cháy." },
+          { name: "Chả Mực Thoan Hạ Long", category: "restaurant", desc: "Chả mực giã tay giòn ngọt sần sật đặc sản trứ danh đất mỏ." },
+          { name: "Nhà Hàng Hồng Hạnh", category: "restaurant", desc: "Thương hiệu nhà hàng hải sản ngon nổi tiếng hàng đầu Hạ Long." },
+          { name: "Chèo Thuyền Kayak Qua Hang Luồn", category: "experience", desc: "Trải nghiệm tự chèo kayak khám phá thế giới nước yên bình xung quanh núi đá." },
+          { name: "Nghỉ Đêm Trên Du Thuyền 5 Sao", category: "experience", desc: "Trải nghiệm sang trọng đẳng cấp ngắm hoàng hôn và ngủ đêm trên vịnh." }
+        ]
+      },
+      "Cần Thơ": {
+        rating: "4.7",
+        banner: "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=600&q=80",
+        safety: "Tuyệt vời",
+        popularity: "Sông nước",
+        cost: "Bình dân",
+        ageTips: {
+          kids: { spot: "Khu du lịch Mỹ Khánh", food: "Bánh xèo miền Tây", play: "Trải nghiệm làm nông dân" },
+          adults: { spot: "Chợ nổi Cái Răng", food: "Lẩu mắm Dạ Lý", play: "Đi đò dọc ngắm bình minh" },
+          elderly: { spot: "Nhà cổ Bình Thủy", food: "Nem nướng Cái Răng", play: "Dạo bến Ninh Kiều về đêm" }
+        },
+        spots: [
+          { name: "Chợ Nổi Cái Răng", category: "attraction", desc: "Nét văn hóa mua bán giao thương trên sông độc đáo sầm uất miền sông nước Cửu Long." },
+          { name: "Nhà Cổ Bình Thủy", category: "attraction", desc: "Ngôi nhà cổ mang phong cách kiến trúc Pháp - Hoa sang trọng cổ kính nguyên vẹn." },
+          { name: "Lẩu Mắm Dạ Lý", category: "restaurant", desc: "Thương hiệu lẩu mắm miền Tây trứ danh đậm vị đậm đà ngập tràn loại rau đồng nội." },
+          { name: "Nem Nướng Thanh Vân", category: "restaurant", desc: "Nem nướng nướng than thơm lừng cuốn bánh tráng rau sống cực kỳ đưa miệng." },
+          { name: "Trải Nghiệm Làm Bánh Hủ Tiếu Sông Nước", category: "experience", desc: "Tự tay tráng bánh, cắt sợi hủ tiếu truyền thống độc đáo tại lò bánh địa phương." },
+          { name: "Ăn Hủ Tiếu Gõ Trên Ghe Chợ Nổi", category: "experience", desc: "Thưởng thức bát hủ tiếu nóng hổi dập dềnh trên ghe chòng chành buổi sớm đầy thú vị." }
+        ]
+      }
+    };
+
+    window.toggleSpotSelection = function(cardEl, name) {
       const idx = window.selectedAttractions.indexOf(name);
       if (idx > -1) {
         window.selectedAttractions.splice(idx, 1);
-        element.style.background = 'rgba(255,255,255,0.03)';
-        element.style.borderColor = 'var(--border)';
-        element.style.color = 'var(--text)';
-        const star = element.querySelector('.chip-star');
-        if (star) star.style.color = '#00e5ff';
+        cardEl.classList.remove('selected');
       } else {
         window.selectedAttractions.push(name);
-        element.style.background = 'linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(59, 130, 246, 0.25))';
-        element.style.borderColor = '#00e5ff';
-        element.style.color = '#fff';
-        const star = element.querySelector('.chip-star');
-        if (star) star.style.color = '#fff';
+        cardEl.classList.add('selected');
       }
-
       updateAdditionalInfoWithAttractions();
-    }
+    };
 
     function updateAdditionalInfoWithAttractions() {
       const extraInput = document.getElementById('additionalInfo');
@@ -1110,78 +2099,336 @@
     }
 
     function showCityAttractions(cityName) {
-      const container = document.getElementById('cityAttractionsContainer');
-      const listContainer = document.getElementById('cityAttractionsList');
-      const label = document.getElementById('attractionCityName');
-      if (!container || !listContainer || !label) return;
+      const panel = document.getElementById('v2DestReviewPanel');
+      if (!panel) return;
+      
+      const cityData = detailsMap[cityName] || detailsMap[cityName.trim()];
+      if (!cityData) {
+        panel.style.display = 'none';
+        return;
+      }
 
+      // 1. Populate Column 1 (Brochure)
+      document.getElementById('v2DestTitle').textContent = cityName;
+      document.getElementById('v2DestBannerImg').src = cityData.banner;
+      
+      document.getElementById('v2ScoreQuality').textContent = `⭐ ${cityData.rating || '4.8'}`;
+      document.getElementById('v2ScoreSafety').textContent = cityData.safety || 'Tốt';
+      document.getElementById('v2ScoreTrend').textContent = cityData.popularity || 'Bình thường';
+      document.getElementById('v2ScoreCost').textContent = cityData.cost || 'Hợp lý';
+
+      // Age Suggestions
+      document.getElementById('v2AgeKidSpot').textContent = cityData.ageTips.kids.spot;
+      document.getElementById('v2AgeKidFood').textContent = cityData.ageTips.kids.food;
+      document.getElementById('v2AgeKidPlay').textContent = cityData.ageTips.kids.play;
+
+      document.getElementById('v2AgeAdultSpot').textContent = cityData.ageTips.adults.spot;
+      document.getElementById('v2AgeAdultFood').textContent = cityData.ageTips.adults.food;
+      document.getElementById('v2AgeAdultPlay').textContent = cityData.ageTips.adults.play;
+
+      document.getElementById('v2AgeElderSpot').textContent = cityData.ageTips.elderly.spot;
+      document.getElementById('v2AgeElderFood').textContent = cityData.ageTips.elderly.food;
+      document.getElementById('v2AgeElderPlay').textContent = cityData.ageTips.elderly.play;
+
+      // 2. Populate Column 2 (Spots)
+      const listContainer = document.getElementById('reviewPanelSpots');
+      listContainer.innerHTML = '';
+      
+      // Reset selected attractions for new city
       window.selectedAttractions = [];
       const extraInput = document.getElementById('additionalInfo');
       if (extraInput) {
         extraInput.value = extraInput.value.replace(/Ưu tiên đi qua các địa điểm du lịch: [^.]+\./g, '').trim();
       }
 
-      label.textContent = cityName;
-      listContainer.innerHTML = '';
+      const categories = {
+        attraction: { label: " Điểm chơi", icon: "🏛️", color: "#3b82f6", rgb: "59, 130, 246" },
+        restaurant: { label: " Quán ăn", icon: "🍜", color: "#10b981", rgb: "16, 185, 129" },
+        experience: { label: " Trải nghiệm", icon: "✨", color: "#f59e0b", rgb: "245, 158, 11" }
+      };
 
-      let spots = [];
-      const nameLower = cityName.toLowerCase().trim();
-      const placeData = (window.WANDER_PLACES || []).find(p => 
-        p.name.toLowerCase().trim() === nameLower ||
-        nameLower.includes(p.name.toLowerCase().trim()) ||
-        p.name.toLowerCase().trim().includes(nameLower)
-      );
+      cityData.spots.forEach(spot => {
+        const catInfo = categories[spot.category] || { label: " Khác", icon: "📍", color: "#6b7280", rgb: "107, 114, 128" };
+        const card = document.createElement('div');
+        card.className = 'review-spot-card';
+        card.setAttribute('data-category', spot.category);
+        card.setAttribute('data-spot-name', spot.name);
+        
+        card.style.cssText = `
+          background: rgba(255,255,255,0.03); 
+          border: 1px solid rgba(255,255,255,0.06); 
+          border-radius: 0.75rem; 
+          padding: 0.6rem 0.75rem; 
+          display: flex; 
+          flex-direction: column; 
+          gap: 0.2rem; 
+          cursor: pointer; 
+          transition: all 0.2s;
+        `;
+        
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:0.25rem;">
+            <span style="font-weight:700; font-size:0.75rem; color:#fff;" class="spot-card-name">${spot.name}</span>
+            <span style="font-size:0.55rem; padding:1px 5px; border-radius:4px; font-weight:600; color:${catInfo.color}; background:rgba(${catInfo.rgb}, 0.15); white-space:nowrap;">
+              ${catInfo.icon}${catInfo.label}
+            </span>
+          </div>
+          <p class="spot-card-desc" style="margin:0; font-size:0.65rem; line-height:1.35;">${spot.desc}</p>
+          <div style="display:flex; gap:0.5rem; margin-top:0.45rem;">
+            <button class="spot-action-btn" style="flex:0 0 auto; background:transparent; border:1px solid rgba(255,255,255,0.06); color:var(--text); padding:0.35rem 0.6rem; border-radius:0.45rem; font-size:0.78rem; cursor:pointer;">Xem review</button>
+            <button class="spot-select-btn" style="flex:0 0 auto; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); color:var(--text); padding:0.35rem 0.6rem; border-radius:0.45rem; font-size:0.78rem; cursor:pointer;">Chọn</button>
+          </div>
+        `;
 
-      if (placeData) {
-        if (placeData.amusementPlaces && placeData.amusementPlaces.length > 0) {
-          spots.push(...placeData.amusementPlaces.map(x => ({ name: x.name, type: 'Vui chơi' })));
+        // Attach actions
+        card.querySelector('.spot-action-btn').onclick = (e) => { e.stopPropagation(); showSpotDetails(spot); };
+        card.querySelector('.spot-select-btn').onclick = (e) => { e.stopPropagation(); window.toggleSpotSelection(card, spot.name); };
+        card.onclick = (e) => {
+          if (e.target.tagName.toLowerCase() !== 'button') showSpotDetails(spot);
+        };
+        listContainer.appendChild(card);
+      });
+
+      // Show panel with smooth entry
+      panel.style.display = 'block';
+      panel.style.opacity = '0';
+      panel.style.transform = 'translateY(-10px)';
+      requestAnimationFrame(() => {
+        panel.style.transition = 'all 0.4s ease';
+        panel.style.opacity = '1';
+        panel.style.transform = 'translateY(0)';
+      });
+      // Fetch place info (coords + reviews) from server API and render map + reviews
+      (async function(){
+        try {
+          const q = encodeURIComponent(cityName);
+          const res = await fetch(`/api/place-info?name=${q}`);
+          const j = await res.json();
+          let coords = [21.0278, 105.8342];
+          let reviews = null;
+          if (j && j.success && j.data) {
+            coords = j.data.coords || coords;
+            reviews = j.data.reviews || null;
+          }
+
+          const mapEl = document.getElementById('v2DestMap');
+          if (typeof L !== 'undefined' && mapEl) {
+            try {
+              if (!window.v2LeafletMap) {
+                window.v2LeafletMap = L.map('v2DestMap', { zoomControl: false, attributionControl: false }).setView(coords, 10);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(window.v2LeafletMap);
+                window.v2LeafletMarker = L.marker(coords).addTo(window.v2LeafletMap);
+              } else {
+                window.v2LeafletMap.setView(coords, 10);
+                if (window.v2LeafletMarker) window.v2LeafletMarker.setLatLng(coords);
+                else window.v2LeafletMarker = L.marker(coords).addTo(window.v2LeafletMap);
+              }
+            } catch (e) { console.warn('Map set failed', e); }
+          }
+
+          const reviewsEl = document.getElementById('v2DestReviews');
+          if (reviewsEl) {
+            if (Array.isArray(reviews) && reviews.length > 0) {
+              reviewsEl.innerHTML = reviews.map(r => `
+                <div class="review-item-premium" style="margin-bottom:0.6rem;">
+                  <div class="review-source" style="font-size:0.72rem;color:var(--text-muted);">${r.source || 'WanderViet'}</div>
+                  <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(r.user)}&background=random" style="width:30px; height:30px; border-radius:50%;">
+                    <b style="font-size:0.9rem;">${r.user}</b>
+                    <span style="color:#fbbf24;">${'★'.repeat(Math.max(0, Math.min(5, r.rating || 5)))}</span>
+                  </div>
+                  <p style="margin:0; font-size:0.85rem; color:var(--text-muted);">"${r.text}"</p>
+                </div>
+              `).join('');
+            } else if (typeof generateRandomReviews === 'function') {
+              reviewsEl.innerHTML = generateRandomReviews();
+            }
+          }
+        } catch (err) {
+          console.warn('Failed to fetch place-info', err);
+          try { const reviewsEl = document.getElementById('v2DestReviews'); if (reviewsEl && typeof generateRandomReviews === 'function') reviewsEl.innerHTML = generateRandomReviews(); } catch(e){}
         }
-        if (placeData.checkInSpots && placeData.checkInSpots.length > 0) {
-          spots.push(...placeData.checkInSpots.map(x => ({ name: x.name, type: 'Check-in' })));
+      })();
+      
+      // Reset filter checkboxes to checked
+      document.getElementById('prefCategoryAttraction').checked = true;
+      document.getElementById('prefCategoryRestaurant').checked = true;
+      document.getElementById('prefCategoryExperience').checked = true;
+    }
+
+    window.applyReviewFilters = function() {
+      const showAttraction = document.getElementById('prefCategoryAttraction').checked;
+      const showRestaurant = document.getElementById('prefCategoryRestaurant').checked;
+      const showExperience = document.getElementById('prefCategoryExperience').checked;
+      
+      const cards = document.querySelectorAll('#reviewPanelSpots .review-spot-card');
+      cards.forEach(card => {
+        const cat = card.getAttribute('data-category');
+        let visible = false;
+        if (cat === 'attraction' && showAttraction) visible = true;
+        if (cat === 'restaurant' && showRestaurant) visible = true;
+        if (cat === 'experience' && showExperience) visible = true;
+        
+        if (visible) {
+          card.style.display = 'flex';
+          card.style.opacity = '0';
+          setTimeout(() => {
+            card.style.transition = 'opacity 0.2s';
+            card.style.opacity = '1';
+          }, 10);
+        } else {
+          card.style.display = 'none';
         }
-        if (placeData.diningPlaces && placeData.diningPlaces.length > 0) {
-          spots.push(...placeData.diningPlaces.map(x => ({ name: x.name, type: 'Ẩm thực' })));
-        }
+      });
+    };
+
+    
+    // Bộ từ điển ảnh thực tế Unsplash chất lượng cao cho các địa điểm nổi tiếng Việt Nam (Thẩm mỹ đỉnh cao)
+    const SPOT_PHOTOS_DB = {
+      // Hà Nội
+      "Lăng Bác & Chùa Một Cột": [
+        "https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=640&auto=format&fit=crop&q=80"
+      ],
+      "Hồ Hoàn Kiếm & Đền Ngọc Sơn": [
+        "https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=640&auto=format&fit=crop&q=80"
+      ],
+      "Phố Cổ Hà Nội": [
+        "https://images.unsplash.com/photo-1528127269322-539801943592?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=640&auto=format&fit=crop&q=80"
+      ],
+      // Đà Nẵng
+      "Cầu Vàng Bà Nà Hills": [
+        "https://images.unsplash.com/photo-1524230572899-a752b3835840?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1555244162-803834f70033?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1528127269322-539801943592?w=640&auto=format&fit=crop&q=80"
+      ],
+      "Ngũ Hành Sơn": [
+        "https://images.unsplash.com/photo-1559592487-7c70d2683959?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=640&auto=format&fit=crop&q=80"
+      ],
+      "Bán đảo Sơn Trà & Chùa Linh Ứng": [
+        "https://images.unsplash.com/photo-1583244532610-2a234e7c3eca?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=640&auto=format&fit=crop&q=80"
+      ],
+      // Sài Gòn
+      "Nhà Thờ Đức Bà & Bưu Điện TP": [
+        "https://images.unsplash.com/photo-1583244532610-2a234e7c3eca?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=640&auto=format&fit=crop&q=80"
+      ],
+      "Chợ Bến Thành": [
+        "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=640&auto=format&fit=crop&q=80"
+      ],
+      // Đà Lạt
+      "Thung Lũng Tình Yêu": [
+        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=640&auto=format&fit=crop&q=80"
+      ]
+    };
+
+    function showSpotDetails(spot) {
+      const tab = document.getElementById('spotReviewTab');
+      if (!tab) return;
+      tab.classList.add('active');
+
+      const categoryMap = {
+        attraction: { label: 'Điểm chơi', icon: '🏛️', tag: 'Khám phá địa điểm nổi bật' },
+        restaurant: { label: 'Quán ăn', icon: '🍜', tag: 'Trải nghiệm ẩm thực đặc sắc' },
+        experience: { label: 'Trải nghiệm', icon: '✨', tag: 'Hoạt động giải trí & trải nghiệm' }
+      };
+      const catInfo = categoryMap[spot.category] || { label: 'Khác', icon: '📍', tag: 'Trải nghiệm địa phương' };
+
+      // Lấy ảnh từ từ điển thực tế, hoặc sinh ảnh Unsplash chất lượng theo từ khóa để không bị lỗi
+      let images = SPOT_PHOTOS_DB[spot.name];
+      if (!images || images.length === 0) {
+        const keyword = encodeURIComponent(spot.name.replace('&', ' '));
+        images = [
+          `https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=640&auto=format&fit=crop&q=80&sig=${Math.floor(Math.random()*1000)}`,
+          `https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=640&auto=format&fit=crop&q=80&sig=${Math.floor(Math.random()*1000)}`,
+          `https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=640&auto=format&fit=crop&q=80&sig=${Math.floor(Math.random()*1000)}`
+        ];
       }
 
-      if (spots.length === 0) {
-        const destObj = (REGION_DESTINATIONS[currentRegion] || []).find(d => d.name === cityName);
-        if (destObj && destObj.spots) {
-          spots = destObj.spots.map(s => ({ name: s, type: 'Nổi bật' }));
-        }
-      }
-
-      if (spots.length > 0) {
-        container.style.display = 'block';
-        container.style.opacity = '0';
-        container.style.transform = 'translateY(-5px)';
-        requestAnimationFrame(() => {
-          container.style.transition = 'all 0.3s ease';
-          container.style.opacity = '1';
-          container.style.transform = 'translateY(0)';
-        });
-
-        spots.forEach(spot => {
-          const chip = document.createElement('div');
-          chip.className = 'attraction-chip';
-          chip.innerHTML = `
-            <span class="chip-star" style="color:#00e5ff; font-size:0.75rem; transition:color 0.2s;">★</span>
-            <span style="font-weight:600;">${spot.name}</span>
-            <span style="font-size:0.6rem; opacity:0.8; background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px; font-weight:500; margin-left:0.25rem;">${spot.type}</span>
-          `;
-          
-          chip.style.cssText = `
-            display:inline-flex; align-items:center; gap:0.4rem; padding:0.45rem 0.9rem;
-            background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:2rem;
-            font-size:0.75rem; color:var(--text); cursor:pointer; transition:all 0.2s; user-select:none;
-          `;
-
-          chip.onclick = () => toggleAttractionChoice(spot.name, chip);
-          listContainer.appendChild(chip);
-        });
+      const overallScore = (4.3 + Math.random() * 0.7).toFixed(1);
+      const ratingPills = [];
+      if (spot.category === 'restaurant') {
+        ratingPills.push(`🍽️ Món ăn <strong>4.${Math.floor(Math.random()*10)}</strong>`);
+        ratingPills.push(`🏠 Không gian <strong>4.${Math.floor(Math.random()*10)}</strong>`);
+        ratingPills.push(`⭐ Tổng <strong>${overallScore}</strong>`);
+      } else if (spot.category === 'attraction') {
+        ratingPills.push(`🎡 Trải nghiệm <strong>4.${Math.floor(Math.random()*10)}</strong>`);
+        ratingPills.push(`🛡️ An toàn <strong>4.${Math.floor(Math.random()*10)}</strong>`);
+        ratingPills.push(`⭐ Tổng <strong>${overallScore}</strong>`);
       } else {
-        container.style.display = 'none';
+        ratingPills.push(`✨ Thú vị <strong>4.${Math.floor(Math.random()*10)}</strong>`);
+        ratingPills.push(`⭐ Tổng <strong>${overallScore}</strong>`);
       }
+
+      const experiences = {
+        restaurant: 'Ăn uống phong phú, phù hợp nhóm bạn và gia đình.',
+        attraction: 'Thích hợp cho khám phá, check-in, đi bộ và chụp ảnh.',
+        experience: 'Hoạt động tương tác, vui nhộn và đầy cảm hứng.'
+      };
+      const reviewText = experiences[spot.category] || 'Trải nghiệm địa phương đặc sắc phù hợp mọi hành trình.';
+
+      const reviews = [
+        { user: 'Bảo Lan', rating: 5, text: 'Đây là trải nghiệm tuyệt vời, không gian đẹp, dịch vụ nhanh và rất đáng tiền!' },
+        { user: 'Minh Huy', rating: 5, text: 'Cảnh quan tuyệt đẹp, hướng dẫn viên nhiệt tình, nhóm mình chụp được rất nhiều ảnh đẹp.' },
+        { user: 'Khánh Mai', rating: 4, text: 'Đồ ăn cực ngon và vừa vị, giá cả hợp lý, sẽ quay lại lần sau!' }
+      ];
+
+      tab.innerHTML = `
+        <div class="spot-review-header">
+          <div>
+            <div class="spot-review-title">${spot.name}</div>
+            <div class="spot-review-tags" style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-top:0.3rem;">
+              <span class="spot-review-pill">${catInfo.icon} ${catInfo.label}</span>
+              <span class="spot-review-pill">⭐ ${overallScore}</span>
+              <span class="spot-review-pill">${catInfo.tag}</span>
+            </div>
+          </div>
+          <button class="spot-review-close" onclick="document.getElementById('spotReviewTab').classList.remove('active');">Đóng</button>
+        </div>
+        <div class="spot-review-content" style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.25rem;">
+          <div style="display:flex; flex-direction:column; gap:0.85rem;">
+            <p class="spot-review-summary" style="margin:0; font-size:0.9rem; line-height:1.6; font-weight:500;">${spot.desc} ${reviewText}</p>
+            <div class="spot-review-ratings" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              ${ratingPills.map(pill => `<div class="spot-review-rating" style="flex:1; text-align:center;">${pill}</div>`).join('')}
+            </div>
+            <div class="spot-review-gallery" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; margin-top:0.25rem;">
+              ${images.map(src => `<img src="${src}" style="width:100%; height:90px; object-fit:cover; border-radius:0.75rem; border:1px solid rgba(0,0,0,0.06);" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop'" alt="${spot.name}">`).join('')}
+            </div>
+          </div>
+          <div class="spot-review-list" style="display:flex; flex-direction:column; gap:0.65rem;">
+            <div style="font-weight:700; font-size:0.85rem; margin-bottom:0.15rem; display:flex; justify-content:space-between; align-items:center;">
+              <span>Đánh giá từ cộng đồng</span>
+              <span style="font-size:0.75rem; font-weight:normal; opacity:0.7;">3 bình luận</span>
+            </div>
+            ${reviews.map(review => `
+              <div class="spot-review-item" style="display:flex; gap:0.6rem; align-items:flex-start; padding:0.5rem; background:var(--bg-card, rgba(0,0,0,0.01)); border:1px solid var(--border, rgba(0,0,0,0.03)); border-radius:0.75rem;">
+                <div class="spot-review-avatar" style="flex-shrink:0;">${review.user.charAt(0)}</div>
+                <div class="spot-review-meta" style="flex:1; min-width:0;">
+                  <div class="spot-review-meta-header" style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700;">
+                    <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${review.user}</span>
+                    <span class="spot-review-review-stars">${'★'.repeat(review.rating)}</span>
+                  </div>
+                  <p class="spot-review-text" style="margin:0.15rem 0 0 0; font-size:0.78rem; line-height:1.45; word-wrap:break-word;">${review.text}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
     }
 
     function selectDestination(name, cardEl) {

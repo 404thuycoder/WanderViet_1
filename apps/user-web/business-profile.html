@@ -32,7 +32,7 @@
     </style>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hồ sơ Doanh nghiệp — WanderViệt</title>
+    <title>Hồ sơ Doanh nghiệp — WanderViet AI</title>
     <link rel="icon" type="image/png" href="/assets/wanderviet-logo-cropped-rounded.png">
     <link rel="stylesheet" href="css/global-tokens.css?v=47" />
     <link rel="stylesheet" href="css/styles.css?v=47" />
@@ -135,7 +135,7 @@
         <aside>
             <div class="info-card">
                 <span class="info-title">Giới thiệu</span>
-                <p id="biz-desc" style="color:var(--text-dim); line-height:1.7; font-size:15px;">Doanh nghiệp đối tác chiến lược của WanderViệt, chuyên cung cấp các dịch vụ du lịch và nghỉ dưỡng cao cấp.</p>
+                <p id="biz-desc" style="color:var(--text-dim); line-height:1.7; font-size:15px;">Doanh nghiệp đối tác chiến lược của WanderViet AI, chuyên cung cấp các dịch vụ du lịch và nghỉ dưỡng cao cấp.</p>
             </div>
             <div class="info-card">
                 <span class="info-title">Thông tin liên hệ</span>
@@ -255,10 +255,10 @@
                             biz = {
                                 _id: p.ownerId || p._id,
                                 id: p.ownerId || p.id || p._id,
-                                name: isSystem ? 'WanderViệt Partner' : (p.ownerName || p.name),
-                                displayName: isSystem ? 'WanderViệt Partner' : (p.ownerName || p.name),
+                                name: isSystem ? 'WanderViet AI Partner' : (p.ownerName || p.name),
+                                displayName: isSystem ? 'WanderViet AI Partner' : (p.ownerName || p.name),
                                 avatar: isSystem ? 'https://ui-avatars.com/api/?name=WanderVi%E1%BB%87t+Partner&background=6366f1&color=fff&size=256' : (p.image || p.coverImage || (p.images && p.images[0])),
-                                description: isSystem ? `Đối tác chiến lược cung cấp ${foundPlaces.length} trải nghiệm tinh hoa tại hệ thống WanderViệt.` : (p.description || p.snippet),
+                                description: isSystem ? `Đối tác chiến lược cung cấp ${foundPlaces.length} trải nghiệm tinh hoa tại hệ thống WanderViet AI.` : (p.description || p.snippet),
                                 email: p.contactEmail,
                                 phone: p.contactPhone,
                                 website: p.website
@@ -301,7 +301,7 @@
                 updateFollowBtn();
                 
                 const name = biz.displayName || biz.name;
-                document.title = name + ' - WanderViệt';
+                document.title = name + ' - WanderViet AI';
                 document.getElementById('biz-name').innerText = name;
                 document.getElementById('biz-logo').innerText = name.charAt(0).toUpperCase();
                 if (biz.avatar) {

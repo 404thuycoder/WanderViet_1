@@ -1,4 +1,4 @@
-// Dummy Service Worker for WanderViệt
+﻿// Dummy Service Worker for WanderViet AI
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });

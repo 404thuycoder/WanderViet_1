@@ -1,4 +1,4 @@
-/**
+﻿/**
  * serviceManagement.js — API Integrated version
  */
 (function() {
@@ -731,7 +731,7 @@
             <div class="sm-header">
                 <div>
                     <h2 class="sm-title">Quản lý dịch vụ</h2>
-                    <p style="color:#94a3b8; font-size:14px; margin-top:4px">Đăng tải và quản lý các sản phẩm du lịch của bạn trên WanderViệt.</p>
+                    <p style="color:#94a3b8; font-size:14px; margin-top:4px">Đăng tải và quản lý các sản phẩm du lịch của bạn trên WanderViet AI.</p>
                 </div>
                 <button class="sm-btn-primary" onclick="window.smActions.add()">+ Thêm dịch vụ mới</button>
             </div>

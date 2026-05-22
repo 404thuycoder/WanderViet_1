@@ -1,4 +1,4 @@
-/**
+﻿/**
  * bookingManagement.js — Real Data Edition
  * Fetch đơn hàng thật từ API /api/bookings (role: business)
  * Hỗ trợ: lọc tab, tìm kiếm, cập nhật trạng thái, xuất CSV.
@@ -229,7 +229,7 @@
             <div class="bk-mgmt-header">
                 <div class="bk-mgmt-title">
                     <h2>📋 Quản lý đơn hàng</h2>
-                    <p>Đơn hàng thực tế từ khách đặt trên hệ thống WanderViệt</p>
+                    <p>Đơn hàng thực tế từ khách đặt trên hệ thống WanderViet AI</p>
                 </div>
                 <div class="bk-top-actions">
                     <button class="btn-refresh" onclick="window._bkLoadBookings()">🔄 Làm mới</button>

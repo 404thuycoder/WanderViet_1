@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   "use strict";
 
   // IMMEDIATE FAIL-SAFE: if anything goes wrong, log it
@@ -4245,9 +4245,9 @@
       content.innerHTML = config.data = json.data[type === 'active' ? 'topActive' : (type === 'itineraries' ? 'topItineraries' : (type === 'deposits' ? 'topDeposits' : (type === 'businesses' ? 'topBusinesses' : 'topPlaces')))]
         .map((item, idx) => {
           const info = item.info || item;
-          const name = info.displayName || info.name || item.name || (type === 'businesses' ? 'Doanh nghiệp ẩn danh' : 'Thành viên WanderViệt');
+          const name = info.displayName || info.name || item.name || (type === 'businesses' ? 'Doanh nghiệp ẩn danh' : 'Thành viên WanderViet AI');
           const avatar = info.avatar || item.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff`;
-          const meta = info.email || item.region || (type === 'businesses' ? `${item.placeCount || 0} địa điểm sở hữu` : 'Thành viên WanderViệt');
+          const meta = info.email || item.region || (type === 'businesses' ? `${item.placeCount || 0} địa điểm sở hữu` : 'Thành viên WanderViet AI');
 
           const val = type === 'active' ? Math.floor(item.minutes || 0) : (type === 'itineraries' ? item.count : (type === 'deposits' ? (item.totalSpent || 0).toLocaleString() : (type === 'businesses' ? item.totalFavs : item.favoritesCount)));
 

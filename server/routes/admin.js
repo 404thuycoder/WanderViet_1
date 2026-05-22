@@ -1147,7 +1147,7 @@ router.get('/places', adminTokenAuth, adminAuth, async (req, res) => {
     });
 
     const data = places.map(p => {
-      let ownerName = 'Hệ thống (WanderViet)';
+      let ownerName = 'Hệ thống (WanderViet AI)';
       if (p.ownerId) {
         ownerName = bizMap.get(p.ownerId) || bizMap.get(p.ownerId.toString()) || ownerName;
       }
@@ -1956,7 +1956,7 @@ router.post('/ai-chat', adminTokenAuth, adminAuth, async (req, res) => {
     if (privacyBlockPatterns.some(p => p.test(message))) {
       return res.json({
         success: true,
-        reply: 'Tôi là SENTINEL AI — không thể cung cấp thông tin đó do chính sách bảo mật hệ thống WanderViệt. Tôi có thể hỗ trợ bạn về vận hành Admin Panel không?',
+        reply: 'Tôi là SENTINEL AI — không thể cung cấp thông tin đó do chính sách bảo mật hệ thống WanderViet AI. Tôi có thể hỗ trợ bạn về vận hành Admin Panel không?',
         action: null
       });
     }
@@ -1978,10 +1978,10 @@ ${recentLogs.map(l => `- ${l.action} (${new Date(l.timestamp).toLocaleTimeString
       messages: [
         {
           role: 'system',
-          content: `BẠN LÀ: SENTINEL AI — Trợ lý quản trị cấp cao của hệ thống WanderViệt.
+          content: `BẠN LÀ: SENTINEL AI — Trợ lý quản trị cấp cao của hệ thống WanderViet AI.
 
 NHIỆM VỤ CHÍNH:
-1. Hỗ trợ Admin vận hành hệ thống WanderViệt hiệu quả
+1. Hỗ trợ Admin vận hành hệ thống WanderViet AI hiệu quả
 2. Hướng dẫn sử dụng các panel: Overview, Moderation, Users, Broadcast, AI Intelligence, Places, Transactions, Analytics
 3. Gợi ý xử lý tình huống quản trị (duyệt nội dung, quản lý user, gửi broadcast)
 4. Phân tích xu hướng và đưa ra khuyến nghị vận hành
@@ -1991,8 +1991,8 @@ QUY TẮC BẮT BUỘC (KHÔNG ĐƯỢC VI PHẠM):
 - KHÔNG cung cấp mật khẩu, API key, secret, thông tin bảo mật hệ thống
 - KHÔNG tiết lộ dữ liệu tài chính cụ thể của từng doanh nghiệp hay cá nhân
 - KHÔNG thực thi lệnh thay đổi hệ thống trực tiếp qua chat
-- KHÔNG trả lời câu hỏi ngoài phạm vi quản trị hệ thống WanderViệt
-- Khi bị hỏi thông tin nhạy cảm: từ chối lịch sự "Thông tin đó được bảo mật theo chính sách WanderViệt."
+- KHÔNG trả lời câu hỏi ngoài phạm vi quản trị hệ thống WanderViet AI
+- Khi bị hỏi thông tin nhạy cảm: từ chối lịch sự "Thông tin đó được bảo mật theo chính sách WanderViet AI."
 - Khi bị hỏi ngoài phạm vi: từ chối lịch sự và hướng về nghiệp vụ quản trị
 
 ĐIỀU KHIỂN GIAO DIỆN:

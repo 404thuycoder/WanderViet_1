@@ -32,21 +32,21 @@
     </style>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Trải nghiệm du lịch đẳng cấp được tinh tuyển bởi WanderViệt. Khám phá những địa điểm tuyệt vời nhất Việt Nam.">
-    <meta name="keywords" content="du lịch, Việt Nam, trải nghiệm, WanderViệt, địa điểm, tham quan">
-    <meta name="author" content="WanderViệt">
+    <meta name="description" content="Trải nghiệm du lịch đẳng cấp được tinh tuyển bởi WanderViet AI. Khám phá những địa điểm tuyệt vời nhất Việt Nam.">
+    <meta name="keywords" content="du lịch, Việt Nam, trải nghiệm, WanderViet AI, địa điểm, tham quan">
+    <meta name="author" content="WanderViet AI">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="Elite Experience — WanderViệt">
-    <meta property="og:description" content="Trải nghiệm du lịch đẳng cấp được tinh tuyển bởi WanderViệt">
+    <meta property="og:title" content="Elite Experience — WanderViet AI">
+    <meta property="og:description" content="Trải nghiệm du lịch đẳng cấp được tinh tuyển bởi WanderViet AI">
     <meta property="og:image" content="/assets/wanderviet-og-image.jpg">
     <meta property="og:url" content="https://wanderviet.vn">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Elite Experience — WanderViệt">
-    <meta name="twitter:description" content="Trải nghiệm du lịch đẳng cấp được tinh tuyển bởi WanderViệt">
+    <meta name="twitter:title" content="Elite Experience — WanderViet AI">
+    <meta name="twitter:description" content="Trải nghiệm du lịch đẳng cấp được tinh tuyển bởi WanderViet AI">
     <meta name="twitter:image" content="/assets/wanderviet-og-image.jpg">
     <link rel="canonical" href="https://wanderviet.vn">
-    <title>Elite Experience — WanderViệt</title>
+    <title>Elite Experience — WanderViet AI</title>
     <link rel="icon" type="image/png" href="/assets/wanderviet-logo-cropped-rounded.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2515,7 +2515,7 @@
                                 <div class="confetti-wrap" id="confetti-container"></div>
                             </div>
                             <h2 id="success-title-text" style="font-family:'Plus Jakarta Sans'; font-size:1.6rem; margin:0; font-weight:800; letter-spacing:-1px;">ĐẶT CHỖ HOÀN TẤT</h2>
-                            <p style="color:var(--text-dim); font-size:13px; margin:8px 0 0;">Cảm ơn bạn đã lựa chọn WanderViệt Elite</p>
+                            <p style="color:var(--text-dim); font-size:13px; margin:8px 0 0;">Cảm ơn bạn đã lựa chọn WanderViet AI Elite</p>
                             
                             <div class="booking-code" id="b-id">#WV-XXXX</div>
                             
@@ -3142,9 +3142,9 @@
                 window.currentPlace = p;
 
                 // ── Base Info ──────────────────────────────────────────
-                const name = p.name || 'Địa điểm WanderViệt';
+                const name = p.name || 'Địa điểm WanderViet AI';
                 document.getElementById('p-title').innerText = name;
-                document.title = `${name} — WanderViệt`;
+                document.title = `${name} — WanderViet AI`;
 
                 // Category badge
                 const kindMap = {
@@ -3185,7 +3185,7 @@
                 const readMoreBtn = document.getElementById('read-more-btn');
                 const descContainer = document.getElementById('p-desc-container');
 
-                descEl.innerText = p.description || p.text || 'Trải nghiệm du lịch đẳng cấp được tinh tuyển bởi WanderViệt.';
+                descEl.innerText = p.description || p.text || 'Trải nghiệm du lịch đẳng cấp được tinh tuyển bởi WanderViet AI.';
                 if (p.overview) overviewEl.innerHTML = `<h4 style="font-weight:700;margin-bottom:12px;color:var(--text-main)">Tổng quan</h4><p>${p.overview}</p>`;
                 if (p.highlights && p.highlights.length > 0) {
                     highlightsEl.innerHTML = `<h4 style="font-weight:700;margin-bottom:12px;color:var(--text-main)">Điểm nổi bật</h4><ul style="padding-left:20px">${p.highlights.map(h=>`<li style="margin-bottom:8px">${h}</li>`).join('')}</ul>`;
@@ -3322,7 +3322,7 @@
                 }
 
                 // ── Owner/Business info ────────────────────────────────
-                const ownerName = p.owner ? (p.owner.displayName || p.owner.name || 'Đối tác WanderViệt') : 'Hệ thống WanderViệt';
+                const ownerName = p.owner ? (p.owner.displayName || p.owner.name || 'Đối tác WanderViet AI') : 'Hệ thống WanderViet AI';
                 setEl('biz-name', ownerName);
                 document.getElementById('biz-logo').src = (p.owner && p.owner.avatar) ? p.owner.avatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(ownerName)}&background=6366f1&color=fff`;
                 const phone = p.contactPhone || (p.owner && p.owner.contactPhone) || '1900 9999';
@@ -3356,7 +3356,7 @@
                             <div class="h-item">
                                 <span class="h-icon" style="font-size:2rem; margin-bottom:16px;">✨</span>
                                 <b class="h-name">${h}</b>
-                                <div class="h-text">Đã được kiểm định bởi WanderViệt</div>
+                                <div class="h-text">Đã được kiểm định bởi WanderViet AI</div>
                             </div>
                         `;
                     }).join('');
@@ -4242,7 +4242,7 @@
                                 <div style="flex:1;">
                                     <div style="display:flex; justify-content:space-between; align-items:center;">
                                         <div>
-                                            <div style="font-weight:700; color:var(--text-main); font-size:1rem;">${post.userName || 'Thành viên WanderViệt'}</div>
+                                            <div style="font-weight:700; color:var(--text-main); font-size:1rem;">${post.userName || 'Thành viên WanderViet AI'}</div>
                                             <div style="color:#fbbf24; font-size:12px; margin-top:2px;">
                                                 ${'⭐'.repeat(post.rating)}
                                                 ${post.verified ? '<span style="background:#10b981; color:#fff; font-size:8px; padding:1px 6px; border-radius:4px; margin-left:8px; font-weight:700; vertical-align:middle;">✓ VERIFIED</span>' : ''}
@@ -5080,7 +5080,7 @@
 
             priceDetails += `
                 <div style="display:flex; justify-content:space-between; color:var(--primary); font-weight:700;">
-                    <span>Ưu đãi WanderViệt Elite (10%):</span>
+                    <span>Ưu đãi WanderViet AI Elite (10%):</span>
                     <b>-${discount.toLocaleString('vi-VN')} ₫</b>
                 </div>
             `;
@@ -5266,7 +5266,7 @@
             map = L.map('map-root', { zoomControl: false }).setView([lat, lng], 17);
             
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; WanderViệt &copy; OpenStreetMap'
+                attribution: '&copy; WanderViet AI &copy; OpenStreetMap'
             }).addTo(map);
  
             L.control.zoom({ position: 'bottomright' }).addTo(map);

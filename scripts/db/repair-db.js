@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 const mongoose = require('mongoose');
 const chatbotDb = mongoose.createConnection(process.env.CHATBOT_MONGODB_URI);
 
@@ -11,11 +11,11 @@ const Knowledge = chatbotDb.model('Knowledge', KnowledgeSchema);
 chatbotDb.on('open', async () => {
     console.log('Connected to Chatbot DB for repair...');
     
-    // Tìm các câu trả lời bắt đầu bằng "WanderViệt thấy" hoặc có chứa cụm từ này
+    // Tìm các câu trả lời bắt đầu bằng "WanderViet AI thấy" hoặc có chứa cụm từ này
     const patterns = [
-        /^WanderViệt thấy rằng /i,
-        /^WanderViệt thấy /i,
-        /^Chào bạn, WanderViệt thấy /i
+        /^WanderViet AI thấy rằng /i,
+        /^WanderViet AI thấy /i,
+        /^Chào bạn, WanderViet AI thấy /i
     ];
     
     let count = 0;

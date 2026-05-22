@@ -1,6 +1,6 @@
 ﻿/**
  * paymentManagement.js
- * Payment management module for WanderViệt Business.
+ * Payment management module for WanderViet AI Business.
  */
 
 (function() {
@@ -307,7 +307,7 @@
 
                 <div class="pay-mgmt-body" style="text-align: center;">
                     <div class="pay-icon-wrapper">💳</div>
-                    <h3 style="font-weight: 800; font-size: 24px; color: #1a1a2e;">Cổng thanh toán WanderViệt</h3>
+                    <h3 style="font-weight: 800; font-size: 24px; color: #1a1a2e;">Cổng thanh toán WanderViet AI</h3>
                     <p style="color: #64748b; font-size: 15px; max-width: 400px; line-height: 1.6;">
                         Vui lòng chọn một đơn hàng từ trang Quản lý đơn hàng để tiến hành thanh toán.
                     </p>

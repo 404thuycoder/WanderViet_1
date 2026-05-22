@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const { callGroq } = require('../utils/groq-rotator');
 
@@ -30,7 +30,7 @@ router.post('/ai-advice', auth, async (req, res) => {
     else if (mode === 'walking' || mode === 'foot') modeText = 'đi bộ';
 
     const prompt = `
-Bạn là Trợ lý AI Cố vấn Lộ trình của WanderViệt.
+Bạn là Trợ lý AI Cố vấn Lộ trình của WanderViet AI.
 Khách hàng chuẩn bị đi từ "${origin}" đến "${destination}".
 Khoảng cách dự kiến: ${distance || 'không rõ'}, Thời gian dự kiến: ${duration || 'không rõ'}.
 Phương tiện di chuyển: ${modeText}.
@@ -46,7 +46,7 @@ Lưu ý:
     const response = await groq.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: [
-        { role: 'system', content: 'Bạn là trợ lý cố vấn lộ trình WanderViệt. Trả lời bằng HTML đơn giản.' },
+        { role: 'system', content: 'Bạn là trợ lý cố vấn lộ trình WanderViet AI. Trả lời bằng HTML đơn giản.' },
         { role: 'user', content: prompt }
       ]
     });

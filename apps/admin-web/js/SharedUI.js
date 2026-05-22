@@ -1,5 +1,5 @@
-/**
- * WanderViệt Shared UI Logic
+﻿/**
+ * WanderViet AI Shared UI Logic
  * Handles Theme, Settings Drawer, and Toast system across all portals.
  */
 window.WanderUI = Object.assign(window.WanderUI || {}, (function() {

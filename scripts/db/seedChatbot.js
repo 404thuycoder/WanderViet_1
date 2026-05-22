@@ -1,15 +1,15 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Knowledge = require('./models/Knowledge');
-const chatbotDb = require('./models/dbChatbot');
+const Knowledge = require('../../server/models/Knowledge');
+const chatbotDb = require('../../server/models/dbChatbot');
 
 const faqs = [
   // HỆ THỐNG & TÀI KHOẢN
   { question: "Làm sao để đăng ký tài khoản?", answer: "Bạn nhấn vào nút 'Đăng nhập' ở góc phải màn hình, sau đó chọn 'Chưa có tài khoản? Đăng ký ngay' và điền thông tin là xong!" },
-  { question: "Tôi quên mật khẩu thì phải làm sao?", answer: "Hiện tại WanderViệt hỗ trợ đăng nhập qua Google. Nếu bạn dùng tài khoản riêng, hãy liên hệ admin để được reset mật khẩu nhé." },
+  { question: "Tôi quên mật khẩu thì phải làm sao?", answer: "Hiện tại WanderViet AI hỗ trợ đăng nhập qua Google. Nếu bạn dùng tài khoản riêng, hãy liên hệ admin để được reset mật khẩu nhé." },
   { question: "Làm thế nào để đổi mật khẩu?", answer: "Bạn vào trang 'Cá nhân' -> 'Cài đặt' -> 'Đổi mật khẩu' và nhập mật khẩu mới nhé." },
   { question: "Làm sao để xóa tài khoản?", answer: "Bạn có thể gửi yêu cầu xóa tài khoản tại mục 'Hỗ trợ' hoặc 'Liên hệ' ở cuối trang." },
-  { question: "WanderViệt là gì?", answer: "WanderViệt là nền tảng du lịch thông minh sử dụng AI để giúp bạn lên lịch trình (Planner) và hướng dẫn đường đi GPS (Navigator) chuyên nghiệp." },
+  { question: "WanderViet AI là gì?", answer: "WanderViet AI là nền tảng du lịch thông minh sử dụng AI để giúp bạn lên lịch trình (Planner) và hướng dẫn đường đi GPS (Navigator) chuyên nghiệp." },
 
   // LÊN KẾ HOẠCH (PLANNER)
   { question: "Cách sử dụng AI Trợ lý để lên lịch?", answer: "Bạn vào mục 'AI Trợ lý', chọn điểm đến, sở thích, ngân sách và nhấn 'Tạo lịch trình'. AI sẽ tự động phân bổ các điểm tham quan theo ngày cho bạn." },
@@ -20,7 +20,7 @@ const faqs = [
   // DẪN ĐƯỜNG (NAVIGATOR)
   { question: "Làm sao để bắt đầu dẫn đường?", answer: "Bạn chọn một điểm đến hoặc mở một lịch trình có sẵn, sau đó nhấn nút 'Bắt đầu'. Hệ thống sẽ dùng GPS để chỉ hướng cho bạn." },
   { question: "Tại sao Navigator không tìm thấy vị trí của tôi?", answer: "Bạn cần cấp quyền truy cập GPS cho trình duyệt. Ngoài ra hãy đảm bảo bạn đang đứng ở khu vực thoáng đãng để sóng GPS ổn định hơn." },
-  { question: "Dẫn đường có hỗ trợ giọng nói không?", answer: "Có! WanderViệt có trợ lý ảo phát âm tiếng Việt để nhắc bạn rẽ trái, rẽ phải hoặc khi sắp đến đích." },
+  { question: "Dẫn đường có hỗ trợ giọng nói không?", answer: "Có! WanderViet AI có trợ lý ảo phát âm tiếng Việt để nhắc bạn rẽ trái, rẽ phải hoặc khi sắp đến đích." },
   { question: "Chế độ 'Đi bộ' và 'Xe máy' khác gì?", answer: "Hệ thống sẽ tính toán đường đi tối ưu theo loại phương tiện. Đi bộ sẽ ưu tiên các đường nhỏ, ngõ tắt hoặc phố đi bộ." },
 
   // ĐỊA ĐIỂM DU LỊCH (FAQ ĐIỂM ĐẾN)
@@ -31,26 +31,26 @@ const faqs = [
   { question: "Phố cổ Hội An có thu phí vào cổng không?", answer: "Hội An có bán vé tham quan để bảo tồn di tích. Bạn nên mua vé để được vào thăm các nhà cổ và xem biểu diễn nghệ thuật." },
 
   // MẸO DU LỊCH & AN TOÀN
-  { question: "Cần chuẩn bị gì khi đi du lịch tự túc?", answer: "Bạn nên chuẩn bị: Giấy tờ tùy thân, bản đồ offline (WanderViệt Navigator), một ít tiền mặt, thuốc men cơ bản và sạc dự phòng." },
-  { question: "Làm sao để tiết kiệm chi phí khi đi du lịch?", answer: "Hãy đặt vé/phòng sớm, ăn uống tại các quán địa phương thay vì nhà hàng sang trọng, và sử dụng WanderViệt Planner để tối ưu lộ trình di chuyển." },
+  { question: "Cần chuẩn bị gì khi đi du lịch tự túc?", answer: "Bạn nên chuẩn bị: Giấy tờ tùy thân, bản đồ offline (WanderViet AI Navigator), một ít tiền mặt, thuốc men cơ bản và sạc dự phòng." },
+  { question: "Làm sao để tiết kiệm chi phí khi đi du lịch?", answer: "Hãy đặt vé/phòng sớm, ăn uống tại các quán địa phương thay vì nhà hàng sang trọng, và sử dụng WanderViet AI Planner để tối ưu lộ trình di chuyển." },
   { question: "Lưu ý gì khi đi du lịch vào mùa mưa?", answer: "Luôn mang theo áo mưa/ô, bọc chống nước cho điện thoại, và thường xuyên cập nhật dự báo thời tiết trên app." },
-  { question: "Làm gì khi bị lạc đường?", answer: "Hãy dùng nút 'Định tâm' trên WanderViệt Navigator hoặc hỏi cư dân địa phương. Người Việt Nam rất thân thiện và sẵn lòng chỉ giúp bạn!" },
+  { question: "Làm gì khi bị lạc đường?", answer: "Hãy dùng nút 'Định tâm' trên WanderViet AI Navigator hoặc hỏi cư dân địa phương. Người Việt Nam rất thân thiện và sẵn lòng chỉ giúp bạn!" },
 
-  // CÂU HỎI VỀ WANDERVIỆT
-  { question: "Sử dụng WanderViệt có mất phí không?", answer: "WanderViệt hoàn toàn miễn phí cho người dùng cá nhân. Chúng tôi mong muốn mang lại trải nghiệm du lịch tốt nhất cho bạn." },
-  { question: "Ai là người tạo ra WanderViệt?", answer: "WanderViệt được phát triển bởi đội ngũ kỹ thuật đam mê du lịch với mong muốn số hóa ngành du lịch Việt Nam." },
+  // CÂU HỎI VỀ WANDERVIET AI
+  { question: "Sử dụng WanderViet AI có mất phí không?", answer: "WanderViet AI hoàn toàn miễn phí cho người dùng cá nhân. Chúng tôi mong muốn mang lại trải nghiệm du lịch tốt nhất cho bạn." },
+  { question: "Ai là người tạo ra WanderViet AI?", answer: "WanderViet AI được phát triển bởi đội ngũ kỹ thuật đam mê du lịch với mong muốn số hóa ngành du lịch Việt Nam." },
   { question: "Tôi có thể đóng góp thông tin địa điểm mới không?", answer: "Có! Bạn có thể vào mục 'Đóng góp' hoặc gửi Feedback cho chúng tôi về các địa điểm mới mà bạn thấy thú vị." },
   // LỖI APP & XỬ LÝ NHANH (Viết không dấu, viết tắt)
   { question: "app bi lag ko load dc map thi lam sao", answer: "Bạn thử kiểm tra lại kết nối mạng (Wifi/4G) hoặc đóng ứng dụng mở lại nhé. Đôi khi do mạng yếu nên bản đồ tải chậm một chút." },
-  { question: "map chi duong sai, di vao duong cut", answer: "WanderViệt luôn cố gắng cập nhật dữ liệu liên tục. Nếu gặp đường cấm hoặc đường cụt, bạn nhấn 'Báo cáo lỗi map' để hệ thống tính toán lại đường khác và team dev fix lỗi nha. Xin lỗi bạn vì sự bất tiện này!" },
+  { question: "map chi duong sai, di vao duong cut", answer: "WanderViet AI luôn cố gắng cập nhật dữ liệu liên tục. Nếu gặp đường cấm hoặc đường cụt, bạn nhấn 'Báo cáo lỗi map' để hệ thống tính toán lại đường khác và team dev fix lỗi nha. Xin lỗi bạn vì sự bất tiện này!" },
   { question: "ko co mang xai dc k", answer: "Để lên lịch trình và tìm đường lần đầu bạn cần có mạng. Nhưng sau khi lưu, bạn có thể tải bản đồ offline để dùng khi đi đến các khu vực mất sóng." },
   { question: "app bi vang ra lien tuc xai k dc", answer: "Bạn thử cập nhật ứng dụng lên phiên bản mới nhất hoặc xóa bộ nhớ đệm (cache) của trình duyệt/app xem sao nhé. Nếu vẫn lỗi, hãy inbox cho page để được hỗ trợ kỹ thuật." },
 
   // TÀI KHOẢN & ĐẶT CHỖ (Viết tắt)
   { question: "qmk r lam the nao de lay lai", answer: "Ở màn hình đăng nhập, bạn chọn 'Quên mật khẩu'. Hệ thống sẽ gửi link đặt lại pass vào email của bạn ngay lập tức." },
-  { question: "lam sao de book ksan tren nay", answer: "Hiện tại WanderViệt tập trung vào lên lịch trình và dẫn đường. Nhưng bạn có thể nhấn vào các link liên kết trong phần chi tiết địa điểm để chuyển sang các trang đối tác uy tín đặt phòng nhé." },
+  { question: "lam sao de book ksan tren nay", answer: "Hiện tại WanderViet AI tập trung vào lên lịch trình và dẫn đường. Nhưng bạn có thể nhấn vào các link liên kết trong phần chi tiết địa điểm để chuyển sang các trang đối tác uy tín đặt phòng nhé." },
   { question: "xoa tk ntn", answer: "Để xóa tài khoản, bạn vào phần 'Cá nhân' -> 'Cài đặt' -> kéo xuống dưới cùng chọn 'Xóa tài khoản'. Lưu ý thao tác này không thể hoàn tác đâu nhé!" },
-  { question: "app co tinh phi k vay", answer: "WanderViệt hoàn toàn miễn phí cho các tính năng cơ bản nha bạn! Bạn cứ thoải mái sử dụng để lên kế hoạch vi vu nhé." },
+  { question: "app co tinh phi k vay", answer: "WanderViet AI hoàn toàn miễn phí cho các tính năng cơ bản nha bạn! Bạn cứ thoải mái sử dụng để lên kế hoạch vi vu nhé." },
 
   // LÊN KẾ HOẠCH & TÌM KIẾM NHANH (Viết tắt, ngôn ngữ chat)
   { question: "thay doi thgian lich trinh ntn", answer: "Trong mục 'Chuyến đi của tôi', bạn mở lịch trình ra, nhấn vào biểu tượng cây bút để chỉnh sửa giờ giấc hoặc kéo thả để đổi thứ tự các địa điểm nha." },
@@ -61,7 +61,7 @@ const faqs = [
   { question: "thue xe may o dau uy tin v shop", answer: "Khi tìm kiếm một thành phố (ví dụ Đà Nẵng, Phú Quốc), bạn kéo xuống mục 'Dịch vụ tiện ích', app có tổng hợp danh sách các cơ sở cho thuê xe máy được đánh giá cao trên mạng." },
   
   // HỎI ĐÁP NGẪU NHIÊN & TÌNH HUỐNG (Không dấu)
-  { question: "mua banh dac san o dau ngon", answer: "Trong phần thông tin thành phố, bạn chọn tab 'Đặc sản làm quà'. WanderViệt có list các cửa hàng uy tín có kèm review thực tế để bạn tránh bị chặt chém." },
+  { question: "mua banh dac san o dau ngon", answer: "Trong phần thông tin thành phố, bạn chọn tab 'Đặc sản làm quà'. WanderViet AI có list các cửa hàng uy tín có kèm review thực tế để bạn tránh bị chặt chém." },
   { question: "thoi tiet bjo di hue co nong lam k", answer: "Mùa hè ở Huế (tháng 5 - tháng 8) khá nóng bức. Nếu bạn đi mùa này, app sẽ tự động ưu tiên gợi ý các điểm tham quan trong nhà hoặc đi dạo vào buổi chiều tối để mát mẻ hơn." },
   { question: "di phuot 1 minh co tich nang gi ho tro k", answer: "Với dân đi phượt, tính năng Navigator cực kỳ hữu ích với cảnh báo tốc độ, trạm xăng gần nhất và chia sẻ vị trí trực tiếp (Live Location) cho người thân." },
   // LỊCH SỬ & VĂN HÓA (CÓ DẤU)

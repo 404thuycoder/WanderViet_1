@@ -1,5 +1,5 @@
-/**
- * WanderViệt Shared UI Logic
+﻿/**
+ * WanderViet AI Shared UI Logic
  * Theme, Toast, Notifications, Rank Badges, Common Modals
  */
 window.WanderUI = window.WanderUI || {};
@@ -160,7 +160,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         <div style="background:var(--bg-elevated,#1e293b);border-radius:24px;width:min(400px,90vw);padding:2.5rem 2rem;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,0.5);border:1px solid rgba(244,63,94,0.4);">
           <div style="font-size:3.5rem;margin-bottom:1rem;filter:drop-shadow(0 0 12px rgba(244,63,94,0.5));">🔒</div>
           <h2 style="color:#f43f5e;margin:0 0 1rem 0;font-size:1.6rem;font-weight:700;">Tài khoản bị khóa</h2>
-          <p style="color:var(--text-muted,#94a3b8);margin:0 0 2rem 0;line-height:1.6;font-size:0.95rem;">Tài khoản của bạn đã bị quản trị viên khóa do phát hiện dấu hiệu vi phạm chính sách của WanderViệt. Vui lòng đăng xuất.</p>
+          <p style="color:var(--text-muted,#94a3b8);margin:0 0 2rem 0;line-height:1.6;font-size:0.95rem;">Tài khoản của bạn đã bị quản trị viên khóa do phát hiện dấu hiệu vi phạm chính sách của WanderViet AI. Vui lòng đăng xuất.</p>
           <button onclick="WanderUI.forceLogout()" style="background:#f43f5e;color:white;border:none;padding:0.9rem 2rem;border-radius:12px;font-weight:600;font-size:1.05rem;cursor:pointer;width:100%;transition:all 0.2s;box-shadow:0 8px 24px rgba(244,63,94,0.3);">Đăng Xuất Ngay</button>
         </div>
       `;
@@ -737,8 +737,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       <div class="header-inner">
         <div class="header-left">
           <a href="index.html" class="logo">
-            <img src="/assets/wanderviet-logo-cropped-rounded.png" alt="WanderViệt" style="height: 38px; width: 38px; object-fit: cover;">
-            <span class="logo-text">WanderViệt</span>
+            <img src="/assets/wanderviet-logo-cropped-rounded.png" alt="WanderViet AI" style="height: 38px; width: 38px; object-fit: cover;">
+            <span class="logo-text">WanderViet AI</span>
           </a>
         </div>
 
@@ -753,7 +753,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
              <div class="site-nav__mobile-logo">
                 <img src="/assets/wanderviet-logo-cropped-rounded.png" alt="Logo" class="logo-mark-img" style="width: 32px; height: 32px; margin-right: 10px; object-fit: cover;">
                 <div class="site-nav__mobile-title">
-                   <strong>WanderViệt</strong>
+                   <strong>WanderViet AI</strong>
                    <span>Khám phá • Trải nghiệm</span>
                 </div>
              </div>
@@ -1148,11 +1148,11 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       <div class="modal" id="modal-auth" data-modal="auth" role="dialog" aria-modal="true" aria-labelledby="auth-title" hidden>
         <div class="modal__inner">
           <div class="modal__header">
-            <h2 id="auth-title" class="modal__title">Tài khoản WanderViệt</h2>
+            <h2 id="auth-title" class="modal__title">Tài khoản WanderViet AI</h2>
             <button type="button" class="modal__close" data-modal-close aria-label="Đóng">×</button>
           </div>
           <div class="modal__body">
-            <p class="modal__lede">Hệ thống bảo mật WanderViệt. Đăng nhập để đồng bộ lịch trình và ưu đãi của bạn.</p>
+            <p class="modal__lede">Hệ thống bảo mật WanderViet AI. Đăng nhập để đồng bộ lịch trình và ưu đãi của bạn.</p>
             <div class="auth-tabs" role="tablist" style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem">
               <button type="button" class="auth-tab is-active" role="tab" data-auth-tab="login" aria-selected="true" style="padding:0.4rem; font-size:0.9rem">Đăng nhập</button>
               <button type="button" class="auth-tab" role="tab" data-auth-tab="register" aria-selected="false" style="padding:0.4rem; font-size:0.9rem">Đăng ký mới</button>
@@ -1238,7 +1238,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         <div id="global-chat-panel" class="chat-panel" hidden>
           <div class="chat-panel__head">
             <div class="chat-panel__head-left">
-              <strong>Trợ lý WanderViệt</strong>
+              <strong>Trợ lý WanderViet AI</strong>
             </div>
             <div class="chat-panel__head-actions">
               <div class="chat-lang-switcher" title="Chọn ngôn ngữ" id="global-lang-switcher">
@@ -1330,7 +1330,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                     <div class="widget-radio__body">
                       <div class="widget-radio__info">
                         <span class="widget-radio__track" id="radio-track">Lo-Fi Hồ Tây ☕</span>
-                        <span class="widget-radio__author">WanderViệt Ambient</span>
+                        <span class="widget-radio__author">WanderViet AI Ambient</span>
                       </div>
                       <button type="button" class="widget-radio__play-btn" id="radio-play-btn" title="Phát nhạc">▶</button>
                     </div>
@@ -3022,11 +3022,11 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             appendMsg(m.text, m.role, false, true, m.timestamp); // skipCache = true, pass stored timestamp
           });
         } else if (!currentSessionId) {
-          appendMsg('Xin chào! Tôi là Trợ lý WanderViệt 🌟 Hỏi tôi bất cứ điều gì về du lịch Việt Nam nhé!', 'bot');
+          appendMsg('Xin chào! Tôi là Trợ lý WanderViet AI 🌟 Hỏi tôi bất cứ điều gì về du lịch Việt Nam nhé!', 'bot');
           renderSuggestions(DEFAULT_SUGGESTIONS);
         }
       } catch (e) {
-        if (!currentSessionId) appendMsg('Xin chào! Tôi là Trợ lý WanderViệt 🌟 Hỏi tôi bất cứ điều gì về du lịch Việt Nam nhé!', 'bot');
+        if (!currentSessionId) appendMsg('Xin chào! Tôi là Trợ lý WanderViet AI 🌟 Hỏi tôi bất cứ điều gì về du lịch Việt Nam nhé!', 'bot');
       }
     }
 

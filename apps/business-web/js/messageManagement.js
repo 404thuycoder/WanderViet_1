@@ -1,6 +1,6 @@
-/**
+﻿/**
  * messageManagement.js — Zenith Dark Messenger
- * Advanced Chat interface for WanderViệt Business Partner Hub.
+ * Advanced Chat interface for WanderViet AI Business Partner Hub.
  */
 (function() {
     'use strict';
@@ -52,7 +52,7 @@
             /th[oô]ng\s*tin\s*c[aá]\s*nh[aâ]n.*(?:user|ng[uư][oờ]i\s*d[uù]ng)/i,
         ];
         if (privacyPatterns.some(p => p.test(raw))) {
-            return 'Xin lỗi, em không thể tư vấn về thông tin đó. Em chỉ hỗ trợ vận hành Business Portal WanderViệt. Bạn cần hướng dẫn tính năng nào không ạ? 🏢';
+            return 'Xin lỗi, em không thể tư vấn về thông tin đó. Em chỉ hỗ trợ vận hành Business Portal WanderViet AI. Bạn cần hướng dẫn tính năng nào không ạ? 🏢';
         }
 
         // 2. Tra trí nhớ đã học
@@ -78,7 +78,7 @@
             for (const key in guides) {
                 if (clean.includes(key)) return guides[key];
             }
-            return 'Business Portal WanderViệt gồm:\n✅ **Dashboard**: Tổng quan\n✅ **Quản lý Dịch vụ**: Thêm/sửa/xóa\n✅ **Đặt chỗ**: Xử lý booking\n✅ **Tin nhắn**: Chat với khách\nBạn cần hướng dẫn phần nào ạ?';
+            return 'Business Portal WanderViet AI gồm:\n✅ **Dashboard**: Tổng quan\n✅ **Quản lý Dịch vụ**: Thêm/sửa/xóa\n✅ **Đặt chỗ**: Xử lý booking\n✅ **Tin nhắn**: Chat với khách\nBạn cần hướng dẫn phần nào ạ?';
         }
 
         // 4. Xử lý flow đặt chỗ
@@ -114,7 +114,7 @@
             greeting: ['chao', 'hi', 'hello', 'oi', 'alo'],
         };
         if (intents.greeting.some(k => clean.includes(k)))
-            return 'Chào bạn! Em là Trợ lý WanderViệt. Em có thể hỗ trợ bạn về dịch vụ du lịch hoặc hướng dẫn sử dụng Business Portal. Bạn cần gì ạ?';
+            return 'Chào bạn! Em là Trợ lý WanderViet AI. Em có thể hỗ trợ bạn về dịch vụ du lịch hoặc hướng dẫn sử dụng Business Portal. Bạn cần gì ạ?';
         if (intents.services.some(k => clean.includes(k)))
             return 'Bên em cung cấp **Tour du lịch** và **Khách sạn & Resort** cao cấp. Bạn muốn tìm hiểu dịch vụ nào ạ?';
         if (intents.booking.some(k => clean.includes(k)) || clean.includes('phong')) {
@@ -134,9 +134,9 @@
             /b[oó]ng\s*[đd][aá]|game|phim|nh[aạ]c|th[eờ]i\s*ti[eế]t/i,
         ];
         if (offTopicPatterns.some(p => p.test(raw)))
-            return 'Xin lỗi, em chỉ hỗ trợ về dịch vụ và vận hành Business Portal WanderViệt ạ. Bạn cần hướng dẫn gì không? 🏢';
+            return 'Xin lỗi, em chỉ hỗ trợ về dịch vụ và vận hành Business Portal WanderViet AI ạ. Bạn cần hướng dẫn gì không? 🏢';
 
-        return 'Dạ em là Trợ lý WanderViệt. Bạn có thể hỏi về đặt tour, đặt phòng, hoặc hướng dẫn sử dụng Business Portal ạ!';
+        return 'Dạ em là Trợ lý WanderViet AI. Bạn có thể hỏi về đặt tour, đặt phòng, hoặc hướng dẫn sử dụng Business Portal ạ!';
     }
 
     // ── Styles ──────────────────────────────────────────────────
@@ -192,7 +192,7 @@
     window.initMessageManagement = function() {
         localMessages = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
         localConversations = [
-            { id: AI_BOT_ID, customerName: 'Trợ lý AI WanderViệt', avatar: '👩‍💼', status: 'online', lastMessage: 'Em có thể giúp gì cho mình ạ?', time: 'Online', isAI: true },
+            { id: AI_BOT_ID, customerName: 'Trợ lý AI WanderViet AI', avatar: '👩‍💼', status: 'online', lastMessage: 'Em có thể giúp gì cho mình ạ?', time: 'Online', isAI: true },
             { id: 'c-1', customerName: 'Nguyễn Văn A', avatar: 'https://i.pravatar.cc/150?u=1', status: 'online', lastMessage: 'Báo giá cho mình nhé', time: '10:30' }
         ];
 

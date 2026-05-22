@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import './business-design.css';
 import { authService } from './authService';
 
@@ -71,12 +71,12 @@ export default function Auth({ onLoginSuccess }) {
         <div className="biz-auth-header">
           <div className="logo" style={{ justifyContent: 'center', marginBottom: '1rem', fontSize: '1.8rem' }}>
             <span className="logo-mark">◈</span>
-            WanderViệt Doanh nghiệp
+            WanderViet AI Doanh nghiệp
           </div>
           <p className="auth-subtitle">
             {isLogin 
               ? 'Đăng nhập để quản lý dịch vụ và kết nối với khách hàng.' 
-              : 'Đăng ký tài khoản để bắt đầu kinh doanh trên hệ sinh thái WanderViệt.'}
+              : 'Đăng ký tài khoản để bắt đầu kinh doanh trên hệ sinh thái WanderViet AI.'}
           </p>
         </div>
 

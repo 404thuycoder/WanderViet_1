@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 const { callGroq } = require('../utils/groq-rotator');
 
@@ -120,7 +120,7 @@ router.post('/plan-route', auth, async (req, res) => {
     const placesStr = places.map((p, idx) => `[${idx}] ${p.name} (Tọa độ: ${p.lat}, ${p.lng})`).join('\n');
 
     const prompt = `
-Bạn là Trợ lý AI Giao thông Nội bộ của WanderViệt.
+Bạn là Trợ lý AI Giao thông Nội bộ của WanderViet AI.
 Khách hàng muốn đi qua các điểm sau (Tọa độ và tên):
 ${placesStr}
 
@@ -150,7 +150,7 @@ Chỉ trả về Object JSON.
     const response = await groq.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: [
-        { role: 'system', content: 'Bạn là chuyên gia định tuyến WanderViệt. Chỉ trả về JSON.' },
+        { role: 'system', content: 'Bạn là chuyên gia định tuyến WanderViet AI. Chỉ trả về JSON.' },
         { role: 'user', content: prompt }
       ],
       response_format: { type: 'json_object' }

@@ -1,7 +1,7 @@
-"use strict";
+﻿"use strict";
 
 /**
- * Dữ liệu điểm đến — WanderViệt (fallback phía client khi MongoDB không khả dụng)
+ * Dữ liệu điểm đến — WanderViet AI (fallback phía client khi MongoDB không khả dụng)
  * Nguồn: Được lấy từ các cổng TTĐT và trang du lịch chính thống của Việt Nam
  * budget: 1=tiết kiệm, 2=vừa phải, 3=cao cấp | pace: cham|vua|nhanh
  */

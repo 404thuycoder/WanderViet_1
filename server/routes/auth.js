@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -981,7 +981,7 @@ router.post('/forgot-password', async (req, res) => {
     const mailOptions = {
       to: account.email,
       from: process.env.EMAIL_USER,
-      subject: 'Đặt lại mật khẩu WanderViệt',
+      subject: 'Đặt lại mật khẩu WanderViet AI',
       text: `Bạn nhận được email này vì bạn (hoặc ai đó) đã yêu cầu đặt lại mật khẩu cho tài khoản của mình.\n\n` +
             `Vui lòng nhấp vào liên kết sau hoặc dán vào trình duyệt của bạn để hoàn tất quá trình:\n\n` +
             `${resetUrl}\n\n` +

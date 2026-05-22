@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+﻿import React, { useEffect, useMemo, useState } from 'react';
 import Auth from './Auth';
 import { authService } from './authService';
 import ChatBot from './components/ChatBot';
@@ -232,7 +232,7 @@ export default function BusinessDashboard() {
         <div className="biz-sidebar-header">
           <div className="logo" style={{ fontSize: '1.2rem' }}>
             <span className="logo-mark">◈</span>
-            WanderViệt Doanh nghiệp
+            WanderViet AI Doanh nghiệp
           </div>
         </div>
         <div style={{ padding: '0 1.5rem', marginBottom: '1rem' }}>

@@ -328,7 +328,7 @@ router.post('/', optionalAuth, async (req, res) => {
           messages: [
             {
               role: 'system',
-              content: `Bạn là bộ não phân tích ý định người dùng của hệ thống WanderViệt - nền tảng du lịch Việt Nam.
+              content: `Bạn là bộ não phân tích ý định người dùng của hệ thống WanderViet AI - nền tảng du lịch Việt Nam.
 Hãy phân tích NGỮ CẢNH TOÀN VẸN, không đọc từng từ riêng lẻ.
 
 QUY TẮC QUAN TRỌNG NHẤT (BẮT BUỘC):
@@ -394,7 +394,7 @@ VÍ DỤ:
 
       // Nếu là ngôn ngữ khác (en, jp, kr, fr), BẮT BUỘC bỏ qua Quick Response để AI tự trả lời đúng thứ tiếng
       if (isVietnameseIntent) {
-        const answer = "Chào bạn! Mình là Trợ lý du lịch WanderViệt đây. Bạn cần mình tư vấn địa điểm nào hay có thắc mắc gì về chuyến đi không?";
+        const answer = "Chào bạn! Mình là Trợ lý du lịch WanderViet AI đây. Bạn cần mình tư vấn địa điểm nào hay có thắc mắc gì về chuyến đi không?";
         
         // Ghi lại lịch sử ngay cả với Quick Response để session không bị "rỗng" trong History
         if (chatbotDb.readyState === 1) {
@@ -681,11 +681,11 @@ QUY TẮC TỐI THƯỢNG (PHẢI TUÂN THỦ):
 5. Cấm giới thiệu các địa điểm khác. Bạn chỉ trung thành với "${placeContext.name}".
 `;
     } else if (scope === 'admin_portal') {
-      systemPrompt = `BẠN LÀ: TRỰC QUAN QUẢN TRỊ - SENTINEL AI của WanderViệt. Phong cách: Chính xác.`;
+      systemPrompt = `BẠN LÀ: TRỰC QUAN QUẢN TRỊ - SENTINEL AI của WanderViet AI. Phong cách: Chính xác.`;
     } else if (scope === 'business_portal') {
-      systemPrompt = `BẠN LÀ: CỐ VẤN KINH DOANH WanderViệt. Hỗ trợ doanh nghiệp tối ưu vận hành.`;
+      systemPrompt = `BẠN LÀ: CỐ VẤN KINH DOANH WanderViet AI. Hỗ trợ doanh nghiệp tối ưu vận hành.`;
     } else {
-      systemPrompt = `BẠN LÀ: WANDER-SOUL - Trợ lý du lịch thông thái và am hiểu bậc nhất của hệ thống WanderViệt.
+      systemPrompt = `BẠN LÀ: WANDER-SOUL - Trợ lý du lịch thông thái và am hiểu bậc nhất của hệ thống WanderViet AI.
 PHONG CÁCH & QUY TẮC PHẢN HỒI:
 1. TRẢ LỜI ĐÚNG TRỌNG TÂM VÀ SÂU SẮC: Khách hỏi gì thì trả lời thẳng vào vấn đề. Tuyệt đối không trả lời sơ sài, cụt lủn. Hãy thể hiện bạn là một chuyên gia thực thụ.
 2. THÔNG TIN CHÍNH XÁC & KHÁCH QUAN: Cung cấp thông tin thật, chính xác về vị trí, đặc trưng, giờ mở cửa hay cách đi lại. CẤM BỊA ĐẶT HOẶC RÂU ÔNG NỌ CẮM CẰM BÀ KIA (VD: Không lấy địa danh tỉnh khác gắn vào tỉnh đang hỏi).
@@ -974,7 +974,7 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
         ];
 
         const generatePlanForStyle = async (dest, daysVal, budgetVal, styleObj) => {
-            const prompt = `Bạn là SIÊU KIẾN TRÚC SƯ LỊCH TRÌNH của WanderViệt. Hãy tạo một lịch trình du lịch TỐI ƯU BỞI AI cho điểm đến ${dest} trong ${daysVal} ngày.
+            const prompt = `Bạn là SIÊU KIẾN TRÚC SƯ LỊCH TRÌNH của WanderViet AI. Hãy tạo một lịch trình du lịch TỐI ƯU BỞI AI cho điểm đến ${dest} trong ${daysVal} ngày.
             
             === THÔNG TIN PHONG CÁCH ===
             - Tên phong cách: ${styleObj.title}
@@ -1049,7 +1049,7 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
         if (req.user) {
           const userDoc = await User.findById(req.user.id);
           if (userDoc) {
-            userName = userDoc.displayName || userDoc.name || 'Thành viên WanderViet';
+            userName = userDoc.displayName || userDoc.name || 'Thành viên WanderViet AI';
             userEmail = userDoc.email || '';
           }
         }
@@ -1087,7 +1087,7 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
         }
 
         if (savedProposals.length > 0) {
-          const summaryMsg = `Dựa trên sở thích của bạn, Trợ lý WanderViệt đã thiết kế riêng **${savedProposals.length} phương án lịch trình thực tế** siêu chất lượng tại **${finalDest}**.
+          const summaryMsg = `Dựa trên sở thích của bạn, Trợ lý WanderViet AI đã thiết kế riêng **${savedProposals.length} phương án lịch trình thực tế** siêu chất lượng tại **${finalDest}**.
 
 Hãy bấm vào phương án bạn thích bên dưới để chuyển trực tiếp đến **Travel Planner AI** xem chi tiết bản đồ di chuyển, gợi ý phòng, dự trù ngân sách và video review nhé! 👇\n[ITIN_PROPOSALS:${JSON.stringify(savedProposals)}]`;
 

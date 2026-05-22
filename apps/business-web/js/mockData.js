@@ -1,6 +1,6 @@
 ﻿/**
  * mockData.js
- * Centralized mock data for WanderViệt Business Dashboard.
+ * Centralized mock data for WanderViet AI Business Dashboard.
  */
 
 // 1. DANH SÁCH DỊCH VỤ (Services)
@@ -73,7 +73,7 @@ const conversations = [
 const messages = [
     // Conversation 1
     { id: 'm1', conversationId: 'conv-1', sender: 'customer', content: 'Chào bạn, tôi đã đặt tour du thuyền bên mình.', time: '10:30' },
-    { id: 'm2', conversationId: 'conv-1', sender: 'business', content: 'Chào anh Tuấn, WanderViệt đã nhận được đơn hàng của anh ạ. Em có thể hỗ trợ gì thêm không?', time: '10:32' },
+    { id: 'm2', conversationId: 'conv-1', sender: 'business', content: 'Chào anh Tuấn, WanderViet AI đã nhận được đơn hàng của anh ạ. Em có thể hỗ trợ gì thêm không?', time: '10:32' },
     { id: 'm3', conversationId: 'conv-1', sender: 'customer', content: 'Tôi muốn đặt thêm 1 người nữa được không?', time: '10:45' },
     
     // Conversation 2

@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 (function () {
   "use strict";
@@ -1888,7 +1888,7 @@
                 '<h4 class="detail-section-title">💬 Đánh giá từ khách du lịch</h4>' +
                 '<div class="reviews-list" id="modal-reviews-list">' + (p.reviews && p.reviews.length > 0 ? p.reviews.map(function(r){
                   return '<div class="review-item-v2">' +
-                    '<div class="review-header"><strong>' + escapeHtml(r.userName || 'Người dùng WanderViệt') + '</strong><span class="review-stars">' + '★'.repeat(r.rating) + '☆'.repeat(5-r.rating) + '</span></div>' +
+                    '<div class="review-header"><strong>' + escapeHtml(r.userName || 'Người dùng WanderViet AI') + '</strong><span class="review-stars">' + '★'.repeat(r.rating) + '☆'.repeat(5-r.rating) + '</span></div>' +
                     '<p class="review-text">' + escapeHtml(r.comment) + '</p>' +
                     '<div class="review-date">' + new Date(r.createdAt).toLocaleDateString('vi-VN') + '</div>' +
                   '</div>';
@@ -3814,7 +3814,7 @@
 
           const displayImg = (p.images && p.images[0] && p.images[0].length > 5) ? p.images[0] : (p.image && p.image.length > 5 ? p.image : fallbackImg);
           const addrStr = (p.address||'').split(',').pop().trim() || 'Việt Nam';
-          const ownerName = p.ownerName || 'WanderViệt Partner';
+          const ownerName = p.ownerName || 'WanderViet AI Partner';
           
           let catLabel = 'Trải nghiệm';
           if (p.kind === 'khach-san') catLabel = 'Lưu trú Elite';

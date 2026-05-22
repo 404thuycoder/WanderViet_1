@@ -55,7 +55,7 @@ router.post('/admin', sharedAuth, async (req, res) => {
       minOrderValue: Number(minOrderValue || 0),
       createdBy: 'admin',
       ownerId: req.user.id,
-      ownerName: 'WanderViệt',
+      ownerName: 'WanderViet AI',
       scope: 'all',
       totalLimit: Number(totalLimit || 0),
       perUserLimit: Number(perUserLimit || 1),
@@ -159,9 +159,12 @@ router.post('/business', businessAuth, async (req, res) => {
       return res.status(400).json({ success: false, message: `Mã "${code}" đã tồn tại` });
     }
 
-    // Lấy tên doanh nghiệp
+    // Lấy tên doanh nghiệp (hỗ trợ cả ObjectId và customId)
     const BusinessAccount = require('../models/BusinessAccount');
-    const biz = await BusinessAccount.findById(req.user.id).select('name displayName');
+    const mongoose = require('mongoose');
+    const bizQuery = { $or: [{ customId: req.user.id }] };
+    if (mongoose.Types.ObjectId.isValid(req.user.id)) bizQuery.$or.push({ _id: req.user.id });
+    const biz = await BusinessAccount.findOne(bizQuery).select('name displayName');
     const bizName = biz ? (biz.displayName || biz.name) : 'Doanh nghiệp';
 
     const voucher = new Voucher({

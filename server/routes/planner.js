@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const { auth, JWT_SECRET } = require('./auth');
@@ -117,7 +117,7 @@ router.post('/generate', optionalAuth, async (req, res) => {
       console.error('Weather fetch error:', e.message);
     }
 
-    const prompt = `Bạn là SIÊU KIẾN TRÚC SƯ LỊCH TRÌNH của WanderViệt. Nhiệm vụ của bạn là biến một chuyến đi thành một TÁC PHẨM NGHỆ THUẬT.
+    const prompt = `Bạn là SIÊU KIẾN TRÚC SƯ LỊCH TRÌNH của WanderViet AI. Nhiệm vụ của bạn là biến một chuyến đi thành một TÁC PHẨM NGHỆ THUẬT.
 
 === THÔNG TIN CHUYẾN ĐI ===
 - Điểm đến: ${destination}
@@ -420,7 +420,7 @@ router.post('/discover', async (req, res) => {
     const messages = [
       {
         role: 'system',
-        content: `Bạn là trợ lý du lịch WanderViệt. Nhiệm vụ của bạn là lắng nghe yêu cầu của khách hàng (ngân sách, sở thích, thời tiết...) và gợi ý những điểm đến phù hợp tại Việt Nam.
+        content: `Bạn là trợ lý du lịch WanderViet AI. Nhiệm vụ của bạn là lắng nghe yêu cầu của khách hàng (ngân sách, sở thích, thời tiết...) và gợi ý những điểm đến phù hợp tại Việt Nam.
         
         QUY TẮC:
         1. Nếu thông tin thiếu, hãy hỏi gộp các câu hỏi về: Nơi xuất phát, Số người, Sở thích chính.
@@ -485,7 +485,7 @@ router.post('/smart-wizard', optionalAuth, async (req, res) => {
       }
     }
 
-    const systemPrompt = `Bạn là bộ não của Trợ lý Lịch trình Thông minh WanderViệt.
+    const systemPrompt = `Bạn là bộ não của Trợ lý Lịch trình Thông minh WanderViet AI.
 Nhiệm vụ: Thu thập thông tin từ người dùng để tạo lịch trình du lịch cá nhân hóa.
 
 QUY TẮC CỐT LÕI:

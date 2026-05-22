@@ -1,4 +1,4 @@
-const SocialHub = {
+﻿const SocialHub = {
     user: null,
     posts: [],
     stories: [],
@@ -957,7 +957,7 @@ const SocialHub = {
     shareStory: function (storyId) {
         const url = `${window.location.origin}/social-hub.html?story=${storyId || ''}`;
         if (navigator.share) {
-            navigator.share({ title: 'WanderViệt Thước Phim', url })
+            navigator.share({ title: 'WanderViet AI Thước Phim', url })
                 .catch(() => this._copyStoryUrl(url));
         } else {
             this._copyStoryUrl(url);
@@ -1297,10 +1297,10 @@ const SocialHub = {
 
     // Danh sách nhạc mẫu (free audio URLs)
     MUSIC_TRACKS: [
-        { id: 1, name: 'Sunny Day Vibes', author: 'WanderViệt', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', genre: 'Pop', emoji: '☀️' },
+        { id: 1, name: 'Sunny Day Vibes', author: 'WanderViet AI', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3', genre: 'Pop', emoji: '☀️' },
         { id: 2, name: 'Chill Travel', author: 'Lofi Studio', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3', genre: 'Lofi', emoji: '🌊' },
         { id: 3, name: 'Adventure Awaits', author: 'Epic Sounds', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3', genre: 'Epic', emoji: '🏔️' },
-        { id: 4, name: 'Vietnam Morning', author: 'WanderViệt', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', genre: 'Acoustic', emoji: '🌸' },
+        { id: 4, name: 'Vietnam Morning', author: 'WanderViet AI', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3', genre: 'Acoustic', emoji: '🌸' },
         { id: 5, name: 'Street Food Beat', author: 'City Vibes', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3', genre: 'Electronic', emoji: '🍜' },
         { id: 6, name: 'Mekong Sunset', author: 'Indie Folk', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3', genre: 'Folk', emoji: '🌅' },
     ],
@@ -1858,7 +1858,7 @@ const SocialHub = {
                 <div class="reactions-list">
                     ${users.map(u => {
                         const isMe = String(u.userId) === String(this.user?._id || this.user?.id);
-                        const name = isMe ? 'Bạn' : 'Người dùng WanderViệt';
+                        const name = isMe ? 'Bạn' : 'Người dùng WanderViet AI';
                         const avatar = isMe ? (this.user?.avatar || '/assets/default-avatar.svg') : '/assets/default-avatar.svg';
                         return `
                         <div class="reaction-user-item">
@@ -3044,7 +3044,7 @@ const SocialHub = {
                 <div class="glass-panel" style="padding: 4rem 2rem; border-radius: 32px;">
                     <h1 style="font-size: 2.5rem; margin-bottom: 1rem; font-family: var(--font-display);">👋 Chào mừng đến với Cộng đồng</h1>
                     <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 2.5rem; line-height: 1.6;">
-                        Hãy đăng nhập để kết nối với hàng nghìn du khách, chia sẻ trải nghiệm và nhận những gợi ý du lịch độc quyền từ cộng đồng WanderViệt.
+                        Hãy đăng nhập để kết nối với hàng nghìn du khách, chia sẻ trải nghiệm và nhận những gợi ý du lịch độc quyền từ cộng đồng WanderViet AI.
                     </p>
                     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
                         <button class="btn btn--primary btn--large" onclick="WanderUI.openAuthModal('login')">Đăng nhập ngay</button>

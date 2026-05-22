@@ -1,14 +1,14 @@
-const nodemailer = require('nodemailer');
+﻿const nodemailer = require('nodemailer');
 
 /**
- * Generates a premium HTML email template for WanderViệt OTP
+ * Generates a premium HTML email template for WanderViet AI OTP
  */
 const getOtpTemplate = (otp, purposeName) => {
   const isForgot = purposeName === 'forgot_password';
   const title = isForgot ? 'Đặt Lại Mật Khẩu' : 'Xác Thực Tài Khoản';
   const description = isForgot 
-    ? 'Bạn nhận được email này vì đã yêu cầu đặt lại mật khẩu cho tài khoản WanderViệt của mình.' 
-    : 'Chào mừng bạn đến với WanderViệt! Vui lòng sử dụng mã OTP dưới đây để hoàn tất đăng ký tài khoản.';
+    ? 'Bạn nhận được email này vì đã yêu cầu đặt lại mật khẩu cho tài khoản WanderViet AI của mình.' 
+    : 'Chào mừng bạn đến với WanderViet AI! Vui lòng sử dụng mã OTP dưới đây để hoàn tất đăng ký tài khoản.';
   
   return `
     <!DOCTYPE html>
@@ -16,7 +16,7 @@ const getOtpTemplate = (otp, purposeName) => {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>WanderViệt OTP Verification</title>
+      <title>WanderViet AI OTP Verification</title>
       <style>
         body {
           font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -117,7 +117,7 @@ const getOtpTemplate = (otp, purposeName) => {
       <div class="container">
         <div class="logo">
           <span class="logo-symbol">◈</span>
-          <span class="logo-text">WanderViệt</span>
+          <span class="logo-text">WanderViet AI</span>
         </div>
         <div class="header">
           <h1>${title}</h1>
@@ -130,12 +130,12 @@ const getOtpTemplate = (otp, purposeName) => {
         </div>
 
         <p style="font-size: 14px; line-height: 1.6; color: #94a3b8; text-align: center;">
-          <span class="warning-text">Lưu ý bảo mật:</span> Tuyệt đối không chia sẻ mã OTP này với bất kỳ ai, kể cả nhân viên WanderViệt.
+          <span class="warning-text">Lưu ý bảo mật:</span> Tuyệt đối không chia sẻ mã OTP này với bất kỳ ai, kể cả nhân viên WanderViet AI.
         </p>
 
         <div class="footer">
-          <p>Email này được gửi tự động từ hệ thống bảo mật của WanderViệt.</p>
-          <p>© 2026 WanderViệt Ecosystem. Khám phá du lịch thông minh bằng AI.</p>
+          <p>Email này được gửi tự động từ hệ thống bảo mật của WanderViet AI.</p>
+          <p>© 2026 WanderViet AI Ecosystem. Khám phá du lịch thông minh bằng AI.</p>
         </div>
       </div>
     </body>
@@ -163,11 +163,11 @@ const sendOtpEmail = async (email, otp, purpose) => {
   });
 
   const subject = purpose === 'forgot_password' 
-    ? '🔒 Đặt lại mật khẩu tài khoản WanderViệt' 
-    : '✨ Xác thực đăng ký tài khoản WanderViệt';
+    ? '🔒 Đặt lại mật khẩu tài khoản WanderViet AI' 
+    : '✨ Xác thực đăng ký tài khoản WanderViet AI';
 
   const mailOptions = {
-    from: `"Bảo mật WanderViệt" <${mailUser}>`,
+    from: `"Bảo mật WanderViet AI" <${mailUser}>`,
     to: email,
     subject: subject,
     html: getOtpTemplate(otp, purpose)

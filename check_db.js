@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 const Place = require('./server/models/Place');
 const BusinessAccount = require('./server/models/BusinessAccount');
 
@@ -14,7 +14,7 @@ mongoose.connect('mongodb://localhost:27017/wanderviet').then(async () => {
     }
 
     if (p) {
-        let ownerName = 'WanderViệt Partner';
+        let ownerName = 'WanderViet AI Partner';
         let ownerId = null;
         
         if (p.ownerId) {

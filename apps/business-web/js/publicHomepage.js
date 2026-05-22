@@ -26,7 +26,7 @@
     var _pubServices = [];
 
     const projects = [
-        { title: 'Hệ thống quản lý WanderViệt', category: 'Tech/Software', image: 'https://images.unsplash.com/photo-1551288049-bbda446b17ad?w=600&q=80' },
+        { title: 'Hệ thống quản lý WanderViet AI', category: 'Tech/Software', image: 'https://images.unsplash.com/photo-1551288049-bbda446b17ad?w=600&q=80' },
         { title: 'Chiến dịch "Khám phá Việt Nam"', category: 'Marketing', image: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=600&q=80' },
         { title: 'Ứng dụng đặt tour Real-time', category: 'App Development', image: 'https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600&q=80' }
     ];
@@ -212,7 +212,7 @@
     }
 
     function ServiceCard(s) {
-        const desc = s.desc || s.description || 'Dịch vụ chất lượng cao từ đối tác WanderViệt.';
+        const desc = s.desc || s.description || 'Dịch vụ chất lượng cao từ đối tác WanderViet AI.';
         const price = fmtPrice(s.price || s.priceFrom);
         const rating = parseFloat(s.rating || s.ratingAvg || 0);
         const reviewCount = s.reviews || s.reviewCount || 0;
@@ -291,7 +291,7 @@
                 <div class="sec-header">
                     <span class="sec-tag">Dịch vụ chuyên nghiệp</span>
                     <h2>Dịch vụ nổi bật</h2>
-                    <p>Hệ sinh thái dịch vụ đa dạng, chất lượng cao từ các đối tác uy tín WanderViệt.</p>
+                    <p>Hệ sinh thái dịch vụ đa dạng, chất lượng cao từ các đối tác uy tín WanderViet AI.</p>
                 </div>
                 <div class="service-grid-v3" id="pub-svc-grid">
                     ${svcs.map(ServiceCard).join('')}
@@ -315,7 +315,7 @@
                 <div class="sec-header">
                     <span class="sec-tag">Dự án & Khách hàng</span>
                     <h2>Dự án tiêu biểu đã thực hiện</h2>
-                    <p>Những cột mốc quan trọng trong hành trình phát triển và phục vụ khách hàng của WanderViệt.</p>
+                    <p>Những cột mốc quan trọng trong hành trình phát triển và phục vụ khách hàng của WanderViet AI.</p>
                 </div>
                 <div class="portfolio-grid">
                     ${projects.map(p => `
@@ -367,7 +367,7 @@
                     </div>
                 </div>
                 <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:30px; text-align:center; font-size:12px; color:#64748b">
-                    © 2026 WanderViệt Enterprise. All Rights Reserved.
+                    © 2026 WanderViet AI Enterprise. All Rights Reserved.
                 </div>
             </footer>
 

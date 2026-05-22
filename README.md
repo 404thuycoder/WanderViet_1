@@ -1,4 +1,4 @@
-# WanderViệt — Du lịch thông minh
+﻿# WanderViet AI — Du lịch thông minh
 
 Nền tảng du lịch cá nhân hóa cho người Việt. Gồm 3 cổng: **User Portal**, **Business Partner**, và **Admin Dashboard**.
 

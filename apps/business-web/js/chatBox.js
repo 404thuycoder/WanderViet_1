@@ -1,4 +1,4 @@
-/**
+﻿/**
  * chatBox.js — ULTIMATE SMART AI CHATBOT v6.0 (DIVERSE VERSION)
  * Một nhân viên CSKH ảo toàn diện, am hiểu doanh nghiệp và có khả năng tư vấn chuyên sâu.
  */
@@ -17,7 +17,7 @@
 
     // ── KNOWLEDGE & DATA ─────────────────────────────────────────
     const companyProfile = {
-        name: "WanderViệt Enterprise",
+        name: "WanderViet AI Enterprise",
         address: "123 Đường Du Lịch, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh",
         phone: "1900 1234",
         email: "info@wanderviet.com",
@@ -27,29 +27,29 @@
 
     const variations = {
         greeting: [
-            "Chào bạn! Em là Trợ lý ảo của WanderViệt. Em có thể giúp gì cho mình ạ? 😊",
-            "WanderViệt xin chào! Rất vui được hỗ trợ bạn. Bạn cần tư vấn về Tour hay Khách sạn ạ?",
-            "Chào mừng bạn đến với WanderViệt! Em có thể giúp bạn tìm kiếm thông tin dịch vụ hoặc báo giá ngay nhé! ✨",
-            "Alo! Em là trợ lý thông minh của WanderViệt đây. Bạn cần em hỗ trợ phần nào ạ?"
+            "Chào bạn! Em là Trợ lý ảo của WanderViet AI. Em có thể giúp gì cho mình ạ? 😊",
+            "WanderViet AI xin chào! Rất vui được hỗ trợ bạn. Bạn cần tư vấn về Tour hay Khách sạn ạ?",
+            "Chào mừng bạn đến với WanderViet AI! Em có thể giúp bạn tìm kiếm thông tin dịch vụ hoặc báo giá ngay nhé! ✨",
+            "Alo! Em là trợ lý thông minh của WanderViet AI đây. Bạn cần em hỗ trợ phần nào ạ?"
         ],
         contact: [
             `Dạ, bạn có thể liên hệ với bên em qua:\n📍 Địa chỉ: ${companyProfile.address}\n📞 Hotline: ${companyProfile.phone}\n📧 Email: ${companyProfile.email}\nBên em luôn sẵn sàng hỗ trợ bạn!`,
-            `Đây là thông tin liên lạc của WanderViệt ạ:\n☎️ Hotline: ${companyProfile.phone}\n🏠 Văn phòng: ${companyProfile.address}\nBạn cần em kết nối với nhân viên tư vấn không ạ?`,
+            `Đây là thông tin liên lạc của WanderViet AI ạ:\n☎️ Hotline: ${companyProfile.phone}\n🏠 Văn phòng: ${companyProfile.address}\nBạn cần em kết nối với nhân viên tư vấn không ạ?`,
             `Để được hỗ trợ trực tiếp, mình có thể gọi số ${companyProfile.phone} hoặc ghé thăm văn phòng tại ${companyProfile.address} nhé! 🏢`
         ],
         services: [
-            `WanderViệt cung cấp các giải pháp toàn diện bao gồm: \n- ${companyProfile.services.join('\n- ')}\nBạn quan tâm đến mảng nào nhất ạ?`,
+            `WanderViet AI cung cấp các giải pháp toàn diện bao gồm: \n- ${companyProfile.services.join('\n- ')}\nBạn quan tâm đến mảng nào nhất ạ?`,
             `Dạ bên em có rất nhiều dịch vụ đa dạng: ${companyProfile.services.join(', ')}. Bạn muốn em gửi thông tin chi tiết của phần nào ạ?`,
-            `Từ Tour du lịch đến Giải pháp Công nghệ, WanderViệt đều có đủ ạ: \n✅ ${companyProfile.services.join('\n✅ ')}\nMình cần em tư vấn thêm không?`
+            `Từ Tour du lịch đến Giải pháp Công nghệ, WanderViet AI đều có đủ ạ: \n✅ ${companyProfile.services.join('\n✅ ')}\nMình cần em tư vấn thêm không?`
         ],
         price: [
             "Giá dịch vụ bên em rất linh hoạt: Tour từ 1.8tr và Phòng từ 1.2tr. Bạn đang quan tâm đến dịch vụ cụ thể nào ạ?",
             "Dạ giá cả tùy thuộc vào thời điểm và hạng dịch vụ. Thông thường Tour bên em từ 1.8tr/người. Bạn muốn em báo giá tour nào ạ?",
-            "WanderViệt luôn có giá tốt nhất cho khách hàng. Tour trọn gói chỉ từ 1.8tr thôi ạ. Mình đi ngày nào để em check giá chính xác nhé? 💸"
+            "WanderViet AI luôn có giá tốt nhất cho khách hàng. Tour trọn gói chỉ từ 1.8tr thôi ạ. Mình đi ngày nào để em check giá chính xác nhé? 💸"
         ],
         thanks: [
             "Dạ không có gì ạ! Rất vui được hỗ trợ bạn. Chúc bạn một ngày tốt lành! ❤️",
-            "Cảm ơn bạn đã quan tâm đến WanderViệt! Chúc bạn có những trải nghiệm tuyệt vời ạ. 😊",
+            "Cảm ơn bạn đã quan tâm đến WanderViet AI! Chúc bạn có những trải nghiệm tuyệt vời ạ. 😊",
             "Dạ vâng ạ! Em luôn ở đây nếu bạn cần hỗ trợ thêm nhé. Tạm biệt bạn! 👋"
         ],
         fallback: [
@@ -81,7 +81,7 @@
         ];
         if (privacyPatterns.some(p => p.test(raw))) {
             return {
-                text: 'Xin lỗi, em không thể tư vấn về thông tin đó. Em chỉ hỗ trợ về dịch vụ và vận hành Business Portal WanderViệt. Bạn cần hướng dẫn gì không ạ? 🏢',
+                text: 'Xin lỗi, em không thể tư vấn về thông tin đó. Em chỉ hỗ trợ về dịch vụ và vận hành Business Portal WanderViet AI. Bạn cần hướng dẫn gì không ạ? 🏢',
                 quick: ['Hướng dẫn đăng dịch vụ', 'Quản lý đặt chỗ', 'Liên hệ hỗ trợ']
             };
         }
@@ -95,7 +95,7 @@
         if (portalGuidePatterns.some(p => p.test(raw))) {
             return {
                 text: pick([
-                    'Business Portal WanderViệt gồm các tính năng chính:\n- **Dashboard**: Tổng quan hoạt động\n- **Quản lý Dịch vụ**: Thêm/sửa tour, phòng\n- **Đặt chỗ (Bookings)**: Quản lý lịch đặt\n- **Tin nhắn**: Giao tiếp với khách\nBạn cần hướng dẫn phần nào ạ?',
+                    'Business Portal WanderViet AI gồm các tính năng chính:\n- **Dashboard**: Tổng quan hoạt động\n- **Quản lý Dịch vụ**: Thêm/sửa tour, phòng\n- **Đặt chỗ (Bookings)**: Quản lý lịch đặt\n- **Tin nhắn**: Giao tiếp với khách\nBạn cần hướng dẫn phần nào ạ?',
                     'Dạ em có thể hướng dẫn bạn:\n✅ Thêm dịch vụ mới\n✅ Xem và xử lý đặt chỗ\n✅ Nhắn tin với khách hàng\n✅ Cập nhật thông tin dịch vụ\nBạn muốn bắt đầu từ đâu ạ?',
                 ]),
                 quick: ['Cách thêm dịch vụ', 'Xem đặt chỗ', 'Nhắn tin khách hàng']
@@ -174,7 +174,7 @@
         ];
         if (offTopicPatterns.some(p => p.test(raw))) {
             return {
-                text: 'Xin lỗi, em chỉ hỗ trợ về dịch vụ và vận hành Business Portal WanderViệt ạ. Bạn cần hướng dẫn gì về nền tảng không? 🏢',
+                text: 'Xin lỗi, em chỉ hỗ trợ về dịch vụ và vận hành Business Portal WanderViet AI ạ. Bạn cần hướng dẫn gì về nền tảng không? 🏢',
                 quick: ['Hướng dẫn Portal', 'Tư vấn Tour', 'Liên hệ hỗ trợ']
             };
         }
@@ -232,7 +232,7 @@
             <div class="cb-header">
                 <div class="cb-avatar">👩‍💼</div>
                 <div style="flex:1">
-                    <div style="font-weight:900;font-size:17px">Trợ lý WanderViệt</div>
+                    <div style="font-weight:900;font-size:17px">Trợ lý WanderViet AI</div>
                     <div style="font-size:12px;opacity:0.8;display:flex;align-items:center;gap:4px">● Đang trực tuyến ⚡</div>
                 </div>
                 <button id="smart-cb-close" style="background:transparent;border:none;color:#fff;cursor:pointer;font-size:22px">✕</button>
@@ -294,7 +294,7 @@
             const container = document.getElementById('smart-cb-messages');
             const msgs = JSON.parse(localStorage.getItem(LS_PREFIX + 'history') || '[]');
             if (msgs.length === 0) {
-                container.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#64748b;font-size:14.5px;line-height:1.7">Chào bạn! Em là <b>Trợ lý WanderViệt</b>. Em có thể giúp gì cho mình về Tour, Khách sạn hay thông tin dịch vụ ạ?</div>`;
+                container.innerHTML = `<div style="text-align:center;padding:60px 20px;color:#64748b;font-size:14.5px;line-height:1.7">Chào bạn! Em là <b>Trợ lý WanderViet AI</b>. Em có thể giúp gì cho mình về Tour, Khách sạn hay thông tin dịch vụ ạ?</div>`;
                 this.renderQuick(["Tư vấn Tour", "Giá phòng", "Liên hệ"]);
                 return;
             }

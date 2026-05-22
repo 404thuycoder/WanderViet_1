@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
 console.log('✅ [public.js] Route module initialized');
 const mongoose = require('mongoose');
@@ -290,7 +290,7 @@ router.get('/all-places', async (req, res) => {
     
     // Gắn thêm ownerName cho từng place để hiển thị đẹp hơn
     const enrichedPlaces = await Promise.all(places.map(async (p) => {
-      let ownerName = 'WanderViệt Partner';
+      let ownerName = 'WanderViet AI Partner';
       let ownerId = null;
       let hasRealBusiness = false;
       let businessData = null;

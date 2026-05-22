@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+﻿const mongoose = require('mongoose');
 
 const feedbackSchema = new mongoose.Schema({
   userId: { type: String, index: true },
@@ -6,7 +6,7 @@ const feedbackSchema = new mongoose.Schema({
   role: { type: String, default: 'user' },
   name: {
     type: String,
-    default: 'Thành viên WanderViệt'
+    default: 'Thành viên WanderViet AI'
   },
   email: {
     type: String,

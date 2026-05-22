@@ -1,5 +1,5 @@
 ﻿/* =====================================================================
-   WanderViệt — Business Partner Dashboard
+   WanderViet AI — Business Partner Dashboard
    Đây là dashboard dành riêng cho đối tác doanh nghiệp
    ===================================================================== */
 'use strict';

@@ -1,4 +1,4 @@
-const express = require('express');
+﻿const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const Place = require('../models/Place');
@@ -381,7 +381,7 @@ router.get('/', async (req, res) => {
 
     const data = places.map(p => ({
       ...p,
-      ownerName: p.ownerId ? (cachedBizMap.get(p.ownerId) || 'Đối tác WanderViệt') : null
+      ownerName: p.ownerId ? (cachedBizMap.get(p.ownerId) || 'Đối tác WanderViet AI') : null
     }));
 
     if (data && data.length > 0) {

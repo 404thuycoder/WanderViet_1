@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 // Fix image viewing error
 window.WanderUI = window.WanderUI || {};
@@ -144,7 +144,7 @@ const FeedbackHub = {
             <div class="empty-view">
                 <i>${this.currentTab === 'system' ? '⚙️' : '🏢'}</i>
                 <h2>${this.currentTab === 'system' ? 'Phản hồi Hệ thống' : 'Phản hồi Doanh nghiệp'}</h2>
-                <p>${this.currentTab === 'system' ? 'Xem các phản hồi về bảo trì, hỗ trợ chung từ WanderViệt.' : 'Trao đổi, tư vấn trực tiếp với các đối tác doanh nghiệp.'}</p>
+                <p>${this.currentTab === 'system' ? 'Xem các phản hồi về bảo trì, hỗ trợ chung từ WanderViet AI.' : 'Trao đổi, tư vấn trực tiếp với các đối tác doanh nghiệp.'}</p>
                 <button class="btn btn--primary" style="margin-top:20px;" onclick="window.location.href='index.html#contact'">Gửi phản hồi mới</button>
             </div>
         `;

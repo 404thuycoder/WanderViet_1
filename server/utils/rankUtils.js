@@ -1,5 +1,5 @@
-/**
- * Ranking Utilities for WanderViệt
+﻿/**
+ * Ranking Utilities for WanderViet AI
  */
 
 const RANKS = [

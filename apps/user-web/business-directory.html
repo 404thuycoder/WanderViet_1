@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -32,7 +32,7 @@
     </style>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh bạ Dịch vụ — WanderViệt</title>
+    <title>Danh bạ Dịch vụ — WanderViet AI</title>
     <link rel="icon" type="image/png" href="/assets/wanderviet-logo-cropped-rounded.png">
     <link rel="stylesheet" href="css/global-tokens.css?v=46" />
     <link rel="stylesheet" href="css/styles.css?v=46" />
@@ -188,7 +188,7 @@
     <header id="header-container"></header>
 
     <section class="hero-lite">
-        <h1 class="hero-title">WanderViệt<br>Dịch vụ & Đối tác</h1>
+        <h1 class="hero-title">WanderViet AI<br>Dịch vụ & Đối tác</h1>
         <div class="search-bar">
             <input type="text" id="mainSearch" placeholder="Tìm kiếm dịch vụ, địa điểm hoặc kênh doanh nghiệp..." onkeyup="if(event.key==='Enter') syncFilters()">
             <button class="btn-search" onclick="syncFilters()">Tìm kiếm</button>
@@ -562,7 +562,7 @@
         function groupByOwner(data) {
             const groups = {};
             data.forEach(p => {
-                const ownerName = p.ownerName || p.name || 'WanderViệt Partner';
+                const ownerName = p.ownerName || p.name || 'WanderViet AI Partner';
                 const ownerId = p.ownerId || p._id || p.id;
                 const hasRealBiz = p.hasRealBusiness !== undefined ? p.hasRealBusiness : (p.ownerId !== p._id);
                 if(!groups[ownerName]) groups[ownerName] = { 
@@ -608,7 +608,7 @@
                         <h3 class="svc-name">${p.name}</h3>
                         <div style="display:flex; gap:16px; font-size:12px; color:var(--text-dim);"><span>⭐ ${p.rating || '5.0'}</span><span>📍 ${(p.address||'').split(',').pop().trim()}</span></div>
                         <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--glass-border); display:flex; justify-content:space-between; align-items:center;">
-                            <div style="display:flex; align-items:center; gap:8px;"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(p.ownerName||'WV')}&background=6366f1&color=fff" style="width:24px; height:24px; border-radius:6px;"> <span style="font-size:11px; font-weight:700; color:var(--text-dim);">${p.ownerName||'WanderViệt Partner'}</span></div>
+                            <div style="display:flex; align-items:center; gap:8px;"><img src="https://ui-avatars.com/api/?name=${encodeURIComponent(p.ownerName||'WV')}&background=6366f1&color=fff" style="width:24px; height:24px; border-radius:6px;"> <span style="font-size:11px; font-weight:700; color:var(--text-dim);">${p.ownerName||'WanderViet AI Partner'}</span></div>
                             <span style="color:var(--primary); font-size:9px; font-weight:800;">VERIFIED 🛡️</span>
                         </div>
                     </div>
@@ -627,7 +627,7 @@
 
             document.getElementById('display-grid').innerHTML = owners.map(b => {
                 const avatar = b.businessData?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=6366f1&color=fff&size=128`;
-                const bio = b.businessData?.bio || `Đối tác chiến lược cung cấp ${b.places.length} trải nghiệm tinh hoa tại hệ thống WanderViệt.`;
+                const bio = b.businessData?.bio || `Đối tác chiến lược cung cấp ${b.places.length} trải nghiệm tinh hoa tại hệ thống WanderViet AI.`;
                 return `
                 <div class="biz-card" onclick="window.location.href='business-profile.html?id=${b.id}'">
                     <img src="${avatar}" class="biz-logo" onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(b.name)}&background=6366f1&color=fff&size=128';">

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
@@ -33,7 +33,7 @@
 
   <link rel="icon" type="image/png" href="/assets/wanderviet-logo-cropped-rounded.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WanderViệt — Nhiệm Vụ & Thành Tựu</title>
+  <title>WanderViet AI — Nhiệm Vụ & Thành Tựu</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
@@ -573,7 +573,7 @@
       return [
         // ☀️ Hàng ngày & Ngắn hạn
         { id:'daily_login_' + todayStr,  cat:'daily',   icon:'☀️', title:'Đăng nhập hàng ngày',          desc:'Mở ứng dụng và đăng nhập tài khoản.',                    xp:5,  max:1, key:'dailyLogin',     link:'index.html' },
-        { id:'daily_chat_' + todayStr,   cat:'daily',   icon:'💬', title:'Trò chuyện với Trợ lý AI',     desc:'Gửi 1 tin nhắn tới Trợ lý WanderViệt hôm nay.',         xp:5,  max:1, key:'dailyChat',      link:'index.html#chat' },
+        { id:'daily_chat_' + todayStr,   cat:'daily',   icon:'💬', title:'Trò chuyện với Trợ lý AI',     desc:'Gửi 1 tin nhắn tới Trợ lý WanderViet AI hôm nay.',         xp:5,  max:1, key:'dailyChat',      link:'index.html#chat' },
         { id:'daily_search_' + todayStr, cat:'daily',   icon:'🔍', title:'Tìm kiếm điểm đến',            desc:'Sử dụng công cụ tìm kiếm thông minh hôm nay.',          xp:4,  max:1, key:'dailySearch',    link:'index.html#search' },
         { id:'daily_history_' + todayStr,cat:'daily',   icon:'⌛', title:'Kiểm tra lịch sử',            desc:'Xem lại lịch sử hoạt động của bạn hôm nay.',             xp:4,  max:1, key:'dailyHistory',   link:'history.html' },
         { id:'daily_quiz_' + todayStr,   cat:'daily',   icon:'🏆', title:'Tham gia WanderQuiz',         desc:'Trả lời câu hỏi trắc nghiệm trong khung chat.',          xp:5,  max:1, key:'dailyQuiz',      link:'index.html#chat' },
@@ -608,7 +608,7 @@
         { id:'social_profile',  cat:'social',  icon:'👤', title:'Hoàn thiện hồ sơ',             desc:'Điền tên hiển thị và thông tin cá nhân.',                xp:15, max:1, key:'socProfile',     link:'profile.html' },
         { id:'social_board',    cat:'social',  icon:'🏆', title:'Xem bảng xếp hạng',            desc:'Truy cập trang BXH để xem vị trí của bạn.',             xp:5,  max:1, key:'socLeaderboard', link:'leaderboard.html' },
         { id:'social_influencer',cat:'social', icon:'✍️', title:'Người truyền cảm hứng',        desc:'Viết 5 đánh giá đóng góp cho cộng đồng.',               xp:50, max:5, key:'reviewWrite',     link:'index.html#reviews' },
-        { id:'social_hub_visit',cat:'social',  icon:'👥', title:'Ghé thăm Cộng đồng',            desc:'Ghé thăm trang Cộng đồng WanderViệt.',                  xp:5,  max:1, key:'socHubVisit',    link:'social-hub.html' },
+        { id:'social_hub_visit',cat:'social',  icon:'👥', title:'Ghé thăm Cộng đồng',            desc:'Ghé thăm trang Cộng đồng WanderViet AI.',                  xp:5,  max:1, key:'socHubVisit',    link:'social-hub.html' },
         { id:'social_like',     cat:'social',  icon:'👍', title:'Thích bài viết',               desc:'Bấm thích 1 bài viết trên Social Hub.',                  xp:5,  max:1, key:'socLike',       link:'social-hub.html' },
         { id:'social_comment',  cat:'social',  icon:'💬', title:'Bình luận bài viết',            desc:'Để lại bình luận trên Social Hub.',                      xp:10, max:1, key:'socComment',    link:'social-hub.html' },
         { id:'social_share',    cat:'social',  icon:'📤', title:'Chia sẻ bài viết',              desc:'Chia sẻ bài viết cộng đồng.',                           xp:10, max:1, key:'socShare',      link:'social-hub.html' },
@@ -902,7 +902,7 @@
             const minText = v.minOrderValue > 0
               ? `Đơn tối thiểu ${Number(v.minOrderValue).toLocaleString('vi-VN')}đ` : 'Mọi đơn hàng';
             const rankColor = v.minRank ? (RANK_COLORS[v.minRank] || '#6366f1') : '#10b981';
-            const byLabel = v.createdBy === 'admin' ? '🏛️ WanderViệt' : `🏢 ${v.ownerName || 'Đối tác'}`;
+            const byLabel = v.createdBy === 'admin' ? '🏛️ WanderViet AI' : `🏢 ${v.ownerName || 'Đối tác'}`;
             const rankBadge = v.minRank
               ? `<span style="font-size:0.7rem; font-weight:800; background:${rankColor}22; color:${rankColor}; border:1px solid ${rankColor}44; padding:2px 8px; border-radius:20px;">Hạng ${v.minRank}+</span>`
               : (v.forNewUsers ? '<span style="font-size:0.7rem; font-weight:800; background:#10b98122; color:#10b981; border:1px solid #10b98144; padding:2px 8px; border-radius:20px;">Thành viên mới</span>' : '<span style="font-size:0.7rem; font-weight:800; background:#6366f122; color:#6366f1; border:1px solid #6366f144; padding:2px 8px; border-radius:20px;">Cho tất cả</span>');

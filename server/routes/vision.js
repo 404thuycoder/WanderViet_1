@@ -23,7 +23,7 @@ router.post('/search', async (req, res) => {
     let placesData = [];
     let knownPlaceNames = "";
     try {
-      const placesDataPath = path.join(__dirname, '../apps/user-web/places-data.js');
+      const placesDataPath = path.join(__dirname, '../../apps/user-web/js/places-data.js');
       const content = fs.readFileSync(placesDataPath, 'utf-8');
       const arrayMatch = content.match(/window\.WANDER_PLACES\s*=\s*(\[[\s\S]*\]);/);
       if (arrayMatch) {

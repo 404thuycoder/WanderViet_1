@@ -1284,6 +1284,119 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             <div class="chat-panel__center">
               <p class="chat-panel__disclaimer">Trợ lý ghép gợi ý từ dữ liệu trang + sở thích bạn lưu; không phải AI tổng quát. Visa/y tế vẫn cần nguồn chính thức.</p>
               <div class="chat-log" id="global-chat-log" role="log" aria-live="polite"></div>
+              
+              <!-- Planning Mode Indicator Bar -->
+              <div class="chat-planning-bar" id="chat-planning-bar" style="display:none;">
+                <div class="chat-planning-bar__inner">
+                  <span class="chat-planning-bar__icon">🗺️</span>
+                  <span class="chat-planning-bar__text">Chế độ lập lịch trình</span>
+                  <span class="chat-planning-bar__step" id="chat-planning-step"></span>
+                  <button class="chat-planning-bar__close" id="chat-planning-close" title="Tắt chế độ lập lịch">✕</button>
+                </div>
+              </div>
+              
+              <!-- Function Chips (ChatGPT style) -->
+              <div class="chat-function-chips" id="chat-function-chips">
+                <button class="chat-func-chip" onclick="injectPlanningFormToChat()">
+                  🗺️ Lập lịch
+                </button>
+                <button class="chat-func-chip" onclick="sendQuickQuery('Tìm địa điểm du lịch nổi tiếng ở Việt Nam')">
+                  📍 Địa điểm
+                </button>
+                <button class="chat-func-chip" onclick="sendQuickQuery('Gợi ý khách sạn, homestay đẹp và giá tốt')">
+                  🏨 Khách sạn
+                </button>
+                <button class="chat-func-chip" onclick="sendQuickQuery('Các món ăn đặc sản nổi tiếng ở Việt Nam')">
+                  🍜 Đặc sản
+                </button>
+                <button class="chat-func-chip" onclick="sendQuickQuery('Mẹo du lịch Việt Nam tiết kiệm')">
+                  💡 Mẹo hay
+                </button>
+                <button class="chat-func-chip" onclick="sendQuickQuery('Các lễ hội văn hóa đặc sắc ở Việt Nam')">
+                  🎉 Lễ hội
+                </button>
+              </div>
+              
+              <!-- Full Planning Form Panel -->
+              <div class="planning-form-panel" id="planning-form-panel" style="display:none;">
+                <div class="planning-form-panel__header">
+                  <span>🗺️ Lập lịch trình du lịch</span>
+                  <button class="planning-form-panel__close" onclick="closePlanningForm()">✕</button>
+                </div>
+                <div class="planning-form-panel__body">
+                  
+                  <!-- Điểm đến -->
+                  <div class="planning-form-group">
+                    <div class="planning-form-label">📍 Bạn muốn đi đâu?</div>
+                    <input type="text" id="plan-destination" class="planning-form-input" placeholder="VD: Đà Nẵng, Phú Quốc, Sapa, Hội An...">
+                  </div>
+                  
+                  <!-- Thời gian & Ngân sách - 2 cột -->
+                  <div class="planning-form-row">
+                    <div class="planning-form-group">
+                      <div class="planning-form-label">📅 Bạn có bao lâu?</div>
+                      <div class="planning-form-options planning-form-options--compact">
+                        <label><input type="radio" name="plan-duration" value="Nửa ngày"> Nửa ngày</label>
+                        <label><input type="radio" name="plan-duration" value="1 ngày"> 1 ngày</label>
+                        <label><input type="radio" name="plan-duration" value="2-3 ngày"> 2-3 ngày</label>
+                        <label><input type="radio" name="plan-duration" value="4-5 ngày"> 4-5 ngày</label>
+                        <label><input type="radio" name="plan-duration" value="1 tuần+"> 1 tuần+</label>
+                      </div>
+                    </div>
+                    <div class="planning-form-group">
+                      <div class="planning-form-label">💰 Ngân sách/người</div>
+                      <div class="planning-form-options planning-form-options--compact">
+                        <label><input type="radio" name="plan-budget" value="Dưới 1 triệu"> &lt;1M</label>
+                        <label><input type="radio" name="plan-budget" value="1-3 triệu"> 1-3M</label>
+                        <label><input type="radio" name="plan-budget" value="3-5 triệu"> 3-5M</label>
+                        <label><input type="radio" name="plan-budget" value="5-10 triệu"> 5-10M</label>
+                        <label><input type="radio" name="plan-budget" value="Trên 10 triệu"> 10M+</label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Đi cùng ai -->
+                  <div class="planning-form-group">
+                    <div class="planning-form-label">👥 Đi cùng ai?</div>
+                    <div class="planning-form-options planning-form-options--compact">
+                      <label><input type="radio" name="plan-style" value="Một mình"> 🚶 Một mình</label>
+                      <label><input type="radio" name="plan-style" value="Vợ/chồng/bạn trai/bạn gái"> 💑 Vợ/chồng</label>
+                      <label><input type="radio" name="plan-style" value="Gia đình có con nhỏ"> 👨‍👩‍👧 Gia đình (con nhỏ)</label>
+                      <label><input type="radio" name="plan-style" value="Gia đình người lớn"> 👨‍👩‍👧‍👦 Gia đình</label>
+                      <label><input type="radio" name="plan-style" value="Nhóm bạn"> 👯 Nhóm bạn</label>
+                      <label><input type="radio" name="plan-style" value="Đi cùng bố mẹ"> 👴👵 Bố mẹ</label>
+                    </div>
+                  </div>
+                  
+                  <!-- Bạn thích gì - checkbox -->
+                  <div class="planning-form-group">
+                    <div class="planning-form-label">🎯 Bạn thích gì? <span style="font-weight:400;color:#64748b">(chọn nhiều)</span></div>
+                    <div class="planning-form-options">
+                      <label><input type="checkbox" name="plan-interest" value="Tắm biển, bơi lội"> 🏖️ Tắm biển</label>
+                      <label><input type="checkbox" name="plan-interest" value="Leo núi, trekking"> ⛰️ Leo núi</label>
+                      <label><input type="checkbox" name="plan-interest" value="Khám phá ẩm thực"> 🍜 Ăn ngon</label>
+                      <label><input type="checkbox" name="plan-interest" value="Chụp ảnh, check-in đẹp"> 📸 Check-in</label>
+                      <label><input type="checkbox" name="plan-interest" value="Mua sắm"> 🛍️ Mua sắm</label>
+                      <label><input type="checkbox" name="plan-interest" value="Tham quan, khám phá"> 🏛️ Tham quan</label>
+                      <label><input type="checkbox" name="plan-interest" value="Bar, club, giải trí"> 🍺 Bar/Club</label>
+                      <label><input type="checkbox" name="plan-interest" value="Nghỉ dưỡng, spa"> 🧖 Spa</label>
+                      <label><input type="checkbox" name="plan-interest" value="Biểu diễn, show"> 🎭 Show</label>
+                    </div>
+                  </div>
+                  
+                  <!-- Yêu cầu thêm -->
+                  <div class="planning-form-group">
+                    <div class="planning-form-label">💬 Yêu cầu đặc biệt <span style="font-weight:400;color:#64748b">(tùy chọn)</span></div>
+                    <input type="text" id="plan-note" class="planning-form-input" placeholder="VD: Gần biển, chỗ đỗ xe, chụp ảnh cưới...">
+                  </div>
+                  
+                </div>
+                <div class="planning-form-panel__footer">
+                  <button class="btn btn--ghost" onclick="closePlanningForm()">Hủy</button>
+                  <button class="btn btn--primary" onclick="submitPlanningForm()">✨ Tạo lịch trình</button>
+                </div>
+              </div>
+              
               <form class="chat-form" id="global-chat-form">
                 <label class="visually-hidden" for="global-chat-input">Nhập câu hỏi</label>
                 <input id="global-chat-input" type="text" placeholder="Hỏi về du lịch Việt Nam…" autocomplete="off" />
@@ -2207,84 +2320,86 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       }
       .activity-cost { font-weight: 700; color: #059669; font-size: 0.9rem; }
 
-      /* Proposal Card Styles - Generation 3.0 Super Premium */
+      /* Proposal Card - Advanced Premium */
       .chat-proposal-card-premium {
-        margin: 12px 0; padding: 18px; border-radius: 22px;
-        background: linear-gradient(165deg, #1e293b, #0f172a);
-        border: 1px solid rgba(16, 185, 129, 0.25);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        margin: 12px 0; padding: 0; border-radius: 18px;
+        background: rgba(16, 185, 129, 0.06);
+        border: 1px solid rgba(16, 185, 129, 0.15);
         animation: wander-toast-in 0.4s cubic-bezier(0.18,0.89,0.32,1.28);
         flex-shrink: 0;
-        transition: transform 0.3s, border-color 0.3s;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        overflow: hidden;
+        position: relative;
+      }
+      .chat-proposal-card-premium::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #10b981, #34d399, #10b981);
+        opacity: 0.7;
       }
       .chat-proposal-card-premium:hover {
-        transform: translateY(-4px);
-        border-color: var(--accent);
+        border-color: rgba(16, 185, 129, 0.4);
+        background: rgba(16, 185, 129, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 35px rgba(16, 185, 129, 0.15);
       }
-      .proposal-header {
-        font-size: 0.65rem; font-weight: 900; text-transform: uppercase;
-        color: var(--accent); letter-spacing: 1.2px; margin-bottom: 10px;
-        display: flex; align-items: center; gap: 6px;
-      }
-      .btn-proposal-action {
-        width: 100%; padding: 11px; border-radius: 12px;
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: #fff; font-weight: 800; border: none; cursor: pointer;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        font-size: 0.85rem; letter-spacing: 0.3px;
-        box-shadow: 0 4px 15px rgba(16,185,129,0.25);
-      }
-      .btn-proposal-action:hover {
-        filter: brightness(1.1);
-        transform: scale(1.02);
-        box-shadow: 0 6px 20px rgba(16,185,129,0.4);
-      }
-      .btn-proposal-action:active { transform: scale(0.97); }
 
-      /* Inline Itinerary Card in Chatbot - Premium Design */
+      /* Inline Itinerary Card - Advanced */
       .chat-itinerary-card {
-        margin: 10px 0; border-radius: 18px; overflow: hidden;
-        border: 1px solid rgba(59,130,246,0.2);
-        background: #0b1629;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        margin: 12px 0; border-radius: 18px;
+        background: rgba(10, 18, 28, 0.8);
+        border: 1px solid rgba(16, 185, 129, 0.15);
         animation: wander-toast-in 0.4s ease-out;
-        max-height: 600px; overflow-y: auto;
+        max-height: 520px; overflow-y: auto;
         flex-shrink: 0;
+        overflow: hidden;
       }
-      .chat-itinerary-card::-webkit-scrollbar { width: 5px; }
-      .chat-itinerary-card::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.25); border-radius: 4px; }
+      .chat-itinerary-card::-webkit-scrollbar { width: 4px; }
+      .chat-itinerary-card::-webkit-scrollbar-thumb { background: rgba(16,185,129,0.3); border-radius: 4px; }
+      .chat-itinerary-card::-webkit-scrollbar-thumb:hover { background: rgba(16,185,129,0.5); }
       .chat-itin-hero {
-        padding: 20px 20px 16px;
-        background: radial-gradient(ellipse at top right, rgba(59,130,246,0.15), transparent),
-                    linear-gradient(160deg, #0d1b35, #0b1629);
-        border-bottom: 1px solid rgba(255,255,255,0.07);
+        padding: 16px 18px 14px;
+        background: linear-gradient(180deg, rgba(16,185,129,0.08) 0%, transparent 100%);
+        border-bottom: 1px solid rgba(16,185,129,0.1);
+        position: relative;
+      }
+      .chat-itin-hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, #10b981, #34d399, #10b981);
+        opacity: 0.6;
       }
       .chat-itin-dest-pill {
         display: inline-block; padding: 4px 12px;
-        background: rgba(59,130,246,0.18); color: #60a5fa;
-        border-radius: 30px; font-size: 0.68rem; font-weight: 900;
-        letter-spacing: 1.5px; margin-bottom: 10px;
+        background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1));
+        color: #10b981;
+        border-radius: 20px; font-size: 0.65rem; font-weight: 800;
+        letter-spacing: 0.5px; margin-bottom: 10px;
+        border: 1px solid rgba(16,185,129,0.25);
       }
-      .chat-itin-hero-title { font-size: 1.25rem; font-weight: 900; color: #fff; margin: 0 0 6px; line-height: 1.2; }
-      .chat-itin-hero-sub { font-size: 0.82rem; color: #94a3b8; margin: 0 0 14px; line-height: 1.5; }
+      .chat-itin-hero-title { font-size: 1.15rem; font-weight: 900; color: #fff; margin: 0 0 6px; line-height: 1.2; }
+      .chat-itin-hero-sub { font-size: 0.8rem; color: #94a3b8; margin: 0 0 14px; line-height: 1.5; }
       .chat-itin-stats {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px; padding-top: 14px;
-        border-top: 1px solid rgba(255,255,255,0.07);
+        display: flex; flex-wrap: wrap; gap: 12px; padding-top: 14px;
+        border-top: 1px solid rgba(255,255,255,0.05);
       }
       .chat-itin-stat { flex: 1; min-width: 80px; display: flex; flex-direction: column; gap: 3px; }
-      .chat-itin-stat-label { font-size: 0.6rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
-      .chat-itin-stat-val { font-size: 0.92rem; font-weight: 800; color: #38bdf8; }
-      .chat-itin-timeline { padding: 16px 16px 8px; display: flex; flex-direction: column; gap: 14px; }
+      .chat-itin-stat-label { font-size: 0.58rem; font-weight: 800; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+      .chat-itin-stat-val { font-size: 0.9rem; font-weight: 800; color: #10b981; }
+      .chat-itin-timeline { padding: 14px 16px 8px; display: flex; flex-direction: column; gap: 12px; }
       .chat-itin-day-block { display: flex; gap: 12px; animation: slideInUp 0.5s ease-out both; }
       .chat-itin-day-sidebar { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; padding-top: 2px; }
       .chat-itin-day-num {
-        width: 34px; height: 34px; border-radius: 50%;
-        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        color: #fff; font-weight: 900; font-size: 0.9rem;
+        width: 32px; height: 32px; border-radius: 10px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: #fff; font-weight: 900; font-size: 0.85rem;
         display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+        box-shadow: 0 4px 12px rgba(16,185,129,0.35);
       }
       .chat-itin-day-content { flex: 1; min-width: 0; }
       .chat-itin-day-title { font-size: 0.88rem; font-weight: 800; color: #fff; margin-bottom: 6px; }
@@ -2799,12 +2914,404 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         scrollToBottom();
     }
 
-    const DEFAULT_SUGGESTIONS = [
-      { text: '🗺️ Lập lịch trình', query: 'Lập lịch trình du lịch cho mình' },
+    // === PLANNING WIZARD: Guided questions for complete trip planning ===
+    const PLANNING_STEPS = [
+      { 
+        id: 'destination', 
+        question: '📍 Bạn muốn đi đâu vậy?', 
+        hint: 'VD: Đà Lạt, Hội An, Sapa...', 
+        placeholder: 'Nhập địa điểm',
+        suggestions: [
+          { text: '🌸 Đà Lạt', query: 'Đà Lạt' },
+          { text: '🏮 Hội An', query: 'Hội An' },
+          { text: '🏔️ Sapa', query: 'Sapa' },
+          { text: '🏖️ Nha Trang', query: 'Nha Trang' },
+          { text: '🌊 Phú Quốc', query: 'Phú Quốc' },
+          { text: '🏙️ TP.HCM', query: 'TP HCM' },
+          { text: '⛰️ Hà Giang', query: 'Hà Giang' },
+          { text: '🏯 Huế', query: 'Huế' },
+        ]
+      },
+      { 
+        id: 'days', 
+        question: '📅 Bạn có bao nhiêu thời gian cho chuyến đi?', 
+        hint: 'VD: 3 ngày, 5 ngày 4 đêm...', 
+        placeholder: 'Nhập số ngày',
+        suggestions: [
+          { text: '📅 1 ngày', query: '1 ngày' },
+          { text: '📅 2 ngày 1 đêm', query: '2 ngày 1 đêm' },
+          { text: '📅 3 ngày 2 đêm', query: '3 ngày 2 đêm' },
+          { text: '📅 4 ngày 3 đêm', query: '4 ngày 3 đêm' },
+          { text: '📅 5 ngày 4 đêm', query: '5 ngày 4 đêm' },
+          { text: '📅 7 ngày', query: '7 ngày hoặc hơn' },
+        ]
+      },
+      { 
+        id: 'travelers', 
+        question: '👥 Mình đi cùng với ai vậy?', 
+        hint: 'VD: 2 người, gia đình 4 người...', 
+        placeholder: 'Số người',
+        suggestions: [
+          { text: '🚶 Một mình', query: 'đi một mình' },
+          { text: '👫 Cặp đôi/2 người', query: '2 người' },
+          { text: '👨‍👩‍👧 Gia đình có trẻ em', query: 'gia đình có trẻ em' },
+          { text: '👨‍👩‍👧‍👦 Gia đình nhiều người', query: 'gia đình đông người' },
+          { text: '👯 Bạn bè nhóm', query: 'đi với bạn bè nhóm' },
+          { text: '👴👵 Người lớn tuổi', query: 'người lớn tuổi đi cùng' },
+        ]
+      },
+      { 
+        id: 'budget', 
+        question: '💰 Ngân sách dự kiến là bao nhiêu vậy?', 
+        hint: 'VD: 3-5 triệu, 10 triệu...', 
+        placeholder: 'Ngân sách',
+        suggestions: [
+          { text: '💰 Tiết kiệm (<3 triệu)', query: 'dưới 3 triệu / người' },
+          { text: '💰 Trung bình (3-5 triệu)', query: '3 đến 5 triệu / người' },
+          { text: '💰 Tốt (5-10 triệu)', query: '5 đến 10 triệu / người' },
+          { text: '💰 Cao cấp (>10 triệu)', query: 'trên 10 triệu / người' },
+        ]
+      },
+      { 
+        id: 'style', 
+        question: '🎯 Bạn thích phong cách du lịch nào nhất?', 
+        hint: 'VD: Nghỉ dưỡng, khám phá...', 
+        placeholder: 'Phong cách',
+        suggestions: [
+          { text: '🏖️ Nghỉ dưỡng', query: 'nghỉ dưỡng, thư giãn' },
+          { text: '🗺️ Khám phá', query: 'khám phá, phiêu lưu' },
+          { text: '🍽️ Ẩm thực', query: 'ẩm thực, ăn uống' },
+          { text: '📸 Check-in/Sống ảo', query: 'check-in, chụp ảnh đẹp' },
+          { text: '⛩️ Văn hóa/Lịch sử', query: 'văn hóa, lịch sử, đền chùa' },
+          { text: '🏃 Mạo hiểm', query: 'mạo hiểm, thể thao' },
+        ]
+      },
+      {
+        id: 'transport',
+        question: '🚗 Bạn muốn di chuyển bằng phương tiện gì?',
+        hint: 'VD: Máy bay, xe khách, xe máy...',
+        placeholder: 'Phương tiện',
+        suggestions: [
+          { text: '✈️ Máy bay', query: 'máy bay' },
+          { text: '🚌 Xe khách', query: 'xe khách, xe giường nằm' },
+          { text: '🚗 Xe máy', query: 'xe máy tự lái' },
+          { text: '🚙 Ô tô', query: 'ô tô riêng hoặc thuê' },
+        ]
+      }
+    ];
+
+    // Planning wizard state
+    let planningWizard = {
+      active: false,
+      currentStep: 0,
+      answers: {},
+      collected: false
+    };
+
+    // Toggle planning mode from chip
+    function togglePlanningMode() {
+      if (planningWizard.active) {
+        exitPlanningMode();
+      } else {
+        enterPlanningMode();
+      }
+    }
+
+    function enterPlanningMode() {
+      const chip = document.getElementById('chip-planning');
+      if (chip) chip.classList.add('chat-func-chip--active');
+      
+      const bar = document.getElementById('chat-planning-bar');
+      if (bar) bar.style.display = 'block';
+      
+      startPlanningWizard();
+    }
+
+    function exitPlanningMode() {
+      planningWizard.active = false;
+      
+      const chip = document.getElementById('chip-planning');
+      if (chip) chip.classList.remove('chat-func-chip--active');
+      
+      const bar = document.getElementById('chat-planning-bar');
+      if (bar) bar.style.display = 'none';
+    }
+
+    function sendQuickQuery(query) {
+      const input = document.getElementById('global-chat-input');
+      const form = document.getElementById('global-chat-form');
+      if (input && form) {
+        input.value = query;
+        form.dispatchEvent(new Event('submit'));
+      }
+    }
+
+    setTimeout(() => {
+      const closeBtn = document.getElementById('chat-planning-close');
+      if (closeBtn) closeBtn.onclick = exitPlanningMode;
+    }, 100);
+
+    function updatePlanningStepDisplay(step, total) {
+      const stepEl = document.getElementById('chat-planning-step');
+      if (stepEl) stepEl.textContent = `${step}/${total}`;
+    }
+
+    // Show planning mode indicator (like AI function call)
+    function showPlanningModeIndicator() {
+      const indicator = document.createElement('div');
+      indicator.id = 'planning-mode-indicator';
+      indicator.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(52, 211, 153, 0.08));
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 20px;
+        margin-bottom: 12px;
+        font-size: 0.72rem;
+        color: #10b981;
+        font-weight: 600;
+        animation: slideDown 0.3s ease;
+      `;
+      indicator.innerHTML = `
+        <span style="font-size:1rem;">🗺️</span>
+        <span>Đang ở chế độ lập lịch trình</span>
+        <span style="margin-left:auto; display:flex; align-items:center; gap:4px;">
+          <span class="pulse-dot" style="width:6px; height:6px; background:#10b981; border-radius:50%;"></span>
+          Active
+        </span>
+      `;
+      log.appendChild(indicator);
+      
+      // Add pulse animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes pulse-dot {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        .pulse-dot { animation: pulse-dot 1.5s ease infinite; }
+        @keyframes slideDown {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    // Update indicator progress
+    function updatePlanningIndicator(step) {
+      const indicator = document.getElementById('planning-mode-indicator');
+      if (indicator) {
+        indicator.innerHTML = `
+          <span style="font-size:1rem;">🗺️</span>
+          <span>Đang ở chế độ lập lịch trình</span>
+          <span style="margin-left:auto; font-size:0.65rem; color:#64748b;">
+            ${step}/${PLANNING_STEPS.length}
+          </span>
+          <span style="display:flex; align-items:center; gap:4px;">
+            <span class="pulse-dot" style="width:6px; height:6px; background:#10b981; border-radius:50%;"></span>
+          </span>
+        `;
+      }
+    }
+
+    // Remove planning indicator
+    function hidePlanningIndicator() {
+      const indicator = document.getElementById('planning-mode-indicator');
+      if (indicator) indicator.remove();
+    }
+
+    // Start planning wizard
+    function startPlanningWizard() {
+      planningWizard = {
+        active: true,
+        currentStep: 0,
+        answers: {},
+        collected: false
+      };
+      
+      // Remove any existing suggestions/chips
+      const existingChips = log.querySelectorAll('.chat-suggestion-container');
+      existingChips.forEach(el => el.remove());
+      
+      // Update step display
+      updatePlanningStepDisplay(1, PLANNING_STEPS.length);
+      
+      // Bot intro message
+      appendMsg('Chào bạn! Mình sẽ giúp bạn lập lịch trình du lịch nhé! 🎯\n\nTrả lời một vài câu hỏi để mình hiểu rõ hơn về chuyến đi của bạn:', 'bot');
+      
+      // Ask first question after a short delay
+      setTimeout(() => {
+        askPlanningQuestion(0);
+      }, 800);
+    }
+
+    // Ask a specific planning question
+    function askPlanningQuestion(stepIndex) {
+      if (stepIndex >= PLANNING_STEPS.length) {
+        // All questions answered - generate plan
+        generatePlanFromWizard();
+        return;
+      }
+
+      const step = PLANNING_STEPS[stepIndex];
+      
+      // Update step display
+      updatePlanningStepDisplay(stepIndex + 1, PLANNING_STEPS.length);
+      
+      // Bot asks question in chat style
+      appendMsg(step.question, 'bot');
+      
+      // Show hint
+      const hintDiv = document.createElement('div');
+      hintDiv.style.cssText = 'font-size:0.72rem; color:#94a3b8; margin-top:4px; margin-bottom:12px; padding-left:12px;';
+      hintDiv.textContent = `💡 Gợi ý: ${step.hint}`;
+      log.appendChild(hintDiv);
+      
+      // Render suggestions as chips
+      if (step.suggestions) {
+        const container = document.createElement('div');
+        container.className = 'chat-suggestion-container';
+        container.style.display = 'flex';
+        container.style.flexWrap = 'wrap';
+        container.style.gap = '8px';
+        container.style.marginTop = '8px';
+        
+        step.suggestions.forEach(sug => {
+          const chip = document.createElement('div');
+          chip.className = 'chat-suggestion-chip';
+          chip.textContent = sug.text;
+          chip.onclick = () => {
+            // Add user message
+            appendMsg(sug.text, 'user');
+            // Store answer
+            planningWizard.answers[step.id] = sug.query;
+            // Remove current chips
+            container.remove();
+            // Next step
+            planningWizard.currentStep++;
+            
+            // Brief pause then ask next
+            setTimeout(() => {
+              askPlanningQuestion(planningWizard.currentStep);
+            }, 400);
+          };
+          container.appendChild(chip);
+        });
+        log.appendChild(container);
+      }
+      
+      scrollToBottom();
+    }
+
+    // Progress text
+    function progressText(stepIndex) {
+      return `${stepIndex + 1}/${PLANNING_STEPS.length}`;
+    }
+
+    // Generate plan from wizard answers
+    function generatePlanFromWizard() {
+      const a = planningWizard.answers;
+      
+      // Exit planning mode
+      exitPlanningMode();
+      
+      // Show "thinking" message
+      appendMsg('✅ Mình đã thu thập đủ thông tin rồi! Để mình lập lịch trình chi tiết cho bạn nhé...', 'bot');
+      
+      // Build the prompt
+      let prompt = `Hãy lập lịch trình du lịch chi tiết và hoàn chỉnh cho tôi với các thông tin sau:\n\n`;
+      prompt += `📍 Địa điểm: ${a.destination || 'chưa xác định'}\n`;
+      prompt += `📅 Thời gian: ${a.days || 'chưa xác định'}\n`;
+      prompt += `👥 Người đi: ${a.travelers || 'chưa xác định'}\n`;
+      prompt += `💰 Ngân sách: ${a.budget || 'chưa xác định'}\n`;
+      prompt += `🎯 Phong cách: ${a.style || 'khám phá'}\n`;
+      if (a.transport) prompt += `🚗 Di chuyển: ${a.transport}\n`;
+      prompt += `\nYêu cầu:\n`;
+      prompt += `- Lịch trình chi tiết từng ngày, từng buổi (sáng, trưa, chiều, tối)\n`;
+      prompt += `- Gợi ý địa điểm cụ thể với thời gian\n`;
+      prompt += `- Địa điểm ăn uống phù hợp với ngân sách\n`;
+      prompt += `- Mẹo và lưu ý hữu ích\n`;
+      prompt += `- Chi phí ước tính\n`;
+      
+      // End wizard mode
+      planningWizard.active = false;
+      
+      // Send to AI
+      const input = document.getElementById('global-chat-input');
+      const form = document.getElementById('global-chat-form');
+      if (input && form) {
+        input.value = prompt;
+        form.dispatchEvent(new Event('submit'));
+      }
+    }
+
+    const PLANNING_SUGGESTIONS = [
+      { text: '🗺️ Lập lịch trình', query: '__START_WIZARD__' },
       { text: '🏨 Tìm chỗ ở', query: 'Tìm khách sạn hoặc homestay đẹp' },
       { text: '🍽️ Món ngon', query: 'Gợi ý các món ăn đặc sản địa phương' },
-      { text: '📸 Điểm check-in', query: 'Những địa điểm chụp ảnh đẹp nhất' }
+      { text: '📸 Điểm check-in', query: 'Những địa điểm chụp ảnh đẹp nhất' },
+      { text: '✈️ Lên kế hoạch hoàn chỉnh', query: 'Hướng dẫn tôi lập kế hoạch du lịch' }
     ];
+
+    // Quick-start combos for 1-click planning
+    const QUICK_PLANNERS = [
+      { text: '🌸 Đà Lạt 3 ngày', query: 'Lập lịch trình du lịch Đà Lạt 3 ngày 2 đêm' },
+      { text: '🏖️ Nha Trang 4 ngày', query: 'Lập lịch trình du lịch Nha Trang 4 ngày 3 đêm' },
+      { text: '🏮 Hội An 2 ngày', query: 'Lập lịch trình du lịch Hội An 2 ngày 1 đêm' },
+      { text: '🏔️ Sapa 3 ngày', query: 'Lập lịch trình du lịch Sapa 3 ngày 2 đêm' },
+      { text: '🌊 Phú Quốc 4 ngày', query: 'Lập lịch trình du lịch Phú Quốc 4 ngày 3 đêm' },
+      { text: '🏙️ TP.HCM 2 ngày', query: 'Lập lịch trình du lịch TP.HCM 2 ngày 1 đêm' },
+    ];
+
+    // Render welcome message with Quick Planners
+    function renderWelcomeWithPlanner() {
+      // Welcome message
+      const welcomeDiv = document.createElement('div');
+      welcomeDiv.style.cssText = 'text-align:center; padding:10px 0 15px;';
+      welcomeDiv.innerHTML = `
+        <div style="font-size:1.5rem; margin-bottom:6px;">🌟</div>
+        <div style="font-size:1rem; font-weight:700; color:#fff; margin-bottom:4px;">WanderViet AI</div>
+        <div style="font-size:0.75rem; color:#94a3b8;">Trợ lý lập kế hoạch du lịch thông minh</div>
+      `;
+      log.appendChild(welcomeDiv);
+
+      // Quick planners section
+      const qpSection = document.createElement('div');
+      qpSection.style.cssText = 'margin:8px 0;';
+      qpSection.innerHTML = `<div style="font-size:0.65rem; color:#10b981; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">🚀 Khởi đầu nhanh</div>`;
+
+      const qpGrid = document.createElement('div');
+      qpGrid.className = 'chat-quick-planners';
+      QUICK_PLANNERS.forEach(qp => {
+        const card = document.createElement('div');
+        card.className = 'chat-quick-card';
+        card.textContent = qp.text;
+        card.onclick = () => {
+          const input = document.getElementById('global-chat-input');
+          const form = document.getElementById('global-chat-form');
+          if (input && form) {
+            input.value = qp.query;
+            form.dispatchEvent(new Event('submit'));
+          }
+        };
+        qpGrid.appendChild(card);
+      });
+      qpSection.appendChild(qpGrid);
+      log.appendChild(qpSection);
+
+      // Divider
+      const divider = document.createElement('div');
+      divider.style.cssText = 'display:flex; align-items:center; gap:8px; margin:12px 0;';
+      divider.innerHTML = `<div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div><span style="font-size:0.65rem; color:#64748b; font-weight:600;">HOẶC HỎI TRỰC TIẾP</span><div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>`;
+      log.appendChild(divider);
+
+      // Suggestions
+      renderSuggestions(PLANNING_SUGGESTIONS);
+      scrollToBottom();
+    }
 
     function formatChatMarkdown(text) {
       if (!text) return '';
@@ -2815,7 +3322,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           return `<div class="chat-highlight-box"><span class="chat-highlight-tag">✨ Nổi bật:</span> ${content.trim()}</div>`;
       });
 
-      // 2. Bold: **text**
+      // 2. Markdown links: [text](url) → <a href="url" target="_blank">text</a>
+      html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, (match, label, url) => {
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#38bdf8; text-decoration:underline; word-break:break-all;">${label}</a>`;
+      });
+
+      // 3. Bold: **text**
       html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
       // 3. Lists: + or - at start of line
@@ -2986,6 +3498,43 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         msg.appendChild(convertBtn);
       }
       
+      // Nút mở form lập lịch trong chat
+      if (role === 'bot' && !isHtml) {
+        const planBtn = document.createElement('button');
+        planBtn.className = 'btn-bubble-plan';
+        planBtn.innerHTML = '🗺️ Lập lịch ngay';
+        planBtn.style.cssText = `
+          margin-top: 12px;
+          margin-right: 8px;
+          padding: 10px 16px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15));
+          border: 1px solid rgba(99, 102, 241, 0.4);
+          color: #a5b4fc;
+          font-weight: 600;
+          font-size: 0.8rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        `;
+        planBtn.onclick = () => openPlanningForm();
+        planBtn.onmouseenter = () => {
+          planBtn.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(139, 92, 246, 0.25))';
+          planBtn.style.transform = 'translateY(-1px)';
+        };
+        planBtn.onmouseleave = () => {
+          planBtn.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15))';
+          planBtn.style.transform = 'translateY(0)';
+        };
+        msg.appendChild(planBtn);
+      }
+      
+      // Phát hiện form lập lịch nhúng trong chat
+      if (text.includes('[PLANNING_FORM]')) {
+        const formHtml = createInlinePlanningForm();
+        msg.querySelector('.chat-bubble__content').innerHTML = text.replace('[PLANNING_FORM]', '') + formHtml;
+        msg.querySelector('.chat-bubble__content').style.paddingBottom = '8px';
+      }
+      
       msgContainer.appendChild(msg);
       log.appendChild(msgContainer);
       
@@ -3022,11 +3571,10 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             appendMsg(m.text, m.role, false, true, m.timestamp); // skipCache = true, pass stored timestamp
           });
         } else if (!currentSessionId) {
-          appendMsg('Xin chào! Tôi là Trợ lý WanderViet AI 🌟 Hỏi tôi bất cứ điều gì về du lịch Việt Nam nhé!', 'bot');
-          renderSuggestions(DEFAULT_SUGGESTIONS);
+          renderWelcomeWithPlanner();
         }
       } catch (e) {
-        if (!currentSessionId) appendMsg('Xin chào! Tôi là Trợ lý WanderViet AI 🌟 Hỏi tôi bất cứ điều gì về du lịch Việt Nam nhé!', 'bot');
+        if (!currentSessionId) renderWelcomeWithPlanner();
       }
     }
 
@@ -3139,8 +3687,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         localStorage.removeItem('wander_shared_chat');
         log.innerHTML = '';
         lastMsgTimestamp = null; // Reset divider logic
-        appendMsg('Chào bạn! Tôi đã sẵn sàng cho cuộc trò chuyện mới. Mình có thể giúp gì cho chuyến đi của bạn?', 'bot');
-        renderSuggestions(DEFAULT_SUGGESTIONS);
+        renderWelcomeWithPlanner();
       };
     }
 
@@ -3167,6 +3714,14 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       e.preventDefault();
       const msg = input.value.trim();
       if (!msg) return;
+      
+      // Check if starting planning wizard
+      if (msg === '__START_WIZARD__') {
+        input.value = '';
+        startPlanningWizard();
+        return;
+      }
+      
       const wasVoice = _lastInputWasVoice; // true nếu input từ mic, false nếu gõ text
       _lastInputWasVoice = false; // Reset sau mỗi lần gửi
       appendMsg(msg, 'user');
@@ -3244,12 +3799,42 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             }
 
             if (resData.discoveryPlaces && resData.discoveryPlaces.length > 0) {
-                renderDiscoveryCarousel(resData.discoveryPlaces);
+                // ĐÃ BỎ: Không render discovery carousel trong chat nữa vì gây confuse
+                // User ấn vào → gửi message lặp → vòng lặp. Chỉ hiện khi cần thiết.
+                // renderDiscoveryCarousel(resData.discoveryPlaces);
             }
 
             if (resData.suggestedTours && resData.suggestedTours.length > 0) {
                 console.log("Rendering Tour Carousel with", resData.suggestedTours.length, "tours");
                 renderTourCarousel(resData.suggestedTours);
+            }
+
+            // Render suggestedLink: nút mở link trực tiếp khi tour không có trong DB
+            if (resData.suggestedLink) {
+                const linkWrap = document.createElement('div');
+                linkWrap.style.cssText = 'margin: 12px 0; text-align: center;';
+                const btn = document.createElement('a');
+                btn.href = resData.suggestedLink.url;
+                btn.target = '_blank';
+                btn.rel = 'noopener noreferrer';
+                btn.style.cssText = `
+                    display: inline-block;
+                    padding: 12px 24px;
+                    background: linear-gradient(135deg, #f43f5e, #e11d48);
+                    color: #fff;
+                    border-radius: 12px;
+                    font-weight: 700;
+                    font-size: 0.9rem;
+                    text-decoration: none;
+                    box-shadow: 0 4px 15px rgba(244,63,94,0.3);
+                    transition: transform 0.2s, box-shadow 0.2s;
+                `;
+                btn.textContent = resData.suggestedLink.label || '🔗 Xem thêm';
+                btn.onmouseover = () => { btn.style.transform = 'translateY(-2px)'; btn.style.boxShadow = '0 6px 20px rgba(244,63,94,0.4)'; };
+                btn.onmouseout = () => { btn.style.transform = 'none'; btn.style.boxShadow = '0 4px 15px rgba(244,63,94,0.3)'; };
+                linkWrap.appendChild(btn);
+                log.appendChild(linkWrap);
+                scrollToBottom();
             }
         } else {
             console.warn("Chatbot: API returned failure or invalid data", resData);
@@ -3457,7 +4042,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             card.className = 'chat-discovery-card';
             card.style.cssText = `height: 180px; min-height: 180px; min-width: 150px; max-width: 150px; border-radius: 12px; background: #1e293b; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; flex-shrink: 0; display: flex; flex-direction: column; scroll-snap-align: start; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 5px;`;
             card.innerHTML = `
-                <div class="chat-discovery-img" style="width: 100%; height: 90px; min-height: 90px; flex-shrink: 0; background-image:url('${p.image || 'assets/img/hero_nature.jpg'}'); background-size: cover; background-position: center;"></div>
+                <div class="chat-discovery-img" style="width: 100%; height: 90px; min-height: 90px; flex-shrink: 0; background-image:url('${p.image || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop'}'); background-size: cover; background-position: center;"></div>
                 <div class="chat-discovery-info" style="padding: 10px; flex: 1; display: flex; flex-direction: column;">
                     <div class="chat-discovery-name" style="font-size: 0.85rem; font-weight: 700; color: #fff; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.3;">${p.name}</div>
                     <div class="chat-discovery-loc" style="font-size: 0.7rem; color: #94a3b8; margin-top: auto;">📍 ${p.region || 'Việt Nam'}</div>
@@ -3492,7 +4077,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             card.style.cssText = `height: 250px; min-height: 250px; scroll-snap-align: start; flex-shrink: 0; cursor: pointer; min-width: 220px; max-width: 220px; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2);`;
             
             card.innerHTML = `
-                <div class="chat-tour-img" style="width: 100%; height: 130px; min-height: 130px; flex-shrink: 0; background-image:url('${t.images?.[0] || t.image || 'assets/img/hero_nature.jpg'}'); background-size: cover; background-position: center; position: relative;">
+                <div class="chat-tour-img" style="width: 100%; height: 130px; min-height: 130px; flex-shrink: 0; background-image:url('${t.images?.[0] || t.image || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop'}'); background-size: cover; background-position: center; position: relative;">
                     <div class="chat-tour-badge" style="position: absolute; top: 10px; right: 10px; background: linear-gradient(135deg, #f43f5e, #e11d48); color: #fff; font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 8px; box-shadow: 0 4px 10px rgba(244,63,94,0.3);">${t.isTour ? 'TOUR' : (t.kind === 'khach-san' || t.businessCategory === 'stay' ? 'KHÁCH SẠN' : (t.kind === 'nha-hang' || t.businessCategory === 'dining' ? 'NHÀ HÀNG' : 'DỊCH VỤ'))}</div>
                 </div>
                 <div class="chat-tour-info" style="padding: 12px; flex: 1; display: flex; flex-direction: column;">
@@ -3528,174 +4113,330 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     function renderProposalOptions(proposals) {
         const container = document.createElement('div');
-        container.style.cssText = `
-            display: flex; 
-            flex-direction: column; 
-            gap: 10px; 
-            margin: 8px 0;
-            width: 100%;
-        `;
-        
+        container.className = 'chat-proposals-container';
+        container.style.cssText = 'margin: 8px 0; max-width: 100%; box-sizing: border-box;';
+
+        // Tiêu đề với icon
+        const title = document.createElement('div');
+        title.style.cssText = 'font-size:0.62rem; color:#10b981; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; display:flex; align-items:center; gap:6px;';
+        title.innerHTML = `<span style="width:14px;height:14px;background:#10b981;border-radius:50%;display:inline-block;"></span> Gợi ý lịch trình`;
+        container.appendChild(title);
+
+        // Grid wrapper
+        const grid = document.createElement('div');
+        grid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; width: 100%; box-sizing: border-box;';
+
         proposals.forEach((p, idx) => {
             const card = document.createElement('div');
-            card.className = 'chat-proposal-card-premium';
             card.style.cssText = `
-                width: 100%;
                 display: flex;
                 flex-direction: column;
-                background: linear-gradient(160deg, #1e293b, #0f172a);
-                border: 1px solid rgba(16, 185, 129, 0.35);
-                border-radius: 14px;
-                padding: 14px;
-                box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-                transition: transform 0.2s, border-color 0.2s;
-                animation: fadeInUp 0.3s ease ${idx * 0.1}s both;
+                background: rgba(10, 18, 28, 0.8);
+                border: 1px solid rgba(16,185,129,0.15);
+                border-radius: 16px;
+                cursor: pointer;
+                transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                animation: fadeInUp 0.4s ease ${idx * 0.1}s both;
+                overflow: hidden;
+                position: relative;
             `;
-            card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-                    <div>
-                        <div style="font-size:0.6rem; color:var(--accent); font-weight:900; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">✨ Phương án ${idx + 1}</div>
-                        <h4 style="margin:0; color:#fff; font-size: 0.95rem; font-weight:800; line-height:1.2;">${p.title}</h4>
-                    </div>
-                    <span style="font-size:0.9rem; color:var(--accent); font-weight:900; white-space:nowrap; margin-left:8px;">💰 ${p.budget}</span>
-                </div>
-                <div style="display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap;">
-                    <span style="font-size:0.65rem; background:rgba(255,255,255,0.08); padding:3px 10px; border-radius:10px; color:#cbd5e1;">📅 ${p.days} Ngày</span>
-                    <span style="font-size:0.65rem; background:rgba(255,255,255,0.08); padding:3px 10px; border-radius:10px; color:#cbd5e1;">📍 ${p.destination || 'Việt Nam'}</span>
-                    <span style="font-size:0.65rem; background:rgba(255,255,255,0.08); padding:3px 10px; border-radius:10px; color:#cbd5e1;">🎒 ${p.style}</span>
-                </div>
-                <p style="margin:0 0 10px; font-size: 0.78rem; color:#94a3b8; line-height: 1.5;">"${p.description}"</p>
-                <button type="button" class="btn-proposal-action" style="width:100%; padding:10px; border-radius:10px; background:linear-gradient(135deg, #00f0ff, #0ea5e9); color:#000; font-weight:800; border:none; cursor:pointer; transition:all 0.2s; font-size:0.8rem; letter-spacing:0.3px;">⚡ Chọn và lên lịch chi tiết →</button>
-            `;
-            const btn = card.querySelector('button');
-            btn.onclick = () => {
-                btn.textContent = '🚀 Đang chuyển hướng...';
-                btn.disabled = true;
 
-                // Thoát fullscreen nếu có
+            // Gradient accent top
+            const accentTop = document.createElement('div');
+            accentTop.style.cssText = 'position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, #10b981, #34d399, #10b981); z-index:1;';
+            card.appendChild(accentTop);
+
+            // Hình ảnh minh họa
+            const imgSrc = p.image || getDestinationImage(p.destination || p.title || '');
+            const imgWrap = document.createElement('div');
+            imgWrap.style.cssText = 'width:100%; height:90px; position:relative; overflow:hidden;';
+            imgWrap.innerHTML = `
+                <img src="${imgSrc}" alt="${p.title || p.destination || ''}"
+                     style="width:100%; height:100%; object-fit:cover; transition: transform 0.4s;"
+                     onerror="this.src='https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop'; this.parentElement.style.height='70px'">
+                <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(10,18,28,0.85) 100%);"></div>
+                <div style="position:absolute; bottom:6px; left:8px; right:8px; display:flex; gap:4px; flex-wrap:wrap;">
+                    <span style="font-size:0.58rem; background:rgba(16,185,129,0.85); color:#fff; padding:2px 8px; border-radius:10px; font-weight:700;">📅 ${p.days}N</span>
+                    <span style="font-size:0.58rem; background:rgba(0,0,0,0.6); color:#fff; padding:2px 8px; border-radius:10px; font-weight:700;">📍 ${p.destination || 'VN'}</span>
+                </div>
+            `;
+            card.appendChild(imgWrap);
+
+            // Nội dung
+            const content = document.createElement('div');
+            content.style.cssText = 'padding:10px 12px 8px; display:flex; flex-direction:column; gap:6px;';
+
+            // Title
+            const titleEl = document.createElement('div');
+            titleEl.style.cssText = 'font-size:0.78rem; font-weight:700; color:#fff; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;';
+            titleEl.textContent = p.title || `Phương án ${idx + 1}`;
+            content.appendChild(titleEl);
+
+            // Tags row
+            const tags = document.createElement('div');
+            tags.style.cssText = 'display:flex; gap:4px; flex-wrap:wrap;';
+            if (p.budget) {
+                tags.innerHTML = `<span style="font-size:0.6rem; color:#f59e0b; font-weight:700;">💰 ${p.budget}</span>`;
+            }
+            if (p.style) {
+                tags.innerHTML += `<span style="font-size:0.6rem; color:#94a3b8; font-weight:500;">🎒 ${p.style}</span>`;
+            }
+            content.appendChild(tags);
+
+            card.appendChild(content);
+
+            // Hover effects
+            card.onmouseover = () => {
+                card.style.background = 'rgba(16,185,129,0.1)';
+                card.style.borderColor = 'rgba(16,185,129,0.4)';
+                card.style.transform = 'translateY(-3px) scale(1.02)';
+                card.style.boxShadow = '0 12px 30px rgba(16,185,129,0.2), 0 0 0 1px rgba(16,185,129,0.1)';
+                const img = card.querySelector('img');
+                if (img) img.style.transform = 'scale(1.08)';
+            };
+            card.onmouseout = () => {
+                card.style.background = 'rgba(10, 18, 28, 0.8)';
+                card.style.borderColor = 'rgba(16,185,129,0.15)';
+                card.style.transform = 'none';
+                card.style.boxShadow = 'none';
+                const img = card.querySelector('img');
+                if (img) img.style.transform = 'scale(1)';
+            };
+
+            card.onclick = () => {
                 if (panel.classList.contains('chat-panel--fullscreen')) {
                     panel.classList.remove('chat-panel--fullscreen');
                     fabWrap.classList.remove('is-fullscreen');
-                    const expandBtn = document.getElementById('global-chat-expand-btn');
-                    if (expandBtn) { expandBtn.textContent = '⛶'; expandBtn.title = 'Phóng to toàn màn hình'; }
                 }
-
-                // Đóng panel chat
-                if (typeof togglePanel === 'function') {
-                    togglePanel();
-                }
-
-                // Chuyển hướng trực tiếp sang AI Assistant
+                if (typeof togglePanel === 'function') togglePanel();
                 window.location.href = `/planner.html?view=true&itinId=${p._id}`;
             };
-            container.appendChild(card);
+
+            grid.appendChild(card);
         });
 
+        container.appendChild(grid);
         log.appendChild(container);
-          scrollToBottom();
+        scrollToBottom();
+    }
+
+    // Helper: get destination image - accurate matching for each destination
+    function getDestinationImage(destination) {
+        const dest = (destination || '').toLowerCase().trim();
+        
+        // Image map - each destination has unique accurate image
+        const imgMap = {
+            // === TÂY BẮC ===
+            'sapa': 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400&h=300&fit=crop', // terraced rice fields
+            'sa pa': 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400&h=300&fit=crop',
+            'lào cai': 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400&h=300&fit=crop',
+            'hà giang': 'https://images.unsplash.com/photo-1563190095-2296374d5d20?w=400&h=300&fit=crop', // ha giang winding road
+            'yên bái': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop', // yen bai terraced fields
+            'mai châu': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop', // mai chau
+            'mộc châu': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
+            'điện biên': 'https://images.unsplash.com/photo-1562783700-74fc9d4e1b83?w=400&h=300&fit=crop',
+            'lai châu': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
+            'sơn la': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
+            'tuyên quang': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
+            'hoà bình': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
+            
+            // === ĐÔNG BẮC ===
+            'quảng ninh': 'https://images.unsplash.com/photo-1528127269322-539801943592?w=400&h=300&fit=crop', // ha long bay
+            'hạ long': 'https://images.unsplash.com/photo-1528127269322-539801943592?w=400&h=300&fit=crop',
+            'hải phòng': 'https://images.unsplash.com/photo-1528127269322-539801943592?w=400&h=300&fit=crop',
+            'bắc ninh': 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&h=300&fit=crop',
+            'bắc kạn': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
+            'cao bằng': 'https://images.unsplash.com/photo-1563190095-2296374d5d20?w=400&h=300&fit=crop',
+            'lạng sơn': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
+            
+            // === ĐỒNG BẰNG BẮC BỘ ===
+            'hà nội': 'https://images.unsplash.com/photo-1509030450996-dd1a26dda07d?w=400&h=300&fit=crop', // hanoi old quarter
+            'hải dương': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
+            'hưng yên': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
+            'thái bình': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
+            'nam định': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
+            'ninh bình': 'https://images.unsplash.com/photo-1505881402582-c5bc11054f91?w=400&h=300&fit=crop', // tam coc boat
+            'thanh hóa': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
+            'nghệ an': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
+            'hà tĩnh': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop',
+            
+            // === BẮC TRUNG BỘ ===
+            'quảng bình': 'https://images.unsplash.com/photo-1505881402582-c5bc11054f91?w=400&h=300&fit=crop', // phong nha cave
+            'quảng trị': 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&h=300&fit=crop',
+            'thừa thiên huế': 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&h=300&fit=crop', // hue imperial
+            'huế': 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&h=300&fit=crop',
+            'đà nẵng': 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=400&h=300&fit=crop', // danang dragon bridge
+            'quảng nam': 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&h=300&fit=crop',
+            
+            // === NAM TRUNG BỘ ===
+            'quảng ngãi': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
+            'bình định': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
+            'phú yên': 'https://images.unsplash.com/photo-1573465542326-53c4f6b86dcd?w=400&h=300&fit=crop',
+            'khánh hòa': 'https://images.unsplash.com/photo-1573465542326-53c4f6b86dcd?w=400&h=300&fit=crop', // nha trang beach
+            'nha trang': 'https://images.unsplash.com/photo-1573465542326-53c4f6b86dcd?w=400&h=300&fit=crop',
+            'bình thuận': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop',
+            'phú quốc': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop', // phu quoc beach
+            'bà rịa': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
+            'vũng tàu': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
+            
+            // === TÂY NGUYÊN ===
+            'đắk lắk': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop', // highlands coffee
+            'đắk nông': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop',
+            'lâm đồng': 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&h=300&fit=crop', // da lat
+            'đà lạt': 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&h=300&fit=crop',
+            'gia lai': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop',
+            'kon tum': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop',
+            
+            // === ĐÔNG NAM BỘ ===
+            'hồ chí minh': 'https://images.unsplash.com/photo-1550807002-6c2e4d8f0f3e?w=400&h=300&fit=crop', // saigon
+            'tp hcm': 'https://images.unsplash.com/photo-1550807002-6c2e4d8f0f3e?w=400&h=300&fit=crop',
+            'bình dương': 'https://images.unsplash.com/photo-1550807002-6c2e4d8f0f3e?w=400&h=300&fit=crop',
+            'đồng nai': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
+            'tây ninh': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
+            
+            // === ĐỒNG BẰNG SÔNG CỬU LONG ===
+            'cần thơ': 'https://images.unsplash.com/photo-1558362477-2d6482e7d7c5?w=400&h=300&fit=crop', // floating market
+            'đồng tháp': 'https://images.unsplash.com/photo-1558362477-2d6482e7d7c5?w=400&h=300&fit=crop', // lotus fields
+            'an giang': 'https://images.unsplash.com/photo-1558362477-2d6482e7d7c5?w=400&h=300&fit=crop', // tra su forest
+            'kiên giang': 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=300&fit=crop',
+            'hậu giang': 'https://images.unsplash.com/photo-1558362477-2d6482e7d7c5?w=400&h=300&fit=crop',
+            'tiền giang': 'https://images.unsplash.com/photo-1558362477-2d6482e7d7c5?w=400&h=300&fit=crop',
+            'bến tre': 'https://images.unsplash.com/photo-1558362477-2d6482e7d7c5?w=400&h=300&fit=crop', // coconut
+            'trà vinh': 'https://images.unsplash.com/photo-1558362477-2d6482e7d7c5?w=400&h=300&fit=crop',
+            'vĩnh long': 'https://images.unsplash.com/photo-1558362477-2d6482e7d7c5?w=400&h=300&fit=crop',
+            'sóc trăng': 'https://images.unsplash.com/photo-1558362477-2d6482e7d7c5?w=400&h=300&fit=crop',
+            'bạc liêu': 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=300&fit=crop',
+            'cà mau': 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=300&fit=crop', // cajeput forest
+            'hội an': 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&h=300&fit=crop', // hoi an lanterns
+            'bình phước': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop',
+        };
+
+        // Try exact and partial match
+        for (const key of Object.keys(imgMap)) {
+            if (dest === key || dest.includes(key) || key.includes(dest)) {
+                return imgMap[key];
+            }
+        }
+        
+        // Fallback
+        return 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&h=300&fit=crop';
     }
 
     function renderItineraryCard(itin) {
         const card = document.createElement('div');
-        card.className = 'chat-itinerary-card';
+        card.style.cssText = 'background:rgba(10,18,28,0.85); border:1px solid rgba(16,185,129,0.15); border-radius:16px; margin:8px 0; animation:fadeInUp 0.4s ease; overflow:hidden; position:relative;';
 
-        // Stats grid
-        const statsHtml = `
-            <div class="chat-itin-stats">
-                <div class="chat-itin-stat"><div class="chat-itin-stat-label">THỜI GIAN</div><div class="chat-itin-stat-val">${itin.days || ''} Ngày</div></div>
-                <div class="chat-itin-stat"><div class="chat-itin-stat-label">DỰ KIẼN CHI PHÍ</div><div class="chat-itin-stat-val">${itin.estimatedCost || 'Đang ước tính'}</div></div>
-                ${itin.transport ? `<div class="chat-itin-stat"><div class="chat-itin-stat-label">PHƯƠNG TIỆN</div><div class="chat-itin-stat-val">${itin.transport}</div></div>` : ''}
+        // Gradient accent top
+        const accentTop = document.createElement('div');
+        accentTop.style.cssText = 'position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, #10b981, #34d399, #10b981); z-index:2;';
+        card.appendChild(accentTop);
+
+        // Hero image
+        const heroImg = document.createElement('div');
+        const heroSrc = itin.heroImage || getDestinationImage(itin.destination || '');
+        heroImg.style.cssText = 'width:100%; height:120px; position:relative; overflow:hidden;';
+        heroImg.innerHTML = `
+            <img src="${heroSrc}" alt="${itin.destination || ''}"
+                 style="width:100%; height:100%; object-fit:cover;"
+                 onerror="this.src='https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop'; this.parentElement.style.height='80px'">
+            <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 30%, rgba(10,18,28,0.9) 100%);"></div>
+            <div style="position:absolute; top:12px; left:12px; right:12px; display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                    <div style="background:linear-gradient(135deg,#10b981,#059669); color:#fff; font-size:0.62rem; font-weight:800; padding:3px 10px; border-radius:10px; display:inline-block; margin-bottom:4px;">📍 ${itin.destination || 'Việt Nam'}</div>
+                    <div style="font-size:0.7rem; color:#fff; font-weight:700; text-shadow:0 1px 4px rgba(0,0,0,0.5);">${itin.days || 3} ngày · ${itin.estimatedCost || ''}</div>
+                </div>
             </div>
         `;
+        card.appendChild(heroImg);
 
-        // Days timeline
-        const daysHtml = (itin.itinerary || []).map((day, idx) => {
-            const actsHtml = (day.activities || []).map(act => {
-                // Format time range (08:00 → 08:00 - 10:00 if start/end exist)
-                const timeLabel = act.timeEnd ? `${act.time} - ${act.timeEnd}` : (act.time || '');
-                return `
-                <div class="chat-itin-act-card">
-                    <div class="chat-itin-act-time">${timeLabel}</div>
-                    <div class="chat-itin-act-info">
-                        <div class="chat-itin-act-name">${act.task || act.name || ''}</div>
-                        ${act.location ? `<div class="chat-itin-act-loc">📍 ${act.location}</div>` : ''}
-                        ${act.tip ? `<div class="chat-itin-act-tip">💡 ${act.tip}</div>` : ''}
-                        ${act.cost ? `<span class="chat-itin-act-cost">🟢 ${act.cost}</span>` : ''}
-                    </div>
-                </div>`;
-            }).join('');
+        // Summary
+        if (itin.tripSummary) {
+            const summary = document.createElement('div');
+            summary.style.cssText = 'padding:8px 14px 0; font-size:0.72rem; color:#94a3b8; line-height:1.5;';
+            summary.textContent = itin.tripSummary;
+            card.appendChild(summary);
+        }
 
-            return `
-            <div class="chat-itin-day-block" style="animation-delay:${idx * 0.1}s">
-                <div class="chat-itin-day-sidebar">
-                    <div class="chat-itin-day-num">${day.day}</div>
+        // Days
+        const daysWrap = document.createElement('div');
+        daysWrap.style.cssText = 'display:flex; flex-direction:column; gap:4px; padding:10px 14px;';
+        (itin.itinerary || []).forEach((day) => {
+            const topAct = (day.activities || [])[0];
+            const dayEl = document.createElement('div');
+            dayEl.style.cssText = 'display:flex; align-items:center; gap:10px; padding:6px 10px; background:rgba(255,255,255,0.03); border-radius:10px; border-left:3px solid #10b981; transition:all 0.2s;';
+            dayEl.innerHTML = `
+                <div style="width:28px; height:28px; min-width:28px; background:linear-gradient(135deg,#10b981,#059669); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; font-size:0.65rem;">${day.day}</div>
+                <div style="flex:1; min-width:0;">
+                    <div style="font-size:0.72rem; color:#fff; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${topAct ? (topAct.task || topAct.name || '') : (day.title || day.subtitle || `Ngày ${day.day}`)}</div>
+                    ${topAct && topAct.location ? `<div style="font-size:0.62rem; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📍 ${topAct.location}</div>` : ''}
                 </div>
-                <div class="chat-itin-day-content">
-                    <div class="chat-itin-day-title">Ngày ${day.day}${day.title ? ` (${day.title})` : ''}</div>
-                    ${day.subtitle ? `<div class="chat-itin-day-sub">${day.subtitle}</div>` : ''}
-                    <div class="chat-itin-acts">${actsHtml}</div>
-                </div>
-            </div>`;
-        }).join('');
+                ${topAct && topAct.time ? `<div style="font-size:0.6rem; color:#10b981; font-weight:700; white-space:nowrap;">⏱ ${topAct.time}</div>` : ''}
+            `;
+            dayEl.onmouseover = () => { dayEl.style.background = 'rgba(16,185,129,0.1)'; dayEl.style.borderColor = '#34d399'; };
+            dayEl.onmouseout = () => { dayEl.style.background = 'rgba(255,255,255,0.03)'; dayEl.style.borderColor = '#10b981'; };
+            daysWrap.appendChild(dayEl);
+        });
+        card.appendChild(daysWrap);
 
-        card.innerHTML = `
-            <div class="chat-itin-hero">
-                <div class="chat-itin-dest-pill">📍 ${(itin.destination || '').toUpperCase()}</div>
-                <h3 class="chat-itin-hero-title">Hành trình khám phá ${itin.days || ''} ngày</h3>
-                ${itin.tripSummary ? `<p class="chat-itin-hero-sub">${itin.tripSummary}</p>` : ''}
-                ${statsHtml}
-            </div>
-            <div class="chat-itin-timeline">${daysHtml}</div>
-            <div class="chat-itin-actions">
-                <button class="btn-save-itin" type="button">💾 Lưu lịch trình này</button>
-                <button class="btn-export-itin" type="button">📋 Sao chép</button>
-            </div>
+        // Actions
+        const actions = document.createElement('div');
+        actions.style.cssText = 'display:flex; gap:5px;';
+        actions.innerHTML = `
+            <button class="btn-save-itin" style="flex:1; padding:7px; border-radius:8px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.35); color:#10b981; font-size:0.65rem; font-weight:700; cursor:pointer;">💾 Lưu</button>
+            <button class="btn-export-itin" style="flex:1; padding:7px; border-radius:8px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#94a3b8; font-size:0.65rem; font-weight:700; cursor:pointer;">📋 Copy</button>
+            <button class="btn-view-detail" style="flex:2; padding:7px; border-radius:8px; background:linear-gradient(135deg,#10b981,#059669); border:none; color:#fff; font-size:0.65rem; font-weight:800; cursor:pointer;">⚡ Chi tiết →</button>
         `;
+        card.appendChild(actions);
 
-        // ĐỒNG BỘ VỚI TRANG PLANNER (Nếu đang mở planner.html)
+        // Sync
         if (window.location.pathname.includes('planner.html') && window.WanderPlanner) {
             const placeholder = document.getElementById('resultPlaceholder');
             const resultContainer = document.getElementById('timelineResult');
             const refineBox = document.getElementById('refineBox');
-            
             if (placeholder) placeholder.style.display = 'none';
             if (resultContainer) resultContainer.style.display = 'block';
             if (refineBox) refineBox.style.display = 'block';
-
-            // Cập nhật dữ liệu vào WanderPlanner để đồng bộ tab history/refine
             if (typeof window.WanderPlanner.renderItinerary === 'function') {
                 window.WanderPlanner.renderItinerary(itin, itin.destination || 'Điểm đến', itin.days || 3, '');
             }
         }
 
-        // Nút Lưu
-        card.querySelector('.btn-save-itin').onclick = async () => {
+        actions.querySelector('.btn-save-itin').onclick = async (e) => {
+            e.stopPropagation();
             const token = localStorage.getItem('wander_token');
-            if (!token) { if (window.WanderUI) WanderUI.showToast('Đăng nhập để lưu lịch trình nhé!', 'warning'); return; }
-            const btn = card.querySelector('.btn-save-itin');
-            btn.textContent = '⏳ Đang lưu...';
-            btn.disabled = true;
+            if (!token) { if (window.WanderUI) WanderUI.showToast('Đăng nhập để lưu!', 'warning'); return; }
+            const btn = actions.querySelector('.btn-save-itin');
+            btn.textContent = '⏳...'; btn.disabled = true;
             try {
                 const res = await fetch('/api/planner/save', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-auth-token': token }, body: JSON.stringify({ planJson: itin, destination: itin.destination, days: itin.days }) });
                 const d = await res.json();
-                if (d.success) { btn.textContent = '✅ Đã lưu!'; if (window.WanderUI) WanderUI.showToast('Lịch trình đã lưu vào My Trips!', 'success'); }
-                else { btn.textContent = '💾 Lưu lịch trình'; btn.disabled = false; }
-            } catch(e) { btn.textContent = '💾 Lưu lịch trình'; btn.disabled = false; }
+                btn.textContent = d.success ? '✅' : '💾';
+                btn.disabled = false;
+            } catch(e) { btn.textContent = '💾'; btn.disabled = false; }
         };
 
-        // Nút Sao chép
-        card.querySelector('.btn-export-itin').onclick = () => {
-            let text = `📍 Lịch trình ${itin.destination} - ${itin.days} ngày\n💰 ${itin.estimatedCost}\n\n`;
+        actions.querySelector('.btn-export-itin').onclick = (e) => {
+            e.stopPropagation();
+            let text = `📍 ${itin.destination} - ${itin.days}N\n💰 ${itin.estimatedCost || ''}\n\n`;
             (itin.itinerary || []).forEach(day => {
-                text += `=== Ngày ${day.day}: ${day.title || ''} ===\n`;
-                (day.activities || []).forEach(act => { text += `  ${act.time || ''} - ${act.task || act.name || ''} (${act.location || ''})\n`; });
-                text += '\n';
+                text += `📅 Ngày ${day.day}${day.title ? ` (${day.title})` : ''}\n`;
+                (day.activities || []).forEach(a => { text += `  • ${a.time || ''} ${a.task || a.name || ''}${a.location ? ` - ${a.location}` : ''}\n`; });
             });
-            navigator.clipboard?.writeText(text).then(() => { if (window.WanderUI) WanderUI.showToast('Đã sao chép lịch trình!', 'success'); });
+            navigator.clipboard?.writeText(text).then(() => { if (window.WanderUI) WanderUI.showToast('Đã sao chép!', 'success'); });
+        };
+
+        actions.querySelector('.btn-view-detail').onclick = (e) => {
+            e.stopPropagation();
+            if (panel.classList.contains('chat-panel--fullscreen')) {
+                panel.classList.remove('chat-panel--fullscreen');
+                fabWrap.classList.remove('is-fullscreen');
+            }
+            if (typeof togglePanel === 'function') togglePanel();
+            window.location.href = `/planner.html?view=true&itinId=${itin._id || 'new'}`;
         };
 
         log.appendChild(card);
-          scrollToBottom();
+        scrollToBottom();
     }
 
     // Welcome message or resume session
@@ -3773,6 +4514,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       renderItineraryCard: renderItineraryCard,
       renderDiscoveryCarousel: renderDiscoveryCarousel,
       renderTourCarousel: renderTourCarousel,
+      togglePlanningMode: togglePlanningMode,
+      sendQuickQuery: sendQuickQuery,
       sendMessage: async (text) => {
         if (!text) return;
         
@@ -3783,6 +4526,245 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         if (form) form.dispatchEvent(new Event('submit'));
       }
     };
+    // Expose for inline onclick handlers
+    window.togglePlanningMode = togglePlanningMode;
+    window.sendQuickQuery = sendQuickQuery;
+    window.toggleQuickQueryPanel = toggleQuickQueryPanel;
+    window.clearQuickQuery = clearQuickQuery;
+    window.submitQuickQuery = submitQuickQuery;
+    window.openPlanningForm = openPlanningForm;
+    window.closePlanningForm = closePlanningForm;
+    window.submitPlanningForm = submitPlanningForm;
+    window.injectPlanningFormToChat = injectPlanningFormToChat;
+    
+    // Quick Query Panel Functions
+    function toggleQuickQueryPanel() {
+      const panel = document.getElementById('quick-query-panel');
+      if (!panel) return;
+      
+      if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        scrollToBottom();
+      } else {
+        panel.style.display = 'none';
+      }
+    }
+    
+    function clearQuickQuery() {
+      const panel = document.getElementById('quick-query-panel');
+      if (!panel) return;
+      panel.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+        input.checked = false;
+      });
+    }
+    
+    function submitQuickQuery() {
+      const selections = [];
+      
+      // Single select (radio)
+      const radioGroups = ['qq-budget', 'qq-duration', 'qq-style'];
+      radioGroups.forEach(name => {
+        const checked = document.querySelector(`input[name="${name}"]:checked`);
+        if (checked) selections.push(checked.value);
+      });
+      
+      // Multi select (checkbox)
+      const checkboxGroups = ['qq-place', 'qq-activity', 'qq-food'];
+      checkboxGroups.forEach(name => {
+        const checked = document.querySelectorAll(`input[name="${name}"]:checked`);
+        if (checked.length > 0) {
+          const values = Array.from(checked).map(c => c.value);
+          selections.push(values.join(', '));
+        }
+      });
+      
+      if (selections.length === 0) {
+        if (window.WanderUI) WanderUI.showToast('Vui lòng chọn ít nhất một tiêu chí', 'warning');
+        return;
+      }
+      
+      const query = 'Tôi muốn du lịch ' + selections.join('; ');
+      const input = document.getElementById('global-chat-input');
+      const form = document.getElementById('global-chat-form');
+      
+      if (input && form) {
+        input.value = query;
+        form.dispatchEvent(new Event('submit'));
+      }
+      
+      // Close panel
+      const panel = document.getElementById('quick-query-panel');
+      if (panel) panel.style.display = 'none';
+    }
+    
+    // Inject planning form directly into chat
+    function injectPlanningFormToChat() {
+      const introText = 'Bạn muốn lập lịch trình du lịch? Điền thông tin bên dưới để mình giúp bạn nhé!';
+      appendMsg(introText + ' [PLANNING_FORM]', 'bot');
+    }
+    
+    // Planning Form Functions
+    function openPlanningForm() {
+      // Inject form into chat instead of showing panel
+      injectPlanningFormToChat();
+    }
+    
+    function closePlanningForm() {
+      const panel = document.getElementById('planning-form-panel');
+      if (panel) panel.style.display = 'none';
+      
+      // Reset form
+      const destInput = document.getElementById('plan-destination');
+      const noteInput = document.getElementById('plan-note');
+      if (destInput) destInput.value = '';
+      if (noteInput) noteInput.value = '';
+      
+      const panel2 = document.getElementById('planning-form-panel');
+      if (panel2) {
+        panel2.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+          input.checked = false;
+        });
+      }
+    }
+    
+    // Tạo form lập lịch inline trong chat
+    function createInlinePlanningForm() {
+      return `
+        <div class="inline-plan-form" style="margin-top: 16px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 16px; padding: 16px;">
+          <div style="font-weight: 600; font-size: 0.85rem; color: #a5b4fc; margin-bottom: 12px;">🗺️ Lập lịch trình nhanh</div>
+          
+          <div style="margin-bottom: 10px;">
+            <input type="text" id="inline-plan-dest" placeholder="📍 Điểm đến..." style="width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #f1f5f9; font-size: 0.82rem; box-sizing: border-box;">
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">📅 Thời gian</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-duration" value="Nửa ngày" style="display:none;"> Nửa ngày</label>
+                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-duration" value="1 ngày" style="display:none;"> 1 ngày</label>
+                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-duration" value="2-3 ngày" style="display:none;"> 2-3N</label>
+                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-duration" value="4-5 ngày" style="display:none;"> 4-5N</label>
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">💰 Ngân sách</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-budget" value="Dưới 1M" style="display:none;"> &lt;1M</label>
+                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-budget" value="1-3 triệu" style="display:none;"> 1-3M</label>
+                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-budget" value="3-5 triệu" style="display:none;"> 3-5M</label>
+                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-budget" value="5 triệu+" style="display:none;"> 5M+</label>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 10px;">
+            <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">👥 Đi cùng</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-style" value="Một mình" style="display:none;"> 🚶 Một mình</label>
+              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-style" value="Cặp đôi" style="display:none;"> 💑 Cặp đôi</label>
+              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-style" value="Gia đình" style="display:none;"> 👨‍👩‍👧 Gia đình</label>
+              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-style" value="Nhóm bạn" style="display:none;"> 👯 Nhóm</label>
+            </div>
+          </div>
+          
+          <div style="margin-bottom: 12px;">
+            <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">🎯 Sở thích <span style="color:#64748b">(chọn nhiều)</span></div>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Biển" style="display:none;"> 🏖️ Biển</label>
+              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Núi" style="display:none;"> ⛰️ Núi</label>
+              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Ăn ngon" style="display:none;"> 🍜 Ăn</label>
+              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Check-in" style="display:none;"> 📸 Check-in</label>
+              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Mua sắm" style="display:none;"> 🛍️ Mua sắm</label>
+              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Nghỉ dưỡng" style="display:none;"> 🧖 Spa</label>
+            </div>
+          </div>
+          
+          <div style="display: flex; gap: 8px;">
+            <button onclick="submitInlinePlanForm(this)" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 10px; color: #fff; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">✨ Tạo lịch trình</button>
+          </div>
+        </div>
+        <style>
+          .inline-plan-form label:hover { background: rgba(99, 102, 241, 0.2) !important; border-color: rgba(99, 102, 241, 0.4) !important; }
+          .inline-plan-form input[type="radio"]:checked + span,
+          .inline-plan-form input:checked + span { background: rgba(99, 102, 241, 0.3) !important; border-color: #6366f1 !important; color: #a5b4fc !important; }
+          .inline-plan-form input[type="radio"]:checked ~ * { }
+          .inline-plan-form button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+        </style>
+      `;
+    }
+    
+    // Submit form lập lịch inline trong chat
+    window.submitInlinePlanForm = function(btn) {
+      const form = btn.closest('.inline-plan-form');
+      const dest = form.querySelector('#inline-plan-dest')?.value.trim();
+      const duration = form.querySelector('input[name="inline-duration"]:checked')?.value;
+      const budget = form.querySelector('input[name="inline-budget"]:checked')?.value;
+      const style = form.querySelector('input[name="inline-style"]:checked')?.value;
+      const interests = Array.from(form.querySelectorAll('input[name="inline-interest"]:checked')).map(c => c.value);
+      
+      if (!dest) {
+        form.querySelector('#inline-plan-dest').focus();
+        return;
+      }
+      
+      let prompt = `Lập lịch trình du lịch:\n• Điểm đến: ${dest}`;
+      if (duration) prompt += `\n• Thời gian: ${duration}`;
+      if (budget) prompt += `\n• Ngân sách: ${budget}/người`;
+      if (style) prompt += `\n• Đi cùng: ${style}`;
+      if (interests.length > 0) prompt += `\n• Sở thích: ${interests.join(', ')}`;
+      
+      const input = document.getElementById('global-chat-input');
+      const chatForm = document.getElementById('global-chat-form');
+      if (input && chatForm) {
+        input.value = prompt;
+        chatForm.dispatchEvent(new Event('submit'));
+      }
+    };
+    
+    function submitPlanningForm() {
+      // Gather all inputs
+      const destination = document.getElementById('plan-destination')?.value.trim();
+      const budget = document.querySelector('input[name="plan-budget"]:checked')?.value;
+      const duration = document.querySelector('input[name="plan-duration"]:checked')?.value;
+      const interests = Array.from(document.querySelectorAll('input[name="plan-interest"]:checked')).map(c => c.value);
+      const style = document.querySelector('input[name="plan-style"]:checked')?.value;
+      const note = document.getElementById('plan-note')?.value.trim();
+      
+      // Validation
+      if (!destination) {
+        if (window.WanderUI) WanderUI.showToast('Vui lòng nhập điểm đến', 'warning');
+        document.getElementById('plan-destination')?.focus();
+        return;
+      }
+      
+      // Build prompt - clean and natural
+      let prompt = `Lập lịch trình du lịch cho tôi:\n`;
+      prompt += `• Điểm đến: ${destination}\n`;
+      if (duration) prompt += `• Thời gian: ${duration}\n`;
+      if (budget) prompt += `• Ngân sách: ${budget}/người\n`;
+      if (style) prompt += `• Đi cùng: ${style}\n`;
+      if (interests.length > 0) prompt += `• Sở thích: ${interests.join(', ')}\n`;
+      if (note) prompt += `• Yêu cầu: ${note}`;
+      
+      // Close form
+      closePlanningForm();
+      
+      // Send to chat
+      const input = document.getElementById('global-chat-input');
+      const form = document.getElementById('global-chat-form');
+      
+      if (input && form) {
+        input.value = prompt;
+        form.dispatchEvent(new Event('submit'));
+      }
+    }
+    
+    function scrollToBottom() {
+      const log = document.getElementById('global-chat-log');
+      if (log) log.scrollTop = log.scrollHeight;
+    }
+    
     // Compatibility alias for chat-brain.js
     window.displayAIMessage = (data) => {
       if (typeof data === 'string') {
@@ -3792,7 +4774,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         if (data.proposal) renderProposalCard(data.proposal);
         if (data.itineraryCard) renderItineraryCard(data.itineraryCard);
         if (data.proposals) renderProposalOptions(data.proposals);
-        if (data.discoveryPlaces) renderDiscoveryCarousel(data.discoveryPlaces);
+        if (data.discoveryPlaces) {
+            // ĐÃ BỎ: Không render discovery carousel — gây confuse và lặp
+        }
         if (data.suggestedTours) renderTourCarousel(data.suggestedTours);
       }
     };
@@ -4736,5 +5720,4 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
   return { setTheme, toggleTheme, showToast, setButtonLoading, toggleNotificationDrawer, updateNotificationBadge, markAsRead, markAllAsRead, syncAuthUI, forceLogout, toggleUserMenu, openAuthModal, confirm, openPlaceDetail, openBookingDetail, openItineraryDetail, openNotificationDetailModal, getRankBadgeHTML, getRankIcon, getStoreKey, initSettingsHandlers, trackQuestActivity, getQuestActivity, startTopLoader, finishTopLoader, openModal, closeModal, copyToClipboard, viewImage };
 })());
-
 

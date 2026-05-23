@@ -26,7 +26,7 @@ const optionalAuth = (req, res, next) => {
   if (token) {
     try {
       const decoded = jwt.verify(token, JWT_SECRET);
-      req.user = decoded.user | decoded.account | decoded;
+      req.user = decoded.user || decoded.account || decoded;
     } catch (e) { }
   }
   next();
@@ -48,6 +48,9 @@ try {
 
 // --- HELPER: GENERATE RESPONSE METADATA (PROPOSALS, DISCOVERY, TOURS) ---
 async function generateResponseMetadata(message, aiAnswer, locationContext, isItineraryRequest = false) {
+  // Ensure isItineraryRequest is always boolean (prevent 0/null being truthy/falsy)
+  const itinReq = isItineraryRequest === true;
+
   let proposal = null;
   let discoveryPlaces = null;
   let suggestedTours = null;
@@ -56,7 +59,7 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
   const lowerAnswer = safeAnswer.toLowerCase();
   const lowerUserMsg = message.toLowerCase();
   const weatherKeywords = ['thời tiết', 'mát', 'đẹp trời', 'nắng', 'đi chơi', 'thoi tiet', 'dep troi', 'di choi'];
-  const isWeatherContext = weatherKeywords.some(k => lowerUserMsg.includes(k) || lowerAnswer.includes(k));
+  const isWeatherContext = weatherKeywords.some(k => lowerUserMsg.includes(k));
 
   // 1. Tự động nhận diện Tỉnh/Thành/Địa điểm được hỏi
   const provinces = [
@@ -83,7 +86,7 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
   // Ưu tiên: trích xuất tên địa danh/di tích CỤ THỂ từ message
   let specificLandmark = null;
   for (const [kw, prov] of Object.entries(landmarkToProvince)) {
-    if (lowerUserMsg.includes(kw) | lowerAnswer.includes(kw)) {
+    if (lowerUserMsg.includes(kw)) {
       specificLandmark = kw; // giữ nguyên tên landmark gốc
       break;
     }
@@ -100,51 +103,51 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
         break;
       }
     }
-    // ƯU TIÊN 2: Nếu người dùng không nhắc, mới tìm trong câu trả lời của AI
-    if (!detectedDest) {
-      for (const p of provinces) {
-        if (lowerAnswer.includes(p.toLowerCase())) {
-          detectedDest = p;
-          break;
-        }
-      }
-    }
+    // ƯU TIÊN 2: ĐÃ BỎ - KHÔNG lấy detectedDest từ câu trả lời AI
+    // Lý do: Nếu user hỏi "lịch sử VN", AI trả lời nhắc đến "Đà Nẵng" trong ngữ cảnh lịch sử
+    // → KHÔNG nên hiển thị discovery Đà Nẵng. Discovery chỉ hiện khi USER chủ động hỏi về địa điểm.
+    // Việc extract từ AI answer làm sai ngữ cảnh.
     // ƯU TIÊN 3: Dùng Regex bắt các địa danh cấp huyện (như Sóc Sơn) không có trong list tỉnh thành
     if (!detectedDest) {
        let destMatch = lowerUserMsg.match(/(?:ở|tại|đến|đi|cho|tìm|về)\s+([a-zà-ỹ]+(?:\s[a-zà-ỹ]+){1,3})/i);
        if (destMatch) {
            const captured = destMatch[1].trim();
-           const badDests = ['trình', 'kế hoạch', 'đi', 'đến', 'này', 'nhé', 'đó', 'đây', 'chơi', 'giúp', 'cho', 'nha', 'chuyến', 'với', 'nhé', 'điểm', 'diem', 'tour', 'dịch vụ', 'khách sạn', 'đâu', 'đâu không', 'gì'];
-           if (!badDests.includes(captured) && captured.length > 2) {
+           // ⚠️ Validate: chỉ chấp nhận nếu captured MATCH tỉnh thành hoặc landmark thực sự
+           const isValidProvince = provinces.some(p => p.toLowerCase() === captured || p.toLowerCase().includes(captured) || captured.includes(p.toLowerCase()));
+           const isValidLandmark = Object.keys(landmarkToProvince).some(lm => lm === captured || captured.includes(lm));
+           const badDests = ['trình', 'kế hoạch', 'đi', 'đến', 'này', 'nhé', 'đó', 'đây', 'chơi', 'giúp', 'cho', 'nha', 'chuyến', 'với', 'nhé', 'điểm', 'diem', 'tour', 'dịch vụ', 'khách sạn', 'đâu', 'đâu không', 'gì', 'anh hùng', 'chiến tranh', 'lịch sử', 'văn hóa', 'bác hồ', 'hồ chí minh', 'việt nam', 'các', 'vị', 'viet nam'];
+           if (!badDests.includes(captured) && captured.length > 2 && (isValidProvince || isValidLandmark)) {
                detectedDest = captured;
+               console.log(`[DEBUG Meta] detectedDest from regex: "${captured}" (validProvince=${isValidProvince}, validLandmark=${isValidLandmark})`);
            }
        }
     }
   }
 
-  // 2. Tự động nhận diện Style/Thể loại du lịch từ tags
+  // 2. Tự động nhận diện Style/Thể loại du lịch từ USER MESSAGE (không từ AI answer)
+  // ⚠️ Chỉ detect từ message của người dùng để tránh AI answer gây nhiễu
+  // ⚠️ LOẠI TRỪ các từ mang tính hỏi-đáp kiến thức (lịch sử, văn hóa, di tích) vì chúng làm sai ngữ cảnh discovery
   let detectedTags = [];
-  if (lowerUserMsg.includes('biển') | lowerAnswer.includes('biển') | lowerUserMsg.includes('đảo') | lowerAnswer.includes('đảo')) {
+  if (lowerUserMsg.includes('biển') || lowerUserMsg.includes('đảo')) {
     detectedTags.push('biển');
   }
-  if (lowerUserMsg.includes('núi') | lowerAnswer.includes('núi') | lowerUserMsg.includes('trekking') | lowerAnswer.includes('trekking') | lowerUserMsg.includes('leo núi') | lowerAnswer.includes('leo núi')) {
+  if (lowerUserMsg.includes('núi') || lowerUserMsg.includes('trekking') || lowerUserMsg.includes('leo núi')) {
     detectedTags.push('leo núi');
   }
-  if (lowerUserMsg.includes('văn hóa') | lowerAnswer.includes('văn hóa') | lowerUserMsg.includes('lịch sử') | lowerAnswer.includes('lịch sử') | lowerUserMsg.includes('di tích') | lowerAnswer.includes('di tích') | lowerUserMsg.includes('phố cổ') | lowerAnswer.includes('phố cổ') | lowerUserMsg.includes('chùa') | lowerAnswer.includes('chùa') | lowerUserMsg.includes('đền') | lowerAnswer.includes('đền')) {
-    detectedTags.push('văn hóa');
-  }
-  if (lowerUserMsg.includes('ẩm thực') | lowerAnswer.includes('ẩm thực') | lowerUserMsg.includes('ăn uống') | lowerAnswer.includes('ăn uống') | lowerUserMsg.includes('đặc sản') | lowerAnswer.includes('đặc sản')) {
+  if (lowerUserMsg.includes('ẩm thực') || lowerUserMsg.includes('ăn uống') || lowerUserMsg.includes('đặc sản')) {
     detectedTags.push('ẩm thực');
   }
-  if (lowerUserMsg.includes('nghỉ dưỡng') | lowerAnswer.includes('nghỉ dưỡng') | lowerUserMsg.includes('resort') | lowerAnswer.includes('resort')) {
+  if (lowerUserMsg.includes('nghỉ dưỡng') || lowerUserMsg.includes('resort')) {
     detectedTags.push('nghỉ dưỡng');
   }
+  // ⚠️ KHÔNG detect 'văn hóa', 'lịch sử', 'di tích', 'phố cổ', 'chùa', 'đền' vào detectedTags
+  // Vì user hỏi "lịch sử VN" → hiển thị câu trả lời kiến thức, KHÔNG hiển thị discovery places về chùa/di tích
 
-  // A. Tự tạo Proposal (Lịch trình nhanh) - tạo khi isItineraryRequest=true (không cần AI text phải chứa keyword)
-  if (isItineraryRequest) {
+  // A. Tự tạo Proposal (Lịch trình nhanh) - tạo khi itinReq=true (không cần AI text phải chứa keyword)
+  if (itinReq) {
       if (isWeatherContext) {
           proposal = {
-              destination: detectedDest | locationContext | "vùng lân cận",
+              destination: detectedDest || locationContext || "vùng lân cận",
               days: 1,
               budget: "Dưới 1 triệu VNĐ",
               style: "Dạo phố & Ngắm cảnh",
@@ -185,14 +188,23 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
     }];
   } else {
     // Nếu là câu hỏi chung chung về tỉnh thành/thể loại, ta lọc local
-    const shouldShowDiscovery = lowerAnswer.includes('địa điểm') | lowerAnswer.includes('quán') | lowerAnswer.includes('nơi') | lowerAnswer.includes('khám phá') | lowerAnswer.includes('gợi ý') | isWeatherContext | detectedDest | detectedTags.length > 0;
+    // ⚠️ CHỈ check USER MESSAGE, không dùng AI answer để tránh AI tự ý trigger discovery
+    // CHỈ hiện discovery khi: user hỏi về địa điểm CỤ THỂ HOẶC thời tiết HOẶC greeting ngắn
+    // KHÔNG hiện discovery khi user hỏi chung chung (lịch sử, văn hóa, kiến thức...)
+    const userAskedAboutPlace = detectedDest || specificLandmark;
+    const isShortGreeting = lowerUserMsg.length < 15 && ['alo', 'chào', 'hi', 'hello', 'xin chào', 'chào bạn', 'cảm ơn'].some(k => lowerUserMsg.includes(k));
+    const shouldShowDiscovery = !!(userAskedAboutPlace || isWeatherContext || isShortGreeting);
+    // ⚠️ KHÔNG hiện discovery nếu câu hỏi về người/concept (hỏi "có ai", "là gì", "bao nhiêu" kèm tên địa điểm)
+    const questionPatterns = ['có .+ nào', 'là gì', 'bao nhiêu', 'ai là', 'ở đâu', 'ra đời', 'sinh ngày', 'có gì', 'cần gì'];
+    const isQuestionAboutConcept = questionPatterns.some(p => lowerUserMsg.match(new RegExp(p)));
+    const suppressDiscovery = isQuestionAboutConcept && detectedDest && !specificLandmark;
     
-    if (shouldShowDiscovery) {
+    if (shouldShowDiscovery && !suppressDiscovery) {
       let filtered = cachedPlaces;
       
       if (detectedDest) {
         filtered = filtered.filter(p => 
-          p.name.toLowerCase().includes(detectedDest.toLowerCase()) | 
+          p.name.toLowerCase().includes(detectedDest.toLowerCase()) || 
           p.region.toLowerCase().includes(detectedDest.toLowerCase())
         );
       }
@@ -207,7 +219,7 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
 
       if (discoveryPlaces.length === 0) {
           // CHỈ fallback về TOP places nếu KHÔNG có detectedDest VÀ (câu ngắn hoặc lời chào)
-          if (!detectedDest && (lowerUserMsg.length < 15 | ['alo', 'chào', 'hi', 'hello'].some(k => lowerUserMsg.includes(k)))) {
+          if (!detectedDest && (lowerUserMsg.length < 15 || ['alo', 'chào', 'hi', 'hello'].some(k => lowerUserMsg.includes(k)))) {
               discoveryPlaces = cachedPlaces.filter(p => p.top).slice(0, 5);
           } else {
               discoveryPlaces = []; // Khóa chặt: Đã hỏi địa danh cụ thể mà không có trong thẻ thì tuyệt đối không mọc ra đề xuất Phú Quốc, Hạ Long lung tung
@@ -223,9 +235,9 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
   
   let wantsTour = tourKeywords.some(k => lowerUserMsg.includes(k));
   let wantsService = serviceKeywords.some(k => lowerUserMsg.includes(k));
-  let searchDest = detectedDest | (proposal ? proposal.destination : null);
+  let searchDest = detectedDest || (proposal ? proposal.destination : null);
 
-  if (wantsTour | wantsService | isItineraryRequest) {
+  if (wantsTour || wantsService || itinReq) {
     try {
         if (searchDest && searchDest.length > 2) {
             // --- ƯU TIÊN 0: Nếu có landmark cụ thể (Quốc Tử Giám, Văn Miếu...) → tìm CHÍNH XÁC theo tên landmark ---
@@ -267,7 +279,7 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
                 suggestedTours = [];
             }
         } else if (detectedTags.length > 0) {
-            // Không hỏi địa danh, nhưng hỏi theo thể loại (VD: tour leo núi, khách sạn biển...)
+            // Chỉ hiện tour/services có trong DB theo tags
             let tagConds = [];
             detectedTags.forEach(tag => {
                 tagConds.push({ kind: new RegExp(tag, 'i') });
@@ -277,13 +289,20 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
             suggestedTours = await Place.find({
                 isDeleted: { $ne: true },
                 status: 'approved',
+                kind: { $in: ['tour', 'dich-vu', 'service'] },
                 $or: tagConds
             }).limit(5).lean();
             console.log(`[Tour Search] Tags only → found ${suggestedTours.length} results`);
-        } else if (wantsTour | wantsService) {
-            // Hỏi tour chung chung không có địa danh → fallback nổi bật
-            suggestedTours = await Place.find({ isDeleted: { $ne: true }, status: 'approved' }).sort({ favoritesCount: -1 }).limit(5).lean();
-            console.log(`[Tour Search] Generic fallback → found ${suggestedTours.length} results`);
+        } else if (wantsTour || wantsService) {
+            // CHỈ hiện khi hỏi tour/dịch vụ chung mà CÓ results trong DB
+            // KHÔNG có fallback "top places" vì đó là place cards không phải tour/services
+            const genericQ = {
+                isDeleted: { $ne: true },
+                status: 'approved',
+                kind: { $in: ['tour', 'dich-vu', 'service'] }
+            };
+            suggestedTours = await Place.find(genericQ).sort({ favoritesCount: -1 }).limit(5).lean();
+            console.log(`[Tour Search] Generic tour/service → found ${suggestedTours.length} results`);
         }
     } catch (tourErr) {
         console.error("Error fetching suggested services:", tourErr);
@@ -295,7 +314,67 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
   }
 
   console.log(`[Metadata] Suggested Services/Tours count: ${suggestedTours ? suggestedTours.length : 0}`);
-  return { proposal, discoveryPlaces, suggestedTours };
+  console.log(`[DEBUG Meta] OUTPUT: proposal=${!!proposal}, discoveryPlaces=${discoveryPlaces ? discoveryPlaces.length : 0}, suggestedTours=${suggestedTours ? suggestedTours.length : 0}`);
+
+  // GỬI LINK TRỰC TIẾP THAY GOOGLE SEARCH KHI KHÔNG CÓ TOUR TRONG DB
+  // Luôn gửi link hữu ích khi user hỏi về tour/dịch vụ
+  let suggestedLink = null;
+
+  if (wantsTour) {
+    // Ưu tiên: search trực tiếp theo tên địa điểm trên Viator (chuyên tour & hoạt động)
+    const searchName = searchDest || 'Vietnam';
+    const viatorUrl = `https://www.viator.com/search/${encodeURIComponent(searchName + ' tours activities')}`;
+    if (searchDest) {
+      suggestedLink = {
+        type: 'external',
+        label: `🗺️ Tour & hoạt động tại ${searchDest} (Viator)`,
+        url: viatorUrl,
+        source: 'viator'
+      };
+    } else if (detectedTags.includes('biển')) {
+      suggestedLink = {
+        type: 'external',
+        label: '🌊 Tour biển & đảo hot nhất Việt Nam',
+        url: 'https://www.viator.com/search/Vietnam+beach+island+tours',
+        source: 'viator'
+      };
+    } else if (detectedTags.includes('leo núi')) {
+      suggestedLink = {
+        type: 'external',
+        label: '⛰️ Tour leo núi & trekking Việt Nam',
+        url: 'https://www.viator.com/search/Vietnam+trekking+mountain+tours',
+        source: 'viator'
+      };
+    } else {
+      suggestedLink = {
+        type: 'external',
+        label: '🎯 Tour & hoạt động hàng đầu Việt Nam',
+        url: 'https://www.viator.com/search/Vietnam+tours+activities',
+        source: 'viator'
+      };
+    }
+  } else if (wantsService) {
+    // Dịch vụ: dùng Klook (chuyên booking dịch vụ, khách sạn, ẩm thực)
+    if (searchDest) {
+      const svcType = lowerUserMsg.includes('khách sạn') || lowerUserMsg.includes('homestay') || lowerUserMsg.includes('resort') ? 'hotels' :
+                      lowerUserMsg.includes('nhà hàng') || lowerUserMsg.includes('quán ăn') || lowerUserMsg.includes('ẩm thực') ? 'restaurants' : 'activities';
+      suggestedLink = {
+        type: 'external',
+        label: `🏨 Dịch vụ & lưu trú tại ${searchDest} (Klook)`,
+        url: `https://www.klook.com/en-US/search/${encodeURIComponent(searchDest)}/${svcType}/`,
+        source: 'klook'
+      };
+    } else {
+      suggestedLink = {
+        type: 'external',
+        label: '🔍 Dịch vụ du lịch tốt nhất Việt Nam (Klook)',
+        url: 'https://www.klook.com/en-US/city/34/vietnam/',
+        source: 'klook'
+      };
+    }
+  }
+
+  return { proposal, discoveryPlaces, suggestedTours, suggestedLink };
 }
 
 router.post('/', optionalAuth, async (req, res) => {
@@ -308,9 +387,9 @@ router.post('/', optionalAuth, async (req, res) => {
     }
 
     // Định danh người dùng/phiên
-    const sessionKey = req.user ? req.user.id : (deviceId | 'anonymous_guest');
-    const targetLang = req.body.lang | 'auto';
-    const scope = req.body.scope | 'user_portal';
+    const sessionKey = req.user ? req.user.id : (deviceId || 'anonymous_guest');
+    const targetLang = req.body.lang || 'auto';
+    const scope = req.body.scope || 'user_portal';
 
     // ═════ SEMANTIC INTENT CLASSIFIER (PRE-ROUTER) ═════
     let semanticIntent = {
@@ -364,7 +443,7 @@ VÍ DỤ:
           response_format: { type: 'json_object' }
         }, false);
 
-        const semanticRaw = routeCompletion.choices[0]?.message?.content | '{}';
+        const semanticRaw = routeCompletion.choices[0]?.message?.content || '{}';
         const parsed = JSON.parse(semanticRaw);
         // Gán lại biến semanticIntent đã khai báo ở dòng 315 (KHÔNG dùng const để tránh SyntaxError)
         semanticIntent = { ...semanticIntent, ...parsed };
@@ -396,7 +475,7 @@ VÍ DỤ:
       // Chỉ sử dụng Quick Response tiếng Việt nếu:
       // 1. targetLang là 'vi'
       // 2. targetLang là 'auto' VÀ từ khóa chào hỏi là thuần Việt
-      const isVietnameseIntent = (targetLang === 'vi') | (targetLang === 'auto' && ['alo', 'chào', 'ơi', 'ê', 'ê hả', 'xin chào'].includes(lowerMsg));
+        const isVietnameseIntent = (targetLang === 'vi') || (targetLang === 'auto' && ['alo', 'chào', 'ơi', 'ê', 'ê hả', 'xin chào'].includes(lowerMsg));
 
       // Nếu là ngôn ngữ khác (en, jp, kr, fr), BẮT BUỘC bỏ qua Quick Response để AI tự trả lời đúng thứ tiếng
       if (isVietnameseIntent) {
@@ -470,8 +549,8 @@ VÍ DỤ:
     // 2. Xử lý ngữ cảnh hành trình & vị trí
     let tripContext = "Khách đang khám phá tự do.";
     if (itinerary && itinerary.length > 0) {
-      const stops = itinerary.map(s => s.name | s).join(' -> ');
-      tripContext = `Khách đang đi theo chuyến: "${activeTrip | 'Hành trình thông minh'}". Lộ trình dự kiến: ${stops}.`;
+      const stops = itinerary.map(s => s.name || s).join(' -> ');
+      tripContext = `Khách đang đi theo chuyến: "${activeTrip || 'Hành trình thông minh'}". Lộ trình dự kiến: ${stops}.`;
     }
 
     let locationContext = "Chưa xác định rõ vị trí GPS.";
@@ -487,7 +566,7 @@ VÍ DỤ:
     // Kiểm tra câu hỏi có trong Database chưa để tiết kiệm API (Chỉ áp dụng cho tiếng Việt hoặc Auto)
     let searchResult = null; // Lưu kết quả nếu phải đi "tìm kiếm"
 
-    if (!placeContext && chatbotDb.readyState === 1 && message.length > 2 && (targetLang === 'vi' | targetLang === 'auto')) {
+    if (!placeContext && chatbotDb.readyState === 1 && message.length > 2 && (targetLang === 'vi' || targetLang === 'auto')) {
       const timeSensitiveKeywords = ['thứ mấy', 'ngày nào', 'mấy giờ', 'hôm nay', 'bây giờ', 'thu may', 'ngay nao', 'may gio', 'hom nay', 'bay gio'];
       const isTimeSensitive = timeSensitiveKeywords.some(k => lowerMsg.includes(k));
       
@@ -617,7 +696,7 @@ VÍ DỤ:
         }
 
         // If user explicitly asks for full detail, return the stored full article
-        if ((lowerMsg.includes('chi tiết') | lowerMsg.includes('toàn bộ')) && destToSearch) {
+        if ((lowerMsg.includes('chi tiết') || lowerMsg.includes('toàn bộ')) && destToSearch) {
             const wikiKey = `WIKI_${destToSearch.toLowerCase()}`;
             const fullDoc = await Knowledge.findOne({ question: wikiKey });
             if (fullDoc) {
@@ -689,20 +768,20 @@ VÍ DỤ:
 
     // --- START SYSTEM PROMPT CONSTRUCTION ---
     let systemPrompt = "";
-    const userRole = role | (req.user ? req.user.role : 'user');
+    const userRole = role || (req.user ? req.user.role : 'user');
 
     if (placeContext) {
       // CHẾ ĐỘ CHUYÊN GIA DỊCH VỤ CỐ ĐỊNH (FIXED CONTEXT)
       systemPrompt = `BẠN LÀ NHÂN VIÊN CHUYÊN TRÁCH CỦA DỊCH VỤ: "${placeContext.name}".
 DỮ LIỆU CỐ ĐỊNH (DUY NHẤT):
 - Tên: ${placeContext.name}
-- Loại: ${placeContext.kind | placeContext.businessCategory}
-- Mô tả: ${placeContext.description | placeContext.text}
+- Loại: ${placeContext.kind || placeContext.businessCategory}
+- Mô tả: ${placeContext.description || placeContext.text}
 - Đặc điểm: ${Array.isArray(placeContext.highlights) ? placeContext.highlights.join(', ') : 'Chưa có'}
 - Tiện ích: ${Array.isArray(placeContext.amenities) ? placeContext.amenities.join(', ') : 'Chưa có'}
-- Giá: ${placeContext.price | placeContext.priceFrom | 'Liên hệ'} VNĐ
+- Giá: ${placeContext.price || placeContext.priceFrom || 'Liên hệ'} VNĐ
 - Giờ mở cửa: ${placeContext.openTime} - ${placeContext.closeTime}
-- FAQ: ${Array.isArray(placeContext.faqs) ? placeContext.faqs.map(f => `Q: ${f.question} -> A: ${f.answer}`).join(' | ') : 'Chưa có'}
+- FAQ: ${Array.isArray(placeContext.faqs) ? placeContext.faqs.map(f => `Q: ${f.question} -> A: ${f.answer}`).join(' || ') : 'Chưa có'}
 
 QUY TẮC TỐI THƯỢNG (PHẢI TUÂN THỦ):
 1. KHÔNG SỬ DỤNG KIẾN THỨC BÊN NGOÀI. Chỉ trả lời dựa trên DỮ LIỆU CỐ ĐỊNH ở trên.
@@ -765,7 +844,7 @@ Hãy quan sát kỹ tín hiệu từ hệ thống được truyền vào qua ng�
     const languageNames = { 'vi': 'Tiếng Việt', 'en': 'English', 'jp': 'Japanese', 'kr': 'Korean', 'fr': 'French' };
     let langRule = "Trả lời bằng chính ngôn ngữ khách đang hỏi.";
     if (req.body.lang && req.body.lang !== 'auto') {
-      langRule = `BẮT BUỘC TRẢ LỜI BẰNG ${languageNames[req.body.lang] | 'Tiếng Việt'}.`;
+      langRule = `BẮT BUỘC TRẢ LỜI BẰNG ${languageNames[req.body.lang] || 'Tiếng Việt'}.`;
     }
     systemPrompt += `\n${langRule}`;
 
@@ -793,7 +872,7 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
     if (searchResult) systemPrompt += `\n- THÔNG TIN TRA CỨU MỚI: ${searchResult}`;
     
     systemPrompt += `\n- NGỮ CẢNH VỊ TRÍ: ${locationContext}`;
-    systemPrompt += `\n- VAI TRÒ NGƯỜI DÙNG: ${userRole} | TRANG: ${scope}`;
+    systemPrompt += `\n- VAI TRÒ NGƯỜI DÙNG: ${userRole} || TRANG: ${scope}`;
     
     systemPrompt += `\n\nCHỈ THỊ CUỐI CÙNG: Trả lời bằng ngôn ngữ của khách. Thân thiện, ngắn gọn, cực kỳ am hiểu về dữ liệu trên.`;
 
@@ -806,12 +885,12 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
       'đi đâu', 'chơi gì', 'di dau', 'choi gi', 'muốn đi', 'muon di', 'cho mình đi', 'cho minh di'
     ];
     // Phát hiện thêm các câu đổi ý chung chung như "k thích đại điểm này đổi đi"
-    let isModification = lowerMsg.includes('đổi') | lowerMsg.includes('doi') | lowerMsg.includes('k thích') | lowerMsg.includes('không thích') | lowerMsg.includes('khong thich');
-    let isItineraryRequest = itineraryKeywords.some(k => lowerMsg.includes(k)) | 
+    let isModification = lowerMsg.includes('đổi') || lowerMsg.includes('doi') || lowerMsg.includes('k thích') || lowerMsg.includes('không thích') || lowerMsg.includes('khong thich');
+    let isItineraryRequest = itineraryKeywords.some(k => lowerMsg.includes(k)) || 
                              (lowerMsg.includes('lịch') && lowerMsg.includes('trình')) |
                              (lowerMsg.includes('kế') && lowerMsg.includes('hoạch'));
 
-    if (isModification && (lowerMsg.includes('điểm') | lowerMsg.includes('diem') | lowerMsg.includes('chỗ') | lowerMsg.includes('cho') | lowerMsg.includes('này') | lowerMsg.includes('nay'))) {
+    if (isModification && (lowerMsg.includes('điểm') || lowerMsg.includes('diem') || lowerMsg.includes('chỗ') || lowerMsg.includes('cho') || lowerMsg.includes('này') || lowerMsg.includes('nay'))) {
       isItineraryRequest = true;
     }
 
@@ -826,15 +905,15 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
         let isConversationalFollowUp = false;
         if (chatHistory && chatHistory.length > 0) {
            const lastMsg = chatHistory[chatHistory.length - 1];
-           if (lastMsg.role === 'assistant' && (lastMsg.content.toLowerCase().includes('lập lịch') | lastMsg.content.toLowerCase().includes('đi đâu') | lastMsg.content.toLowerCase().includes('bao lâu'))) {
+           if (lastMsg.role === 'assistant' && (lastMsg.content.toLowerCase().includes('lập lịch') || lastMsg.content.toLowerCase().includes('đi đâu') || lastMsg.content.toLowerCase().includes('bao lâu'))) {
                isConversationalFollowUp = true;
            }
         }
         
-        const hasDetailedParams = semanticIntent.destination && (semanticIntent.days | semanticIntent.budget);
+        const hasDetailedParams = semanticIntent.destination && (semanticIntent.days || semanticIntent.budget);
 
         // NẾU TỪ TRƯỚC ĐÃ TRUE (nhờ keyword) thì GIỮ NGUYÊN.
-        isItineraryRequest = isItineraryRequest | hasExplicit | isConversationalFollowUp | hasDetailedParams;
+        isItineraryRequest = isItineraryRequest || hasExplicit || isConversationalFollowUp || hasDetailedParams;
         
         if (!isItineraryRequest) {
             console.log(`🚫 [Itinerary Guard] Semantic Intent rejected (no explicit keyword, not follow-up, and missing detailed params in '${lowerMsg}').`);
@@ -854,7 +933,7 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
     const strongItinKeywords = ['lên lịch', 'lập lịch', 'tạo lịch', 'lịch trình', 'kế hoạch'];
     const hasStrongItinKeyword = strongItinKeywords.some(k => lowerMsg.includes(k));
 
-    if ((hasTourKeyword | hasServiceKeyword) && !hasStrongItinKeyword) {
+    if ((hasTourKeyword || hasServiceKeyword) && !hasStrongItinKeyword) {
       isItineraryRequest = false;
       console.log(`🚌 [Service vs Itinerary Guard] Detected explicit SERVICE/TOUR request. Forcing isItineraryRequest=false.`);
       
@@ -955,18 +1034,18 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
         const autoGenKeywords = ['tùy mày', 'tùy m', 'tự động', 'auto', 'tùy ý', 'tự tạo', 'muốn gì cũng được', 'bất kỳ', 'tuy may', 'tuy m', 'tu dong', 'tuy y', 'tu tao', 'muon gi cung dooc', 'bat ky'];
         const isAutoGen = autoGenKeywords.some(k => lowerMsg.includes(k));
 
-        let destination = semanticIntent.destination | (destMatch ? destMatch[1].trim() : null);
+        let destination = semanticIntent.destination || (destMatch ? destMatch[1].trim() : null);
         
         // Loại bỏ các từ bị bắt nhầm
         if (destination) {
             const badDests = ['trình', 'kế hoạch', 'đi', 'đến', 'này', 'nhé', 'đó', 'đây', 'chơi', 'giúp', 'cho', 'nha', 'chuyến', 'với', 'điểm', 'diem', 'mấy', 'bao nhiêu', 'nhanh', 'nhanh nhất'];
-            if (badDests.includes(destination.toLowerCase().trim()) | destination.trim().length < 3) {
+            if (badDests.includes(destination.toLowerCase().trim()) || destination.trim().length < 3) {
                 destination = null;
             }
         }
         
-        const days = semanticIntent.days | (daysMatch ? parseInt(daysMatch[1]) : (isAutoGen ? 3 : null));
-        const budget = semanticIntent.budget | (budgetMatch ? parseInt(budgetMatch[1]) : null);
+        const days = semanticIntent.days || (daysMatch ? parseInt(daysMatch[1]) : (isAutoGen ? 3 : null));
+        const budget = semanticIntent.budget || (budgetMatch ? parseInt(budgetMatch[1]) : null);
 
         // Cứu cánh cho câu hỏi nối tiếp nếu không tìm thấy địa danh trực tiếp
         if (!destination && chatHistory.length > 0) {
@@ -1013,15 +1092,15 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
             const knownLandmarks = ['quốc tử giám', 'văn miếu', 'hồ gươm', 'hoàn kiếm', 'hồ tây', 'tây hồ', 'bà nà', 'sơn trà', 'ngũ hành sơn', 'phố cổ', 'chùa cầu', 'tháp bà', 'vinpearl', 'dinh độc lập', 'bến thành', 'tràng an', 'tam cóc', 'fansipan', 'ruộng bậc thang', 'đỉnh bà đen', 'hang sơn đoòng', 'phong nha', 'cáp treo hòn thơm', 'bãi sao', 'lăng bác', 'chùa một cột', 'ba đình', 'bát tràng', 'thăng long', 'bích động', 'núi bà rá'];
             
             const destLower = destination.toLowerCase();
-            const isValidProvince = validProvinces.some(p => destLower.includes(p.toLowerCase()) | p.toLowerCase().includes(destLower));
-            const isValidLandmark = knownLandmarks.some(lm => destLower.includes(lm) | lm.includes(destLower));
+            const isValidProvince = validProvinces.some(p => destLower.includes(p.toLowerCase()) || p.toLowerCase().includes(destLower));
+            const isValidLandmark = knownLandmarks.some(lm => destLower.includes(lm) || lm.includes(destLower));
             
             if (!isValidProvince && !isValidLandmark) {
                 // Loại bỏ các từ bị bắt nhầm
                 const badWords = ['học', 'làm', 'kiếm tiền', 'chữa bệnh', 'thi', 'ôn bài', 'trình', 'kế hoạch', 'chơi', 'đi', 'đến', 'mấy', 'bao nhiêu', 'nhanh'];
                 const hasBadWord = badWords.some(bw => destLower.includes(bw));
                 
-                if (hasBadWord | destination.trim().length < 3) {
+                if (hasBadWord || destination.trim().length < 3) {
                     const askDestMsg = "Mình cần biết bạn muốn đi đâu thật sự nè! Bạn cho mình biết tên tỉnh thành hoặc địa điểm du lịch cụ thể nhé (ví dụ: Đà Lạt, Hội An, Văn Miếu...). Mình sẽ lập lịch trình cực xịn cho bạn! 😊";
                     if (chatbotDb.readyState === 1) {
                         if (!currentSessionId) currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -1057,10 +1136,10 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
         }
 
         const finalDest = destination;
-        const finalDays = days | 3;
-        const finalBudget = budget | 5;
-        const companion = semanticIntent.companion | "Bạn bè";
-        const interests = semanticIntent.interests | "";
+        const finalDays = days || 3;
+        const finalBudget = budget || 5;
+        const companion = semanticIntent.companion || "Bạn bè";
+        const interests = semanticIntent.interests || "";
 
         console.log(`✈️ [Itinerary] Creating 3 Parallel Real Detailed Plans for: ${finalDest}, ${finalDays} ngày, ${finalBudget}tr...`);
 
@@ -1128,7 +1207,7 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
                 response_format: { type: 'json_object' }
             }, false);
 
-            const raw = comp.choices[0]?.message?.content | '{}';
+            const raw = comp.choices[0]?.message?.content || '{}';
             return JSON.parse(raw);
         };
 
@@ -1146,15 +1225,15 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
         if (req.user) {
           const userDoc = await User.findById(req.user.id);
           if (userDoc) {
-            userName = userDoc.displayName | userDoc.name | 'Thành viên WanderViet AI';
-            userEmail = userDoc.email | '';
+            userName = userDoc.displayName || userDoc.name || 'Thành viên WanderViet AI';
+            userEmail = userDoc.email || '';
           }
         }
 
         const savedProposals = [];
         for (let i = 0; i < plans.length; i++) {
           const plan = plans[i];
-          if (!plan | !plan.itinerary) continue;
+          if (!plan || !plan.itinerary) continue;
           
           const styleObj = styles[i];
           
@@ -1164,7 +1243,7 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
             days: Number(finalDays),
             budget: `${finalBudget} triệu VNĐ`,
             companion: String(companion),
-            interests: String(interests | styleObj.vibe),
+            interests: String(interests || styleObj.vibe),
             planJson: plan,
             userName,
             userEmail,
@@ -1179,7 +1258,7 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
             days: finalDays,
             budget: `${finalBudget} triệu VNĐ`,
             style: styleObj.title,
-            description: plan.tripSummary | styleObj.vibe
+            description: plan.tripSummary || styleObj.vibe
           });
         }
 
@@ -1211,7 +1290,7 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
       // Ép model tuân thủ ngôn ngữ bằng cách nhúng thẳng lệnh vào câu hỏi cuối cùng
       let finalUserMessage = message;
       if (targetLang !== 'auto') {
-        const langName = languageNames[targetLang] | 'Tiếng Việt';
+        const langName = languageNames[targetLang] || 'Tiếng Việt';
         finalUserMessage = `${message}\n\n[SYSTEM INSTRUCTION: You MUST reply in ${langName}. Do NOT use any other language.]`;
       } else {
         finalUserMessage = `${message}\n\n[SYSTEM INSTRUCTION: Detect the language of my message and reply in that same language.]`;
@@ -1246,12 +1325,7 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
           }, isBiz);
         }
 
-        console.log("[DEBUG H1] Groq raw completion content:", JSON.stringify(completion.choices[0]?.message?.content));
-        console.log("[DEBUG H1] Type of raw content:", typeof completion.choices[0]?.message?.content);
-
         let aiAnswer = completion.choices[0]?.message?.content || "Mình chưa nghe rõ, bạn nói lại nhé!";
-
-        console.log("[DEBUG H2] aiAnswer after assignment:", aiAnswer, "| type:", typeof aiAnswer, "| length:", typeof aiAnswer === 'string' ? aiAnswer.length : 'N/A');
 
       // 4.5. MÔ HÌNH KIỂM DUYỆT (VERIFIER AI) - Đã gỡ bỏ để tăng tốc độ phản hồi và chống lỗi dịch tiếng Trung ngẫu nhiên.
       // Thay vào đó, model 70B với temperature 0.3 đã đủ độ tin cậy để xử lý ngữ cảnh 12,000 ký tự.
@@ -1303,14 +1377,21 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
 
       const finalMeta = await generateResponseMetadata(message, aiAnswer, locationContext, isItineraryRequest);
 
+      // Khi KHÔNG có tour trong DB nhưng user hỏi về tour/dịch vụ → nhúng link vào câu trả lời AI
+      if (finalMeta.suggestedLink && (!finalMeta.suggestedTours || finalMeta.suggestedTours.length === 0)) {
+        const linkMd = `[👉 ${finalMeta.suggestedLink.label}](${finalMeta.suggestedLink.url})`;
+        aiAnswer = aiAnswer.trim() + '\n\n' + linkMd;
+      }
+
       res.json({
         success: true,
         answer: aiAnswer,
         sessionId: currentSessionId,
-        messageId: res.locals.messageId | null,
+        messageId: res.locals.messageId || null,
         proposal: finalMeta.proposal,
         discoveryPlaces: finalMeta.discoveryPlaces,
         suggestedTours: finalMeta.suggestedTours,
+        suggestedLink: finalMeta.suggestedLink,
         source: 'wander-soul-gen3-ultimate'
       });
       
@@ -1355,7 +1436,7 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
 // Lấy danh sách các phiên chat của người dùng
 router.get('/sessions', optionalAuth, async (req, res) => {
   try {
-    const sessionKey = req.user ? req.user.id : (req.query.deviceId | 'anonymous_guest');
+    const sessionKey = req.user ? req.user.id : (req.query.deviceId || 'anonymous_guest');
     console.log("🔍 Fetching sessions for userId:", sessionKey);
 
     // Group by sessionId to get unique sessions
@@ -1378,7 +1459,7 @@ router.get('/sessions', optionalAuth, async (req, res) => {
       let displayTitle = s.title;
       const sid = s._id;
 
-      if (!displayTitle | displayTitle.trim() === 'Hội thoại mới' | displayTitle === 'null' | displayTitle === 'undefined') {
+      if (!displayTitle || displayTitle.trim() === 'Hội thoại mới' || displayTitle === 'null' || displayTitle === 'undefined') {
         const firstUserMsg = await Conversation.findOne({ sessionId: sid, role: 'user' }).sort({ timestamp: 1 });
         if (firstUserMsg && firstUserMsg.text) {
           let clean = firstUserMsg.text.replace(/[?.,!]/g, '').trim();
@@ -1417,7 +1498,7 @@ router.get('/history/:sid', optionalAuth, async (req, res) => {
 router.delete('/session/:sid', optionalAuth, async (req, res) => {
   try {
     const { sid } = req.params;
-    const sessionKey = req.user ? req.user.id : (req.query.deviceId | 'anonymous_guest');
+    const sessionKey = req.user ? req.user.id : (req.query.deviceId || 'anonymous_guest');
 
     // Đảm bảo người dùng chỉ xóa được chat của chính họ
     const result = await Conversation.deleteMany({ sessionId: sid, userId: sessionKey });
@@ -1436,16 +1517,16 @@ router.delete('/session/:sid', optionalAuth, async (req, res) => {
 router.post('/feedback', optionalAuth, async (req, res) => {
   try {
     const { messageId, feedback, reason } = req.body;
-    if (!messageId | !['up', 'down', 'none'].includes(feedback)) {
+    if (!messageId || !['up', 'down', 'none'].includes(feedback)) {
       return res.status(400).json({ success: false, message: 'Dữ liệu không hợp lệ.' });
     }
 
-    const sessionKey = req.user ? req.user.id : (req.query.deviceId | 'anonymous_guest');
+    const sessionKey = req.user ? req.user.id : (req.query.deviceId || 'anonymous_guest');
     
     // Cập nhật phản hồi vào Conversation
     const updated = await Conversation.findOneAndUpdate(
       { _id: messageId, userId: sessionKey },
-      { $set: { feedback, feedbackReason: reason | '' } },
+      { $set: { feedback, feedbackReason: reason || '' } },
       { returnDocument: 'after' }
     );
 

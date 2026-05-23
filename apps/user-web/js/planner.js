@@ -210,7 +210,6 @@ const initPlanner = function () {
   const refineBtn = document.getElementById('refineBtn');
   const btnModeForm = document.getElementById('btnModeForm');
   const btnModeDiscovery = document.getElementById('btnModeDiscovery');
-  const stepBasic = document.getElementById('stepBasic');
   const stepSmartWizard = document.getElementById('stepSmartWizard');
   const btnSaveTrip = document.getElementById('btnSaveTrip');
   const versionTabs = document.getElementById('versionTabs');
@@ -218,6 +217,1349 @@ const initPlanner = function () {
   let currentItineraryId = null;
   let planHistory = [];
   let currentPlanIndex = -1;
+  let currentFormStep = 1;
+
+  // =====================================================
+  // Initialize new Step 2 features
+  // =====================================================
+  
+  // Set up event listeners for new features
+  const setupStep2Listeners = () => {
+    // Days/Nights auto-sync
+    const daysInput = document.getElementById('days');
+    const nightsInput = document.getElementById('nights');
+    
+    // Ensure default values
+    if (daysInput && !daysInput.value) daysInput.value = 3;
+    if (nightsInput && !nightsInput.value) nightsInput.value = 2;
+    
+    if (daysInput) {
+      daysInput.addEventListener('input', () => {
+        const days = parseInt(daysInput.value) || 1;
+        if (nightsInput) nightsInput.value = Math.max(0, days - 1);
+        updateBudgetEstimate();
+      });
+      daysInput.addEventListener('change', () => {
+        const days = parseInt(daysInput.value) || 1;
+        if (nightsInput) nightsInput.value = Math.max(0, days - 1);
+        updateBudgetEstimate();
+      });
+    }
+    if (nightsInput) {
+      nightsInput.addEventListener('input', () => {
+        const nights = parseInt(nightsInput.value) || 0;
+        if (daysInput) daysInput.value = nights + 1;
+        updateBudgetEstimate();
+      });
+      nightsInput.addEventListener('change', () => {
+        const nights = parseInt(nightsInput.value) || 0;
+        if (daysInput) daysInput.value = nights + 1;
+        updateBudgetEstimate();
+      });
+    }
+    
+    // Budget select change
+    const budgetSelect = document.getElementById('budget');
+    if (budgetSelect) {
+      budgetSelect.addEventListener('change', () => {
+        const val = budgetSelect.value;
+        if (val.includes('1 triệu')) selectTravelTier('budget');
+        else if (val.includes('3') || val.includes('7')) selectTravelTier('normal');
+        else if (val.includes('15')) selectTravelTier('luxury');
+        updateBudgetEstimate();
+      });
+    }
+    
+    // Trip date change
+    const tripDate = document.getElementById('tripDate');
+    if (tripDate) {
+      tripDate.addEventListener('change', updateDateTimeHints);
+    }
+    
+    // Departure time change
+    const departureTime = document.getElementById('departureTime');
+    if (departureTime) {
+      departureTime.addEventListener('change', updateDateTimeHints);
+    }
+    
+    // Điểm đến thay đổi -> cập nhật chi phí di chuyển
+    const destInput = document.getElementById('dest');
+    if (destInput) {
+      destInput.addEventListener('input', () => {
+        setTimeout(() => updateBudgetEstimate(), 200);
+      });
+      destInput.addEventListener('change', () => {
+        updateBudgetEstimate();
+      });
+    }
+    
+    // Member inputs
+    ['adults', 'children', 'toddlers', 'seniors'].forEach(type => {
+      const input = document.getElementById(type);
+      if (input) {
+        input.addEventListener('change', () => {
+          updateTotalMembers();
+          updateBudgetEstimate();
+        });
+      }
+    });
+    
+    updateTotalMembers();
+    updateBudgetEstimate();
+    updateDateTimeHints();
+  };
+  
+  // Run setup after a small delay to ensure DOM is ready
+  setTimeout(setupStep2Listeners, 100);
+  
+  // Initialize travel tier selection (highlight the default tier)
+  setTimeout(() => {
+    if (typeof selectTravelTier === 'function') {
+      selectTravelTier('normal');
+    }
+  }, 150);
+
+  // =====================================================
+  // FORM STEP NAVIGATION (2 Bước)
+  // =====================================================
+  window.switchFormStep = function(step) {
+    const step1 = document.getElementById('formStep1');
+    const step2 = document.getElementById('formStep2');
+    const tabs = document.querySelectorAll('.form-step-tab');
+
+    if (step === 1) {
+      if (step1) step1.style.display = 'block';
+      if (step2) step2.style.display = 'none';
+      tabs.forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.step === '1');
+      });
+      currentFormStep = 1;
+    } else if (step === 2) {
+      if (step1) step1.style.display = 'none';
+      if (step2) step2.style.display = 'block';
+      tabs.forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.step === '2');
+      });
+      currentFormStep = 2;
+      
+      // Sync data from Step 1 to Step 2
+      syncStep1ToStep2();
+    }
+  };
+
+  // Sync data from Step 1 to Step 2 inputs
+  function syncStep1ToStep2() {
+    const destInput = document.getElementById('dest');
+    if (destInput) {
+      // Get destinations from selectedDestinations array or existing value
+      const selectedDests = window.selectedDestinations || [];
+      if (selectedDests.length > 0) {
+        // Join all destination names
+        destInput.value = selectedDests.map(d => d.name || d.destination || d).join(', ');
+      }
+      // If no array but there's existing value, keep it
+    }
+    
+    // Sync selected destinations preview
+    syncSelectedDestinationsPreview();
+    
+    // Update date/time hints
+    updateDateTimeHints();
+    
+    // Initialize budget estimate
+    updateBudgetEstimate();
+    
+    // Update total members
+    updateTotalMembers();
+  }
+
+  // Sync selected destinations from Step 1 to Step 2 preview
+  function syncSelectedDestinationsPreview() {
+    const preview = document.getElementById('selectedDestPreview');
+    const chipsContainer = document.getElementById('selectedDestChipsStep2');
+    const emptyMsg = document.getElementById('selectedDestEmpty');
+    const countSpan = document.getElementById('selectedCount');
+    const destInput = document.getElementById('dest');
+    
+    if (!chipsContainer) return;
+    
+    // Get selected destinations from Step 1
+    const selectedDests = window.selectedDestinations || [];
+    const destText = destInput?.value?.trim() || '';
+    
+    // Always show the preview section when in step 2
+    if (preview) {
+      preview.style.display = 'block';
+    }
+    
+    // Update count based on array length or text
+    if (countSpan) {
+      const count = selectedDests.length || (destText ? 1 : 0);
+      countSpan.textContent = count > 0 ? ` (${count} địa điểm)` : '';
+    }
+    
+    // Clear container
+    chipsContainer.innerHTML = '';
+    
+    // If no destinations at all, show empty state
+    if (selectedDests.length === 0 && !destText) {
+      if (emptyMsg) {
+        emptyMsg.style.display = 'block';
+      }
+      return;
+    }
+    
+    if (emptyMsg) {
+      emptyMsg.style.display = 'none';
+    }
+    
+    // If we have destination objects from Step 1
+    if (selectedDests.length > 0) {
+      selectedDests.forEach((dest, index) => {
+        const destName = dest.name || dest.destination || dest;
+        const chip = createDestChip(destName, index);
+        chipsContainer.appendChild(chip);
+      });
+      
+      // Add "Delete all" button if multiple destinations
+      if (selectedDests.length > 1) {
+        const deleteAllBtn = createDeleteAllButton();
+        chipsContainer.appendChild(deleteAllBtn);
+      }
+    } 
+    // If we just have text in dest input (manually typed)
+    else if (destText) {
+      const chip = createDestChip(destText, -1);
+      chipsContainer.appendChild(chip);
+    }
+  }
+
+  // Create a destination chip element
+  function createDestChip(destName, index) {
+    const chip = document.createElement('div');
+    chip.style.cssText = `
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.6rem;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 2rem;
+      font-size: 0.8rem;
+      color: #60a5fa;
+      font-weight: 600;
+    `;
+    
+    // Remove button only if we have array data
+    const removeBtn = index >= 0 ? `
+      <button type="button" onclick="removeDestinationFromStep2(${index})" style="
+        background: rgba(239, 68, 68, 0.2);
+        border: none;
+        color: #f87171;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        line-height: 1;
+        padding: 0;
+      ">×</button>
+    ` : '';
+    
+    chip.innerHTML = `<span>📍 ${destName}</span>${removeBtn}`;
+    return chip;
+  }
+
+  // Create "Delete all" button
+  function createDeleteAllButton() {
+    const deleteAllBtn = document.createElement('button');
+    deleteAllBtn.type = 'button';
+    deleteAllBtn.style.cssText = `
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.6rem;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 2rem;
+      font-size: 0.7rem;
+      color: #f87171;
+      cursor: pointer;
+      margin-left: 0.25rem;
+    `;
+    deleteAllBtn.innerHTML = '🗑️ Xóa tất cả';
+    deleteAllBtn.onclick = () => {
+      if (confirm('Bạn có chắc muốn xóa tất cả điểm đến?')) {
+        window.selectedDestinations = [];
+        const destInput = document.getElementById('dest');
+        if (destInput) destInput.value = '';
+        syncSelectedDestinationsPreview();
+      }
+    };
+    return deleteAllBtn;
+  }
+
+  // Remove a destination from the selected list in Step 2
+  window.removeDestinationFromStep2 = function(index) {
+    if (!window.selectedDestinations || window.selectedDestinations.length === 0) return;
+    
+    window.selectedDestinations.splice(index, 1);
+    
+    // Update hidden dest field
+    const destInput = document.getElementById('dest');
+    if (destInput) {
+      destInput.value = window.selectedDestinations.map(d => d.name || d.destination || d).join(', ');
+    }
+    
+    syncSelectedDestinationsPreview();
+  };
+
+  // Update date/time hints for better UX
+  function updateDateTimeHints() {
+    const tripDate = document.getElementById('tripDate');
+    const departureTime = document.getElementById('departureTime');
+    const dateHint = document.getElementById('tripDateHint');
+    const timeHint = document.getElementById('departureTimeHint');
+    
+    if (tripDate && tripDate.value && dateHint) {
+      const date = new Date(tripDate.value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const diffTime = date.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) {
+        dateHint.textContent = 'Hôm nay';
+      } else if (diffDays === 1) {
+        dateHint.textContent = 'Ngày mai';
+      } else if (diffDays > 1 && diffDays <= 7) {
+        dateHint.textContent = `${diffDays} ngày nữa`;
+      } else {
+        dateHint.textContent = date.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'numeric' });
+      }
+    }
+    
+    if (departureTime && departureTime.value && timeHint) {
+      const [hours, minutes] = departureTime.value.split(':');
+      const hour = parseInt(hours);
+      
+      if (hour >= 5 && hour < 12) {
+        timeHint.textContent = 'Buổi sáng';
+      } else if (hour >= 12 && hour < 18) {
+        timeHint.textContent = 'Buổi chiều';
+      } else if (hour >= 18 && hour < 22) {
+        timeHint.textContent = 'Buổi tối';
+      } else {
+        timeHint.textContent = 'Đêm khuya';
+      }
+    }
+  }
+
+  // Days/Nights adjustment
+  window.adjustDays = function(delta) {
+    const daysInput = document.getElementById('days');
+    const nightsInput = document.getElementById('nights');
+    if (!daysInput || !nightsInput) return;
+    
+    let days = parseInt(daysInput.value) || 3;
+    days = Math.max(1, Math.min(14, days + delta));
+    daysInput.value = days;
+    
+    // Nights = days - 1 (for typical trip)
+    const nights = Math.max(0, days - 1);
+    nightsInput.value = nights;
+    
+    updateBudgetEstimate();
+  };
+
+  window.adjustNights = function(delta) {
+    const daysInput = document.getElementById('days');
+    const nightsInput = document.getElementById('nights');
+    if (!daysInput || !nightsInput) return;
+    
+    let nights = parseInt(nightsInput.value) || 2;
+    nights = Math.max(0, Math.min(13, nights + delta));
+    nightsInput.value = nights;
+    
+    // Days = nights + 1
+    const days = nights + 1;
+    daysInput.value = days;
+    
+    updateBudgetEstimate();
+  };
+
+  // Member count adjustment
+  window.adjustMember = function(type, delta) {
+    const input = document.getElementById(type);
+    if (!input) return;
+    
+    let count = parseInt(input.value) || 0;
+    const max = type === 'adults' ? 10 : 10;
+    const min = type === 'adults' ? 1 : 0;
+    count = Math.max(min, Math.min(max, count + delta));
+    input.value = count;
+    
+    updateTotalMembers();
+    updateBudgetEstimate();
+  };
+
+  // Update total members count
+  function updateTotalMembers() {
+    const adults = parseInt(document.getElementById('adults')?.value) || 0;
+    const children = parseInt(document.getElementById('children')?.value) || 0;
+    const toddlers = parseInt(document.getElementById('toddlers')?.value) || 0;
+    const seniors = parseInt(document.getElementById('seniors')?.value) || 0;
+    const total = adults + children + toddlers + seniors;
+    
+    const totalDisplay = document.getElementById('totalMembers');
+    if (totalDisplay) {
+      totalDisplay.textContent = total + ' người';
+    }
+    
+    // Update companion select
+    const companion = document.getElementById('companion');
+    if (companion) {
+      if (total === 1) companion.value = 'Một mình';
+      else if (total === 2) companion.value = 'Cặp đôi';
+      else if (total > 2 && children > 0) companion.value = 'Gia đình';
+      else companion.value = 'Bạn bè';
+    }
+  }
+
+  // Travel tier selection
+  let currentTravelTier = 'normal';
+  
+  // Chi phí theo từng hạng mục (giá/người/ngày) - theo thị trường Việt Nam 2025
+  const tierCosts = {
+    // Budget - Tiết kiệm ( backpacker, khách sạn bình dân)
+    budget: {
+      hotel: { perRoom: 350000, maxPerRoom: 2 },     // 350K/phòng/đêm ( dorm, nhà nghỉ)
+      food: { perAdult: 150000, perChild: 100000 },   // 150K người lớn, 100K trẻ em/ngày
+      transport: 100000,                              // 100K/người/ngày (bus, xe máy thuê)
+      ticket: 150000,                                  // 150K/người/ngày (vé tham quan)
+      entertain: 50000                                // 50K/người/ngày (đồ uống, cà phê)
+    },
+    // Normal - Tiêu chuẩn (3-4 sao, ăn uống ngon)
+    normal: {
+      hotel: { perRoom: 750000, maxPerRoom: 2 },     // 750K/phòng/đêm (3-4 sao)
+      food: { perAdult: 300000, perChild: 200000 },   // 300K người lớn, 200K trẻ em/ngày
+      transport: 200000,                              // 200K/người/ngày (grab, thuê xe)
+      ticket: 300000,                                  // 300K/người/ngày
+      entertain: 100000                                // 100K/người/ngày
+    },
+    // Luxury - Cao cấp (5 sao, resort, ăn nhà hàng)
+    luxury: {
+      hotel: { perRoom: 2000000, maxPerRoom: 2 },    // 2M/phòng/đêm (5 sao, resort)
+      food: { perAdult: 500000, perChild: 350000 },   // 500K người lớn, 350K trẻ em/ngày
+      transport: 400000,                              // 400K/người/ngày (ô tô riêng, tài xế)
+      ticket: 500000,                                  // 500K/người/ngày
+      entertain: 200000                                // 200K/người/ngày
+    }
+  };
+  
+  // ================================================
+  // DATABASE CHI PHÍ ĐỊA ĐIỂM NỔI BẬT
+  // ================================================
+  const SPOT_COSTS = {
+    // ===== HÀ NỘI =====
+    "Lăng Bác & Chùa Một Cột": { ticket: 0, food: 0, type: "attraction" },
+    "Hồ Hoàn Kiếm & Đền Ngọc Sơn": { ticket: 0, food: 0, type: "attraction" },
+    "Phở Thìn Bờ Hồ": { ticket: 0, food: 70000, type: "restaurant" },
+    "Bún Chả Đắc Kim": { ticket: 0, food: 60000, type: "restaurant" },
+    "Xem Múa Rối Nước Bông Sen": { ticket: 150000, food: 0, type: "experience" },
+    "Tour Đêm Nhà Tù Hỏa Lò": { ticket: 200000, food: 0, type: "experience" },
+    "Chả cá Lã Vọng": { ticket: 0, food: 200000, type: "restaurant" },
+    "Trà Hạt Long An": { ticket: 0, food: 80000, type: "cafe" },
+    "Phủ Tây Hồ": { ticket: 0, food: 0, type: "attraction" },
+    
+    // ===== TP.HCM =====
+    "Dinh Độc Lập": { ticket: 75000, food: 0, type: "attraction" },
+    "Nhà Thờ Đức Bà": { ticket: 0, food: 0, type: "attraction" },
+    "Cơm Tấm Nguyễn Văn Cừ": { ticket: 0, food: 55000, type: "restaurant" },
+    "Hủ Tiếu Thanh Xuân": { ticket: 0, food: 50000, type: "restaurant" },
+    "Du Thuyền Sông Sài Gòn": { ticket: 350000, food: 200000, type: "experience" },
+    "Bóng Nước Kịch Nói Sân Khấu": { ticket: 200000, food: 0, type: "experience" },
+    "Bảo Tàng Chứng Tích Chiến Tranh": { ticket: 150000, food: 0, type: "attraction" },
+    "Phố Đi Bộ Nguyễn Huệ": { ticket: 0, food: 0, type: "attraction" },
+    "Bến Thành": { ticket: 0, food: 0, type: "attraction" },
+    "Landmark 81": { ticket: 0, food: 0, type: "attraction" },
+    "Bánh Mì Huỳnh Hoa": { ticket: 0, food: 55000, type: "restaurant" },
+    "Cơm Tấm Kiều Giang": { ticket: 0, food: 60000, type: "restaurant" },
+    "Hủ Tiếu Nam Vang Quảng Đức": { ticket: 0, food: 60000, type: "restaurant" },
+    "Cà Phê Trung Nguyên Legend": { ticket: 0, food: 60000, type: "cafe" },
+    
+    // ===== ĐÀ NẴNG =====
+    "Ngũ Hành Sơn": { ticket: 0, food: 0, type: "attraction" },
+    "Cầu Vàng Bà Nà Hills": { ticket: 750000, food: 0, type: "attraction" },
+    "Bà Nà Hills": { ticket: 750000, food: 0, type: "attraction" },
+    "Bánh Tráng Trần": { ticket: 0, food: 100000, type: "restaurant" },
+    "Mì Quảng Bà Mua": { ticket: 0, food: 60000, type: "restaurant" },
+    "Dù Lượn Trên Bán Đảo Sơn Trà": { ticket: 450000, food: 0, type: "experience" },
+    "Du Thuyền Sông Hàn Ngắm Cầu Rồng": { ticket: 350000, food: 150000, type: "experience" },
+    "Cà Phê Mitora": { ticket: 0, food: 60000, type: "cafe" },
+    "Hải Sản Năm Đảnh": { ticket: 0, food: 250000, type: "restaurant" },
+    
+    // ===== HỘI AN =====
+    "Chùa Cầu Nhật Bản": { ticket: 0, food: 0, type: "attraction" },
+    "Rừng Dừa Bảy Mẫu": { ticket: 150000, food: 0, type: "attraction" },
+    "Bánh Mì Phượng": { ticket: 0, food: 45000, type: "restaurant" },
+    "Cao Lầu Thanh": { ticket: 0, food: 60000, type: "restaurant" },
+    "Thả Hoa Đăng Dòng Sông Hoài": { ticket: 50000, food: 0, type: "experience" },
+    "Học Làm Đèn Lồng Truyền Thống": { ticket: 150000, food: 0, type: "experience" },
+    
+    // ===== HUẾ =====
+    "Đại Nội Huế (Hoàng Thành)": { ticket: 150000, food: 0, type: "attraction" },
+    "Lăng Khải Định": { ticket: 100000, food: 0, type: "attraction" },
+    "Nhà Hàng Cung Đình": { ticket: 0, food: 300000, type: "restaurant" },
+    "Cơm Hến Hoa Đông": { ticket: 0, food: 50000, type: "restaurant" },
+    "Nghe Ca Huế Trên Sông Hương": { ticket: 200000, food: 150000, type: "experience" },
+    "Đi Xích Lô Vòng Quanh Phố Cổ": { ticket: 100000, food: 0, type: "experience" },
+    "Bún Hến Quảng Điền": { ticket: 0, food: 50000, type: "restaurant" },
+    "Bánh Nậm Đông Ba": { ticket: 0, food: 30000, type: "restaurant" },
+    "Cung An Định": { ticket: 150000, food: 0, type: "attraction" },
+    "Lăng Vua Minh Mạng": { ticket: 100000, food: 0, type: "attraction" },
+    
+    // ===== NHA TRANG =====
+    "Tháp Bà Ponagar": { ticket: 0, food: 0, type: "attraction" },
+    "Nhà Thờ Đá Nha Trang": { ticket: 0, food: 0, type: "attraction" },
+    "VinWonders Nha Trang": { ticket: 350000, food: 0, type: "attraction" },
+    "Nem Nướng Đặng Văn Quyên": { ticket: 0, food: 100000, type: "restaurant" },
+    "Hải Sản Thanh Sương": { ticket: 0, food: 200000, type: "restaurant" },
+    "Lặn Biển Ngắm San Hô Hòn Mun": { ticket: 450000, food: 0, type: "experience" },
+    "Tắm Bùn Khoáng Tháp Bà": { ticket: 250000, food: 0, type: "experience" },
+    
+    // ===== SAPA =====
+    "Bản Cát Cát": { ticket: 70000, food: 150000, type: "attraction" },
+    "Đỉnh Fansipan": { ticket: 300000, food: 0, type: "attraction" },
+    "Fansipan": { ticket: 300000, food: 0, type: "attraction" },
+    "Cáp treo Fansipan": { ticket: 650000, food: 0, type: "attraction" },
+    "Lẩu Cá Hồi Song Nhi": { ticket: 0, food: 200000, type: "restaurant" },
+    "Nhà Hàng A Phủ": { ticket: 0, food: 150000, type: "restaurant" },
+    "Tắm Lá Thuốc Dao Đỏ Ta Phìn": { ticket: 150000, food: 0, type: "experience" },
+    "Chợ Tình Sapa Đêm Thứ Bảy": { ticket: 0, food: 0, type: "experience" },
+    
+    // ===== HẠ LONG =====
+    "Vịnh Hạ Long (Động Thiên Cung - Hang Sửng Sốt)": { ticket: 250000, food: 0, type: "attraction" },
+    "Sun World Hạ Long Complex": { ticket: 350000, food: 0, type: "attraction" },
+    "Chả Mực Thoan Hạ Long": { ticket: 0, food: 150000, type: "restaurant" },
+    "Nhà Hàng Hồng Hạnh": { ticket: 0, food: 200000, type: "restaurant" },
+    "Chèo Thuyền Kayak Qua Hang Luồn": { ticket: 150000, food: 0, type: "experience" },
+    "Nghỉ Đêm Trên Du Thuyền 5 Sao": { ticket: 2000000, food: 500000, type: "experience" },
+    
+    // ===== NINH BÌNH =====
+    "Khu du lịch sinh thái Tràng An": { ticket: 250000, food: 0, type: "attraction" },
+    "Hang Múa": { ticket: 100000, food: 0, type: "attraction" },
+    "Nhà Hàng Thăng Long Ninh Bình": { ticket: 0, food: 150000, type: "restaurant" },
+    "Nhà Hàng Ba Cửa": { ticket: 0, food: 150000, type: "restaurant" },
+    "Đi Đò Chèo Tràng An Hóa Thân Phim Ảnh": { ticket: 200000, food: 0, type: "experience" },
+    "Đạp Xe Qua Các Bản Làng Tam Cốc": { ticket: 80000, food: 0, type: "experience" },
+    
+    // ===== HÀ GIANG =====
+    "Mã Pí Lèng": { ticket: 0, food: 0, type: "attraction" },
+    "Cột Cờ Lũng Cú": { ticket: 0, food: 0, type: "attraction" },
+    "Nhà Hàng Hương Quyên": { ticket: 0, food: 150000, type: "restaurant" },
+    "Quán Ăn Thanh Bình": { ticket: 0, food: 100000, type: "restaurant" },
+    "Hoa Tam Giác Mạch Mùa Thu": { ticket: 0, food: 0, type: "experience" },
+    "Trekking Cao Nguyên Đá": { ticket: 0, food: 0, type: "experience" },
+    
+    // ===== MỘC CHÂU =====
+    "Đồi Chè Trái Tim Mộc Châu": { ticket: 0, food: 0, type: "attraction" },
+    "Thác Dải Yếm": { ticket: 50000, food: 0, type: "attraction" },
+    "Trang Trại Mận Mỹ Úc": { ticket: 0, food: 80000, type: "restaurant" },
+    "Nhà Hàng Ba Liều": { ticket: 0, food: 120000, type: "restaurant" },
+    "Cắm Trại Thung Lũng Mận": { ticket: 50000, food: 0, type: "experience" },
+    "Bơi Suối Nước Nóng Mộc Châu": { ticket: 100000, food: 0, type: "experience" },
+    
+    // ===== CAO BẰNG =====
+    "Thác Bản Giốc": { ticket: 40000, food: 0, type: "attraction" },
+    "Động Ngườm Ngao": { ticket: 80000, food: 0, type: "attraction" },
+    "Pác Bó - Khu Di Tích Cách Mạng": { ticket: 0, food: 0, type: "attraction" },
+    
+    // ===== ĐÀ LẠT =====
+    "Hồ Tuyền Lâm & Thiền Viện Trúc Lâm": { ticket: 0, food: 0, type: "attraction" },
+    "Thác Datanla": { ticket: 80000, food: 0, type: "attraction" },
+    "Vườn Dâu Tây Dalat Farm": { ticket: 50000, food: 100000, type: "attraction" },
+    "Lẩu Gà Lá É Tao Ngộ": { ticket: 0, food: 180000, type: "restaurant" },
+    "Bánh Căn Tăng Bạt Hổ": { ticket: 0, food: 40000, type: "restaurant" },
+    "Café Mê Tiền": { ticket: 0, food: 60000, type: "cafe" },
+    "Cơm Lam Đà Lạt": { ticket: 0, food: 40000, type: "restaurant" },
+    "Săn Mây Đồi Chè Cầu Đất": { ticket: 0, food: 0, type: "experience" },
+    "Cắm Trại Đồi Đa Phú": { ticket: 50000, food: 0, type: "experience" },
+    
+    // ===== PHÚ QUỐC =====
+    "Bãi Sao": { ticket: 0, food: 0, type: "attraction" },
+    "Grand World Phú Quốc": { ticket: 0, food: 0, type: "attraction" },
+    "Vinpearl Safari": { ticket: 500000, food: 0, type: "attraction" },
+    "Chùa Hộ Quốc": { ticket: 0, food: 0, type: "attraction" },
+    "Bún Quậy Thanh Hùng": { ticket: 0, food: 60000, type: "restaurant" },
+    "Nhà Ghẹ Hàm Ninh": { ticket: 0, food: 200000, type: "restaurant" },
+    "Gỏi Cá Trích": { ticket: 0, food: 120000, type: "restaurant" },
+    "Ngắm Hoàng Hôn Sunset Sanato": { ticket: 0, food: 0, type: "experience" },
+    "Tour 4 Đảo Cano Phú Quốc": { ticket: 350000, food: 0, type: "experience" },
+    
+    // ===== CẦN THƠ =====
+    "Chợ Nổi Cái Răng": { ticket: 0, food: 50000, type: "attraction" },
+    "Nhà Cổ Bình Thủy": { ticket: 30000, food: 0, type: "attraction" },
+    "Lẩu Mắm Dạ Lý": { ticket: 0, food: 180000, type: "restaurant" },
+    "Nem Nướng Thanh Vân": { ticket: 0, food: 80000, type: "restaurant" },
+    "Trải Nghiệm Làm Bánh Hủ Tiếu Sông Nước": { ticket: 100000, food: 50000, type: "experience" },
+    "Ăn Hủ Tiếu Gõ Trên Ghe Chợ Nổi": { ticket: 0, food: 50000, type: "experience" },
+    
+    // ===== AN GIANG =====
+    "Núi Sam": { ticket: 0, food: 0, type: "attraction" },
+    "Chùa Phi Lai": { ticket: 0, food: 0, type: "attraction" },
+    "Làng Nổi Châu Đốc": { ticket: 50000, food: 0, type: "attraction" },
+    "Chợ Châu Đốc": { ticket: 0, food: 0, type: "attraction" },
+    "Bánh Pía Châu Đốc": { ticket: 0, food: 30000, type: "restaurant" },
+    "Thăm Làng Nổi Trên Sông": { ticket: 80000, food: 0, type: "experience" },
+    "Mua Sắm Chợ Biên Giới": { ticket: 0, food: 0, type: "experience" },
+    
+    // ===== BÌNH BA =====
+    "Bãi Nồm Bình Ba": { ticket: 0, food: 0, type: "attraction" },
+    "Bãi Chướng Bình Ba": { ticket: 0, food: 0, type: "attraction" },
+    "Bãi Nhà Cũ Bình Ba": { ticket: 0, food: 0, type: "attraction" },
+    "Nhà Hàng Hải Sản Tươi Sống": { ticket: 0, food: 200000, type: "restaurant" },
+    "Lặn Biển Ngắm San Hô": { ticket: 300000, food: 0, type: "experience" },
+    "Nải Bình Ba": { ticket: 0, food: 0, type: "experience" },
+    
+    // ===== TUY HÒA =====
+    "Tháp Nhạn Tuy Hòa": { ticket: 0, food: 0, type: "attraction" },
+    "Vịnh Vũng Rô": { ticket: 0, food: 0, type: "attraction" },
+    "Nhà Hàng Hải Sản Vũng Rô": { ticket: 0, food: 200000, type: "restaurant" },
+    "Bánh Xèo Tuy Hòa": { ticket: 0, food: 60000, type: "restaurant" },
+    "Chèo Thuyền Kayak Vịnh Vũng Rô": { ticket: 150000, food: 0, type: "experience" },
+    "Ngắm Hoàng Hôn Bờ Biển": { ticket: 0, food: 0, type: "experience" },
+    
+    // ===== PLEIKU =====
+    "Biển Hồ T'Nơng Pleiku": { ticket: 0, food: 0, type: "attraction" },
+    "Chùa Minh Thành": { ticket: 0, food: 0, type: "attraction" },
+    "Thủy Điện Yaly": { ticket: 0, food: 0, type: "attraction" },
+    "Nhà Hàng Đặc Sản Tây Nguyên": { ticket: 0, food: 150000, type: "restaurant" },
+    
+    // ===== NÚI CẤP =====
+    "Núi Cấp": { ticket: 30000, food: 0, type: "attraction" },
+    "Chùa Vĩnh Nghiêm": { ticket: 0, food: 0, type: "attraction" },
+  };
+  
+  // Chi phí mặc định theo loại (nếu không có trong database)
+  const DEFAULT_COSTS = {
+    attraction: { ticket: 100000, food: 0 },
+    restaurant: { ticket: 0, food: 100000 },
+    cafe: { ticket: 0, food: 50000 },
+    experience: { ticket: 150000, food: 0 },
+    region: { ticket: 0, food: 0 }
+  };
+  
+  // Lấy chi phí cho một địa điểm
+  function getSpotCost(spotName) {
+    // Tìm chính xác
+    if (SPOT_COSTS[spotName]) {
+      return SPOT_COSTS[spotName];
+    }
+    
+    // Tìm gần đúng
+    const normalizedName = spotName.toLowerCase();
+    for (const [name, cost] of Object.entries(SPOT_COSTS)) {
+      if (normalizedName.includes(name.toLowerCase()) || name.toLowerCase().includes(normalizedName)) {
+        return cost;
+      }
+    }
+    
+    // Mặc định theo category
+    return null;
+  }
+  
+  // Tính tổng chi phí các địa điểm đã chọn
+  function calculateSelectedSpotsCost() {
+    const spots = window.selectedAttractionData || [];
+    let totalTicket = 0;
+    let totalFood = 0;
+    let spotCount = 0;
+    
+    spots.forEach(spot => {
+      const cost = getSpotCost(spot.name);
+      if (cost) {
+        totalTicket += cost.ticket || 0;
+        totalFood += cost.food || 0;
+        spotCount++;
+      } else {
+        // Dùng chi phí mặc định
+        const defaultCost = DEFAULT_COSTS[spot.category] || DEFAULT_COSTS.attraction;
+        totalTicket += defaultCost.ticket;
+        totalFood += defaultCost.food;
+        spotCount++;
+      }
+    });
+    
+    return { totalTicket, totalFood, spotCount };
+  }
+
+  // ================================================
+  // DATABASE TỌA ĐỘ CÁC THÀNH PHỐ VIỆT NAM
+  // ================================================
+  const CITY_COORDS = {
+    // Miền Bắc
+    "Hà Nội": { lat: 21.0285, lng: 105.8542 },
+    "Hạ Long": { lat: 20.9101, lng: 107.1839 },
+    "Sapa": { lat: 22.3363, lng: 103.8430 },
+    "Ninh Bình": { lat: 20.2537, lng: 105.9750 },
+    "Hà Giang": { lat: 22.8233, lng: 104.9826 },
+    "Cao Bằng": { lat: 22.1447, lng: 106.1983 },
+    "Lai Châu": { lat: 22.3956, lng: 103.3610 },
+    "Điện Biên": { lat: 21.3860, lng: 103.0131 },
+    "Lào Cai": { lat: 22.4855, lng: 103.8708 },
+    "Yên Bái": { lat: 21.7228, lng: 104.9119 },
+    "Thái Nguyên": { lat: 21.5942, lng: 105.8482 },
+    "Bắc Kạn": { lat: 22.1470, lng: 105.8348 },
+    "Tuyên Quang": { lat: 21.8236, lng: 105.2167 },
+    "Vĩnh Phúc": { lat: 21.3068, lng: 105.5875 },
+    "Phú Thọ": { lat: 21.4098, lng: 105.2153 },
+    "Quảng Ninh": { lat: 20.9527, lng: 106.7590 },
+    "Bắc Giang": { lat: 21.2782, lng: 106.1976 },
+    "Hưng Yên": { lat: 20.6465, lng: 106.0510 },
+    "Hải Dương": { lat: 20.9379, lng: 106.3159 },
+    "Hải Phòng": { lat: 20.8584, lng: 106.6650 },
+    "Nam Định": { lat: 20.4238, lng: 106.1623 },
+    "Thái Bình": { lat: 20.5366, lng: 106.3380 },
+    "Nghệ An": { lat: 18.6791, lng: 105.6814 },
+    "Thanh Hóa": { lat: 19.8067, lng: 105.7850 },
+    
+    // Miền Trung
+    "Hà Tĩnh": { lat: 18.3427, lng: 105.8960 },
+    "Quảng Bình": { lat: 17.4689, lng: 106.6219 },
+    "Quảng Trị": { lat: 16.7381, lng: 107.0840 },
+    "Thừa Thiên Huế": { lat: 16.4637, lng: 107.5909 },
+    "Đà Nẵng": { lat: 16.0544, lng: 108.2022 },
+    "Quảng Nam": { lat: 15.5734, lng: 108.4739 },
+    "Quảng Ngãi": { lat: 15.1204, lng: 108.8004 },
+    "Bình Định": { lat: 13.7820, lng: 109.2190 },
+    "Phú Yên": { lat: 13.0885, lng: 109.0928 },
+    "Khánh Hòa": { lat: 12.2388, lng: 109.1966 },
+    "Ninh Thuận": { lat: 11.5744, lng: 108.9999 },
+    "Bình Thuận": { lat: 10.9294, lng: 108.0663 },
+    
+    // Tây Nguyên
+    "Đắk Lắk": { lat: 12.7100, lng: 108.2375 },
+    "Đắk Nông": { lat: 12.2586, lng: 107.8387 },
+    "Gia Lai": { lat: 13.9842, lng: 108.1353 },
+    "Kon Tum": { lat: 14.3496, lng: 108.0006 },
+    "Lâm Đồng": { lat: 11.9403, lng: 108.4413 },
+    "Đà Lạt": { lat: 11.9463, lng: 108.4413 },
+    
+    // Miền Nam
+    "TP.HCM": { lat: 10.8231, lng: 106.6297 },
+    "Tây Ninh": { lat: 11.3353, lng: 106.0838 },
+    "Bình Dương": { lat: 10.9789, lng: 106.6548 },
+    "Đồng Nai": { lat: 10.9541, lng: 106.8622 },
+    "Bà Rịa Vũng Tàu": { lat: 10.5419, lng: 107.2420 },
+    "Vũng Tàu": { lat: 10.4806, lng: 107.1839 },
+    "Bình Phước": { lat: 11.5333, lng: 106.8827 },
+    "Tiền Giang": { lat: 10.4499, lng: 106.3424 },
+    "Bến Tre": { lat: 10.2410, lng: 106.4239 },
+    "Trà Vinh": { lat: 9.9459, lng: 106.3427 },
+    "Vĩnh Long": { lat: 10.0677, lng: 105.7849 },
+    "Đồng Tháp": { lat: 10.4925, lng: 105.6925 },
+    "An Giang": { lat: 10.5210, lng: 105.1244 },
+    "Kiên Giang": { lat: 10.0442, lng: 105.0800 },
+    "Cần Thơ": { lat: 10.0452, lng: 105.7469 },
+    "Hậu Giang": { lat: 9.7729, lng: 105.4666 },
+    "Sóc Trăng": { lat: 9.6044, lng: 105.9739 },
+    "Bạc Liêu": { lat: 9.2941, lng: 105.7268 },
+    "Cà Mau": { lat: 9.1870, lng: 105.1471 },
+    "Phú Quốc": { lat: 10.2278, lng: 103.9600 },
+    "Côn Đảo": { lat: 8.7058, lng: 106.5955 }
+  };
+  
+  // ================================================
+  // HÀM TÍNH KHOẢNG CÁCH (HAVERSINE FORMULA)
+  // ================================================
+  function calculateDistance(lat1, lng1, lat2, lng2) {
+    const R = 6371; // Bán kính trái đất (km)
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // Khoảng cách km
+  }
+  
+  // ================================================
+  // TÍNH CHI PHÍ DI CHUYỂN THEO KHOẢNG CÁCH
+  // ================================================
+  function calculateTransportCost(distanceKm, tier) {
+    if (distanceKm <= 5) {
+      // Cùng thành phố - gần như miễn phí (đi bộ, xe đạp)
+      return tier === 'luxury' ? 50000 : (tier === 'normal' ? 30000 : 20000);
+    }
+    
+    // Chi phí theo km và tier (1 CHIỀU - đã tính khứ hồi)
+    const costPerKm = {
+      budget: 3500,    // 3,500 VNĐ/km (xe máy thuê ~100K/ngày + xăng)
+      normal: 6000,    // 6,000 VNĐ/km (ô tô chia sẻ, taxi Grab)
+      luxury: 12000    // 12,000 VNĐ/km (ô tô riêng/ thuê xe có tài xế)
+    };
+    
+    let baseCost = 0;
+    if (distanceKm > 300) {
+      // Ước tính vé máy bay khứ hồi
+      baseCost = {
+        budget: 800000,   // Máy bay giá rẻ
+        normal: 1500000,  // Máy bay thường
+        luxury: 3000000   // Hạng thương gia
+      }[tier];
+    } else if (distanceKm > 100) {
+      // Cao tốc hoặc đường dài (khứ hồi)
+      baseCost = distanceKm * costPerKm[tier] * 2;
+    } else {
+      // Di chuyển nội vùng (khứ hồi)
+      baseCost = distanceKm * costPerKm[tier] * 2;
+    }
+    
+    return Math.round(baseCost);
+  }
+  
+  // Lấy tọa độ điểm đến từ danh sách đã chọn
+  function getDestinationCoords() {
+    // Ưu tiên 1: Lấy trực tiếp từ input dest
+    const destInput = document.getElementById('dest');
+    if (destInput && destInput.value && destInput.value.trim()) {
+      const coords = getCoordsByName(destInput.value.trim());
+      if (coords) return coords;
+    }
+    
+    // Ưu tiên 2: selectedDestinations (object array)
+    let selectedDests = window.selectedDestinations || [];
+    
+    // Ưu tiên 3: selectedDestNames (string array)
+    if (selectedDests.length === 0) {
+      selectedDests = window.selectedDestNames || [];
+    }
+    
+    if (selectedDests.length === 0) {
+      return null;
+    }
+    
+    // Lấy tên điểm đến đầu tiên
+    let destName = '';
+    if (typeof selectedDests[0] === 'object') {
+      destName = selectedDests[0].name || selectedDests[0].destination || '';
+    } else {
+      destName = selectedDests[0] || '';
+    }
+    
+    return getCoordsByName(destName);
+  }
+  
+  // Tìm tọa độ theo tên
+  function getCoordsByName(name) {
+    if (!name) return null;
+    
+    // Chuẩn hóa tên (bỏ dấu, lowercase)
+    const normalizedName = name.toLowerCase().trim();
+    
+    // Tìm trong database
+    for (const [cityName, coords] of Object.entries(CITY_COORDS)) {
+      const normalizedCity = cityName.toLowerCase();
+      
+      // So khớp chính xác hoặc một phần
+      if (normalizedCity.includes(normalizedName) || normalizedName.includes(normalizedCity)) {
+        return coords;
+      }
+      
+      // Trường hợp TP.HCM / Sài Gòn
+      if (normalizedName.includes('hcm') || normalizedName.includes('sài gòn')) {
+        if (normalizedCity.includes('hcm') || normalizedCity.includes('sài gòn')) {
+          return coords;
+        }
+      }
+    }
+    return null;
+  }
+  
+  // Chi phí giảm cho trẻ em và người cao tuổi
+  const CHILD_UNDER_5_DISCOUNT = 1.0;    // Miễn phí hoàn toàn
+  const CHILD_6_11_DISCOUNT = 0.30;       // Giảm 30%
+  const SENIOR_DISCOUNT = 0.20;            // Giảm 20%
+
+  window.selectTravelTier = function(tier) {
+    currentTravelTier = tier;
+    
+    // Update button styles
+    document.querySelectorAll('.travel-tier-btn').forEach(btn => {
+      btn.classList.remove('active');
+      btn.style.borderColor = '';
+      btn.style.background = '';
+      btn.style.color = '';
+    });
+    
+    const activeBtn = document.querySelector(`.travel-tier-btn[data-tier="${tier}"]`);
+    if (activeBtn) {
+      activeBtn.classList.add('active');
+      if (tier === 'budget') {
+        activeBtn.style.borderColor = '#fbbf24';
+        activeBtn.style.background = 'rgba(251,191,36,0.15)';
+        activeBtn.style.color = '#fbbf24';
+      } else if (tier === 'normal') {
+        activeBtn.style.borderColor = '#10b981';
+        activeBtn.style.background = 'rgba(16,185,129,0.15)';
+        activeBtn.style.color = '#10b981';
+      } else if (tier === 'luxury') {
+        activeBtn.style.borderColor = '#8b5cf6';
+        activeBtn.style.background = 'rgba(139,92,246,0.15)';
+        activeBtn.style.color = '#8b5cf6';
+      }
+    }
+    
+    updateBudgetEstimate();
+  };
+
+  // Update budget estimate - chi tiết theo từng khoản
+  function updateBudgetEstimate() {
+    const days = parseInt(document.getElementById('days')?.value) || 1;
+    const nights = parseInt(document.getElementById('nights')?.value) || (days - 1);
+    const adults = parseInt(document.getElementById('adults')?.value) || 0;
+    const children = parseInt(document.getElementById('children')?.value) || 0;  // 6-11 tuổi
+    const toddlers = parseInt(document.getElementById('toddlers')?.value) || 0; // 0-5 tuổi
+    const seniors = parseInt(document.getElementById('seniors')?.value) || 0;
+    
+    // Lấy chi phí theo tier đã chọn
+    const tier = tierCosts[currentTravelTier];
+    
+    // ===== 1. TÍNH TIỀN PHÒNG KHÁCH SẠN =====
+    // Tính số người cần tính phòng (trẻ dưới 5 tuổi ngủ chung miễn phí)
+    const payablePeople = adults + children + seniors; // Trẻ 6-11 + NL + NC tuổi
+    // Tính số phòng cần thiết (mỗi phòng tối đa 2 người)
+    const roomsNeeded = Math.ceil(payablePeople / tier.hotel.maxPerRoom);
+    const hotelTotal = tier.hotel.perRoom * roomsNeeded * nights;
+    
+    // Chi tiết phòng
+    const hotelDetail = document.getElementById('hotelDetail');
+    if (hotelDetail) {
+      hotelDetail.textContent = `${roomsNeeded} phòng × ${formatCurrency(tier.hotel.perRoom)} × ${nights} đêm`;
+    }
+    
+    // ===== 2. TÍNH TIỀN ĂN UỐNG =====
+    // Người lớn & trẻ 6-11 & người cao tuổi: ăn đầy đủ
+    // Trẻ dưới 5 tuổi: miễn phí ăn
+    const mealPeople = adults + children + seniors;
+    const foodTotal = tier.food.perAdult * mealPeople * days;
+    
+    // Chi tiết ăn uống
+    const foodDetail = document.getElementById('foodDetail');
+    if (foodDetail) {
+      let foodDesc = `${mealPeople} người × ${formatCurrency(tier.food.perAdult)} × ${days} ngày`;
+      if (toddlers > 0) foodDesc += ` + ${toddlers} trẻ <5tuổi miễn phí`;
+      foodDetail.textContent = foodDesc;
+    }
+    
+    // ===== 3. TÍNH TIỀN DI CHUYỂN (DỰA TRÊN GPS) =====
+    // Lấy tọa độ khởi hành từ GPS hoặc mặc định Hà Nội
+    const formStep2 = document.getElementById('aiPlannerFormStep2');
+    const hasGPS = formStep2?.dataset?.lat && formStep2?.dataset?.lon;
+    const depLat = parseFloat(formStep2?.dataset?.lat) || 21.0285; // Mặc định Hà Nội
+    const depLng = parseFloat(formStep2?.dataset?.lon) || 105.8542;
+    
+    // Lấy tọa độ điểm đến
+    const destCoords = getDestinationCoords();
+    const destLat = destCoords?.lat || 16.0544; // Mặc định Đà Nẵng
+    const destLng = destCoords?.lng || 108.2022;
+    
+    // Tính khoảng cách
+    const distanceKm = calculateDistance(depLat, depLng, destLat, destLng);
+    const transportTotal = calculateTransportCost(distanceKm, currentTravelTier);
+    
+    const transportDetail = document.getElementById('transportDetail');
+    const transportIcon = document.getElementById('transportIcon');
+    const transportRoute = document.getElementById('transportRoute');
+    
+    // Lấy tên điểm đến
+    let destName = 'Điểm đến';
+    const selectedDests = window.selectedDestinations || window.selectedDestNames || [];
+    if (selectedDests.length > 0) {
+      destName = typeof selectedDests[0] === 'object' 
+        ? (selectedDests[0].name || selectedDests[0].destination || 'Điểm đến')
+        : selectedDests[0];
+    } else {
+      const destInput = document.getElementById('dest');
+      if (destInput?.value) destName = destInput.value;
+    }
+    
+    // Lấy tên điểm khởi hành
+    const depName = hasGPS ? (formStep2?.dataset?.departureName || 'Vị trí của bạn') : 'Hà Nội (mặc định)';
+    
+    // Hiển thị tuyến đường
+    if (transportRoute) {
+      transportRoute.textContent = `📍 ${depName} → ${destName}`;
+    }
+    
+    // Hiển thị chi tiết và icon
+    if (transportDetail) {
+      if (distanceKm <= 5) {
+        transportDetail.textContent = '📍 Cùng khu vực - Di chuyển nội bộ (Grab, xe máy)';
+      } else if (distanceKm > 300) {
+        transportDetail.textContent = `✈️ Khoảng ${Math.round(distanceKm)}km - Máy bay khứ hồi`;
+      } else if (distanceKm > 100) {
+        transportDetail.textContent = `🚗 Khoảng ${Math.round(distanceKm)}km - Ô tô cao tốc (khứ hồi)`;
+      } else {
+        transportDetail.textContent = `🛵 Khoảng ${Math.round(distanceKm)}km - Xe máy/Grab (khứ hồi)`;
+      }
+    }
+    if (transportIcon) {
+      if (distanceKm <= 5) transportIcon.textContent = '🏠';
+      else if (distanceKm > 300) transportIcon.textContent = '✈️';
+      else if (distanceKm > 100) transportIcon.textContent = '🚗';
+      else transportIcon.textContent = '🛵';
+    }
+    
+    // ===== 4. TÍNH TIỀN VÉ THAM QUAN =====
+    // Người lớn: 100%, Trẻ 6-11: giảm 30%, Trẻ <5: miễn phí, Người cao tuổi: giảm 20%
+    const ticketAdults = tier.ticket * adults * days;
+    const ticketChildren = tier.ticket * (1 - CHILD_6_11_DISCOUNT) * children * days;
+    const ticketSeniors = tier.ticket * (1 - SENIOR_DISCOUNT) * seniors * days;
+    const ticketToddlers = 0; // Miễn phí
+    const ticketTotal = ticketAdults + ticketChildren + ticketSeniors + ticketToddlers;
+    
+    const ticketDetail = document.getElementById('ticketDetail');
+    if (ticketDetail) {
+      let parts = [];
+      if (adults > 0) parts.push(`NL: ${formatCurrency(tier.ticket)}×${adults}×${days}`);
+      if (children > 0) parts.push(`6-11t: -30%`);
+      if (seniors > 0) parts.push(`NC: -20%`);
+      if (toddlers > 0) parts.push(`<5t: miễn phí`);
+      ticketDetail.textContent = parts.join(' | ');
+    }
+    
+    // ===== 5. TÍNH TIỀN GIẢI TRÍ & ĐỒ UỐNG =====
+    // Tất cả mọi người đều tính (trẻ dưới 5 giảm 50%)
+    const totalPeople = adults + children + toddlers + seniors;
+    
+    const entertainAdults = tier.entertain * (adults + seniors + children) * days;
+    const entertainToddlers = tier.entertain * 0.5 * toddlers * days;
+    const entertainTotal = entertainAdults + entertainToddlers;
+    
+    const entertainDetail = document.getElementById('entertainDetail');
+    if (entertainDetail) {
+      let entertainDesc = `Người lớn: ${formatCurrency(tier.entertain)} × ${days} ngày`;
+      if (toddlers > 0) entertainDesc += ` + Trẻ nhỏ -50%`;
+      entertainDetail.textContent = entertainDesc;
+    }
+    
+    // ===== TÍNH CHI PHÍ ĐỊA ĐIỂM ĐÃ CHỌN =====
+    const spotsCost = calculateSelectedSpotsCost();
+    let spotsGrandTotal = 0;
+    const spotsCostSection = document.getElementById('selectedSpotsCostSection');
+    const spotsTotalEl = document.getElementById('spotsTotal');
+    const spotsDetailEl = document.getElementById('spotsDetail');
+    const spotsListEl = document.getElementById('spotsList');
+    
+    if (spotsCost.spotCount > 0) {
+      if (spotsCostSection) spotsCostSection.style.display = 'block';
+      
+      // Chi phí địa điểm cho tất cả mọi người
+      const spotsPerPerson = spotsCost.totalTicket + spotsCost.totalFood;
+      spotsGrandTotal = spotsPerPerson * totalPeople;
+      
+      // Hiển thị
+      if (spotsTotalEl) {
+        spotsTotalEl.textContent = formatCurrency(spotsGrandTotal);
+      }
+      if (spotsDetailEl) {
+        let detail = `${spotsCost.spotCount} địa điểm × ${totalPeople} người`;
+        if (spotsCost.totalTicket > 0) detail += ` | Vé: ${formatCurrency(spotsCost.totalTicket)}/ng`;
+        if (spotsCost.totalFood > 0) detail += ` | Ăn: ${formatCurrency(spotsCost.totalFood)}/ng`;
+        spotsDetailEl.textContent = detail;
+      }
+      if (spotsListEl) {
+        const spotNames = (window.selectedAttractionData || []).map(s => s.name).join(', ');
+        spotsListEl.textContent = spotNames.substring(0, 100) + (spotNames.length > 100 ? '...' : '');
+      }
+    } else {
+      if (spotsCostSection) spotsCostSection.style.display = 'none';
+    }
+    
+    // ===== TỔNG HỢP =====
+    const grandTotal = hotelTotal + foodTotal + transportTotal + ticketTotal + entertainTotal + spotsGrandTotal;
+    const perPerson = totalPeople > 0 ? Math.round(grandTotal / totalPeople) : 0;
+    
+    // Cập nhật DOM
+    document.getElementById('hotelTotal').textContent = formatCurrency(hotelTotal);
+    document.getElementById('foodTotal').textContent = formatCurrency(foodTotal);
+    document.getElementById('transportTotal').textContent = formatCurrency(transportTotal);
+    document.getElementById('ticketTotal').textContent = formatCurrency(ticketTotal);
+    document.getElementById('entertainTotal').textContent = formatCurrency(entertainTotal);
+    
+    // Tổng cộng
+    document.getElementById('totalBudget').textContent = formatCurrency(grandTotal);
+    document.getElementById('perPersonBudget').textContent = formatCurrency(perPerson);
+    
+    // Label thời gian
+    const tripLabel = document.getElementById('tripDurationLabel');
+    if (tripLabel) {
+      tripLabel.textContent = `${days} ngày ${nights} đêm`;
+    }
+    
+    // Tóm tắt thành viên
+    const membersSummary = document.getElementById('membersSummary');
+    if (membersSummary) {
+      let parts = [];
+      if (adults > 0) parts.push(`${adults} NL`);
+      if (children > 0) parts.push(`${children} TE`);
+      if (toddlers > 0) parts.push(`${toddlers} TN`);
+      if (seniors > 0) parts.push(`${seniors} NCT`);
+      membersSummary.textContent = `${parts.join(' + ')} = ${totalPeople} người`;
+    }
+  }
+
+  // Format currency
+  function formatCurrency(amount) {
+    if (amount >= 1000000) {
+      return (amount / 1000000).toFixed(amount % 1000000 === 0 ? 0 : 1) + 'M';
+    }
+    return amount.toLocaleString('vi-VN');
+  }
+
+  // Location functions
+  let locationMap = null;
+  let locationMarker = null;
+
+  window.getCurrentLocation = function() {
+    if (!navigator.geolocation) {
+      if (window.WanderToast) {
+        window.WanderToast.warning("Trình duyệt không hỗ trợ định vị");
+      }
+      return;
+    }
+    
+    if (window.WanderToast) {
+      window.WanderToast.info("📍 Đang lấy vị trí của bạn...");
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        // Show map container
+        const mapContainer = document.getElementById('locationMapContainer');
+        if (mapContainer) mapContainer.style.display = 'block';
+        
+        // Initialize or update map
+        await initLocationMap(lat, lon);
+        
+        // Get address from coordinates
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+          const data = await response.json();
+          const address = data.display_name || `Vị trí (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+          
+          document.getElementById('selectedLocationDisplay').style.display = 'flex';
+          document.getElementById('selectedLocationText').textContent = address;
+          document.getElementById('departureLocation').value = address;
+          
+          // Store in data attribute
+          document.getElementById('aiPlannerFormStep2').dataset.lat = lat;
+          document.getElementById('aiPlannerFormStep2').dataset.lon = lon;
+          document.getElementById('aiPlannerFormStep2').dataset.departureName = address.split(',')[0]; // Lấy phần đầu của địa chỉ
+          
+          if (window.WanderToast) {
+            window.WanderToast.success("Đã xác định vị trí!");
+          }
+          
+          // Cập nhật chi phí di chuyển sau khi có GPS
+          setTimeout(() => updateBudgetEstimate(), 100);
+        } catch (err) {
+          console.error("Error getting address:", err);
+          document.getElementById('selectedLocationDisplay').style.display = 'flex';
+          document.getElementById('selectedLocationText').textContent = `Vị trí (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
+        }
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        if (window.WanderToast) {
+          window.WanderToast.warning("Không thể lấy vị trí. Vui lòng cho phép truy cập vị trí.");
+        }
+      },
+      { timeout: 10000 }
+    );
+  };
+
+  window.toggleManualLocation = function() {
+    const manualInput = document.getElementById('manualLocationInput');
+    const mapContainer = document.getElementById('locationMapContainer');
+    
+    if (manualInput) {
+      manualInput.style.display = manualInput.style.display === 'none' ? 'block' : 'none';
+    }
+    if (mapContainer) {
+      mapContainer.style.display = 'none';
+    }
+  };
+
+  async function initLocationMap(lat, lon) {
+    const mapDiv = document.getElementById('locationMap');
+    if (!mapDiv) return;
+    
+    // Check if Leaflet is loaded
+    if (typeof L === 'undefined') {
+      console.error("Leaflet not loaded");
+      return;
+    }
+    
+    if (locationMap) {
+      locationMap.setView([lat, lon], 13);
+    } else {
+      locationMap = L.map('locationMap').setView([lat, lon], 13);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(locationMap);
+      
+      // Click handler for map
+      locationMap.on('click', async (e) => {
+        const { lat: clickLat, lng: clickLon } = e.latlng;
+        
+        if (locationMarker) {
+          locationMarker.setLatLng(e.latlng);
+        } else {
+          locationMarker = L.marker(e.latlng).addTo(locationMap);
+        }
+        
+        // Get address
+        try {
+          const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${clickLat}&lon=${clickLon}`);
+          const data = await response.json();
+          const address = data.display_name || `Vị trí (${clickLat.toFixed(4)}, ${clickLon.toFixed(4)})`;
+          
+          document.getElementById('selectedLocationDisplay').style.display = 'flex';
+          document.getElementById('selectedLocationText').textContent = address;
+          document.getElementById('departureLocation').value = address;
+          
+          document.getElementById('aiPlannerFormStep2').dataset.lat = clickLat;
+          document.getElementById('aiPlannerFormStep2').dataset.lon = clickLon;
+        } catch (err) {
+          console.error("Error getting address:", err);
+        }
+      });
+    }
+    
+    if (locationMarker) {
+      locationMarker.setLatLng([lat, lon]);
+    } else {
+      locationMarker = L.marker([lat, lon]).addTo(locationMap);
+    }
+  }
+
+  // Submit form from Step 2 to Wizard
+  window.submitFormToWizard = function() {
+    // Get all form data from Step 2
+    const dest = document.getElementById('dest')?.value || '';
+    const days = parseInt(document.getElementById('days')?.value) || 1;
+    const nights = parseInt(document.getElementById('nights')?.value) || (days - 1);
+    const companion = document.getElementById('companion')?.value || '';
+    const budget = document.getElementById('budget')?.value || '';
+    const additionalInfo = document.getElementById('additionalInfo')?.value || '';
+    const tripDate = document.getElementById('tripDate')?.value || '';
+    const departureTime = document.getElementById('departureTime')?.value || '08:00';
+    
+    // Get member counts
+    const adults = parseInt(document.getElementById('adults')?.value) || 0;
+    const children = parseInt(document.getElementById('children')?.value) || 0;
+    const toddlers = parseInt(document.getElementById('toddlers')?.value) || 0;
+    const seniors = parseInt(document.getElementById('seniors')?.value) || 0;
+    const totalMembers = adults + children + toddlers + seniors;
+    
+    // Get departure location
+    const departureLocation = document.getElementById('departureLocation')?.value || '';
+    const formStep2 = document.getElementById('aiPlannerFormStep2');
+    const depLat = formStep2?.dataset?.lat || '';
+    const depLon = formStep2?.dataset?.lon || '';
+
+    // Get selected styles/sessions
+    const selectedStyles = [];
+    document.querySelectorAll('.style-chip[data-style].active').forEach(chip => {
+      selectedStyles.push(chip.dataset.style);
+    });
+    const selectedSessions = [];
+    document.querySelectorAll('.style-chip[data-session].active').forEach(chip => {
+      selectedSessions.push(chip.dataset.session);
+    });
+
+    // Prepare data for Smart Wizard
+    const formData = {
+      destination: dest,
+      days: days,
+      nights: nights,
+      companion: companion,
+      budget: budget,
+      additionalInfo: additionalInfo,
+      tripDate: tripDate,
+      departureTime: departureTime,
+      styles: selectedStyles.join(', '),
+      sessions: selectedSessions.join(', '),
+      // Member data
+      adults: adults,
+      children: children,
+      toddlers: toddlers,
+      seniors: seniors,
+      totalMembers: totalMembers,
+      travelTier: currentTravelTier,
+      // Departure location
+      departureLocation: departureLocation,
+      departureLat: depLat,
+      departureLon: depLon,
+      // Selected destinations from Step 1
+      selectedDestinations: window.selectedDestinations ? JSON.stringify(window.selectedDestinations) : ''
+    };
+
+    console.log("📝 [Form Step 2] Submitting to Wizard:", formData);
+
+    // Check if destination is filled
+    if (!dest && !window.selectedDestinations?.length) {
+      if (window.WanderToast) {
+        window.WanderToast.warning("Vui lòng chọn điểm đến trước!");
+      } else {
+        alert("Vui lòng chọn điểm đến trước!");
+      }
+      switchFormStep(1);
+      return;
+    }
+
+    // Start Smart Wizard with this data
+    if (window.SmartWizard && typeof window.SmartWizard.start === 'function') {
+      window.SmartWizard.start(formData);
+    } else {
+      // Fallback: directly trigger form submission
+      const form = document.getElementById('aiPlannerFormStep2') || document.getElementById('aiPlannerForm');
+      if (form) {
+        // Create hidden fields and submit
+        Object.entries(formData).forEach(([key, value]) => {
+          let input = form.querySelector(`[name="${key}"]`);
+          if (!input) {
+            input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            form.appendChild(input);
+          }
+          input.value = value;
+        });
+        
+        // Trigger the original submit flow
+        if (typeof window.doGenerate === 'function') {
+          window.doGenerate(formData);
+        } else {
+          // Try to trigger btnStartSmartWizard click behavior
+          const wizardBtn = document.getElementById('btnStartSmartWizard');
+          if (wizardBtn) {
+            wizardBtn.click();
+          }
+        }
+      }
+    }
+  };
 
   // --- Discovery Logic ---
   const discoveryForm = document.getElementById('discoveryForm');
@@ -235,26 +1577,60 @@ const initPlanner = function () {
 
   if (btnModeForm && btnModeDiscovery) {
     const btnModeCompare = document.getElementById('btnModeCompare');
-    
+    const stepDiscovery = document.getElementById('stepDiscovery');
+    const stepCompare = document.getElementById('stepCompare');
+    const formStepNav = document.getElementById('formStepNav');
+
     function switchPath(activeBtn, targetStepId) {
-      // Clear active class from all buttons
+      // Clear active class from all mode buttons
       [btnModeForm, btnModeDiscovery, btnModeCompare].forEach(btn => btn?.classList.remove('active'));
       activeBtn.classList.add('active');
+
+      // Hide ALL steps/sections first
+      // Form steps (formStep1, formStep2)
+      const formStep1 = document.getElementById('formStep1');
+      const formStep2 = document.getElementById('formStep2');
+      if (formStep1) formStep1.style.display = 'none';
+      if (formStep2) formStep2.style.display = 'none';
       
-      // Hide all steps
-      [stepBasic, document.getElementById('stepDiscovery'), stepSmartWizard, document.getElementById('stepCompare')].forEach(step => {
-        if (step) step.style.display = 'none';
-      });
+      // Other paths
+      if (stepDiscovery) stepDiscovery.style.display = 'none';
+      if (stepSmartWizard) stepSmartWizard.style.display = 'none';
+      if (stepCompare) stepCompare.style.display = 'none';
+      
+      // Form step nav (only show for Form mode)
+      if (formStepNav) formStepNav.style.display = 'none';
 
       // Reset comparison mode visuals if switching away from compare
       const container = document.getElementById('timelineContent');
       if (container) container.classList.remove('comparison-mode-active');
       const saveBtn = document.getElementById('btnSaveTrip');
       if (saveBtn) saveBtn.style.display = 'inline-flex';
-      
-      // Show target step
-      const targetStep = document.getElementById(targetStepId);
-      if (targetStep) targetStep.style.display = 'flex';
+
+      // Show target step based on which tab was clicked
+      if (targetStepId === 'stepBasic' || targetStepId === 'formStep1') {
+        // Form Mode - show formStep1 (Step 1: Chọn điểm đến)
+        if (formStepNav) formStepNav.style.display = 'flex';
+        if (formStep1) {
+          formStep1.style.display = 'block';
+          formStep1.style.display = ''; // Remove inline style to use CSS
+        }
+        // Reset to step 1
+        switchFormStep(1);
+      } else if (targetStepId === 'stepDiscovery') {
+        // Discovery Mode
+        if (stepDiscovery) stepDiscovery.style.display = 'flex';
+        if (discoveryHistory.length === 0 && discoveryMessages.children.length === 0) {
+          addDiscoveryBubble("Chào bạn! Tôi là WanderAI. Hãy cho tôi biết ngân sách và sở thích, tôi sẽ gợi ý cho bạn nhé! ✨", "ai");
+          renderDiscoverySuggestions();
+        }
+      } else if (targetStepId === 'stepCompare') {
+        // Compare Mode
+        if (stepCompare) stepCompare.style.display = 'flex';
+        if (typeof window.loadSavedTripsForComparison === 'function') {
+          window.loadSavedTripsForComparison();
+        }
+      }
     }
 
     btnModeForm.addEventListener('click', () => {
@@ -263,18 +1639,11 @@ const initPlanner = function () {
 
     btnModeDiscovery.addEventListener('click', () => {
       switchPath(btnModeDiscovery, 'stepDiscovery');
-      if (discoveryHistory.length === 0 && discoveryMessages.children.length === 0) {
-        addDiscoveryBubble("Chào bạn! Tôi là WanderAI. Hãy cho tôi biết ngân sách và sở thích, tôi sẽ gợi ý cho bạn nhé! ✨", "ai");
-        renderDiscoverySuggestions();
-      }
     });
 
     if (btnModeCompare) {
       btnModeCompare.addEventListener('click', () => {
         switchPath(btnModeCompare, 'stepCompare');
-        if (typeof window.loadSavedTripsForComparison === 'function') {
-           window.loadSavedTripsForComparison();
-        }
       });
     }
   }
@@ -489,13 +1858,24 @@ const initPlanner = function () {
       this.data.companion = document.getElementById('companion').value;
       this.data.optionCount = document.getElementById('optionCount')?.value || "1";
       this.data.departureTime = document.getElementById('departureTime')?.value || "08:00";
-      
+
       // Fix sessions collection from style-chips
       this.data.sessions = Array.from(document.querySelectorAll('.style-chip.active[data-session]')).map(chip => chip.dataset.session);
 
-      document.getElementById('stepBasic').style.display = 'none';
-      document.getElementById('stepDiscovery').style.display = 'none';
-      document.getElementById('stepSmartWizard').style.display = 'flex';
+      // Hide form steps and show wizard
+      const formStep1 = document.getElementById('formStep1');
+      const formStep2 = document.getElementById('formStep2');
+      const formStepNav = document.getElementById('formStepNav');
+      const stepDiscovery = document.getElementById('stepDiscovery');
+      const stepCompare = document.getElementById('stepCompare');
+      
+      if (formStepNav) formStepNav.style.display = 'none';
+      if (formStep1) formStep1.style.display = 'none';
+      if (formStep2) formStep2.style.display = 'none';
+      if (stepDiscovery) stepDiscovery.style.display = 'none';
+      if (stepCompare) stepCompare.style.display = 'none';
+      if (stepSmartWizard) stepSmartWizard.style.display = 'flex';
+      
       this.dom.chatArea.innerHTML = '';
       this.history = [];
       this.handleMessage(`Tôi muốn đi ${this.data.destination} trong ${this.data.days} ngày. Hãy tư vấn thêm để hoàn thiện lịch trình.`);
@@ -1551,10 +2931,19 @@ const initPlanner = function () {
           skipWizard: true
       };
 
-      // 3. UI
-      document.getElementById('stepBasic').style.display = 'none';
-      if (document.getElementById('stepDiscovery')) document.getElementById('stepDiscovery').style.display = 'none';
-      if (document.getElementById('stepSmartWizard')) document.getElementById('stepSmartWizard').style.display = 'none';
+      // 3. UI - Hide all form steps and other paths
+      const formStepNav = document.getElementById('formStepNav');
+      const formStep1 = document.getElementById('formStep1');
+      const formStep2 = document.getElementById('formStep2');
+      const stepDiscovery = document.getElementById('stepDiscovery');
+      const stepCompare = document.getElementById('stepCompare');
+      
+      if (formStepNav) formStepNav.style.display = 'none';
+      if (formStep1) formStep1.style.display = 'none';
+      if (formStep2) formStep2.style.display = 'none';
+      if (stepDiscovery) stepDiscovery.style.display = 'none';
+      if (stepCompare) stepCompare.style.display = 'none';
+      if (stepSmartWizard) stepSmartWizard.style.display = 'none';
       
       // 4. Generate
       doGenerate(generationData);
@@ -1637,17 +3026,27 @@ const initPlanner = function () {
     const plannerFormCard = document.getElementById('plannerFormCard');
     if (plannerFormCard) plannerFormCard.style.display = 'flex';
     
-    // Đưa các step về đúng trạng thái ban đầu: Hiện stepBasic, ẩn các step khác
-    const stepBasic = document.getElementById('stepBasic');
-    if (stepBasic) stepBasic.style.display = 'block';
+    // Đưa các step về đúng trạng thái ban đầu
+    // Form steps
+    const formStep1 = document.getElementById('formStep1');
+    const formStep2 = document.getElementById('formStep2');
+    const formStepNav = document.getElementById('formStepNav');
+    
+    if (formStepNav) formStepNav.style.display = 'flex';
+    if (formStep1) {
+      formStep1.style.display = 'block';
+      formStep1.style.display = ''; // Remove inline style
+    }
+    if (formStep2) formStep2.style.display = 'none';
+    
+    // Other paths
     const stepDiscovery = document.getElementById('stepDiscovery');
-    if (stepDiscovery) stepDiscovery.style.display = 'none';
     const stepSmartWizard = document.getElementById('stepSmartWizard');
-    if (stepSmartWizard) stepSmartWizard.style.display = 'none';
     const stepCompare = document.getElementById('stepCompare');
+    
+    if (stepDiscovery) stepDiscovery.style.display = 'none';
+    if (stepSmartWizard) stepSmartWizard.style.display = 'none';
     if (stepCompare) stepCompare.style.display = 'none';
-    const pathNav = document.querySelector('.planner-path-nav');
-    if (pathNav) pathNav.style.display = 'flex';
     
     // Đặt lại SmartWizard về trạng thái ban đầu (InputArea hiện, ConfirmationArea ẩn)
     const smartConfirmationArea = document.getElementById('smartConfirmationArea');
@@ -1655,7 +3054,7 @@ const initPlanner = function () {
     const smartInputArea = document.getElementById('smartInputArea');
     if (smartInputArea) smartInputArea.style.display = 'flex';
 
-    // Đặt lại các nút chuyển mode trên cùng về active cho Form Nhập
+    // Đặt lại các nút chuyển mode trên cùng về active cho "Lập lịch"
     document.querySelectorAll('.mode-toggle-btn').forEach(b => b.classList.remove('active'));
     const btnModeForm = document.getElementById('btnModeForm');
     if (btnModeForm) btnModeForm.classList.add('active');
@@ -1757,3 +3156,96 @@ if (document.readyState === 'loading') {
 
 // Fallback for safety
 setTimeout(initPlanner, 1500);
+
+// ================================================================
+// Selected Destinations Chips (Simple, non-intrusive)
+// ================================================================
+window.selectedDestNames = [];
+
+function updateSelectedChips() {
+  var container = document.getElementById('selectedDestChips');
+  var list = document.getElementById('selectedDestList');
+  if (!container || !list) return;
+
+  if (window.selectedDestNames.length === 0) {
+    container.style.display = 'none';
+  } else {
+    container.style.display = 'block';
+    list.innerHTML = window.selectedDestNames.map(function(name, idx) {
+      return '<span class="selected-dest-chip">' + name + ' <button type="button" class="remove-btn" onclick="removeDestChip(' + idx + ')">×</button></span>';
+    }).join('');
+  }
+}
+
+function addDestChip(name) {
+  if (!name || window.selectedDestNames.indexOf(name) !== -1) return;
+  window.selectedDestNames.push(name);
+  updateSelectedChips();
+}
+
+function removeDestChip(idx) {
+  if (window.selectedDestNames && window.selectedDestNames.length > idx) {
+    window.selectedDestNames.splice(idx, 1);
+    updateSelectedChips();
+  }
+}
+
+// ================================================================
+// Map Zoom with GPS
+// ================================================================
+function openMapZoom() {
+  var overlay = document.getElementById('mapZoomOverlay');
+  var zoomBody = document.getElementById('mapZoomBody');
+  var zoomGps = document.getElementById('mapZoomGps');
+  var currentCoords = window.currentMapCoords || [21.0278, 105.8342];
+  var cityName = window.currentMapCity || 'Điểm đến';
+
+  // Create container for map
+  zoomBody.innerHTML = '<div id="mapZoomContainer" style="height:100%;"></div>';
+
+  // Show GPS info
+  zoomGps.innerHTML = '<div style="display:flex; align-items:center; gap:0.5rem;"><span>📍</span><strong>' + cityName + '</strong></div><div style="margin-top:0.5rem; color:var(--text-muted);">🌐 GPS: <code style="background:rgba(0,0,0,0.2); padding:0.15rem 0.3rem; border-radius:0.25rem;">' + currentCoords[0].toFixed(6) + ', ' + currentCoords[1].toFixed(6) + '</code></div>';
+
+  overlay.classList.add('active');
+
+  // Init Leaflet after modal opens
+  setTimeout(function() {
+    if (typeof L !== 'undefined') {
+      try {
+        if (window.mapZoomInstance) {
+          window.mapZoomInstance.remove();
+        }
+        window.mapZoomInstance = L.map('mapZoomContainer', { zoomControl: true, attributionControl: true }).setView(currentCoords, 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(window.mapZoomInstance);
+
+        // Add destination marker
+        L.marker(currentCoords).addTo(window.mapZoomInstance).bindPopup('<b>' + cityName + '</b>').openPopup();
+
+        // Add user location
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(pos) {
+            var userCoords = [pos.coords.latitude, pos.coords.longitude];
+            L.circle(userCoords, { radius: 300, color: '#10b981', fillColor: '#10b981', fillOpacity: 0.2 }).addTo(window.mapZoomInstance);
+            L.marker(userCoords, { icon: L.divIcon({ className: 'user-marker', html: '📍', iconSize: [24, 24] }) }).addTo(window.mapZoomInstance).bindPopup('📍 Vị trí của bạn');
+            L.polyline([userCoords, currentCoords], { color: '#60a5fa', dashArray: '5, 10', weight: 2 }).addTo(window.mapZoomInstance);
+          }, function() {});
+        }
+      } catch (e) {
+        zoomBody.innerHTML = '<p style="color:#fff; text-align:center; padding:3rem;">Không thể tải bản đồ</p>';
+      }
+    } else {
+      zoomBody.innerHTML = '<p style="color:#fff; text-align:center; padding:3rem;">Bản đồ không khả dụng</p>';
+    }
+  }, 100);
+}
+
+function closeMapZoom(e) {
+  if (!e || e.target === document.getElementById('mapZoomOverlay')) {
+    document.getElementById('mapZoomOverlay').classList.remove('active');
+  }
+}
+
+// ESC to close
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeMapZoom();
+});

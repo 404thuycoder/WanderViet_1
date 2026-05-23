@@ -862,6 +862,11 @@ a {
   scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
 }
 
+/* Hide region dest cards completely */
+.region-dest-scroll.hidden {
+  display: none !important;
+}
+
 /* Custom Scrollbar for Premium Look */
 .region-dest-scroll::-webkit-scrollbar {
   height: 4px;
@@ -878,7 +883,7 @@ a {
 }
 
 .region-dest-card {
-  flex: 0 0 145px; /* Chiều rộng cố định để không bị ép nhỏ */
+  flex: 0 0 170px; /* Chiều rộng cố định để hiển thị đủ thông tin */
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border);
   border-radius: 0.85rem;
@@ -957,6 +962,44 @@ a {
 
 .region-dest-card.active .dest-card-name {
   color: #60a5fa;
+}
+
+/* Dest Card Stars */
+.dest-card-stars {
+  font-size: 0.65rem;
+  color: #fbbf24;
+  letter-spacing: 1px;
+  margin: 0.25rem 0;
+}
+
+/* Dest Card Meta Tags */
+.dest-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.meta-tag {
+  font-size: 0.5rem;
+  padding: 2px 5px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.meta-tag.safety {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.meta-tag.hot {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+}
+
+.meta-tag.cost {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
 }
 
 /* Travel dates row - giống ảnh 1 */

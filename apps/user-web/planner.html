@@ -1365,31 +1365,48 @@
             <!-- ĐIỂM ĐẾN TRONG VÙNG - hiện ra khi click vùng -->
             <div id="regionDestinations" class="region-dest-panel" style="display:none;">
               <div class="region-dest-header">
-                <div class="region-dest-label">🗺️ <span id="regionDestLabel">Chọn điểm đến</span> <small style="text-transform:none; font-weight:400; color:var(--text-muted); margin-left:0.5rem">(Nhấn lại miền để đóng)</small></div>
-                <button type="button" id="btnRefreshDest" class="btn-refresh-dest" onclick="refreshDestinations()">
-                  <span>🔄 Ngẫu nhiên</span>
-                </button>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div class="region-dest-label">
+                    <button type="button" id="btnBackToRegions" onclick="backToRegionList()" style="display:none; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); border-radius:8px; padding:0.4rem 0.75rem; color:#60a5fa; cursor:pointer; font-size:0.75rem; margin-right:0.5rem;">
+                      ← Quay lại
+                    </button>
+                    <span id="regionDestLabel">🗺️ Chọn điểm đến</span>
+                  </div>
+                  <button type="button" id="btnRefreshDest" class="btn-refresh-dest" onclick="refreshDestinations()" style="display:none;">
+                    <span>🔄 Ngẫu nhiên</span>
+                  </button>
+                </div>
               </div>
               <div id="regionDestCards" class="region-dest-scroll"></div>
               
-
-              <!-- PREMIUM DESTINATION DISCOVERY PANEL - REVISED LAYOUT -->
+              <!-- PREMIUM DESTINATION DISCOVERY PANEL -->
               <div id="v2DestReviewPanel" style="display:none; position:relative; margin-top:1rem; border-radius:1.25rem; padding:0; box-shadow:0 4px 20px rgba(0,0,0,0.08); overflow:hidden;">
                 
                 <!-- GPS Status Toast -->
                 <div id="gpsStatus" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:100; background:rgba(0,0,0,0.85); color:#fff; padding:0.75rem 1.25rem; border-radius:0.75rem; font-size:0.85rem; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.3); max-width:280px;"></div>
                 
                 <!-- Header với Banner + Close Button -->
-                <div id="v2DestBanner" style="height:140px; position:relative; overflow:hidden;">
-                  <img id="v2DestBannerImg" src="" alt="Banner" style="width:100%; height:100%; object-fit:cover; filter:brightness(0.7);">
-                  <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, transparent 100%);"></div>
+                <div id="v2DestBanner" style="height:180px; position:relative; overflow:hidden;">
+                  <img id="v2DestBannerImg" src="" alt="Banner" style="width:100%; height:100%; object-fit:cover; filter:brightness(0.6);">
+                  <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);"></div>
                   <div style="position:absolute; bottom:0; left:0; right:0; padding:1rem;">
                     <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                      <div>
-                        <h4 id="v2DestTitle" style="margin:0; font-size:1.4rem; font-weight:800; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.5);">Đà Lạt</h4>
-                        <div id="v2DestRating" style="display:flex; align-items:center; gap:0.5rem; margin-top:0.25rem;">
-                          <span style="background:#fbbf24; color:#000; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;">⭐ <span id="v2ScoreQuality">4.9</span></span>
-                          <span style="color:#fff; font-size:0.8rem;">Đánh giá từ du khách</span>
+                      <div style="flex:1;">
+                        <h4 id="v2DestTitle" style="margin:0 0 0.25rem; font-size:1.5rem; font-weight:800; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.5);">Đà Lạt</h4>
+                        
+                        <!-- Rating Stars -->
+                        <div id="v2DestRating" style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
+                          <span id="v2StarsDisplay" style="font-size:1rem; color:#fbbf24; letter-spacing:2px;">★★★★★</span>
+                          <span id="v2ScoreQuality" style="background:#fbbf24; color:#000; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;">4.9</span>
+                          <span style="color:#fff; font-size:0.8rem;">· Đánh giá từ du khách</span>
+                        </div>
+                        
+                        <!-- Quick Info Tags -->
+                        <div id="v2QuickInfo" style="display:flex; flex-wrap:wrap; gap:0.4rem;">
+                          <span id="v2SafetyTag" style="background:rgba(16,185,129,0.8); color:#fff; padding:3px 8px; border-radius:20px; font-size:0.65rem; font-weight:600;">🛡️ An toàn: Tốt</span>
+                          <span id="v2PopularTag" style="background:rgba(249,115,22,0.8); color:#fff; padding:3px 8px; border-radius:20px; font-size:0.65rem; font-weight:600;">🔥 Cực hot</span>
+                          <span id="v2CostTag" style="background:rgba(59,130,246,0.8); color:#fff; padding:3px 8px; border-radius:20px; font-size:0.65rem; font-weight:600;">💰 Chi phí: Trung bình</span>
+                          <span id="v2WeatherTag" style="background:rgba(14,165,233,0.8); color:#fff; padding:3px 8px; border-radius:20px; font-size:0.65rem; font-weight:600;">🌤️ Mát mẻ</span>
                         </div>
                       </div>
                       <button type="button" onclick="closeV2ReviewPanel()" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; font-size:1.2rem;">×</button>
@@ -2456,22 +2473,32 @@
       allDest.forEach(dest => {
         const card = document.createElement('div');
         card.className = 'region-dest-card';
-        const spotsHtml = dest.spots && dest.spots.length > 0
-          ? `${dest.spots.slice(0,2).join(', ')}...`
-          : 'Khám phá điểm nổi bật';
+        
+        // Lấy thông tin chi tiết từ detailsMap
+        const cityData = detailsMap[dest.name] || {};
+        const rating = cityData.rating || '4.5';
+        const starCount = Math.round(parseFloat(rating));
+        const stars = '★'.repeat(starCount) + '☆'.repeat(5 - starCount);
+        const safety = cityData.safety || 'Tốt';
+        const popularity = cityData.popularity || 'Hot';
+        const cost = cityData.cost || 'Trung bình';
 
         const imgSrc = (typeof window.getVNPhoto === 'function') ? window.getVNPhoto(dest.name, Math.floor(Math.random()*100)) : (dest.img || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop');
 
         card.innerHTML = `
           <div class="dest-card-image">
             <img src="${imgSrc}" alt="${dest.name}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop';">
-            <div class="dest-card-badge">ĐIỂM: 5</div>
-            <div class="dest-card-verified">Verified</div>
+            <div class="dest-card-badge">⭐ ${rating}</div>
           </div>
           <div class="dest-card-info">
             <div class="dest-card-location">${currentRegion || ''}</div>
             <div class="dest-card-name">${dest.name}</div>
-            <div class="dest-card-desc">${spotsHtml}</div>
+            <div class="dest-card-stars">${stars}</div>
+            <div class="dest-card-meta">
+              <span class="meta-tag safety">🛡️ ${safety}</span>
+              <span class="meta-tag hot">🔥 ${popularity}</span>
+              <span class="meta-tag cost">💰 ${cost}</span>
+            </div>
             <div class="dest-card-actions">
               <a href="#" class="link-detail" onclick="event.preventDefault(); selectDestination('${dest.name.replace("'","\'")}', this.closest('.region-dest-card'))">Chi tiết →</a>
               <button class="btn-go" onclick="event.stopPropagation(); selectDestination('${dest.name.replace("'","\'")}', this.closest('.region-dest-card'))">+ Chuyến đi</button>
@@ -3621,8 +3648,20 @@
       document.getElementById('v2DestTitle').textContent = cityName;
       document.getElementById('v2DestBannerImg').src = cityData.banner;
       
-      // 2. Populate Scores
-      document.getElementById('v2ScoreQuality').textContent = cityData.rating || '4.8';
+      // 2. Populate Scores - Stars and Tags
+      const rating = cityData.rating || '4.8';
+      document.getElementById('v2ScoreQuality').textContent = rating;
+      // Generate stars based on rating
+      const starCount = Math.round(parseFloat(rating));
+      document.getElementById('v2StarsDisplay').textContent = '★'.repeat(starCount) + '☆'.repeat(5 - starCount);
+      
+      // Update quick info tags
+      document.getElementById('v2SafetyTag').innerHTML = `🛡️ An toàn: ${cityData.safety || 'Tốt'}`;
+      document.getElementById('v2PopularTag').innerHTML = `🔥 ${cityData.popularity || 'Cực hot'}`;
+      document.getElementById('v2CostTag').innerHTML = `💰 Chi phí: ${cityData.cost || 'Trung bình'}`;
+      document.getElementById('v2WeatherTag').innerHTML = `🌤️ ${cityData.weather || 'Mát mẻ'}`;
+      
+      // Legacy scores (still used elsewhere)
       document.getElementById('v2ScoreSafety').textContent = cityData.safety || 'Tốt';
       document.getElementById('v2ScoreTrend').textContent = cityData.popularity || 'Bình thường';
       document.getElementById('v2ScoreCost').textContent = cityData.cost || 'Hợp lý';
@@ -3811,16 +3850,9 @@
       }, 50);
     }
 
-    // Close review panel
+    // Close review panel and go back to region list
     window.closeV2ReviewPanel = function() {
-      const panel = document.getElementById('v2DestReviewPanel');
-      if (panel) {
-        panel.style.opacity = '0';
-        panel.style.transform = 'translateY(-10px)';
-        setTimeout(() => {
-          panel.style.display = 'none';
-        }, 300);
-      }
+      backToRegionList();
     };
     
     // Spot Detail Modal Functions
@@ -4223,15 +4255,9 @@
     }
     
     // Alias for onclick handlers
+    // Close review panel and go back to region list
     window.closeV2ReviewPanel = function() {
-      const panel = document.getElementById('v2DestReviewPanel');
-      if (panel) {
-        panel.style.opacity = '0';
-        panel.style.transform = 'translateY(-10px)';
-        setTimeout(() => {
-          panel.style.display = 'none';
-        }, 300);
-      }
+      backToRegionList();
     };
         
     window.applyReviewFilters = function() {
@@ -4434,12 +4460,76 @@
           addDestChip(name);
         }
 
+        // Ẩn danh sách tỉnh, hiện chi tiết (chuyển trang)
+        const regionDestCards = document.getElementById('regionDestCards');
+        const v2ReviewPanel = document.getElementById('v2DestReviewPanel');
+        const btnBack = document.getElementById('btnBackToRegions');
+        const btnRefresh = document.getElementById('btnRefreshDest');
+        const regionLabel = document.getElementById('regionDestLabel');
+        
+        // Ẩn hoàn toàn danh sách tỉnh
+        if (regionDestCards) {
+          regionDestCards.classList.add('hidden');
+        }
+        
+        // Hiện nút quay lại và ẩn nút ngẫu nhiên
+        if (btnBack) btnBack.style.display = 'inline-flex';
+        if (btnRefresh) btnRefresh.style.display = 'none';
+        if (regionLabel) regionLabel.textContent = `📍 ${name}`;
+        
+        // Hiện panel chi tiết (thay thế hoàn toàn)
+        if (v2ReviewPanel) {
+          v2ReviewPanel.style.display = 'block';
+          v2ReviewPanel.style.opacity = '0';
+          v2ReviewPanel.style.transform = 'translateY(10px)';
+          requestAnimationFrame(() => {
+            v2ReviewPanel.style.transition = 'all 0.2s ease';
+            v2ReviewPanel.style.opacity = '1';
+            v2ReviewPanel.style.transform = 'translateY(0)';
+          });
+          // Scroll lên đầu panel
+          v2ReviewPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
         showCityAttractions(name);
         
         // Cập nhật chi phí ước tính ngay khi chọn điểm đến
         if (typeof updateBudgetEstimate === 'function') {
           setTimeout(() => updateBudgetEstimate(), 100);
         }
+      }
+    }
+    
+    // Quay lại danh sách tỉnh
+    window.backToRegionList = function() {
+      const regionDestCards = document.getElementById('regionDestCards');
+      const v2ReviewPanel = document.getElementById('v2DestReviewPanel');
+      const btnBack = document.getElementById('btnBackToRegions');
+      const btnRefresh = document.getElementById('btnRefreshDest');
+      const regionLabel = document.getElementById('regionDestLabel');
+      
+      // Ẩn chi tiết
+      if (v2ReviewPanel) {
+        v2ReviewPanel.style.opacity = '0';
+        v2ReviewPanel.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+          v2ReviewPanel.style.display = 'none';
+        }, 200);
+      }
+      
+      // Hiện lại danh sách tỉnh
+      if (btnBack) btnBack.style.display = 'none';
+      if (btnRefresh) btnRefresh.style.display = 'inline-flex';
+      if (regionLabel) regionLabel.textContent = currentRegion;
+      if (regionDestCards) {
+        regionDestCards.classList.remove('hidden');
+        regionDestCards.style.opacity = '0';
+        regionDestCards.style.transform = 'translateY(10px)';
+        requestAnimationFrame(() => {
+          regionDestCards.style.transition = 'all 0.2s ease';
+          regionDestCards.style.opacity = '1';
+          regionDestCards.style.transform = 'translateY(0)';
+        });
       }
     }
 

@@ -1282,7 +1282,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             </div>
 
             <div class="chat-panel__center">
-              <p class="chat-panel__disclaimer">Trợ lý ghép gợi ý từ dữ liệu trang + sở thích bạn lưu; không phải AI tổng quát. Visa/y tế vẫn cần nguồn chính thức.</p>
               <div class="chat-log" id="global-chat-log" role="log" aria-live="polite"></div>
               
               <!-- Planning Mode Indicator Bar -->
@@ -2901,6 +2900,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         chip.className = 'chat-suggestion-chip';
         chip.textContent = opt.text;
         chip.onclick = () => {
+          // Nếu có action, thực hiện action trực tiếp
+          if (opt.action === 'injectPlanningForm') {
+            injectPlanningFormToChat();
+            return;
+          }
+          // Ngược lại, gửi query như bình thường
           const input = document.getElementById('global-chat-input');
           const form = document.getElementById('global-chat-form');
           if (input && form) {
@@ -3249,11 +3254,11 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     }
 
     const PLANNING_SUGGESTIONS = [
-      { text: '🗺️ Lập lịch trình', query: '__START_WIZARD__' },
+      { text: '🗺️ Lập lịch trình', action: 'injectPlanningForm' },
       { text: '🏨 Tìm chỗ ở', query: 'Tìm khách sạn hoặc homestay đẹp' },
       { text: '🍽️ Món ngon', query: 'Gợi ý các món ăn đặc sản địa phương' },
       { text: '📸 Điểm check-in', query: 'Những địa điểm chụp ảnh đẹp nhất' },
-      { text: '✈️ Lên kế hoạch hoàn chỉnh', query: 'Hướng dẫn tôi lập kế hoạch du lịch' }
+      { text: '✈️ Lên kế hoạch', query: 'Hướng dẫn tôi lập kế hoạch du lịch' }
     ];
 
     // Quick-start combos for 1-click planning
@@ -3268,20 +3273,22 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     // Render welcome message with Quick Planners
     function renderWelcomeWithPlanner() {
-      // Welcome message
+      // Welcome message - clean and professional
       const welcomeDiv = document.createElement('div');
-      welcomeDiv.style.cssText = 'text-align:center; padding:10px 0 15px;';
+      welcomeDiv.style.cssText = 'padding: 24px 20px 16px; text-align: center;';
       welcomeDiv.innerHTML = `
-        <div style="font-size:1.5rem; margin-bottom:6px;">🌟</div>
-        <div style="font-size:1rem; font-weight:700; color:#fff; margin-bottom:4px;">WanderViet AI</div>
-        <div style="font-size:0.75rem; color:#94a3b8;">Trợ lý lập kế hoạch du lịch thông minh</div>
+        <div style="font-size: 1.1rem; font-weight: 700; color: var(--text, #1e293b); margin-bottom: 6px;">WanderViet</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted, #64748b); margin-bottom: 16px;">Trợ lý du lịch thông minh</div>
+        <button onclick="injectPlanningFormToChat()" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: var(--primary, #6366f1); border: none; border-radius: 20px; color: #fff; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+          🗺️ Lập lịch trình
+        </button>
       `;
       log.appendChild(welcomeDiv);
 
       // Quick planners section
       const qpSection = document.createElement('div');
-      qpSection.style.cssText = 'margin:8px 0;';
-      qpSection.innerHTML = `<div style="font-size:0.65rem; color:#10b981; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">🚀 Khởi đầu nhanh</div>`;
+      qpSection.style.cssText = 'margin: 0 16px 16px;';
+      qpSection.innerHTML = `<div style="font-size: 0.65rem; color: var(--text-muted, #64748b); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Gợi ý nhanh</div>`;
 
       const qpGrid = document.createElement('div');
       qpGrid.className = 'chat-quick-planners';
@@ -3301,12 +3308,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       });
       qpSection.appendChild(qpGrid);
       log.appendChild(qpSection);
-
-      // Divider
-      const divider = document.createElement('div');
-      divider.style.cssText = 'display:flex; align-items:center; gap:8px; margin:12px 0;';
-      divider.innerHTML = `<div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div><span style="font-size:0.65rem; color:#64748b; font-weight:600;">HOẶC HỎI TRỰC TIẾP</span><div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>`;
-      log.appendChild(divider);
 
       // Suggestions
       renderSuggestions(PLANNING_SUGGESTIONS);
@@ -3530,6 +3531,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       
       // Phát hiện form lập lịch nhúng trong chat
       if (text.includes('[PLANNING_FORM]')) {
+        // #region debug log
+        fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:appendMsg',message:'=== PROCESSING [PLANNING_FORM] ===',data:{text:text.substring(0,60)},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
         const formHtml = createInlinePlanningForm();
         msg.querySelector('.chat-bubble__content').innerHTML = text.replace('[PLANNING_FORM]', '') + formHtml;
         msg.querySelector('.chat-bubble__content').style.paddingBottom = '8px';
@@ -3715,12 +3719,53 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       const msg = input.value.trim();
       if (!msg) return;
       
-      // Check if starting planning wizard
+      // Check if starting planning wizard (manual trigger)
       if (msg === '__START_WIZARD__') {
         input.value = '';
         startPlanningWizard();
         return;
       }
+      
+      // Auto-detect planning intent from user message
+      // CHỈ trigger khi message chủ yếu về lập lịch (keyword chiếm >50% độ dài)
+      const planningKeywords = [
+        'lập lịch', 'lên lịch', 'tạo lịch trình',
+        'lịch trình', 'trip planner', 'plan trip'
+      ];
+      const lowerMsg = msg.toLowerCase().trim();
+      
+      // Kiểm tra xem có keyword nào match không và keyword chiếm tỷ lệ lớn trong message
+      let matchedKeyword = null;
+      for (const kw of planningKeywords) {
+        if (lowerMsg.includes(kw)) {
+          matchedKeyword = kw;
+          break;
+        }
+      }
+      
+      // Chỉ trigger nếu:
+      // 1. Có keyword match
+      // 2. Message ngắn (< 30 ký tự) HOẶC message chỉ chứa keyword + vài ký tự thêm
+      const isPlanningIntent = matchedKeyword && (
+        lowerMsg.length < 30 || 
+        (lowerMsg.replace(matchedKeyword, '').length < 10)
+      );
+      
+      // #region debug log
+      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:formSubmit',message:'=== FORM SUBMIT HANDLER ===',data:{msg:msg.substring(0,50),isPlanningIntent,_fromPlanningForm:window._fromPlanningForm},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      
+      // Skip keyword detection nếu submit từ form lập lịch
+      if (isPlanningIntent && !window._fromPlanningForm) {
+        window._fromPlanningForm = false;
+        appendMsg(msg, 'user');
+        input.value = '';
+        injectPlanningFormToChat();
+        return;
+      }
+      
+      // Reset flag sau khi xử lý
+      window._fromPlanningForm = false;
       
       const wasVoice = _lastInputWasVoice; // true nếu input từ mic, false nếu gõ text
       _lastInputWasVoice = false; // Reset sau mỗi lần gửi
@@ -4599,6 +4644,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     
     // Inject planning form directly into chat
     function injectPlanningFormToChat() {
+      // #region debug log
+      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:injectPlanningFormToChat',message:'=== INJECT FORM CALLED ===',timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
       const introText = 'Bạn muốn lập lịch trình du lịch? Điền thông tin bên dưới để mình giúp bạn nhé!';
       appendMsg(introText + ' [PLANNING_FORM]', 'bot');
     }
@@ -4627,81 +4675,408 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       }
     }
     
-    // Tạo form lập lịch inline trong chat
+    // Tạo form lập lịch inline trong chat - Professional Design (Theme-aware)
     function createInlinePlanningForm() {
       return `
-        <div class="inline-plan-form" style="margin-top: 16px; background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.25); border-radius: 16px; padding: 16px;">
-          <div style="font-weight: 600; font-size: 0.85rem; color: #a5b4fc; margin-bottom: 12px;">🗺️ Lập lịch trình nhanh</div>
-          
-          <div style="margin-bottom: 10px;">
-            <input type="text" id="inline-plan-dest" placeholder="📍 Điểm đến..." style="width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #f1f5f9; font-size: 0.82rem; box-sizing: border-box;">
+        <div class="inline-plan-form" id="inline-plan-form">
+          <div class="plan-form-header">
+            <div class="plan-form-icon">🗺️</div>
+            <div class="plan-form-title">
+              <span>Lập lịch trình nhanh</span>
+              <small>Điền thông tin để mình lên kế hoạch cho bạn</small>
+            </div>
           </div>
           
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-            <div>
-              <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">📅 Thời gian</div>
-              <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-duration" value="Nửa ngày" style="display:none;"> Nửa ngày</label>
-                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-duration" value="1 ngày" style="display:none;"> 1 ngày</label>
-                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-duration" value="2-3 ngày" style="display:none;"> 2-3N</label>
-                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-duration" value="4-5 ngày" style="display:none;"> 4-5N</label>
+          <div class="plan-form-body">
+            <!-- Điểm đến -->
+            <div class="plan-field">
+              <label class="plan-label">
+                <span class="plan-label-icon">📍</span>
+                <span>Điểm đến</span>
+              </label>
+              <div class="plan-input-wrapper">
+                <input type="text" id="inline-plan-dest" class="plan-text-input" placeholder="VD: Đà Nẵng, Sài Gòn, Phú Quốc...">
               </div>
             </div>
-            <div>
-              <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">💰 Ngân sách</div>
-              <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-budget" value="Dưới 1M" style="display:none;"> &lt;1M</label>
-                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-budget" value="1-3 triệu" style="display:none;"> 1-3M</label>
-                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-budget" value="3-5 triệu" style="display:none;"> 3-5M</label>
-                <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-budget" value="5 triệu+" style="display:none;"> 5M+</label>
+            
+            <!-- Thời gian -->
+            <div class="plan-field">
+              <label class="plan-label">
+                <span class="plan-label-icon">📅</span>
+                <span>Thời gian</span>
+              </label>
+              <div class="plan-chips">
+                <label class="plan-chip"><input type="radio" name="inline-duration" value="Nửa ngày"><span>Nửa ngày</span></label>
+                <label class="plan-chip"><input type="radio" name="inline-duration" value="1 ngày"><span>1 ngày</span></label>
+                <label class="plan-chip"><input type="radio" name="inline-duration" value="2-3 ngày"><span>2-3 ngày</span></label>
+                <label class="plan-chip"><input type="radio" name="inline-duration" value="4-5 ngày"><span>4-5 ngày</span></label>
+                <label class="plan-chip"><input type="radio" name="inline-duration" value="6-7 ngày"><span>6-7 ngày</span></label>
+              </div>
+            </div>
+            
+            <!-- Ngân sách -->
+            <div class="plan-field">
+              <label class="plan-label">
+                <span class="plan-label-icon">💰</span>
+                <span>Ngân sách</span>
+              </label>
+              <div class="plan-chips">
+                <label class="plan-chip"><input type="radio" name="inline-budget" value="Dưới 1 triệu"><span>Dưới 1M</span></label>
+                <label class="plan-chip"><input type="radio" name="inline-budget" value="1-3 triệu"><span>1-3M</span></label>
+                <label class="plan-chip"><input type="radio" name="inline-budget" value="3-5 triệu"><span>3-5M</span></label>
+                <label class="plan-chip"><input type="radio" name="inline-budget" value="5-10 triệu"><span>5-10M</span></label>
+                <label class="plan-chip"><input type="radio" name="inline-budget" value="Trên 10 triệu"><span>10M+</span></label>
+              </div>
+            </div>
+            
+            <!-- Đi cùng - Icon Grid -->
+            <div class="plan-field">
+              <label class="plan-label">
+                <span class="plan-label-icon">👥</span>
+                <span>Đi cùng</span>
+              </label>
+              <div class="plan-companion-grid">
+                <label class="plan-companion-card">
+                  <input type="radio" name="inline-style" value="Một mình">
+                  <div class="companion-icon">🚶</div>
+                  <div class="companion-text">Một mình</div>
+                </label>
+                <label class="plan-companion-card">
+                  <input type="radio" name="inline-style" value="Cặp đôi">
+                  <div class="companion-icon">💑</div>
+                  <div class="companion-text">Cặp đôi</div>
+                </label>
+                <label class="plan-companion-card">
+                  <input type="radio" name="inline-style" value="Gia đình">
+                  <div class="companion-icon">👨‍👩‍👧</div>
+                  <div class="companion-text">Gia đình</div>
+                </label>
+                <label class="plan-companion-card">
+                  <input type="radio" name="inline-style" value="Nhóm bạn">
+                  <div class="companion-icon">👯</div>
+                  <div class="companion-text">Nhóm bạn</div>
+                </label>
+              </div>
+            </div>
+            
+            <!-- Sở thích -->
+            <div class="plan-field">
+              <label class="plan-label">
+                <span class="plan-label-icon">🎯</span>
+                <span>Sở thích</span>
+                <span class="plan-label-hint">(chọn nhiều)</span>
+              </label>
+              <div class="plan-chips plan-chips-multiple">
+                <label class="plan-chip plan-chip-check"><input type="checkbox" name="inline-interest" value="Biển"><span>🏖️ Biển</span></label>
+                <label class="plan-chip plan-chip-check"><input type="checkbox" name="inline-interest" value="Núi"><span>⛰️ Núi</span></label>
+                <label class="plan-chip plan-chip-check"><input type="checkbox" name="inline-interest" value="Ẩm thực"><span>🍜 Ăn uống</span></label>
+                <label class="plan-chip plan-chip-check"><input type="checkbox" name="inline-interest" value="Check-in"><span>📸 Check-in</span></label>
+                <label class="plan-chip plan-chip-check"><input type="checkbox" name="inline-interest" value="Mua sắm"><span>🛍️ Mua sắm</span></label>
+                <label class="plan-chip plan-chip-check"><input type="checkbox" name="inline-interest" value="Nghỉ dưỡng"><span>🧖 Spa/Nghỉ dưỡng</span></label>
+                <label class="plan-chip plan-chip-check"><input type="checkbox" name="inline-interest" value="Phiêu lưu"><span>🚣 Khám phá</span></label>
+                <label class="plan-chip plan-chip-check"><input type="checkbox" name="inline-interest" value="Văn hóa"><span>🏛️ Văn hóa</span></label>
               </div>
             </div>
           </div>
           
-          <div style="margin-bottom: 10px;">
-            <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">👥 Đi cùng</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-style" value="Một mình" style="display:none;"> 🚶 Một mình</label>
-              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-style" value="Cặp đôi" style="display:none;"> 💑 Cặp đôi</label>
-              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-style" value="Gia đình" style="display:none;"> 👨‍👩‍👧 Gia đình</label>
-              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="radio" name="inline-style" value="Nhóm bạn" style="display:none;"> 👯 Nhóm</label>
-            </div>
-          </div>
-          
-          <div style="margin-bottom: 12px;">
-            <div style="font-size: 0.72rem; color: #94a3b8; margin-bottom: 6px;">🎯 Sở thích <span style="color:#64748b">(chọn nhiều)</span></div>
-            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
-              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Biển" style="display:none;"> 🏖️ Biển</label>
-              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Núi" style="display:none;"> ⛰️ Núi</label>
-              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Ăn ngon" style="display:none;"> 🍜 Ăn</label>
-              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Check-in" style="display:none;"> 📸 Check-in</label>
-              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Mua sắm" style="display:none;"> 🛍️ Mua sắm</label>
-              <label style="padding: 6px 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; font-size: 0.72rem; color: #cbd5e1; cursor: pointer;"><input type="checkbox" name="inline-interest" value="Nghỉ dưỡng" style="display:none;"> 🧖 Spa</label>
-            </div>
-          </div>
-          
-          <div style="display: flex; gap: 8px;">
-            <button onclick="submitInlinePlanForm(this)" style="flex: 1; padding: 10px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; border-radius: 10px; color: #fff; font-weight: 600; font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">✨ Tạo lịch trình</button>
+          <div class="plan-form-footer">
+            <button onclick="submitInlinePlanForm(this)" class="plan-submit-btn">
+              <span>✨</span> Tạo lịch trình
+            </button>
           </div>
         </div>
         <style>
-          .inline-plan-form label:hover { background: rgba(99, 102, 241, 0.2) !important; border-color: rgba(99, 102, 241, 0.4) !important; }
-          .inline-plan-form input[type="radio"]:checked + span,
-          .inline-plan-form input:checked + span { background: rgba(99, 102, 241, 0.3) !important; border-color: #6366f1 !important; color: #a5b4fc !important; }
-          .inline-plan-form input[type="radio"]:checked ~ * { }
-          .inline-plan-form button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+          .inline-plan-form {
+            margin-top: 16px;
+            background: var(--bg-elevated, #ffffff);
+            border: 1px solid var(--border, rgba(15, 23, 42, 0.1));
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft, 0 8px 32px rgba(0, 0, 0, 0.08));
+          }
+          
+          .plan-form-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 18px 20px;
+            background: var(--bg-card, rgba(99, 102, 241, 0.08));
+            border-bottom: 1px solid var(--border, rgba(15, 23, 42, 0.1));
+          }
+          
+          .plan-form-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary, #6366f1);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(var(--primary-rgb, 99, 102, 241), 0.3);
+          }
+          
+          .plan-form-title {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+          }
+          
+          .plan-form-title span {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text, #1e293b);
+            letter-spacing: -0.01em;
+          }
+          
+          .plan-form-title small {
+            font-size: 0.78rem;
+            color: var(--text-muted, #64748b);
+          }
+          
+          .plan-form-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+          }
+          
+          .plan-field {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+          }
+          
+          .plan-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+          }
+          
+          .plan-label-icon {
+            font-size: 0.9rem;
+          }
+          
+          .plan-label-hint {
+            font-weight: 400;
+            color: var(--text-secondary, #94a3b8);
+            font-size: 0.72rem;
+            margin-left: 4px;
+          }
+          
+          .plan-input-wrapper {
+            position: relative;
+          }
+          
+          .plan-text-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg, #fafafa);
+            border: 1px solid var(--border, rgba(15, 23, 42, 0.1));
+            border-radius: 12px;
+            color: var(--text, #1e293b);
+            font-size: 0.88rem;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+          }
+          
+          .plan-text-input:focus {
+            outline: none;
+            border-color: var(--primary, #6366f1);
+            box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 99, 102, 241), 0.15);
+          }
+          
+          .plan-text-input::placeholder {
+            color: var(--text-secondary, #94a3b8);
+          }
+          
+          .plan-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+          }
+          
+          .plan-chip {
+            display: inline-flex;
+            padding: 8px 14px;
+            background: var(--bg, #fafafa);
+            border: 1px solid var(--border, rgba(15, 23, 42, 0.1));
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted, #64748b);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+          }
+          
+          .plan-chip:hover {
+            border-color: var(--primary, #6366f1);
+            color: var(--primary, #6366f1);
+          }
+          
+          .plan-chip input {
+            display: none;
+          }
+          
+          .plan-chip:has(input:checked) {
+            background: var(--primary, #6366f1);
+            border-color: var(--primary, #6366f1);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(var(--primary-rgb, 99, 102, 241), 0.25);
+          }
+          
+          .plan-chip:has(input:checked) span {
+            color: inherit;
+          }
+          
+          /* Companion Grid - Icon Cards */
+          .plan-companion-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+          }
+          
+          .plan-companion-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 8px;
+            background: var(--bg, #fafafa);
+            border: 1.5px solid var(--border, rgba(15, 23, 42, 0.1));
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            gap: 8px;
+          }
+          
+          .plan-companion-card:hover {
+            border-color: var(--primary, #6366f1);
+            transform: translateY(-2px);
+          }
+          
+          .plan-companion-card input {
+            display: none;
+          }
+          
+          .plan-companion-card:has(input:checked) {
+            background: var(--primary, #6366f1);
+            border-color: var(--primary, #6366f1);
+          }
+          
+          .plan-companion-card:has(input:checked) .companion-icon,
+          .plan-companion-card:has(input:checked) .companion-text {
+            color: #ffffff;
+          }
+          
+          .companion-icon {
+            font-size: 1.6rem;
+            line-height: 1;
+          }
+          
+          .companion-text {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted, #64748b);
+            text-align: center;
+          }
+          
+          .plan-form-footer {
+            padding: 16px 20px;
+            background: var(--bg, #fafafa);
+            border-top: 1px solid var(--border, rgba(15, 23, 42, 0.1));
+          }
+          
+          .plan-submit-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: var(--primary, #6366f1);
+            border: none;
+            border-radius: 12px;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(var(--primary-rgb, 99, 102, 241), 0.35);
+          }
+          
+          .plan-submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(var(--primary-rgb, 99, 102, 241), 0.45);
+            filter: brightness(1.05);
+          }
+          
+          .plan-submit-btn:active {
+            transform: translateY(0);
+          }
+          
+          /* Dark mode specific overrides for better contrast */
+          [data-theme="dark"] .plan-chip {
+            background: var(--bg-elevated, #0B1426);
+          }
+          
+          [data-theme="dark"] .plan-form-header {
+            background: rgba(var(--primary-rgb, 99, 102, 241), 0.12);
+          }
+          
+          [data-theme="dark"] .plan-text-input {
+            background: var(--bg, #040914);
+          }
+          
+          [data-theme="dark"] .plan-form-footer {
+            background: var(--bg, #040914);
+          }
+          
+          /* Responsive */
+          @media (max-width: 480px) {
+            .plan-form-header {
+              padding: 14px 16px;
+            }
+            .plan-form-body {
+              padding: 16px;
+            }
+            .plan-chip {
+              padding: 6px 12px;
+              font-size: 0.75rem;
+            }
+          }
         </style>
       `;
     }
     
     // Submit form lập lịch inline trong chat
     window.submitInlinePlanForm = function(btn) {
+      // #region debug log
+      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'=== SUBMIT FORM START ===',timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      
+      // Đánh dấu là submit từ form để tránh keyword detection trigger lại
+      window._fromPlanningForm = true;
+      
       const form = btn.closest('.inline-plan-form');
+      // #region debug log
+      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'form found',data:{formExists:!!form,formId:form?.id,formClass:form?.className},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      
+      if (!form) return;
+      
       const dest = form.querySelector('#inline-plan-dest')?.value.trim();
       const duration = form.querySelector('input[name="inline-duration"]:checked')?.value;
       const budget = form.querySelector('input[name="inline-budget"]:checked')?.value;
       const style = form.querySelector('input[name="inline-style"]:checked')?.value;
       const interests = Array.from(form.querySelectorAll('input[name="inline-interest"]:checked')).map(c => c.value);
+      
+      // #region debug log
+      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'form values collected',data:{dest,duration,budget,style,interests},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
       
       if (!dest) {
         form.querySelector('#inline-plan-dest').focus();
@@ -4713,6 +5088,35 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       if (budget) prompt += `\n• Ngân sách: ${budget}/người`;
       if (style) prompt += `\n• Đi cùng: ${style}`;
       if (interests.length > 0) prompt += `\n• Sở thích: ${interests.join(', ')}`;
+      
+      // Tìm và xóa message row chứa form
+      const msgRow = form.closest('.chat-message-row');
+      // #region debug log
+      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'looking for msgRow',data:{msgRowExists:!!msgRow,msgRowClass:msgRow?.className,msgRowParent:msgRow?.parentElement?.className},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      
+      if (msgRow) {
+        msgRow.remove();
+        // #region debug log
+        fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'msgRow removed',timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+      } else {
+        // Không tìm thấy row, xóa form trực tiếp
+        form.remove();
+        // #region debug log
+        fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'msgRow not found, removed form directly',timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+      }
+      
+      // Kiểm tra form còn tồn tại không
+      const formStillExists = !!document.querySelector('.inline-plan-form');
+      // #region debug log
+      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'after removal check',data:{formStillExists},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      
+      // #region debug log
+      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'=== DISPATCHING SUBMIT ===',data:{prompt:prompt.substring(0,80)},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
       
       const input = document.getElementById('global-chat-input');
       const chatForm = document.getElementById('global-chat-form');

@@ -197,6 +197,62 @@
   <script src="js/voice-helper.js?v=1776819067182"></script>
   <script src="js/navigator.js?v=1776819067182"></script>
   <script>
+    // ── Collapsible Header on Scroll ──────────────────────────
+    (function initCollapsibleHeader() {
+      const header = document.getElementById('header-container');
+      const sidebarScroll = document.querySelector('.sidebar-scroll');
+      if (!header) return;
+
+      let lastScrollY = 0;
+      let ticking = false;
+      const HIDE_THRESHOLD = 10;
+      const SCROLL_UP_THRESHOLD = 30;
+
+      function updateHeader(currentScrollY) {
+        if (currentScrollY > HIDE_THRESHOLD && currentScrollY > lastScrollY) {
+          header.classList.add('is-hidden');
+        } else if (currentScrollY < lastScrollY - SCROLL_UP_THRESHOLD) {
+          header.classList.remove('is-hidden');
+        }
+
+        if (currentScrollY > 60) {
+          header.classList.add('is-mini');
+        } else {
+          header.classList.remove('is-mini');
+        }
+
+        lastScrollY = currentScrollY;
+        ticking = false;
+      }
+
+      // SCROLL trên SIDEBAR (không phải window) — đây là nơi scroll thực sự xảy ra
+      if (sidebarScroll) {
+        sidebarScroll.addEventListener('scroll', function() {
+          if (!ticking) {
+            requestAnimationFrame(() => updateHeader(sidebarScroll.scrollTop));
+            ticking = true;
+          }
+        }, { passive: true });
+      }
+
+      // Fallback: window scroll (cho mobile hoặc fullscreen mode)
+      window.addEventListener('scroll', function() {
+        if (!ticking) {
+          requestAnimationFrame(() => updateHeader(window.scrollY));
+          ticking = true;
+        }
+      }, { passive: true });
+
+      // Tap top → hiện header
+      if (sidebarScroll) {
+        sidebarScroll.addEventListener('touchstart', function() {
+          if (sidebarScroll.scrollTop < HIDE_THRESHOLD) {
+            header.classList.remove('is-hidden');
+          }
+        }, { passive: true });
+      }
+    })();
+
     // TRANSPORT COMPARE MODULE
     window.TransportCompare = (function() {
       const FUEL_PRICE = 24000;

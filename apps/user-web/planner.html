@@ -388,33 +388,220 @@
       background: rgba(255,255,255,0.25);
     }
 
-    /* --- Region Destination Grid (large cards like screenshot 2) --- */
+    .nearby-card {
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .nearby-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* --- Region Destination Grid (3 columns - Premium Card Layout) --- */
     .region-dest-scroll {
       display: grid !important;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
       padding: 0.6rem 0.2rem;
       align-items: start;
-      max-height: 520px; /* allow taller grid */
+      max-height: 480px;
       overflow-y: auto;
     }
+    @media (max-width: 900px) {
+      .region-dest-scroll {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .region-dest-scroll {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Premium Destination Card - Landscape Image + Info Side by Side */
     .region-dest-card {
       background: var(--card-bg, rgba(255,255,255,0.03));
       border: 1px solid var(--border, rgba(0,0,0,0.06));
-      border-radius: 0.9rem;
+      border-radius: 1rem;
       overflow: hidden;
       display: flex;
-      flex-direction: column;
-      min-height: 320px;
-      box-shadow: 0 8px 24px rgba(2,6,23,0.35);
-      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      flex-direction: row;
+      align-items: stretch;
+      min-height: 130px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .region-dest-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,23,0.5); }
-    .dest-card-image { position:relative; height:150px; overflow:hidden; }
-    .dest-card-image img { width:100%; height:100%; object-fit:cover; display:block; }
-    .dest-card-badge { position:absolute; left:0.6rem; top:0.6rem; background: #ff4d8b; color:#fff; padding:0.28rem 0.5rem; border-radius:0.5rem; font-weight:700; font-size:0.72rem; }
-    .dest-card-verified { position:absolute; right:0.6rem; top:0.6rem; background: rgba(0,0,0,0.35); color:#d1fae5; padding:0.18rem 0.45rem; border-radius:0.5rem; font-size:0.68rem; }
-    .dest-card-info { padding:0.8rem; display:flex; flex-direction:column; gap:0.5rem; flex:1; }
+    .region-dest-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      border-color: rgba(59, 130, 246, 0.5);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 0.06);
+    }
+    .region-dest-card.active {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.1);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2), 0 8px 20px rgba(59, 130, 246, 0.15);
+    }
+
+    /* Premium Landscape Image Container */
+    .dest-card-image {
+      position: relative;
+      width: 140px;
+      min-width: 140px;
+      height: 100%;
+      min-height: 130px;
+      aspect-ratio: 16/10;
+      overflow: hidden;
+      flex-shrink: 0;
+      border-radius: 1rem 0 0 1rem;
+    }
+    .dest-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    .region-dest-card:hover .dest-card-image img {
+      transform: scale(1.08);
+    }
+
+    /* Premium Info Section */
+    .dest-card-info {
+      padding: 0.75rem;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      flex: 1;
+      min-width: 0;
+    }
+    .dest-card-location {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--text-muted, #94a3b8);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .dest-card-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+    .region-dest-card.active .dest-card-name {
+      color: #60a5fa;
+    }
+
+    /* Premium Stars Display */
+    .dest-card-stars {
+      font-size: 0.75rem;
+      color: #fbbf24;
+      letter-spacing: 1px;
+      margin: 0.15rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Premium Meta Tags */
+    .dest-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 0.25rem;
+    }
+    .meta-tag {
+      font-size: 0.6rem;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    .meta-tag.safety {
+      background: rgba(74, 222, 128, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+    }
+    .meta-tag.cost {
+      background: rgba(251, 191, 36, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(251, 191, 36, 0.3);
+    }
+    .meta-tag.popular {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    /* Premium Image Badges */
+    .dest-card-badge {
+      position: absolute;
+      left: 0.5rem;
+      top: 0.5rem;
+      background: linear-gradient(135deg, #ff4d8b, #ff6b6b);
+      color: #fff;
+      padding: 0.3rem 0.6rem;
+      border-radius: 0.5rem;
+      font-weight: 700;
+      font-size: 0.7rem;
+      box-shadow: 0 2px 8px rgba(255, 77, 139, 0.4);
+    }
+    .dest-card-verified {
+      position: absolute;
+      right: 0.5rem;
+      top: 0.5rem;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      color: #4ade80;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.5rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+
+    /* Premium Action Buttons */
+    .dest-card-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: auto;
+      padding-top: 0.5rem;
+    }
+    .link-detail {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #60a5fa;
+      text-decoration: none;
+      padding: 0.35rem 0.75rem;
+      border-radius: 0.5rem;
+      background: rgba(96, 165, 250, 0.1);
+      border: 1px solid rgba(96, 165, 250, 0.2);
+      transition: all 0.2s;
+    }
+    .link-detail:hover {
+      background: rgba(96, 165, 250, 0.2);
+      transform: translateY(-1px);
+    }
+    .btn-go {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      padding: 0.35rem 0.75rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-go:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      background: linear-gradient(135deg, #059669, #047857);
+    }
+
     /* spot-review-tab style moved to premium adaptive styles */
     .spot-review-header {
       display: flex;
@@ -457,8 +644,30 @@
     }
     .spot-review-content { display: grid; grid-template-columns: 1fr 0.95fr; gap: 1rem; }
     .spot-review-summary { color: #e2e8f0; line-height: 1.75; font-size: 1rem; margin: 0; }
-    .spot-review-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem; margin-top: 1rem; }
-    .spot-review-gallery img { width: 100%; height: 150px; object-fit: cover; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.14); }
+    .spot-review-gallery { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 0.6rem; 
+      margin-top: 0.75rem;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(0,0,0,0.02));
+      border-radius: 1rem;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .spot-review-gallery img { 
+      width: 100%; 
+      aspect-ratio: 1/1; 
+      object-fit: cover; 
+      border-radius: 0.6rem; 
+      border: 2px solid rgba(255,255,255,0.08);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .spot-review-gallery img:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      border-color: rgba(255,255,255,0.2);
+    }
     .spot-review-ratings { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; }
     .spot-review-rating { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 1rem; padding: 0.6rem 0.9rem; min-width: 140px; font-size: 0.95rem; color: #f8fafc; }
     .spot-review-list { display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1.2rem; }
@@ -471,12 +680,15 @@
       .spot-review-content { grid-template-columns: 1fr; }
       .spot-review-gallery img { height: 120px; }
     }
-    .dest-card-location { color:var(--text-muted); font-size:0.75rem; }
-    .dest-card-name { font-weight:800; font-size:1rem; color:var(--text); }
-    .dest-card-desc { color:var(--text-muted); font-size:0.85rem; line-height:1.2; flex:1; }
-    .dest-card-actions { display:flex; justify-content:space-between; align-items:center; gap:0.5rem; margin-top:0.25rem; }
-    .dest-card-actions .link-detail { color:var(--link, #60a5fa); font-weight:700; text-decoration:none; }
-    .dest-card-actions .btn-go { background: linear-gradient(90deg,#7c3aed,#06b6d4); color:#fff; border:none; padding:0.45rem 0.7rem; border-radius:0.6rem; cursor:pointer; }
+    .dest-card-location { color:var(--text-muted); font-size:0.7rem; margin-bottom: 0.1rem; }
+    .dest-card-name { font-weight:800; font-size:0.9rem; color:var(--text); line-height: 1.2; margin: 0; }
+    .dest-card-desc { color:var(--text-muted); font-size:0.8rem; line-height:1.2; flex:1; }
+    .dest-card-stars { font-size: 0.7rem; color: #fbbf24; margin: 0; }
+    .dest-card-meta { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0.2rem 0; }
+    .dest-card-meta .meta-tag { padding: 0.15rem 0.35rem; border-radius: 0.3rem; font-size: 0.6rem; }
+    .dest-card-actions { display: flex; justify-content: space-between; align-items: center; gap: 0.3rem; margin-top: auto; padding-top: 0.3rem; }
+    .dest-card-actions .link-detail { color:var(--link, #60a5fa); font-weight:700; font-size: 0.75rem; text-decoration:none; }
+    .dest-card-actions .btn-go { background: linear-gradient(90deg,#7c3aed,#06b6d4); color:#fff; border:none; padding: 0.35rem 0.5rem; border-radius: 0.5rem; cursor:pointer; font-size: 0.7rem; }
     .spot-action-btn, .spot-select-btn {
       border: 1px solid rgba(255,255,255,0.12);
       background: rgba(255,255,255,0.06);
@@ -703,9 +915,9 @@
     .spot-detail-review-stars { color:#fbbf24; font-size:0.9rem; }
     .spot-detail-review-text { margin:0.15rem 0 0 0; color:#cbd5e1; font-size:0.88rem; line-height:1.5; }
     @media (max-width: 900px) {
-      .region-dest-scroll { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-      .region-dest-card { min-height: 260px; }
-      .dest-card-image { height:120px; }
+      .region-dest-scroll { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+      .region-dest-card { min-height: 110px; }
+      .dest-card-image { width: 100px !important; min-width: 100px !important; height: 100px !important; }
       .spot-detail-body { grid-template-columns: 1fr; }
       .spot-detail-gallery img { width: 100px; height: 72px; }
     }
@@ -1376,6 +1588,13 @@
                     <span>🔄 Ngẫu nhiên</span>
                   </button>
                 </div>
+                <!-- Thanh tìm kiếm tỉnh trong miền đã chọn -->
+                <div style="margin-top:0.5rem;">
+                  <div style="position:relative;">
+                    <input type="text" id="province-search" placeholder="🔍 Tìm tỉnh, thành phố..." oninput="filterRegionDestinations(this.value)" style="width:100%; padding:8px 12px 8px 36px; border-radius:8px; border:1px solid var(--border); background:var(--bg-card); color:var(--text); font-size:0.85rem; outline:none; box-sizing:border-box;">
+                    <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:0.9rem; opacity:0.5;">🔍</span>
+                  </div>
+                </div>
               </div>
               <div id="regionDestCards" class="region-dest-scroll"></div>
               
@@ -1421,10 +1640,17 @@
                   <div class="review-section-block">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                       <span style="font-size:0.75rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">🗺️ Bản đồ & Định vị</span>
+                      <!-- Filter markers by type -->
+                      <div style="display:flex; gap:0.3rem; flex-wrap:wrap;">
+                        <button class="map-filter-btn active" data-type="all" onclick="toggleMapFilter(this, 'all')" style="padding:3px 8px; border-radius:1rem; border:1px solid var(--border); background:rgba(59,130,246,0.1); color:#3b82f6; font-size:0.6rem; cursor:pointer; font-weight:600;">Tất cả</button>
+                        <button class="map-filter-btn" data-type="restaurant" onclick="toggleMapFilter(this, 'restaurant')" style="padding:3px 8px; border-radius:1rem; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-size:0.6rem; cursor:pointer;">🍜 Ăn uống</button>
+                        <button class="map-filter-btn" data-type="cafe" onclick="toggleMapFilter(this, 'cafe')" style="padding:3px 8px; border-radius:1rem; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-size:0.6rem; cursor:pointer;">☕ Cafe</button>
+                        <button class="map-filter-btn" data-type="attraction" onclick="toggleMapFilter(this, 'attraction')" style="padding:3px 8px; border-radius:1rem; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-size:0.6rem; cursor:pointer;">🏛️ Du lịch</button>
+                      </div>
                     </div>
-                    <div id="v2DestMapContainer" style="height:120px; border-radius:0.75rem; overflow:hidden; border:1px solid var(--border); position:relative;">
-                      <iframe id="v2DestMap" width="100%" height="100%" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                      <div style="position:absolute; bottom:0.5rem; right:0.5rem; display:flex; gap:0.4rem;">
+                    <div id="v2DestMapContainer" style="height:160px; border-radius:0.75rem; overflow:hidden; border:1px solid var(--border); position:relative;">
+                      <div id="v2LeafletMap" style="width:100%; height:100%;"></div>
+                      <div style="position:absolute; bottom:0.5rem; right:0.5rem; display:flex; gap:0.4rem; z-index:1000;">
                         <button onclick="openMapZoom()" style="background:rgba(59,130,246,0.9); border:none; border-radius:0.4rem; padding:0.35rem 0.6rem; font-size:0.65rem; color:#fff; cursor:pointer;">🔍 Phóng to</button>
                         <button id="btnGPSDirection" onclick="getGPSDirectionsV2()" style="background:rgba(16,185,129,0.9); border:none; border-radius:0.4rem; padding:0.35rem 0.6rem; font-size:0.65rem; color:#fff; cursor:pointer;">📍 Chỉ đường</button>
                       </div>
@@ -1488,8 +1714,14 @@
                   <div class="review-section-block">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
                       <span style="font-size:0.75rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">📸 Địa điểm & Quán gần đây</span>
+                      <span id="nearby-count" style="font-size:0.65rem; color:var(--text-muted);"></span>
                     </div>
-                    <div id="v2NearbyPlaces" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:0.5rem;">
+                    <!-- Thanh tìm kiếm địa điểm -->
+                    <div style="position:relative; margin-bottom:0.5rem;">
+                      <input type="text" id="nearby-search" placeholder="Tìm kiếm địa điểm..." oninput="filterNearbyPlaces(this.value)" style="width:100%; padding:7px 12px 7px 32px; border-radius:8px; border:1px solid var(--border); background:var(--bg-card); color:var(--text); font-size:0.75rem; outline:none; box-sizing:border-box;">
+                      <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:0.8rem; opacity:0.5;">🔍</span>
+                    </div>
+                    <div id="v2NearbyPlaces" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.5rem;">
                       <!-- Nearby places will be injected here -->
                     </div>
                   </div>
@@ -2405,7 +2637,12 @@
     function openRegionPanel() {
       const panel = document.getElementById('regionDestinations');
       const hint = document.getElementById('regionHint');
+      const searchInput = document.getElementById('province-search');
       const scrollTarget = document.getElementById('regionDestCards');
+      
+      // Reset search input
+      if (searchInput) searchInput.value = '';
+      
       if (panel) {
         panel.style.display = 'block';
         panel.style.opacity = '0';
@@ -2460,6 +2697,21 @@
       }
     }
 
+    // Filter destination cards by search query within selected region
+    window.filterRegionDestinations = function(query) {
+      const scrollContainer = document.getElementById('regionDestCards');
+      if (!scrollContainer) return;
+      const q = (query || '').toLowerCase().trim();
+      const cards = scrollContainer.querySelectorAll('.region-dest-card');
+      let visibleCount = 0;
+      cards.forEach(card => {
+        const name = (card.getAttribute('data-dest-name') || '').toLowerCase();
+        const match = !q || name.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+    };
+
     function renderDestinations() {
       const scrollContainer = document.getElementById('regionDestCards');
       const label = document.getElementById('regionDestLabel');
@@ -2473,6 +2725,7 @@
       allDest.forEach(dest => {
         const card = document.createElement('div');
         card.className = 'region-dest-card';
+        card.setAttribute('data-dest-name', dest.name);
         
         // Lấy thông tin chi tiết từ detailsMap
         const cityData = detailsMap[dest.name] || {};
@@ -2487,7 +2740,7 @@
 
         card.innerHTML = `
           <div class="dest-card-image">
-            <img src="${imgSrc}" alt="${dest.name}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop';">
+            <img src="${imgSrc}" alt="${dest.name}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=600&fit=crop';">
             <div class="dest-card-badge">⭐ ${rating}</div>
           </div>
           <div class="dest-card-info">
@@ -3459,6 +3712,163 @@
     // Selected attractions with full info
     window.selectedAttractionData = []; // Array of { name, category, cityName }
     window.selectedAttractionCards = {}; // Map by spot name
+
+    // ── Leaflet Map với Markers theo loại ────────────────────
+    let v2MapInstance = null;
+    let v2MapMarkers = [];
+    let v2CurrentFilter = 'all';
+    let v2CityData = null;
+
+    const MARKER_COLORS = {
+      restaurant: { color: '#10b981', icon: '🍜' },
+      cafe: { color: '#f59e0b', icon: '☕' },
+      attraction: { color: '#3b82f6', icon: '🏛️' },
+      bar: { color: '#8b5cf6', icon: '🍺' },
+      beach: { color: '#06b6d4', icon: '🏖️' },
+      park: { color: '#22c55e', icon: '🌿' },
+      hotel: { color: '#ec4899', icon: '🏨' },
+      shopping: { color: '#f97316', icon: '🛒' },
+      experience: { color: '#eab308', icon: '✨' },
+      default: { color: '#6b7280', icon: '📍' }
+    };
+
+    // Custom DivIcon cho marker với emoji + màu
+    function createMarkerIcon(icon, color) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40"><path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 24 16 24s16-12 16-24C32 7.163 24.837 0 16 0z" fill="${color}"/><circle cx="16" cy="14" r="7" fill="white"/><text x="16" y="18" text-anchor="middle" font-size="10">${icon}</text></svg>`;
+      return L.divIcon({
+        html: svg,
+        className: '',
+        iconSize: [32, 40],
+        iconAnchor: [16, 40],
+        popupAnchor: [0, -40]
+      });
+    }
+
+    function initV2LeafletMap(cityName, cityData) {
+      // Ensure Leaflet is loaded
+      if (typeof L === 'undefined') {
+        // Retry after short delay
+        setTimeout(() => initV2LeafletMap(cityName, cityData), 500);
+        return;
+      }
+      const container = document.getElementById('v2LeafletMap');
+      if (!container) return;
+      v2CityData = cityData;
+
+      // Remove old map if exists
+      if (v2MapInstance) {
+        v2MapInstance.remove();
+        v2MapInstance = null;
+      }
+
+      // City center coordinates (approximate)
+      const cityCoords = {
+        "Hà Nội": [21.0285, 105.8542],
+        "TP. Hồ Chí Minh": [10.8231, 106.6297],
+        "Đà Nẵng": [16.0544, 108.2022],
+        "Hội An": [15.8801, 108.3380],
+        "Huế": [16.4628, 107.5859],
+        "Hạ Long": [20.9101, 106.9176],
+        "Sapa": [22.3362, 103.8400],
+        "Nha Trang": [12.2388, 109.1967],
+        "Đà Lạt": [11.9465, 108.4419],
+        "Phú Quốc": [10.2298, 103.9637],
+        "Cần Thơ": [10.0452, 105.7469],
+        "Ninh Bình": [20.2541, 105.9740],
+        "Hải Phòng": [20.8449, 106.6881],
+        "Vũng Tàu": [10.4806, 107.1830],
+        "Quy Nhơn": [13.7797, 109.2196]
+      };
+
+      const coords = cityCoords[cityName] || [21.0285, 105.8542];
+
+      // Init Leaflet map
+      v2MapInstance = L.map('v2LeafletMap', {
+        center: coords,
+        zoom: 13,
+        zoomControl: false
+      });
+
+      // Tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap',
+        maxZoom: 19
+      }).addTo(v2MapInstance);
+
+      // Add main city marker
+      const mainIcon = L.divIcon({
+        html: `<div style="background:#ef4444; width:20px; height:20px; border-radius:50%; border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; font-size:10px;">📍</div>`,
+        className: '',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+      L.marker(coords, { icon: mainIcon }).addTo(v2MapInstance).bindPopup(`<b>${cityName}</b><br><small>Điểm đến</small>`);
+
+      // Add nearby place markers
+      const places = cityData.nearbyPlaces || [];
+      const spots = cityData.spots || [];
+      const allPlaces = [...places, ...spots].slice(0, 20); // Max 20 markers
+
+      v2MapMarkers = [];
+      allPlaces.forEach(place => {
+        // Random offset from city center to spread markers
+        const offsetLat = (Math.random() - 0.5) * 0.03;
+        const offsetLng = (Math.random() - 0.5) * 0.04;
+        const placeCoords = [coords[0] + offsetLat, coords[1] + offsetLng];
+        const type = place.type || place.category || 'default';
+        const info = MARKER_COLORS[type] || MARKER_COLORS.default;
+        const icon = createMarkerIcon(info.icon, info.color);
+        
+        const marker = L.marker(placeCoords, { icon }).addTo(v2MapInstance);
+        marker.bindPopup(`
+          <div style="min-width:150px;">
+            <b style="font-size:13px;">${info.icon} ${place.name}</b><br>
+            <span style="font-size:11px; color:#666;">${type === 'restaurant' || type === 'cafe' ? '🍜 Ăn uống' : type === 'attraction' ? '🏛️ Du lịch' : type === 'experience' ? '✨ Trải nghiệm' : '📍 Địa điểm'}</span>
+            ${place.rating ? `<br><span style="font-size:11px;">⭐ ${place.rating}</span>` : ''}
+            ${place.distance ? `<br><span style="font-size:11px;">📏 ${place.distance}</span>` : ''}
+          </div>
+        `);
+        v2MapMarkers.push({ marker, type, place });
+      });
+
+      // Apply current filter
+      applyMapFilter(v2CurrentFilter);
+    }
+
+    function applyMapFilter(filter) {
+      v2MapMarkers.forEach(({ marker, type }) => {
+        if (filter === 'all' || type === filter) {
+          if (v2MapInstance && !marker._map) marker.addTo(v2MapInstance);
+        } else {
+          if (marker._map) v2MapInstance.removeLayer(marker);
+        }
+      });
+    }
+
+    window.toggleMapFilter = function(btn, type) {
+      v2CurrentFilter = type;
+      // Update button styles
+      document.querySelectorAll('.map-filter-btn').forEach(b => {
+        const t = b.getAttribute('data-type');
+        const isActive = t === type;
+        const colors = { restaurant: '#10b981', cafe: '#f59e0b', attraction: '#3b82f6' };
+        b.style.background = isActive ? `${colors[t] || '#3b82f6'}22` : 'transparent';
+        b.style.color = isActive ? (colors[t] || '#3b82f6') : 'var(--text-muted)';
+        b.style.borderColor = isActive ? colors[t] || '#3b82f6' : '';
+        b.classList.toggle('active', isActive);
+      });
+      applyMapFilter(type);
+    };
+
+    window.openMapZoom = function() {
+      if (v2MapInstance) {
+        v2MapInstance.setZoom(15);
+        // Open Google Maps with the city name
+        const cityName = v2CityData ? Object.keys({}).find(k => { return false; }) : '';
+        const destName = document.getElementById('v2DestTitle')?.textContent || '';
+        window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destName + ', Vietnam')}`, '_blank');
+      }
+    };
     
     window.toggleSpotSelection = function(cardEl, name, category, cityName) {
       const existingIdx = window.selectedAttractionData.findIndex(a => a.name === name);
@@ -3669,12 +4079,8 @@
         document.getElementById('v2ScoreWeather').textContent = cityData.weather;
       }
 
-      // 3. Populate GPS Map
-      const mapIframe = document.getElementById('v2DestMap');
-      if (mapIframe) {
-        const mapQuery = encodeURIComponent(cityName + ', Vietnam');
-        mapIframe.src = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${mapQuery}&zoom=13&maptype=roadmap`;
-      }
+      // 3. Populate GPS Map with Leaflet markers by type
+      initV2LeafletMap(cityName, cityData);
 
       // 4. Populate Google Reviews
       const reviewsContainer = document.getElementById('v2GoogleReviews');
@@ -3698,20 +4104,41 @@
       if (nearbyContainer) {
         if (cityData.nearbyPlaces && cityData.nearbyPlaces.length > 0) {
           // Use detailed nearby places with restaurant info
-          nearbyContainer.innerHTML = cityData.nearbyPlaces.map(place => `
-            <div style="border-radius:0.5rem; overflow:hidden; position:relative; border:1px solid var(--border); background:var(--bg-card);">
-              <img src="${place.img}" alt="${place.name}" style="width:100%; height:70px; object-fit:cover;" onerror="this.style.display='none'">
+          nearbyContainer.innerHTML = cityData.nearbyPlaces.map(place => {
+            // Icon mapping theo type
+            const iconMap = {
+              restaurant: { icon: '🍜', color: '#10b981' },
+              cafe: { icon: '☕', color: '#f59e0b' },
+              attraction: { icon: '🏛️', color: '#3b82f6' },
+              bar: { icon: '🍺', color: '#8b5cf6' },
+              beach: { icon: '🏖️', color: '#06b6d4' },
+              park: { icon: '🌿', color: '#22c55e' },
+              hotel: { icon: '🏨', color: '#ec4899' },
+              shopping: { icon: '🛒', color: '#f97316' },
+              experience: { icon: '✨', color: '#eab308' }
+            };
+            const iconInfo = iconMap[place.type] || { icon: '📍', color: '#6b7280' };
+            
+            return `
+            <div class="nearby-card" data-name="${place.name.toLowerCase()}" style="border-radius:0.5rem; overflow:hidden; position:relative; border:1px solid var(--border); background:var(--bg-card); cursor:pointer;" onclick="window.getSpotDirections('${place.name.replace(/'/g, "\\'")}', '${cityName.replace(/'/g, "\\'")}')">
+              <div style="position:relative;">
+                <img src="${place.img}" alt="${place.name}" style="width:100%; height:70px; object-fit:cover;" onerror="this.style.display='none'">
+                <span style="position:absolute; top:4px; right:4px; background:${iconInfo.color}; color:#fff; font-size:0.55rem; padding:2px 5px; border-radius:4px; font-weight:700;">${iconInfo.icon}</span>
+              </div>
               <div style="padding:0.4rem;">
                 <div style="font-size:0.6rem; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${place.name}</div>
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
-                  <span style="font-size:0.55rem; color:${place.type === 'restaurant' ? '#10b981' : '#f59e0b'};">${place.type === 'restaurant' ? '🍜' : '☕'}</span>
+                  <span style="font-size:0.55rem; color:${iconInfo.color}; font-weight:600;">${iconInfo.icon}</span>
                   <span style="font-size:0.55rem; color:#fbbf24;">⭐${place.rating}</span>
                   <span style="font-size:0.55rem; color:var(--text-muted);">${place.distance}</span>
                 </div>
-                <button onclick="window.getSpotDirections('${place.name.replace(/'/g, "\\'")}', '${cityName.replace(/'/g, "\\'")}')" style="width:100%; margin-top:4px; padding:3px; border-radius:4px; border:none; background:rgba(16,185,129,0.15); color:#10b981; font-size:0.55rem; cursor:pointer;">📍 Chỉ đường</button>
+                <button onclick="event.stopPropagation(); window.getSpotDirections('${place.name.replace(/'/g, "\\'")}', '${cityName.replace(/'/g, "\\'")}')" style="width:100%; margin-top:4px; padding:3px; border-radius:4px; border:none; background:${iconInfo.color}22; color:${iconInfo.color}; font-size:0.55rem; cursor:pointer; font-weight:600;">📍 Chỉ đường</button>
               </div>
             </div>
-          `).join('');
+          `}).join('');
+          // Update count
+          const countEl = document.getElementById('nearby-count');
+          if (countEl) countEl.textContent = `${cityData.nearbyPlaces.length} địa điểm`;
         } else if (cityData.photos && cityData.photos.length > 0) {
           // Fallback to photos
           nearbyContainer.innerHTML = cityData.photos.map((photo, idx) => `
@@ -3719,6 +4146,8 @@
               <img src="${photo}" alt="Photo ${idx + 1}" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">
             </div>
           `).join('');
+          const countEl = document.getElementById('nearby-count');
+          if (countEl) countEl.textContent = `${cityData.photos.length} ảnh`;
         } else {
           // Default photos
           nearbyContainer.innerHTML = `
@@ -3726,6 +4155,8 @@
               <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop" alt="Nearby" style="width:100%; height:100%; object-fit:cover;">
             </div>
           `;
+          const countEl = document.getElementById('nearby-count');
+          if (countEl) countEl.textContent = '';
         }
       }
 
@@ -3853,6 +4284,26 @@
     // Close review panel and go back to region list
     window.closeV2ReviewPanel = function() {
       backToRegionList();
+    };
+    
+    // Filter nearby places by search query
+    window.filterNearbyPlaces = function(query) {
+      const container = document.getElementById('v2NearbyPlaces');
+      const countEl = document.getElementById('nearby-count');
+      if (!container) return;
+      const q = query.toLowerCase().trim();
+      const cards = container.querySelectorAll('.nearby-card');
+      let visibleCount = 0;
+      cards.forEach(card => {
+        const name = card.getAttribute('data-name') || '';
+        const match = !q || name.includes(q);
+        card.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+      if (countEl) {
+        const total = cards.length;
+        countEl.textContent = total > 0 ? `${visibleCount}/${total} địa điểm` : '';
+      }
     };
     
     // Spot Detail Modal Functions
@@ -4403,17 +4854,16 @@
           </div>
           <button class="spot-review-close" onclick="document.getElementById('spotReviewTab').classList.remove('active');">Đóng</button>
         </div>
-        <div class="spot-review-content" style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 1.25rem;">
-          <div style="display:flex; flex-direction:column; gap:0.85rem;">
-            <p class="spot-review-summary" style="margin:0; font-size:0.9rem; line-height:1.6; font-weight:500;">${spot.desc} ${reviewText}</p>
-            <div class="spot-review-ratings" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-              ${ratingPills.map(pill => `<div class="spot-review-rating" style="flex:1; text-align:center;">${pill}</div>`).join('')}
+          <div class="spot-review-content" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+            <div class="spot-review-gallery" style="align-self: start;">
+              ${images.map(src => `<img src="${src}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop'" alt="${spot.name}">`).join('')}
             </div>
-            <div class="spot-review-gallery" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:0.5rem; margin-top:0.25rem;">
-              ${images.map(src => `<img src="${src}" style="width:100%; height:90px; object-fit:cover; border-radius:0.75rem; border:1px solid rgba(0,0,0,0.06);" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop'" alt="${spot.name}">`).join('')}
-            </div>
-          </div>
-          <div class="spot-review-list" style="display:flex; flex-direction:column; gap:0.65rem;">
+            <div style="display:flex; flex-direction:column; gap:0.75rem;">
+              <p class="spot-review-summary" style="margin:0; font-size:0.9rem; line-height:1.6; font-weight:500;">${spot.desc} ${reviewText}</p>
+              <div class="spot-review-ratings" style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                ${ratingPills.map(pill => `<div class="spot-review-rating" style="flex:1; text-align:center;">${pill}</div>`).join('')}
+              </div>
+              <div class="spot-review-list" style="display:flex; flex-direction:column; gap:0.65rem;">
             <div style="font-weight:700; font-size:0.85rem; margin-bottom:0.15rem; display:flex; justify-content:space-between; align-items:center;">
               <span>Đánh giá từ cộng đồng</span>
               <span style="font-size:0.75rem; font-weight:normal; opacity:0.7;">3 bình luận</span>

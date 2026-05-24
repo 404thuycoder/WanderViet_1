@@ -1,4 +1,4 @@
-﻿/**
+/**
  * WanderViet AI Shared UI Logic
  * Theme, Toast, Notifications, Rank Badges, Common Modals
  */
@@ -1431,31 +1431,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                       <span class="widget-weather__desc">Thời tiết du lịch rất đẹp ☀️</span>
                     </div>
                     <div class="widget-weather__temp">28°C</div>
-                  </div>
-
-                  <!-- Dynamic WanderRadio Interactive Widget -->
-                  <div class="chat-widget-card widget-radio">
-                    <div class="widget-radio__header">
-                      <span class="widget-radio__title">🎧 WanderRadio</span>
-                      <span class="widget-radio__status" id="radio-status">Đang dừng</span>
-                    </div>
-                    <div class="widget-radio__body">
-                      <div class="widget-radio__info">
-                        <span class="widget-radio__track" id="radio-track">Lo-Fi Hồ Tây ☕</span>
-                        <span class="widget-radio__author">WanderViet AI Ambient</span>
-                      </div>
-                      <button type="button" class="widget-radio__play-btn" id="radio-play-btn" title="Phát nhạc">▶</button>
-                    </div>
-                    <!-- CSS Wave visualizer bars -->
-                    <div class="widget-radio__wave" id="radio-wave">
-                      <div class="wave-bar"></div>
-                      <div class="wave-bar"></div>
-                      <div class="wave-bar"></div>
-                      <div class="wave-bar"></div>
-                      <div class="wave-bar"></div>
-                      <div class="wave-bar"></div>
-                      <div class="wave-bar"></div>
-                    </div>
                   </div>
 
                   <!-- Dynamic WanderQuiz Interactive Widget -->
@@ -3531,9 +3506,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       
       // Phát hiện form lập lịch nhúng trong chat
       if (text.includes('[PLANNING_FORM]')) {
-        // #region debug log
-        fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:appendMsg',message:'=== PROCESSING [PLANNING_FORM] ===',data:{text:text.substring(0,60)},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
+
         const formHtml = createInlinePlanningForm();
         msg.querySelector('.chat-bubble__content').innerHTML = text.replace('[PLANNING_FORM]', '') + formHtml;
         msg.querySelector('.chat-bubble__content').style.paddingBottom = '8px';
@@ -3751,9 +3724,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         (lowerMsg.replace(matchedKeyword, '').length < 10)
       );
       
-      // #region debug log
-      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:formSubmit',message:'=== FORM SUBMIT HANDLER ===',data:{msg:msg.substring(0,50),isPlanningIntent,_fromPlanningForm:window._fromPlanningForm},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
+
       
       // Skip keyword detection nếu submit từ form lập lịch
       if (isPlanningIntent && !window._fromPlanningForm) {
@@ -4644,9 +4615,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     
     // Inject planning form directly into chat
     function injectPlanningFormToChat() {
-      // #region debug log
-      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:injectPlanningFormToChat',message:'=== INJECT FORM CALLED ===',timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
+
       const introText = 'Bạn muốn lập lịch trình du lịch? Điền thông tin bên dưới để mình giúp bạn nhé!';
       appendMsg(introText + ' [PLANNING_FORM]', 'bot');
     }
@@ -4789,10 +4758,10 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           .inline-plan-form {
             margin-top: 16px;
             background: var(--bg-elevated, #ffffff);
-            border: 1px solid var(--border, rgba(15, 23, 42, 0.1));
+            border: 1px solid rgba(2, 132, 199, 0.15);
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: var(--shadow-soft, 0 8px 32px rgba(0, 0, 0, 0.08));
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02) !important;
           }
           
           .plan-form-header {
@@ -4800,20 +4769,20 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             align-items: center;
             gap: 14px;
             padding: 18px 20px;
-            background: var(--bg-card, rgba(99, 102, 241, 0.08));
-            border-bottom: 1px solid var(--border, rgba(15, 23, 42, 0.1));
+            background: linear-gradient(135deg, rgba(2, 132, 199, 0.08) 0%, rgba(16, 185, 129, 0.04) 100%) !important;
+            border-bottom: 1px solid rgba(2, 132, 199, 0.12) !important;
           }
           
           .plan-form-icon {
             width: 48px;
             height: 48px;
-            background: var(--primary, #6366f1);
+            background: linear-gradient(135deg, #0284c7, #10b981) !important;
             border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            box-shadow: 0 4px 12px rgba(var(--primary-rgb, 99, 102, 241), 0.3);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
           }
           
           .plan-form-title {
@@ -4825,13 +4794,14 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           .plan-form-title span {
             font-weight: 700;
             font-size: 1.1rem;
-            color: var(--text, #1e293b);
+            color: #0f172a !important; /* Extremely high contrast */
             letter-spacing: -0.01em;
           }
           
           .plan-form-title small {
             font-size: 0.78rem;
-            color: var(--text-muted, #64748b);
+            color: #475569 !important; /* highly readable slate text */
+            font-weight: 500;
           }
           
           .plan-form-body {
@@ -4851,19 +4821,19 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: var(--text-muted, #64748b);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #334155 !important; /* High contrast field titles */
           }
           
           .plan-label-icon {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
           }
           
           .plan-label-hint {
-            font-weight: 400;
-            color: var(--text-secondary, #94a3b8);
-            font-size: 0.72rem;
+            font-weight: 500;
+            color: #64748b !important;
+            font-size: 0.75rem;
             margin-left: 4px;
           }
           
@@ -4874,23 +4844,24 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           .plan-text-input {
             width: 100%;
             padding: 12px 16px;
-            background: var(--bg, #fafafa);
-            border: 1px solid var(--border, rgba(15, 23, 42, 0.1));
+            background: #ffffff !important;
+            border: 1px solid rgba(2, 132, 199, 0.25) !important;
             border-radius: 12px;
-            color: var(--text, #1e293b);
+            color: #0f172a !important;
             font-size: 0.88rem;
-            transition: all 0.2s ease;
+            font-weight: 500;
+            transition: all 0.25s ease;
             box-sizing: border-box;
           }
           
           .plan-text-input:focus {
             outline: none;
-            border-color: var(--primary, #6366f1);
-            box-shadow: 0 0 0 3px rgba(var(--primary-rgb, 99, 102, 241), 0.15);
+            border-color: #10b981 !important;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
           }
           
           .plan-text-input::placeholder {
-            color: var(--text-secondary, #94a3b8);
+            color: #94a3b8 !important;
           }
           
           .plan-chips {
@@ -4902,19 +4873,22 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           .plan-chip {
             display: inline-flex;
             padding: 8px 14px;
-            background: var(--bg, #fafafa);
-            border: 1px solid var(--border, rgba(15, 23, 42, 0.1));
+            background: #ffffff !important;
+            border: 1px solid rgba(2, 132, 199, 0.2) !important;
             border-radius: 20px;
             font-size: 0.8rem;
-            color: var(--text-muted, #64748b);
+            color: #334155 !important;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
           }
           
           .plan-chip:hover {
-            border-color: var(--primary, #6366f1);
-            color: var(--primary, #6366f1);
+            border-color: #10b981 !important;
+            color: #047857 !important;
+            background: #f0fdf4 !important;
+            transform: translateY(-1px);
           }
           
           .plan-chip input {
@@ -4922,10 +4896,10 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           }
           
           .plan-chip:has(input:checked) {
-            background: var(--primary, #6366f1);
-            border-color: var(--primary, #6366f1);
-            color: #ffffff;
-            box-shadow: 0 2px 8px rgba(var(--primary-rgb, 99, 102, 241), 0.25);
+            background: linear-gradient(135deg, #0284c7, #10b981) !important;
+            border-color: transparent !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25) !important;
           }
           
           .plan-chip:has(input:checked) span {
@@ -4945,16 +4919,17 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             align-items: center;
             justify-content: center;
             padding: 14px 8px;
-            background: var(--bg, #fafafa);
-            border: 1.5px solid var(--border, rgba(15, 23, 42, 0.1));
+            background: #ffffff !important;
+            border: 1.5px solid rgba(2, 132, 199, 0.2) !important;
             border-radius: 14px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             gap: 8px;
           }
           
           .plan-companion-card:hover {
-            border-color: var(--primary, #6366f1);
+            border-color: #10b981 !important;
+            background: #f0fdf4 !important;
             transform: translateY(-2px);
           }
           
@@ -4963,13 +4938,14 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           }
           
           .plan-companion-card:has(input:checked) {
-            background: var(--primary, #6366f1);
-            border-color: var(--primary, #6366f1);
+            background: linear-gradient(135deg, #0284c7, #10b981) !important;
+            border-color: transparent !important;
+            box-shadow: 0 6px 14px rgba(16, 185, 129, 0.25) !important;
           }
           
           .plan-companion-card:has(input:checked) .companion-icon,
           .plan-companion-card:has(input:checked) .companion-text {
-            color: #ffffff;
+            color: #ffffff !important;
           }
           
           .companion-icon {
@@ -4979,21 +4955,21 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           
           .companion-text {
             font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--text-muted, #64748b);
+            font-weight: 700;
+            color: #475569 !important;
             text-align: center;
           }
           
           .plan-form-footer {
             padding: 16px 20px;
-            background: var(--bg, #fafafa);
-            border-top: 1px solid var(--border, rgba(15, 23, 42, 0.1));
+            background: #fafafa !important;
+            border-top: 1px solid rgba(2, 132, 199, 0.12) !important;
           }
           
           .plan-submit-btn {
             width: 100%;
             padding: 14px 24px;
-            background: var(--primary, #6366f1);
+            background: linear-gradient(135deg, #0284c7, #10b981) !important;
             border: none;
             border-radius: 12px;
             color: #ffffff;
@@ -5005,12 +4981,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             align-items: center;
             justify-content: center;
             gap: 8px;
-            box-shadow: 0 4px 15px rgba(var(--primary-rgb, 99, 102, 241), 0.35);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
           }
           
           .plan-submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(var(--primary-rgb, 99, 102, 241), 0.45);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
             filter: brightness(1.05);
           }
           
@@ -5020,19 +4996,58 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           
           /* Dark mode specific overrides for better contrast */
           [data-theme="dark"] .plan-chip {
-            background: var(--bg-elevated, #0B1426);
+            background: #1e293b !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #e2e8f0 !important;
+          }
+          
+          [data-theme="dark"] .plan-chip:hover {
+            background: rgba(16, 185, 129, 0.12) !important;
+            border-color: rgba(16, 185, 129, 0.4) !important;
+            color: #34d399 !important;
+          }
+          
+          [data-theme="dark"] .plan-companion-card {
+            background: #1e293b !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+          }
+          
+          [data-theme="dark"] .plan-companion-card:hover {
+            background: rgba(16, 185, 129, 0.12) !important;
+            border-color: rgba(16, 185, 129, 0.4) !important;
+          }
+          
+          [data-theme="dark"] .plan-companion-card:has(input:checked) {
+            background: linear-gradient(135deg, #0284c7, #10b981) !important;
+            border-color: transparent !important;
           }
           
           [data-theme="dark"] .plan-form-header {
-            background: rgba(var(--primary-rgb, 99, 102, 241), 0.12);
+            background: rgba(2, 132, 199, 0.15) !important;
+            border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+          }
+          
+          [data-theme="dark"] .plan-form-header .plan-form-title span {
+            color: #ffffff !important;
+          }
+          
+          [data-theme="dark"] .plan-form-header .plan-form-title small {
+            color: #94a3b8 !important;
+          }
+          
+          [data-theme="dark"] .plan-form-body .plan-label {
+            color: #cbd5e1 !important;
           }
           
           [data-theme="dark"] .plan-text-input {
-            background: var(--bg, #040914);
+            background: #0f172a !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            color: #ffffff !important;
           }
           
           [data-theme="dark"] .plan-form-footer {
-            background: var(--bg, #040914);
+            background: #0f172a !important;
+            border-top-color: rgba(255, 255, 255, 0.08) !important;
           }
           
           /* Responsive */
@@ -5054,17 +5069,13 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     
     // Submit form lập lịch inline trong chat
     window.submitInlinePlanForm = function(btn) {
-      // #region debug log
-      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'=== SUBMIT FORM START ===',timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
+
       
       // Đánh dấu là submit từ form để tránh keyword detection trigger lại
       window._fromPlanningForm = true;
       
       const form = btn.closest('.inline-plan-form');
-      // #region debug log
-      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'form found',data:{formExists:!!form,formId:form?.id,formClass:form?.className},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
+
       
       if (!form) return;
       
@@ -5074,9 +5085,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       const style = form.querySelector('input[name="inline-style"]:checked')?.value;
       const interests = Array.from(form.querySelectorAll('input[name="inline-interest"]:checked')).map(c => c.value);
       
-      // #region debug log
-      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'form values collected',data:{dest,duration,budget,style,interests},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
+
       
       if (!dest) {
         form.querySelector('#inline-plan-dest').focus();
@@ -5091,32 +5100,22 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       
       // Tìm và xóa message row chứa form
       const msgRow = form.closest('.chat-message-row');
-      // #region debug log
-      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'looking for msgRow',data:{msgRowExists:!!msgRow,msgRowClass:msgRow?.className,msgRowParent:msgRow?.parentElement?.className},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
+
       
       if (msgRow) {
         msgRow.remove();
-        // #region debug log
-        fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'msgRow removed',timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
+
       } else {
         // Không tìm thấy row, xóa form trực tiếp
         form.remove();
-        // #region debug log
-        fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'msgRow not found, removed form directly',timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
+
       }
       
       // Kiểm tra form còn tồn tại không
       const formStillExists = !!document.querySelector('.inline-plan-form');
-      // #region debug log
-      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'after removal check',data:{formStillExists},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
+
       
-      // #region debug log
-      fetch('http://127.0.0.1:7334/ingest/711fdd72-9b5d-4e38-b296-db9f009e5d8f',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'afe872'},body:JSON.stringify({sessionId:'afe872',location:'SharedUI.js:submitInlinePlanForm',message:'=== DISPATCHING SUBMIT ===',data:{prompt:prompt.substring(0,80)},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
+
       
       const input = document.getElementById('global-chat-input');
       const chatForm = document.getElementById('global-chat-form');

@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg: #ffffff;
   --bg-elevated: #f8fafc;
   --bg-card: #f1f5f9;
@@ -2758,7 +2758,7 @@ section[id] {
   position: fixed;
   right: 1.25rem;
   bottom: 84px;
-  width: 380px;
+  width: 400px;
   height: min(580px, calc(100vh - 120px));
   background: rgba(10, 18, 28, 0.85);
   backdrop-filter: blur(40px) saturate(180%);
@@ -9290,7 +9290,7 @@ html.translated-ltr #translate-curtain, html.translated-rtl #translate-curtain {
 
 /* Chat Form to hơn, bố cục cân đối và đồng bộ chiều cao */
 .chat-panel--fullscreen .chat-form {
-  padding: 1.5rem 4rem 3.5rem !important;
+  padding: 1rem 3rem 1.6rem !important;
   backdrop-filter: blur(20px) !important;
   display: flex !important;
   align-items: center !important;
@@ -9299,10 +9299,10 @@ html.translated-ltr #translate-curtain, html.translated-rtl #translate-curtain {
 }
 
 .chat-panel--fullscreen .chat-form input {
-  height: 56px !important;
-  font-size: 1.05rem !important;
-  border-radius: 18px !important;
-  padding: 0 1.5rem !important;
+  height: 46px !important;
+  font-size: 0.95rem !important;
+  border-radius: 14px !important;
+  padding: 0 1.25rem !important;
   transition: all 0.3s ease !important;
   /* Màu nền, màu chữ, border được xử lý bởi light/dark override riêng bên dưới */
 }
@@ -9314,25 +9314,25 @@ html.translated-ltr #translate-curtain, html.translated-rtl #translate-curtain {
 
 
 .chat-panel--fullscreen .chat-form .btn--primary {
-  height: 56px !important;
-  border-radius: 18px !important;
-  padding: 0 2rem !important;
+  height: 46px !important;
+  border-radius: 14px !important;
+  padding: 0 1.5rem !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  font-size: 1rem !important;
+  font-size: 0.92rem !important;
 }
 
 .chat-panel--fullscreen .chat-form .companion-fab-wrapper {
-  width: 56px !important;
-  height: 56px !important;
+  width: 46px !important;
+  height: 46px !important;
 }
 
 .chat-panel--fullscreen .chat-form .companion-fab-wrapper .companion-fab {
-  width: 56px !important;
-  height: 56px !important;
-  border-radius: 18px !important;
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2) !important;
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.15) !important;
 }
 
 /* Responsive Fullscreen */
@@ -9505,11 +9505,11 @@ html.translated-ltr #translate-curtain, html.translated-rtl #translate-curtain {
 
 /* User Message Bubble */
 .chat-bubble--user {
-  background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+  background: linear-gradient(135deg, #0284c7, #10b981) !important; /* Beautiful vibrant sky-to-emerald gradient */
   color: #ffffff !important;
   border: none !important;
   box-shadow: 
-    0 10px 20px -8px rgba(2, 132, 199, 0.3),
+    0 8px 20px -8px rgba(2, 132, 199, 0.3),
     0 4px 10px rgba(2, 132, 199, 0.1) !important;
 }
 
@@ -10427,6 +10427,755 @@ html.translated-ltr #translate-curtain, html.translated-rtl #translate-curtain {
   padding: 4px;
   animation: slideUpModern 0.3s ease;
 }
+
+/* ============================================================
+   CHATBOT UI/UX PREMIUM UPGRADE - POLISHED & COHESIVE
+   ============================================================ */
+
+/* 1. Main Chat Panel Glassmorphism Upgrade */
+.chat-panel {
+  border: 1px solid rgba(16, 185, 129, 0.18) !important;
+  border-radius: 28px !important;
+  background: rgba(10, 18, 28, 0.88) !important;
+  backdrop-filter: blur(40px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(200%) !important;
+  box-shadow: 
+    0 30px 70px rgba(0, 0, 0, 0.6), 
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset, 
+    0 -1px 0 rgba(255, 255, 255, 0.1) inset !important;
+  overflow: hidden;
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-theme="light"] .chat-panel {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(16, 185, 129, 0.18) !important;
+  box-shadow: 
+    0 30px 70px rgba(15, 23, 42, 0.12), 
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset !important;
+}
+
+/* 2. Header Polish */
+.chat-panel__head {
+  padding: 1rem 1.25rem !important;
+  background: rgba(16, 185, 129, 0.06) !important;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.12) !important;
+}
+
+.chat-panel__head::after {
+  background: linear-gradient(90deg, transparent, #10b981, #34d399, #10b981, transparent) !important;
+  height: 2px !important;
+  opacity: 0.6 !important;
+}
+
+.chat-panel__head-left strong {
+  font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif !important;
+  font-size: 1.05rem !important;
+  letter-spacing: -0.02em !important;
+  background: linear-gradient(135deg, #ffffff, #c7d2fe) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+[data-theme="light"] .chat-panel__head-left strong {
+  background: linear-gradient(135deg, #0f172a, #1e293b) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.chat-panel__close {
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+.chat-panel__close:hover {
+  background: rgba(244, 63, 94, 0.2) !important;
+  color: #f43f5e !important;
+  transform: scale(1.08) rotate(90deg) !important;
+}
+
+/* 3. Smooth Chat Logs & Premium Bubbles */
+.chat-log {
+  padding: 1.5rem 1.25rem 110px !important;
+  gap: 1rem !important;
+}
+
+.chat-bubble {
+  border-radius: 20px !important;
+  padding: 0.9rem 1.15rem !important;
+  font-size: 0.9rem !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.3s ease;
+}
+
+.chat-bubble--user {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+  border-bottom-right-radius: 4px !important;
+  border-bottom-left-radius: 20px !important;
+  box-shadow: 
+    0 8px 24px rgba(5, 150, 105, 0.2), 
+    0 2px 8px rgba(0,0,0,0.1) !important;
+}
+
+.chat-bubble--bot {
+  background: rgba(30, 41, 59, 0.4) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #e2e8f0 !important;
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 20px !important;
+  box-shadow: 
+    0 6px 18px rgba(0, 0, 0, 0.12), 
+    0 0 0 1px rgba(255,255,255,0.01) inset !important;
+}
+
+[data-theme="light"] .chat-bubble--bot {
+  background: rgba(241, 245, 249, 0.7) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  color: #1e293b !important;
+}
+
+/* 4. Soft Blending Functional Chips at Bottom */
+.chat-function-chips {
+  background: transparent !important;
+  border-top: none !important;
+  padding: 8px 12px !important;
+  gap: 8px !important;
+}
+
+.chat-func-chip {
+  border-radius: 24px !important;
+  padding: 6px 14px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #94a3b8 !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: none !important;
+}
+
+[data-theme="dark"] .chat-func-chip:nth-child(1) {
+  background: rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #34d399 !important;
+}
+[data-theme="dark"] .chat-func-chip:nth-child(2) {
+  background: rgba(244, 63, 94, 0.08) !important;
+  border-color: rgba(244, 63, 94, 0.2) !important;
+  color: #fb7185 !important;
+}
+[data-theme="dark"] .chat-func-chip:nth-child(3) {
+  background: rgba(59, 130, 246, 0.08) !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+  color: #60a5fa !important;
+}
+[data-theme="dark"] .chat-func-chip:nth-child(4) {
+  background: rgba(249, 115, 22, 0.08) !important;
+  border-color: rgba(249, 115, 22, 0.2) !important;
+  color: #fb923c !important;
+}
+[data-theme="dark"] .chat-func-chip:nth-child(5) {
+  background: rgba(234, 179, 8, 0.08) !important;
+  border-color: rgba(234, 179, 8, 0.2) !important;
+  color: #facc15 !important;
+}
+[data-theme="dark"] .chat-func-chip:nth-child(6) {
+  background: rgba(168, 85, 247, 0.08) !important;
+  border-color: rgba(168, 85, 247, 0.2) !important;
+  color: #c084fc !important;
+}
+
+[data-theme="light"] .chat-func-chip {
+  background: rgba(0, 0, 0, 0.02) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  color: #475569 !important;
+}
+
+[data-theme="light"] .chat-func-chip:nth-child(1) {
+  background: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  color: #15803d !important;
+}
+[data-theme="light"] .chat-func-chip:nth-child(2) {
+  background: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  color: #be123c !important;
+}
+[data-theme="light"] .chat-func-chip:nth-child(3) {
+  background: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+[data-theme="light"] .chat-func-chip:nth-child(4) {
+  background: #fff7ed !important;
+  border-color: #ffedd5 !important;
+  color: #c2410c !important;
+}
+[data-theme="light"] .chat-func-chip:nth-child(5) {
+  background: #fef9c3 !important;
+  border-color: #fef08a !important;
+  color: #a16207 !important;
+}
+[data-theme="light"] .chat-func-chip:nth-child(6) {
+  background: #faf5ff !important;
+  border-color: #f3e8ff !important;
+  color: #7e22ce !important;
+}
+
+.chat-func-chip:hover {
+  background: rgba(16, 185, 129, 0.08) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: #10b981 !important;
+  transform: translateY(-2px) scale(1.05) !important;
+}
+
+[data-theme="light"] .chat-func-chip:hover {
+  background: rgba(16, 185, 129, 0.05) !important;
+  border-color: #10b981 !important;
+  color: #047857 !important;
+  transform: translateY(-2px) scale(1.05) !important;
+}
+
+/* 5. Unified Capsule Console input bar (Siêu Đẹp & Dịu Mắt) */
+.chat-form {
+  margin: 0.75rem 1.25rem 1.25rem !important;
+  padding: 6px 6px 6px 16px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 26px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.2),
+    0 1px 0 rgba(255,255,255,0.02) inset !important;
+  transition: all 0.3s ease !important;
+}
+
+.chat-form::before {
+  display: none !important;
+}
+
+[data-theme="light"] .chat-form {
+  background: rgba(241, 245, 249, 0.9) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 
+    0 10px 30px rgba(15, 23, 42, 0.05),
+    0 1px 0 rgba(255,255,255,0.8) inset !important;
+}
+
+/* Make input inside completely transparent to blend into the capsule */
+.chat-form input {
+  flex: 1 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  height: 40px !important;
+  padding: 0 !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+}
+
+[data-theme="light"] .chat-form input {
+  color: #0f172a !important;
+}
+
+.chat-form input:focus {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Capsule focus feedback */
+.chat-form:focus-within {
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: 
+    0 0 0 3px rgba(16, 185, 129, 0.1),
+    0 12px 32px rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-theme="light"] .chat-form:focus-within {
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  background: #ffffff !important;
+  box-shadow: 
+    0 0 0 3px rgba(16, 185, 129, 0.1),
+    0 12px 32px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Premium Mic Button: blending harmoniously, no harsh solids */
+.companion-fab-wrapper {
+  width: 38px !important;
+  height: 38px !important;
+}
+
+.companion-fab-wrapper .companion-fab {
+  position: relative !important;
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 50% !important;
+  border: none !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #cbd5e1 !important;
+  box-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-theme="light"] .companion-fab-wrapper .companion-fab {
+  background: rgba(0, 0, 0, 0.03) !important;
+  color: #475569 !important;
+}
+
+.companion-fab-wrapper .companion-fab:hover {
+  transform: scale(1.08) !important;
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #10b981 !important;
+}
+
+/* Glowing soft red when active/listening */
+.companion-fab-wrapper .companion-fab.is-listening {
+  background: #f43f5e !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.35) !important;
+}
+
+/* Refined, elegant Send Button */
+.chat-form .btn--primary {
+  height: 38px !important;
+  border-radius: 19px !important;
+  padding: 0 1.25rem !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2) !important;
+  border: none !important;
+  color: #ffffff !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.chat-form .btn--primary:hover {
+  transform: scale(1.03) !important;
+  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.3) !important;
+  filter: brightness(1.06);
+}
+
+.chat-form .btn--primary:active {
+  transform: scale(0.97) !important;
+}
+
+/* 6. Sidebar & Premium Live Widgets Upgrade */
+.chat-panel__right-sidebar {
+  border-left: 1px solid rgba(255, 255, 255, 0.05) !important;
+  background: rgba(11, 15, 25, 0.4) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+}
+
+[data-theme="light"] .chat-panel__right-sidebar {
+  border-left: 1px solid rgba(0, 0, 0, 0.04) !important;
+  background: rgba(248, 250, 252, 0.95) !important;
+}
+
+.chat-panel__right-inner h4 {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 0.92rem !important;
+  margin-bottom: 0.75rem !important;
+  color: #cbd5e1 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+[data-theme="light"] .chat-panel__right-inner h4 {
+  color: #475569 !important;
+}
+
+.chat-widget-card {
+  border-radius: 20px !important;
+  padding: 1.15rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.chat-widget-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+  border-color: rgba(16, 185, 129, 0.15) !important;
+}
+
+[data-theme="light"] .chat-widget-card {
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.04) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+}
+
+[data-theme="light"] .chat-widget-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+/* Premium Glass clock widget */
+.widget-clock {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.1) 0%, rgba(3, 105, 161, 0.02) 100%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.15) !important;
+}
+
+.widget-clock__time {
+  font-family: 'Outfit', 'Inter', monospace !important;
+  font-size: 1.85rem !important;
+  letter-spacing: -0.01em !important;
+  background: linear-gradient(135deg, #ffffff, #e0f2fe) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+[data-theme="light"] .widget-clock {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.06) 0%, rgba(3, 105, 161, 0.01) 100%) !important;
+  border: 1px solid rgba(2, 132, 199, 0.1) !important;
+}
+
+[data-theme="light"] .widget-clock__time {
+  background: linear-gradient(135deg, #0369a1, #0284c7) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+
+.widget-clock__duration-value {
+  border-radius: 8px !important;
+  padding: 3px 10px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-theme="light"] .widget-clock__duration-value {
+  background: rgba(2, 132, 199, 0.08) !important;
+  border-color: rgba(2, 132, 199, 0.04) !important;
+  color: #0369a1 !important;
+}
+
+/* Premium Quiz Widget options polish */
+.quiz-opt-btn {
+  border-radius: 12px !important;
+  padding: 10px 14px !important;
+  font-size: 0.82rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  color: #94a3b8 !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+[data-theme="light"] .quiz-opt-btn {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  background: rgba(0, 0, 0, 0.01) !important;
+  color: #475569 !important;
+}
+
+.quiz-opt-btn:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.06) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+  color: #10b981 !important;
+  transform: translateX(3px) !important;
+}
+
+[data-theme="light"] .quiz-opt-btn:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.04) !important;
+  color: #047857 !important;
+}
+
+/* Premium Tips & Mini Lists styling */
+.chat-tip-item {
+  border-radius: 10px !important;
+  padding: 8px 12px !important;
+  font-size: 0.82rem !important;
+  color: #94a3b8 !important;
+  background: rgba(255, 255, 255, 0.01) !important;
+  border: 1px solid rgba(255, 255, 255, 0.03) !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+  margin-bottom: 5px !important;
+}
+
+[data-theme="light"] .chat-tip-item {
+  color: #475569 !important;
+  background: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.03) !important;
+}
+
+.chat-tip-item:hover {
+  background: rgba(16, 185, 129, 0.06) !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  color: #10b981 !important;
+  transform: translateX(2px) !important;
+}
+
+[data-theme="light"] .chat-tip-item:hover {
+  background: rgba(16, 185, 129, 0.04) !important;
+  color: #047857 !important;
+}
+
+.chat-mini-item {
+  border-radius: 8px !important;
+  padding: 6px 10px !important;
+  font-size: 0.82rem !important;
+  color: #94a3b8 !important;
+  background: rgba(255, 255, 255, 0.01) !important;
+}
+
+[data-theme="light"] .chat-mini-item {
+  color: #475569 !important;
+  background: rgba(0, 0, 0, 0.01) !important;
+}
+
+/* ============================================================
+   CHATBOT SPECIFIC VISUAL FIXES & REFINEMENTS
+   ============================================================ */
+
+/* --- Fix Image 1: Smaller, Sleeker Bottom Input Area (Cho cái này bé lại chút) --- */
+.chat-form {
+  margin: 0.5rem 1rem 1rem !important; /* Tighter margins to save space */
+  padding: 4px 4px 4px 12px !important; /* Reduced padding */
+  border-radius: 22px !important; /* Tighter border-radius */
+}
+
+.chat-form input {
+  height: 36px !important; /* Shorter input field height */
+  font-size: 0.85rem !important; /* Slightly smaller text */
+}
+
+.companion-fab-wrapper {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.companion-fab-wrapper .companion-fab {
+  width: 32px !important;
+  height: 32px !important;
+}
+
+.companion-fab-wrapper .mic-icon {
+  font-size: 1.05rem !important; /* Fit inside smaller mic button */
+}
+
+.chat-form .btn--primary {
+  height: 32px !important; /* Compact button */
+  border-radius: 16px !important;
+  padding: 0 1rem !important;
+  font-size: 0.82rem !important;
+}
+
+
+/* --- Fix Image 2: High Contrast Readable Colors in Light Mode --- */
+[data-theme="light"] .chat-panel__right-inner h4 {
+  color: #1e293b !important; /* Solid dark text for headings */
+}
+
+[data-theme="light"] .widget-clock {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.06) 0%, rgba(3, 105, 161, 0.01) 100%) !important;
+  border: 1.5px solid rgba(2, 132, 199, 0.25) !important; /* Highly visible border */
+}
+
+[data-theme="light"] .widget-clock__time {
+  background: linear-gradient(135deg, #0369a1, #0284c7) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+[data-theme="light"] .widget-clock__date {
+  color: #0369a1 !important; /* Fully readable dark blue instead of faint white */
+  font-weight: 700 !important;
+  opacity: 1 !important;
+}
+
+[data-theme="light"] .widget-clock__duration-label {
+  color: #334155 !important; /* Readable dark gray */
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .widget-clock__duration-value {
+  background: rgba(2, 132, 199, 0.12) !important;
+  color: #0369a1 !important; /* Faint blue border and deep blue value */
+  border: 1px solid rgba(2, 132, 199, 0.2) !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="light"] .widget-weather {
+  border: 1.5px solid rgba(2, 132, 199, 0.2) !important;
+}
+
+[data-theme="light"] .widget-weather__city {
+  color: #0f172a !important; /* Strong text color */
+}
+
+[data-theme="light"] .widget-weather__desc {
+  color: #475569 !important; /* Dark slate weather text */
+  font-weight: 500 !important;
+}
+
+[data-theme="light"] .widget-weather__temp {
+  color: #0284c7 !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="light"] .quiz-opt-btn {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(0, 0, 0, 0.08) !important;
+  color: #1e293b !important; /* Sharp option texts */
+  font-weight: 600 !important;
+}
+
+[data-theme="light"] .quiz-opt-btn:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.06) !important;
+  border-color: #10b981 !important;
+  color: #047857 !important;
+}
+
+[data-theme="light"] .chat-tip-item {
+  background: #ffffff !important;
+  border: 1.5px solid rgba(0, 0, 0, 0.05) !important;
+  color: #334155 !important; /* Fully readable dark slate */
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
+}
+
+[data-theme="light"] .chat-tip-item:hover {
+  background: rgba(16, 185, 129, 0.05) !important;
+  border-color: #10b981 !important;
+  color: #047857 !important;
+}
+
+
+/* --- Fix Image 3: Solid Header Background masking scrolling text (Không bị che khuất đè lên) --- */
+.chat-panel__head {
+  position: relative !important;
+  z-index: 100 !important; /* Keep header strictly on top */
+  background: #0b1426 !important; /* Solid dark blue for dark mode */
+}
+
+[data-theme="light"] .chat-panel__head {
+  background: #ffffff !important; /* Solid opaque white for light mode */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.chat-panel__head::after {
+  z-index: 101 !important; /* Ensure highlight line is visible */
+}
+
+/* Ensure chat logs are spaced correctly to start below solid header */
+.chat-log {
+  z-index: 10 !important;
+  margin-top: 0 !important;
+}
+
+
+/* --- Fix Image 4: Small Chat Drawer Layout and Header Wrapping --- */
+/* Title: White-space nowrap and truncation to NEVER wrap into multiple lines! */
+.chat-panel__head-left {
+  min-width: 0 !important;
+  flex: 1 !important;
+}
+
+.chat-panel__head-left strong {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 190px !important; /* Safely fits and shows the full "Trợ lý WanderViet AI" */
+  font-size: 0.95rem !important;
+  line-height: 1.2 !important;
+  display: inline-block !important;
+}
+
+/* In fullscreen mode, title has unlimited width */
+.chat-panel--fullscreen .chat-panel__head-left strong {
+  max-width: none !important;
+}
+
+/* Slimmer actions spacing in small mode to prevent layout push */
+.chat-panel__head-actions {
+  gap: 3px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Make header buttons slightly more compact in small mode */
+.chat-panel__head-actions .btn-icon-sm {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 8px !important;
+}
+
+.chat-panel__head-actions .chat-panel__close {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 8px !important;
+  font-size: 1.2rem !important;
+  line-height: 1 !important;
+}
+
+.chat-panel__head-actions .chat-lang-btn {
+  width: auto !important; /* Allow language button to stretch naturally to fit content */
+  height: 28px !important;
+  padding: 0 6px !important;
+  border-radius: 8px !important;
+}
+
+/* Clean UI styling overrides for light theme drawer log */
+[data-theme="light"] .chat-bubble--bot {
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  border-left: 4px solid #10b981 !important; /* Premium left accent border for AI bot bubble */
+  color: #1e293b !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02) !important;
+}
+
+[data-theme="light"] .chat-log {
+  background: 
+    radial-gradient(circle at 5% 5%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 95% 30%, rgba(14, 165, 233, 0.06) 0%, transparent 45%),
+    radial-gradient(circle at 50% 90%, rgba(236, 72, 153, 0.03) 0%, transparent 50%),
+    #f8fafc !important; /* Gorgeous mesh gradient background instead of dull solid gray */
+}
+
+/* --- Fix Image 1: Inline Planning Form Bubble Unsquishing & Premium Theme Adaptations --- */
+.chat-bubble:has(.inline-plan-form) {
+  max-width: 100% !important;
+  width: 100% !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-bottom: 8px !important;
+}
+
+.chat-bubble:has(.inline-plan-form) .chat-bubble__content {
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.chat-bubble:has(.inline-plan-form) .chat-bubble__footer {
+  display: none !important; /* Form cards don't need raw copy/audio actions */
+}
+
+/* Make sure inner elements can leverage full parent container width */
+.inline-plan-form {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+
+
+
 
 
 

@@ -726,6 +726,51 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   const isQuests = page.includes('quests');
   const isHistory = page.includes('history');
 
+  window.WanderUI.handleHeaderBack = function() {
+    // 1. If notification drawer is open, close it
+    const notifDrawer = document.getElementById('wander-notif-drawer');
+    if (notifDrawer && notifDrawer.classList.contains('is-open')) {
+      if (typeof window.WanderUI.toggleNotificationDrawer === 'function') {
+        window.WanderUI.toggleNotificationDrawer();
+        return;
+      }
+    }
+
+    // 2. If any modals are open, close them
+    const openModals = Array.from(document.querySelectorAll('.modal')).filter(m => !m.hidden && m.style.display !== 'none');
+    if (openModals.length > 0) {
+      if (typeof window.closeModals === 'function') {
+        window.closeModals();
+        return;
+      }
+    }
+
+    // 3. If user dropdown is open, close it
+    const userDropdown = document.querySelector('[data-user-dropdown]');
+    if (userDropdown && !userDropdown.hidden && userDropdown.style.display !== 'none') {
+      if (typeof window.WanderUI.toggleUserMenu === 'function') {
+        window.WanderUI.toggleUserMenu(false);
+        return;
+      }
+    }
+
+    // 4. If we are on planner.html and Form Step 2 is active, switch to Step 1
+    const formStep2 = document.getElementById('formStep2');
+    if (formStep2 && (formStep2.style.display === 'block' || formStep2.style.display === 'flex' || !formStep2.hasAttribute('hidden') && window.getComputedStyle(formStep2).display !== 'none')) {
+      if (typeof window.switchFormStep === 'function') {
+        window.switchFormStep(1);
+        return;
+      }
+    }
+
+    // 5. Default history back or home navigation
+    if (document.referrer && document.referrer.includes(window.location.host)) {
+      window.history.back();
+    } else {
+      window.location.href = 'index.html';
+    }
+  };
+
   function injectHeader() {
     const container = document.getElementById('header-container') || document.querySelector('[data-header]') || document.querySelector('.site-header') || document.querySelector('header');
     if (!container) {
@@ -1021,6 +1066,16 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
   function injectCommonComponents() {
     // 1. Navigation items are now handled by injectHeader()
+    const rightButtonHtml = isExplorer 
+      ? `<button type="button" class="floating-toc-shrink-btn" onclick="this.parentElement.classList.toggle('is-shrunk'); event.stopPropagation();" title="Thu nhỏ / Phóng to">
+            &lsaquo;
+         </button>`
+      : `<button type="button" class="floating-toc-back-btn" onclick="WanderUI.handleHeaderBack(); event.stopPropagation();" title="Quay lại tác vụ trước">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px; height:14px; display:block;">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+         </button>`;
 
     if (!document.querySelector('link[href*="companion.css"]')) {
       const link = document.createElement('link');
@@ -1633,9 +1688,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 <span class="toc-text-label">Danh mục</span>
              </button>
-             <button type="button" class="floating-toc-shrink-btn" onclick="this.parentElement.classList.toggle('is-shrunk'); event.stopPropagation();" title="Thu nhỏ / Phóng to" style="background:var(--bg-elevated, #fff); border:1px solid var(--border, #e2e8f0); border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--text-muted, #64748b); box-shadow:0 2px 4px rgba(0,0,0,0.05); transition:transform 0.3s; font-size:16px; padding-bottom:2px; font-weight:bold;">
-                &lsaquo;
-             </button>
+             ${rightButtonHtml}
              <ul class="floating-toc-menu">
                 <li style="display:flex; justify-content:space-between; align-items:center; padding: 4px 12px 8px; border-bottom:1px solid var(--border, #e2e8f0); margin-bottom:8px;">
                    <strong style="color:var(--text); font-size:0.9rem;">Mục lục</strong>
@@ -5983,6 +6036,76 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       .chart-title {
         font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; color: var(--text);
         display: flex; align-items: center; gap: 8px;
+      }
+
+      /* Cute Back Button inside Floating TOC */
+      .floating-toc-back-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 1px solid var(--border, #e2e8f0);
+        background: var(--bg-elevated, #fff);
+        color: var(--text-muted, #64748b);
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+        padding: 0;
+        flex-shrink: 0;
+      }
+      .floating-toc-back-btn::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(255, 0, 85, 0.15));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      .floating-toc-back-btn:hover {
+        color: var(--accent, #00F0FF);
+        border-color: var(--accent, #00F0FF);
+        transform: translateX(-3px) scale(1.1);
+        box-shadow: 0 6px 15px rgba(0, 240, 255, 0.25);
+      }
+      .floating-toc-back-btn:hover::before {
+        opacity: 1;
+      }
+      .floating-toc-back-btn svg {
+        transition: transform 0.3s ease;
+      }
+      .floating-toc-back-btn:hover svg {
+        transform: scale(1.15);
+      }
+      .floating-toc-back-btn:active {
+        transform: translateX(-3px) scale(0.92);
+      }
+
+      /* Cute Shrink Button inside Floating TOC */
+      .floating-toc-shrink-btn {
+        background: var(--bg-elevated, #fff);
+        border: 1px solid var(--border, #e2e8f0);
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-muted, #64748b);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: transform 0.3s, background-color 0.2s, border-color 0.2s;
+        font-size: 16px;
+        padding-bottom: 2px;
+        font-weight: bold;
+        flex-shrink: 0;
+      }
+      .floating-toc-shrink-btn:hover {
+        background: var(--bg-card);
+        color: var(--accent);
       }
     `;
     document.head.appendChild(style);

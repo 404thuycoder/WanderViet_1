@@ -8,6 +8,7 @@ const path = require('path');
 const http = require('http');
 const { initBroadcastWorker } = require('./server/utils/broadcastWorker');
 const { initSocket } = require('./server/utils/socketManager');
+const { getSummary } = require('./server/utils/groq-rotator');
 
 // Clean up environment variables
 if (process.env.GROQ_API_KEY) process.env.GROQ_API_KEY = process.env.GROQ_API_KEY.trim();
@@ -200,6 +201,22 @@ mongoose.connect(process.env.MONGODB_URI.trim(), dbOptions)
         console.log('🛡️ Web Quản Trị:     http://localhost:3001');
         console.log('💼 Web Doanh Nghiệp: http://localhost:3002');
         console.log('✅ MongoDB connected');
+        
+        // Log trạng thái Groq API Keys
+        try {
+          const summary = getSummary();
+          console.log('\n📋 [Groq Key Rotator] Trạng thái key khởi tạo:');
+          Object.entries(summary).forEach(([cat, data]) => {
+            if (data.totalKeys > 0) {
+              const keyList = data.keys.map(k => `  • Key[${k.index}]: ${k.prefix} (${k.usageCount} lần gọi)`).join('\n');
+              console.log(`  🔑 Nhóm [${cat}] (${data.totalKeys} key):\n${keyList}`);
+            } else {
+              console.log(`  ⚠️  Nhóm [${cat}]: Không có key nào được cấu hình`);
+            }
+          });
+        } catch (e) {
+          console.warn('⚠️ Không thể đọc trạng thái Groq keys:', e.message);
+        }
         
         const server = http.createServer(app);
         initSocket(server);

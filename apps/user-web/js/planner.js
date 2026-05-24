@@ -3,9 +3,9 @@ window.WanderPlanner = window.WanderPlanner || {};
 
 const VN_DESTINATION_PHOTOS = {
   // --- MIỀN BẮC ---
-  "hà nội": ["https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop", "https://images.unsplash.com/photo-1599708153386-62e26066265e?w=800&fit=crop", "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop"],
-  "hoàn kiếm": ["https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop"],
-  "phố cổ": ["https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop"],
+  "hà nội": ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&fit=crop", "https://images.unsplash.com/photo-1599708153386-62e26066265e?w=800&fit=crop", "https://images.unsplash.com/photo-1529482577220-5da989b9e37c?w=800&fit=crop"],
+  "hoàn kiếm": ["https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&fit=crop"],
+  "phố cổ": ["https://images.unsplash.com/photo-1529482577220-5da989b9e37c?w=800&fit=crop"],
   "hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1547950515-e65383569762?w=800&fit=crop", "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop"],
   "vịnh hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
   "sapa": ["https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop", "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"],
@@ -56,7 +56,14 @@ const VN_DESTINATION_PHOTOS = {
   "quảng ngãi": ["https://images.unsplash.com/photo-1559592443-7f87a030062a?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
   "quảng trị": ["https://images.unsplash.com/photo-1587922546307-776227941871?w=800&fit=crop", "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=800&fit=crop"],
   "vịnh vân phong": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-
+  // Thêm địa điểm mới MIỀN TRUNG
+  "bà nà hills": ["https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&fit=crop", "https://images.unsplash.com/photo-1583547378393-271501b4cfa1?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop"],
+  "nghĩa trang liệt sĩ": ["https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=800&fit=crop", "https://images.unsplash.com/photo-1605538032432-a2a0ec8c9dbb?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  "động phong nha": ["https://images.unsplash.com/photo-1584305886638-348e3e4e9663?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop"],
+  "cố đô huế": ["https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=800&fit=crop", "https://images.unsplash.com/photo-1605538032432-a2a0ec8c9dbb?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  "tháp charu": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  "bãi biển non nước": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1584981772656-78711422700f?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  
   // --- MIỀN NAM ---
   "tp.hcm": ["https://images.unsplash.com/photo-1583547378393-271501b4cfa1?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11dc3?w=800&fit=crop", "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop"],
   "sài gòn": ["https://images.unsplash.com/photo-1583547378393-271501b4cfa1?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11dc3?w=800&fit=crop"],
@@ -79,7 +86,20 @@ const VN_DESTINATION_PHOTOS = {
   "tiền giang": ["https://images.unsplash.com/photo-1596422846543-75c6fc18a594?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
   "đảo nam du": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"],
   "hòn sơn": ["https://images.unsplash.com/photo-1544735724-449ad2bdd335?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "châu đốc": ["https://images.unsplash.com/photo-1563812739347-1906a5996055?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"]
+  "châu đốc": ["https://images.unsplash.com/photo-1563812739347-1906a5996055?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"],
+  // Thêm địa điểm mới MIỀN BẮC
+  "hồ ba bể": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop"],
+  "chùa hương": ["https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&fit=crop", "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop"],
+  "bản giốc": ["https://images.unsplash.com/photo-1581691101914-df07ba063852?w=800&fit=crop", "https://images.unsplash.com/photo-1575986767340-5d17ae767ab0?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop"],
+  "pác bó": ["https://images.unsplash.com/photo-1575986767340-5d17ae767ab0?w=800&fit=crop", "https://images.unsplash.com/photo-1581691101914-df07ba063852?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  "tam chúc": ["https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&fit=crop", "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop"],
+  "kim bảng": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  // Thêm địa điểm mới MIỀN NAM
+  "chợ nổi cái răng": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop"],
+  "vườn quốc gia tràm chim": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  "bạch dâm": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  "hòn gấm": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1584981772656-78711422700f?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  "đảo hòn tằm": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop", "https://images.unsplash.com/photo-1583394953216-2ea56d28a3de?w=800&fit=crop", "https://images.unsplash.com/photo-1559526323-cb2f2fe2591b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"]
 };
 
 const GENERIC_VN_PHOTOS = [
@@ -2505,58 +2525,53 @@ const initPlanner = function () {
                       ${actSession ? `<span style="font-size:0.65rem; font-weight:700; color:${sessionColor}; background:${sessionColor}18; padding:2px 6px; border-radius:8px; white-space:nowrap;">${sessionEmoji} ${actSession}</span>` : ''}
                     </div>
 
-                    <!-- Content Card - Compact Design -->
-                    <div style="flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:1.25rem; overflow:hidden; transition:all 0.3s ease; box-shadow:0 4px 20px rgba(0,0,0,0.15);" 
+                    <!-- Content Card - Image Left + Info Right -->
+                    <div style="flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:1.25rem; overflow:hidden; transition:all 0.3s ease; box-shadow:0 4px 20px rgba(0,0,0,0.15); display:flex; align-items:stretch;" 
                          onmouseenter="this.style.borderColor='rgba(16,185,129,0.3)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 30px rgba(0,0,0,0.25)'"
                          onmouseleave="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.transform=''; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.15)'">
                       
-                      <!-- Image Banner (compact) -->
-                      <div style="height:140px; position:relative; overflow:hidden;">
+                      <!-- Image Section (Left) - Square with rounded corners -->
+                      <div style="width:120px; min-width:120px; height:120px; position:relative; overflow:hidden; flex-shrink:0; align-self:center; margin:0.75rem; border-radius:12px;">
                         <img 
                           src="${getVNPhoto(actName, aIdx)}" 
                           alt="${actName}"
                           loading="lazy"
-                          style="width:100%; height:100%; object-fit:cover;"
-                          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=600&fit=crop';"
+                          style="width:100%; height:100%; object-fit:cover; border-radius:12px;"
+                          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=300&fit=crop';"
                         >
-                        <!-- Overlay gradient -->
-                        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);"></div>
-                        <!-- Location chip on image -->
-                        ${actLocation ? `<div style="position:absolute; bottom:8px; left:10px; display:flex; align-items:center; gap:4px; font-size:0.7rem; color:#fff; font-weight:600; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); padding:3px 8px; border-radius:10px; max-width:80%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📍 ${actLocation}</div>` : ''}
-                        <!-- Cost badge top-right -->
-                        ${actCost ? `<div style="position:absolute; top:8px; right:8px; background:rgba(251,191,36,0.92); color:#000; font-size:0.72rem; font-weight:900; padding:3px 10px; border-radius:10px; backdrop-filter:blur(4px);">💰 ${actCost}</div>` : `<div style="position:absolute; top:8px; right:8px; background:rgba(16,185,129,0.85); color:#fff; font-size:0.72rem; font-weight:900; padding:3px 10px; border-radius:10px;">Miễn phí</div>`}
-                        <!-- Source tag -->
-                        <div class="content-source-tag" style="position:absolute; top:8px; left:8px; font-size:0.6rem; opacity:0.6;">📸 WanderViet</div>
+                        <!-- Rating Badge (Pink Gradient) -->
+                        <div style="position:absolute; top:-4px; right:-4px; background:linear-gradient(135deg, #ec4899, #f472b6); padding:4px 8px; border-radius:10px; display:flex; align-items:center; gap:3px; box-shadow:0 2px 8px rgba(236,72,153,0.4);">
+                          <span style="color:#fff; font-size:0.7rem; font-weight:800;">${actRating > 0 ? actRating : '4.9'}</span>
+                        </div>
+                        <!-- Cost badge -->
+                        ${actCost ? `<div style="position:absolute; bottom:-4px; right:-4px; background:rgba(251,191,36,0.95); color:#000; font-size:0.6rem; font-weight:900; padding:3px 7px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2);">💰 ${actCost}</div>` : `<div style="position:absolute; bottom:-4px; right:-4px; background:rgba(16,185,129,0.95); color:#fff; font-size:0.6rem; font-weight:900; padding:3px 7px; border-radius:8px;">Miễn phí</div>`}
                       </div>
 
-                      <!-- Info Body -->
-                      <div style="padding:1rem 1.1rem 0.9rem;">
-                        <!-- Title Row -->
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; margin-bottom:0.5rem;">
-                          <h4 style="font-size:1rem; color:#fff; margin:0; font-weight:800; line-height:1.3; flex:1;">${actName}</h4>
-                          ${actRating > 0 ? `<div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0;">
-                            <span style="color:#fbbf24; font-size:0.7rem; letter-spacing:1px;">${starHtml}</span>
-                            <span style="color:#fbbf24; font-size:0.7rem; font-weight:800;">${actRating}/5</span>
-                          </div>` : ''}
-                        </div>
-
+                      <!-- Info Section (Right) -->
+                      <div style="flex:1; padding:0.9rem 1rem 0.9rem 0; display:flex; flex-direction:column; justify-content:center; min-width:0;">
+                        <!-- Title -->
+                        <h4 style="font-size:1.05rem; color:#fff; margin:0 0 0.4rem 0; font-weight:800; line-height:1.3;">${actName}</h4>
+                        
+                        <!-- Location -->
+                        ${actLocation ? `<div style="display:flex; align-items:center; gap:4px; font-size:0.72rem; color:#60a5fa; margin-bottom:0.4rem; font-weight:600;">📍 ${actLocation}</div>` : ''}
+                        
                         <!-- Transport badge -->
-                        ${actTransport ? `<div style="display:inline-flex; align-items:center; gap:5px; font-size:0.72rem; color:#60a5fa; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); padding:3px 10px; border-radius:20px; margin-bottom:0.6rem; font-weight:600;">${actTransport}</div>` : ''}
-
+                        ${actTransport ? `<div style="display:inline-flex; align-items:center; gap:5px; font-size:0.68rem; color:#38bdf8; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.2); padding:3px 10px; border-radius:20px; margin-bottom:0.5rem; font-weight:600;">${actTransport}</div>` : ''}
+                        
                         <!-- Description -->
-                        ${actDesc ? `<p style="font-size:0.82rem; line-height:1.6; color:rgba(255,255,255,0.65); margin:0 0 0.75rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${actDesc}</p>` : ''}
-
-                        <!-- Action Row -->
-                        <div style="display:flex; gap:8px; flex-wrap:wrap; padding-top:0.75rem; border-top:1px solid rgba(255,255,255,0.06);">
+                        ${actDesc ? `<p style="font-size:0.78rem; line-height:1.5; color:rgba(255,255,255,0.6); margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${actDesc}</p>` : ''}
+                        
+                        <!-- Action Buttons -->
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; padding-top:0.6rem; margin-top:0.5rem; border-top:1px solid rgba(255,255,255,0.06);">
                           <button type="button" 
                             onclick='showActivityDetails(${actData})'
-                            style="flex:1; background:var(--accent); border:none; color:#fff; padding:7px 12px; border-radius:20px; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:5px; box-shadow:0 3px 12px rgba(16,185,129,0.3);"
+                            style="background:var(--accent); border:none; color:#fff; padding:5px 14px; border-radius:20px; font-size:0.72rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:5px;"
                             onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform=''">
-                            🔍 Xem chi tiết & Review
+                            🔍 Chi tiết
                           </button>
                           <a href="#" 
                             onclick="window.getGPSDirections('${actMapQuery.replace(/'/g, "\\'")}', event)"
-                            style="flex:1; background:#1d4ed8; border:none; color:#fff; padding:7px 12px; border-radius:20px; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:5px; text-decoration:none; box-shadow:0 3px 12px rgba(29,78,216,0.3);"
+                            style="background:#1d4ed8; border:none; color:#fff; padding:5px 14px; border-radius:20px; font-size:0.72rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:5px; text-decoration:none;"
                             onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform=''">
                             🗺️ GPS
                           </a>
@@ -2581,6 +2596,165 @@ const initPlanner = function () {
       </div>
     `;
   }
+
+  // ── ACTIVITY DETAIL MAP ──────────────────────────────────────
+  let actMapInstance = null;
+  let actMapMarkers = [];
+  let actMapCurrentAct = null;
+  let actMapCurrentFilter = 'all';
+
+  const ACTMAP_ICONS = {
+    restaurant: { color: '#10b981', icon: '🍜' },
+    cafe: { color: '#f59e0b', icon: '☕' },
+    attraction: { color: '#3b82f6', icon: '🏛️' },
+    hotel: { color: '#ec4899', icon: '🏨' },
+    beach: { color: '#06b6d4', icon: '🏖️' },
+    park: { color: '#22c55e', icon: '🌿' },
+    bar: { color: '#8b5cf6', icon: '🍺' },
+    shopping: { color: '#f97316', icon: '🛒' },
+    experience: { color: '#eab308', icon: '✨' },
+    destination: { color: '#ef4444', icon: '📍' },
+    default: { color: '#6b7280', icon: '📍' }
+  };
+
+  function actmapCreateIcon(icon, color, size = 32) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40"><path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 24 16 24s16-12 16-24C32 7.163 24.837 0 16 0z" fill="${color}"/><circle cx="16" cy="14" r="7" fill="white"/><text x="16" y="18" text-anchor="middle" font-size="10">${icon}</text></svg>`;
+    return L.divIcon({ html: svg, className: '', iconSize: [32, 40], iconAnchor: [16, 40], popupAnchor: [0, -40] });
+  }
+
+  window.initActivityDetailMap = function(act) {
+    const mapEl = document.getElementById('activityDetailMap');
+    if (!mapEl) return;
+    
+    // Clean up old map
+    if (actMapInstance) {
+      actMapInstance.remove();
+      actMapInstance = null;
+      actMapMarkers = [];
+    }
+
+    const destName = window.currentDestName || 'Việt Nam';
+    const cityCoords = {
+      "Hà Nội": [21.0285, 105.8542], "TP. Hồ Chí Minh": [10.8231, 106.6297],
+      "Đà Nẵng": [16.0544, 108.2022], "Hội An": [15.8801, 108.3380],
+      "Huế": [16.4628, 107.5859], "Hạ Long": [20.9101, 106.9176],
+      "Sapa": [22.3362, 103.8400], "Nha Trang": [12.2388, 109.1967],
+      "Đà Lạt": [11.9465, 108.4419], "Phú Quốc": [10.2298, 103.9637],
+      "Cần Thơ": [10.0452, 105.7469], "Ninh Bình": [20.2541, 105.9740]
+    };
+    const baseCoords = cityCoords[destName] || cityCoords[Object.keys(cityCoords).find(k => destName.toLowerCase().includes(k.toLowerCase()))] || [21.0285, 105.8542];
+
+    const actName = act.task || act.activity || act.name || '';
+    const actLoc = act.location || act.address || '';
+
+    // Generate nearby places based on activity
+    const nearbyPlaces = generateNearbyPlaces(actName, actLoc);
+
+    // Current activity marker (red)
+    const actCoords = [
+      baseCoords[0] + (Math.random() - 0.5) * 0.03,
+      baseCoords[1] + (Math.random() - 0.5) * 0.05
+    ];
+
+    actMapCurrentAct = act;
+    actMapInstance = L.map('activityDetailMap', { center: actCoords, zoom: 14, zoomControl: true });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(actMapInstance);
+
+    // Activity marker (red - destination)
+    const actIcon = actmapCreateIcon('📍', '#ef4444');
+    const actMarker = L.marker(actCoords, { icon: actIcon }).addTo(actMapInstance);
+    actMarker.bindPopup(`<b>${actIcon} ${actName}</b>${actLoc ? `<br><small>📍 ${actLoc}</small>` : ''}${act.time ? `<br><small>🕒 ${act.time}</small>` : ''}`);
+    actMapMarkers.push({ marker: actMarker, type: 'destination', active: true });
+
+    // Nearby markers
+    nearbyPlaces.forEach(place => {
+      const info = ACTMAP_ICONS[place.type] || ACTMAP_ICONS.default;
+      const icon = actmapCreateIcon(info.icon, info.color);
+      const m = L.marker(place.coords, { icon }).addTo(actMapInstance);
+      m.bindPopup(`<div style="min-width:150px;"><b>${info.icon} ${place.name}</b><br><small style="color:#888;">${place.typeText}</small></div>`);
+      actMapMarkers.push({ marker: m, type: place.type, active: true });
+    });
+
+    setTimeout(() => { if (actMapInstance) actMapInstance.invalidateSize(); }, 150);
+  };
+
+  function generateNearbyPlaces(actName, actLoc) {
+    const destName = window.currentDestName || 'Hà Nội';
+    const baseCoords = {
+      "Hà Nội": [21.0285, 105.8542], "TP. Hồ Chí Minh": [10.8231, 106.6297],
+      "Đà Nẵng": [16.0544, 108.2022], "Hội An": [15.8801, 108.3380],
+      "Huế": [16.4628, 107.5859], "Hạ Long": [20.9101, 106.9176],
+      "Sapa": [22.3362, 103.8400], "Nha Trang": [12.2388, 109.1967],
+      "Đà Lạt": [11.9465, 108.4419], "Phú Quốc": [10.2298, 103.9637],
+      "Cần Thơ": [10.0452, 105.7469], "Ninh Bình": [20.2541, 105.9740]
+    }[destName] || [21.0285, 105.8542];
+
+    const restaurants = [
+      { name: 'Nhà hàng Phở 24', type: 'restaurant', typeText: '🍜 Ăn uống' },
+      { name: 'Quán Bún Chả Hà Nội', type: 'restaurant', typeText: '🍜 Ăn uống' },
+      { name: 'Hải Sản Tươi Sống', type: 'restaurant', typeText: '🍜 Ăn uống' },
+      { name: 'Cơm Niêu Đặc Biệt', type: 'restaurant', typeText: '🍜 Ăn uống' },
+      { name: 'Bánh Mì Bóp Tép', type: 'restaurant', typeText: '🍜 Ăn uống' }
+    ];
+    const cafes = [
+      { name: 'Highlands Coffee', type: 'cafe', typeText: '☕ Cafe' },
+      { name: 'Cà Phê Trứng', type: 'cafe', typeText: '☕ Cafe' },
+      { name: 'Cafe Sữa Đá', type: 'cafe', typeText: '☕ Cafe' },
+      { name: 'Trà Sữa Ô Long', type: 'cafe', typeText: '☕ Cafe' }
+    ];
+    const attractions = [
+      { name: 'Công Viên Central', type: 'attraction', typeText: '🏛️ Du lịch' },
+      { name: 'Bảo Tàng Lịch Sử', type: 'attraction', typeText: '🏛️ Du lịch' },
+      { name: 'Thư Viện Quốc Gia', type: 'attraction', typeText: '🏛️ Du lịch' },
+      { name: 'Vườn Hoa Đẹp', type: 'attraction', typeText: '🏛️ Du lịch' }
+    ];
+
+    const allPlaces = [...restaurants, ...cafes, ...attractions];
+    const selected = [];
+    const usedTypes = new Set();
+
+    // Pick 2 of each type but prioritize based on activity name
+    const actLower = actName.toLowerCase();
+    if (actLower.includes('phở') || actLower.includes('cơm') || actLower.includes('nhà hàng') || actLower.includes('hải sản')) {
+      selected.push(...restaurants.slice(0, 3));
+    } else if (actLower.includes('cà phê') || actLower.includes('cafe')) {
+      selected.push(...cafes.slice(0, 3));
+    } else {
+      selected.push(restaurants[0], cafes[0], attractions[0]);
+    }
+
+    return selected.slice(0, 6).map(p => ({
+      ...p,
+      coords: [
+        baseCoords[0] + (Math.random() - 0.5) * 0.04,
+        baseCoords[1] + (Math.random() - 0.5) * 0.06
+      ]
+    }));
+  }
+
+  window.toggleActivityMapFilter = function(btn, type) {
+    if (!actMapInstance) return;
+    actMapCurrentFilter = type;
+    const colors = { restaurant: '#10b981', attraction: '#3b82f6', cafe: '#f59e0b', all: '#ef4444' };
+    document.querySelectorAll('.actmap-filter-btn').forEach(b => {
+      const t = b.getAttribute('data-type');
+      const isActive = t === type;
+      const c = colors[t] || '#ef4444';
+      b.style.background = isActive ? c + '22' : 'transparent';
+      b.style.color = isActive ? c : '';
+      b.style.borderColor = isActive ? c : '';
+      b.classList.toggle('active', isActive);
+    });
+    
+    // Show/hide markers
+    actMapMarkers.forEach(({ marker, type: mType }) => {
+      if (type === 'all' || mType === type) {
+        if (!marker._map) marker.addTo(actMapInstance);
+      } else {
+        if (marker._map) actMapInstance.removeLayer(marker);
+      }
+    });
+  };
 
   // --- ACTIVITY DETAIL MODAL LOGIC (ELITE VERSION) ---
   window.showActivityDetails = function(act) {
@@ -2659,12 +2833,18 @@ const initPlanner = function () {
                </div>
             </div>
 
-            <div class="map-iframe-wrapper" style="height: 450px; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); width: 100%;">
-              <iframe 
-                src="https://maps.google.com/maps?q=${query}&t=&z=15&ie=UTF8&iwloc=&output=embed" 
-                allowfullscreen>
-              </iframe>
-              <div class="content-source-tag">Nguồn: Google Maps Live</div>
+            <div class="map-iframe-wrapper" style="height: 400px; border-radius: 1rem; border: 1px solid rgba(255,255,255,0.1); width: 100%; overflow:hidden;">
+              <!-- Filter buttons -->
+              <div style="display:flex; gap:0.4rem; flex-wrap:wrap; padding:0.75rem; background:rgba(0,0,0,0.3); border-bottom:1px solid rgba(255,255,255,0.1);">
+                <button class="actmap-filter-btn active" data-type="all" onclick="window.toggleActivityMapFilter(this, 'all')" style="padding:4px 10px; border-radius:1rem; border:1px solid var(--border); background:rgba(59,130,246,0.1); color:#3b82f6; font-size:0.7rem; cursor:pointer; font-weight:600;">📍 Điểm đến</button>
+                <button class="actmap-filter-btn" data-type="restaurant" onclick="window.toggleActivityMapFilter(this, 'restaurant')" style="padding:4px 10px; border-radius:1rem; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-size:0.7rem; cursor:pointer;">🍜 Ăn uống</button>
+                <button class="actmap-filter-btn" data-type="attraction" onclick="window.toggleActivityMapFilter(this, 'attraction')" style="padding:4px 10px; border-radius:1rem; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-size:0.7rem; cursor:pointer;">🏛️ Du lịch</button>
+                <button class="actmap-filter-btn" data-type="cafe" onclick="window.toggleActivityMapFilter(this, 'cafe')" style="padding:4px 10px; border-radius:1rem; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-size:0.7rem; cursor:pointer;">☕ Cafe</button>
+                <a href="#" onclick="window.getGPSDirections('${mapQuery.replace(/'/g, "\\'")}', event)" class="btn-open-external-map" style="margin-left:auto; background:#3b82f6; border:none; color:#fff; padding:4px 14px; border-radius:1rem; font-size:0.7rem; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">🗺️ GPS</a>
+              </div>
+              <!-- Leaflet Map Container -->
+              <div id="activityDetailMap" style="height:320px;"></div>
+              <div class="content-source-tag" style="position:absolute; bottom:8px; left:8px;">📸 WanderViet Map</div>
             </div>
         </div>
         
@@ -2772,6 +2952,11 @@ const initPlanner = function () {
 
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    
+    // Khởi tạo Leaflet map với markers sau khi modal hiện
+    setTimeout(() => {
+      if (window.initActivityDetailMap) window.initActivityDetailMap(act);
+    }, 100);
     
     // Khởi tạo render widget thời tiết sau khi DOM cập nhật
     if (window.renderDetailedWeatherWidget) {

@@ -2552,6 +2552,7 @@
         let slideItems = [];
         let slideIndex = 0;
         let slideshowTimer = null;
+        const SLIDESHOW_INTERVAL = 5000; // 5 giây tự động chuyển ảnh
 
         function updateSlide() {
             if (!slideItems || slideItems.length === 0) return;
@@ -2578,10 +2579,11 @@
 
         function startSlideshow() {
             if (slideshowTimer) clearInterval(slideshowTimer);
+            if (slideItems.length <= 1) return; // Không cần slideshow nếu chỉ có 1 ảnh
             slideshowTimer = setInterval(() => {
                 slideIndex = (slideIndex + 1) % slideItems.length;
                 updateSlide();
-            }, 4000);
+            }, SLIDESHOW_INTERVAL);
         }
 
         function nextSlide() {
@@ -2681,12 +2683,38 @@
 
             // ELITE: Merge legacy images and new gallery system & DEDUPLICATE URLS
             const uniqueMap = new Map();
+            
+            // Ưu tiên 1: Ảnh từ Google Maps (photo_reference) - chất lượng cao nhất
+            (place.googlePhotos || []).forEach(item => {
+                if (item && item.photo_reference) {
+                    const url = `/api/public/place-photo?ref=${encodeURIComponent(item.photo_reference)}&maxwidth=1200`;
+                    uniqueMap.set(url, { url, caption: item.caption || 'Google Maps', category: item.category || 'view', type: 'image', source: 'google' });
+                }
+            });
+            
+            // Ưu tiên 2: Ảnh từ gallery DB
             (place.gallery || []).forEach(item => {
-                if (item && item.url) uniqueMap.set(item.url, item);
+                if (item && item.url) uniqueMap.set(item.url, { ...item, source: item.source || 'db' });
             });
+            
+            // Ưu tiên 3: Ảnh từ images field
             (place.images || []).forEach(url => {
-                if(url && !uniqueMap.has(url)) uniqueMap.set(url, { url: url, category: 'general', type: 'image' });
+                if(url && !uniqueMap.has(url)) uniqueMap.set(url, { url: url, category: 'general', type: 'image', source: 'db' });
             });
+            
+            // Ưu tiên cuối: Ảnh Unsplash fallback (chỉ khi không có ảnh thật)
+            if (uniqueMap.size === 0 && place.name) {
+                const unsplashKeywords = encodeURIComponent(place.name + ' Vietnam');
+                const fallbackImages = [
+                    `https://source.unsplash.com/1200x675/?${unsplashKeywords}&sig=1`,
+                    `https://source.unsplash.com/1200x675/?${unsplashKeywords}&sig=2`,
+                    `https://source.unsplash.com/1200x675/?${unsplashKeywords}&sig=3`
+                ];
+                fallbackImages.forEach((url, i) => {
+                    uniqueMap.set(url, { url, caption: `${place.name}`, category: 'view', type: 'image', source: 'unsplash' });
+                });
+            }
+            
             allGalleryItems = Array.from(uniqueMap.values());
             
             if (allGalleryItems.length === 0) {
@@ -2695,8 +2723,8 @@
             }
             if (gallerySec) gallerySec.style.display = 'block';
 
-            // Khởi tạo Slideshow tự động thay đổi ảnh đẹp
-            slideItems = allGalleryItems.filter(it => it.type !== 'video').slice(0, 8); // Top 8 ảnh đẹp nhất
+            // Khởi tạo Slideshow tự động thay đổi ảnh đẹp - top 8 ảnh chất lượng cao nhất
+            slideItems = allGalleryItems.filter(it => it.type !== 'video').slice(0, 8);
             if (slideItems.length > 0) {
                 const el = document.getElementById('gallery-slideshow');
                 if(el) el.style.display = 'block';

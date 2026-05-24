@@ -38,6 +38,18 @@ const currentIndices = {
   business: 0
 };
 
+// Bộ đếm số lần sử dụng mỗi key (để proactive rotation trước khi hết quota)
+const usageCounters = {
+  user_chatbot: [],
+  planner: [],
+  navigation: [],
+  admin: [],
+  business: []
+};
+
+// Số lần gọi tối đa trước khi chuyển key (Groq free tier ~14,400 req/min, dùng 100 để an toàn)
+const MAX_USAGE_BEFORE_ROTATE = 100;
+
 // Hàm lấy danh sách key khả dụng của một category, fallback về user_chatbot nếu category đó trống
 function getKeyPool(category) {
   const pool = pools[category] || [];
@@ -69,7 +81,19 @@ async function callGroq(category, params) {
     const client = new Groq({ apiKey });
 
     try {
-      return await client.chat.completions.create(params);
+      const result = await client.chat.completions.create(params);
+      
+      // Tăng bộ đếm sử dụng key
+      usageCounters[catKey][idx] = (usageCounters[catKey][idx] || 0) + 1;
+      
+      // Proactive rotation: chuyển key nếu key hiện tại đã dùng quá nhiều lần
+      if (usageCounters[catKey][idx] >= MAX_USAGE_BEFORE_ROTATE && pool.length > 1) {
+        currentIndices[catKey] = (currentIndices[catKey] + 1) % pool.length;
+        usageCounters[catKey][idx] = 0;
+        console.warn(`🔄 [Groq Key Rotator] Key nhóm [${catKey}] index ${idx} đã dùng ${MAX_USAGE_BEFORE_ROTATE} lần. Proactive xoay sang index ${currentIndices[catKey]}.`);
+      }
+      
+      return result;
     } catch (err) {
       const isRateLimit = err.status === 429 || (err.message && (err.message.includes('429') || err.message.includes('rate_limit') || err.message.includes('quota') || err.message.includes('limit')));
       
@@ -77,6 +101,7 @@ async function callGroq(category, params) {
         attempts++;
         // Tăng index để xoay sang key tiếp theo trong pool
         currentIndices[catKey] = (currentIndices[catKey] + 1) % pool.length;
+        usageCounters[catKey][idx] = 0;
         console.warn(`🔄 [Groq Key Rotator] Key nhóm [${catKey}] bị giới hạn/hết token. Tự động xoay sang index ${currentIndices[catKey]}. Thử lại lần ${attempts}/${maxRetries}...`);
         continue;
       }
@@ -89,7 +114,29 @@ async function callGroq(category, params) {
   throw new Error(`Tất cả các API Keys trong nhóm [${catKey}] đều đã hết lượt hoặc bị giới hạn băng thông.`);
 }
 
+// Khởi tạo bộ đếm sử dụng cho mỗi key trong pool
+Object.keys(pools).forEach(cat => {
+  usageCounters[cat] = pools[cat].map(() => 0);
+});
+
+// Log tóm tắt khi module được load
+function getSummary() {
+  const summary = {};
+  Object.keys(pools).forEach(cat => {
+    summary[cat] = {
+      totalKeys: pools[cat].length,
+      keys: pools[cat].map((k, i) => ({
+        index: i,
+        prefix: k ? `...${k.slice(-4)}` : 'NULL',
+        usageCount: usageCounters[cat][i] || 0
+      }))
+    };
+  });
+  return summary;
+}
+
 module.exports = {
   callGroq,
-  pools
+  pools,
+  getSummary
 };

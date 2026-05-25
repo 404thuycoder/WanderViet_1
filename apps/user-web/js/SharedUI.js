@@ -763,12 +763,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       }
     }
 
-    // 5. Default history back or home navigation
-    if (document.referrer && document.referrer.includes(window.location.host)) {
-      window.history.back();
-    } else {
-      window.location.href = 'index.html';
-    }
+    // 5. Navigate to home page (clean, no hash to avoid triggering auth modal)
+    window.location.href = 'index.html';
   };
 
   function injectHeader() {
@@ -1066,16 +1062,14 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
   function injectCommonComponents() {
     // 1. Navigation items are now handled by injectHeader()
-    const rightButtonHtml = isExplorer 
-      ? `<button type="button" class="floating-toc-shrink-btn" onclick="this.parentElement.classList.toggle('is-shrunk'); event.stopPropagation();" title="Thu nhỏ / Phóng to">
-            &lsaquo;
-         </button>`
-      : `<button type="button" class="floating-toc-back-btn" onclick="WanderUI.handleHeaderBack(); event.stopPropagation();" title="Quay lại tác vụ trước">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px; height:14px; display:block;">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
+    const rightButtonHtml = !isExplorer
+      ? `<button type="button" class="floating-toc-back-btn" onclick="WanderUI.handleHeaderBack(); event.stopPropagation();" title="Quay lại trang chủ">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:16px; height:16px; display:block;">
+              <path d="M15 18l-6-6 6-6"/>
             </svg>
-         </button>`;
+            <span class="back-btn-sparkle">✦</span>
+         </button>`
+      : '';
 
     if (!document.querySelector('link[href*="companion.css"]')) {
       const link = document.createElement('link');
@@ -1680,13 +1674,52 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         <div class="floating-toc-inner">
           <style>
         .floating-toc-container.is-shrunk .toc-text-label { display: none !important; }
-        .floating-toc-container.is-shrunk .floating-toc-btn { padding: 0 !important; width: 36px !important; border-radius: 50% !important; justify-content: center; }
-        .floating-toc-container.is-shrunk .floating-toc-shrink-btn { transform: rotate(180deg); }
+        .floating-toc-container.is-shrunk .floating-toc-btn { padding: 0 8px !important; min-width: 36px !important; border-radius: 18px !important; justify-content: center; position: relative !important; }
+        .floating-toc-container.is-shrunk .toc-shrink-toggle {
+          display: inline-flex !important;
+          position: absolute !important;
+          right: -8px !important;
+          top: 50% !important;
+          transform: translateY(-50%) rotate(180deg) !important;
+          background: #fff !important;
+          border: 1px solid #e2e8f0 !important;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
+          width: 18px !important;
+          height: 18px !important;
+          margin: 0 !important;
+          z-index: 10 !important;
+        }
+        .floating-toc-container.is-shrunk .toc-shrink-toggle:hover {
+          transform: translateY(-50%) rotate(180deg) scale(1.15) !important;
+          background: #f8fafc !important;
+          border-color: #cbd5e1 !important;
+        }
+        [data-theme="dark"] .floating-toc-container.is-shrunk .toc-shrink-toggle {
+          background: #1e293b !important;
+          border-color: #475569 !important;
+          color: #f1f5f9 !important;
+        }
+        [data-theme="dark"] .floating-toc-container.is-shrunk .toc-shrink-toggle:hover {
+          background: #334155 !important;
+        }
+        .toc-shrink-toggle {
+          display: inline-flex; align-items: center; justify-content: center;
+          width: 16px; height: 16px; border-radius: 50%;
+          background: rgba(0,0,0,0.06); margin-left: 2px;
+          transition: all 0.25s ease; flex-shrink: 0; cursor: pointer;
+        }
+        .toc-shrink-toggle:hover { background: rgba(0,0,0,0.12); transform: scale(1.15); }
+        .toc-shrink-toggle svg { transition: transform 0.3s ease; }
+        [data-theme="dark"] .toc-shrink-toggle { background: rgba(255,255,255,0.1); }
+        [data-theme="dark"] .toc-shrink-toggle:hover { background: rgba(255,255,255,0.2); }
       </style>
       <div class="floating-toc-container" id="floating-toc" style="display:flex; align-items:center; gap:6px;">
              <button type="button" class="floating-toc-btn" onclick="this.parentElement.classList.toggle('is-open')" title="Mục lục Trang chủ">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 <span class="toc-text-label">Danh mục</span>
+                <span class="toc-shrink-toggle" onclick="event.stopPropagation(); this.closest('.floating-toc-container').classList.toggle('is-shrunk');" title="Thu nhỏ / Phóng to">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </span>
              </button>
              ${rightButtonHtml}
              <ul class="floating-toc-menu">
@@ -6038,74 +6071,75 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         display: flex; align-items: center; gap: 8px;
       }
 
-      /* Cute Back Button inside Floating TOC */
+      /* ✨ Cute Gradient Back Button inside Floating TOC */
       .floating-toc-back-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        border: 1px solid var(--border, #e2e8f0);
-        background: var(--bg-elevated, #fff);
-        color: var(--text-muted, #64748b);
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
         cursor: pointer;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 3px 12px rgba(102, 126, 234, 0.35), 0 1px 3px rgba(0,0,0,0.08);
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         position: relative;
         overflow: hidden;
         padding: 0;
         flex-shrink: 0;
       }
+      .floating-toc-back-btn .back-btn-sparkle {
+        position: absolute;
+        top: -1px;
+        right: -1px;
+        font-size: 8px;
+        color: #fbbf24;
+        filter: drop-shadow(0 0 2px rgba(251,191,36,0.6));
+        animation: sparkle-pulse 2s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+      }
+      @keyframes sparkle-pulse {
+        0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        50% { opacity: 0.5; transform: scale(0.7) rotate(20deg); }
+      }
       .floating-toc-back-btn::before {
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(255, 0, 85, 0.15));
+        border-radius: inherit;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         opacity: 0;
         transition: opacity 0.3s ease;
       }
       .floating-toc-back-btn:hover {
-        color: var(--accent, #00F0FF);
-        border-color: var(--accent, #00F0FF);
-        transform: translateX(-3px) scale(1.1);
-        box-shadow: 0 6px 15px rgba(0, 240, 255, 0.25);
+        transform: translateX(-3px) scale(1.12);
+        box-shadow: 0 6px 20px rgba(118, 75, 162, 0.45), 0 0 0 3px rgba(102, 126, 234, 0.15);
       }
       .floating-toc-back-btn:hover::before {
         opacity: 1;
       }
       .floating-toc-back-btn svg {
         transition: transform 0.3s ease;
+        position: relative;
+        z-index: 1;
+        filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
       }
       .floating-toc-back-btn:hover svg {
-        transform: scale(1.15);
+        transform: translateX(-2px);
       }
       .floating-toc-back-btn:active {
-        transform: translateX(-3px) scale(0.92);
+        transform: translateX(-2px) scale(0.92);
+        transition-duration: 0.1s;
       }
-
-      /* Cute Shrink Button inside Floating TOC */
-      .floating-toc-shrink-btn {
-        background: var(--bg-elevated, #fff);
-        border: 1px solid var(--border, #e2e8f0);
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        color: var(--text-muted, #64748b);
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        transition: transform 0.3s, background-color 0.2s, border-color 0.2s;
-        font-size: 16px;
-        padding-bottom: 2px;
-        font-weight: bold;
-        flex-shrink: 0;
+      [data-theme="dark"] .floating-toc-back-btn {
+        background: linear-gradient(135deg, #7c3aed 0%, #db2777 100%);
+        box-shadow: 0 3px 12px rgba(124, 58, 237, 0.4), 0 1px 3px rgba(0,0,0,0.2);
       }
-      .floating-toc-shrink-btn:hover {
-        background: var(--bg-card);
-        color: var(--accent);
+      [data-theme="dark"] .floating-toc-back-btn:hover {
+        box-shadow: 0 6px 20px rgba(219, 39, 119, 0.5), 0 0 0 3px rgba(124, 58, 237, 0.2);
       }
     `;
     document.head.appendChild(style);

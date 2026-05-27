@@ -4434,3 +4434,420 @@ html:not([data-theme="dark"]) .btn-back-step:hover,
   }
 }
 
+
+/* =====================================================================
+   ✨ PREMIUM UI ENHANCEMENT LAYER v2.0
+   Chỉ thêm/override — KHÔNG xóa logic gốc
+   ===================================================================== */
+
+/* ---------- 1. KEYFRAMES ---------- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes staggerFade {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+  50%       { box-shadow: 0 0 0 6px rgba(59,130,246,0.18); }
+}
+@keyframes dotBlink {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%           { transform: scale(1);   opacity: 1; }
+}
+@keyframes heroShimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* ---------- 2. HERO HEADER ENHANCEMENTS ---------- */
+.planner-hero-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #0284c7 100%) !important;
+  min-height: 160px;
+}
+
+/* Subtle animated shine across the hero */
+.planner-hero-header::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.04) 50%,
+    transparent 100%);
+  animation: heroShimmer 5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Title glow */
+.planner-form-title {
+  text-shadow: 0 0 24px rgba(96,165,250,0.5), 0 2px 8px rgba(0,0,0,0.9) !important;
+  letter-spacing: -0.3px;
+  animation: fadeInUp 0.55s ease both;
+}
+.planner-hero-sub {
+  animation: fadeInUp 0.55s 0.1s ease both;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+/* ---------- 3. HOT DESTINATION ITEMS (hero scroll) ---------- */
+.hero-hot-item {
+  border-radius: 0.875rem !important;
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1),
+              box-shadow 0.25s ease !important;
+  animation: fadeInLeft 0.4s ease both;
+  cursor: pointer;
+}
+.hero-hot-item:hover {
+  transform: translateY(-4px) scale(1.03) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.45) !important;
+}
+.hero-hot-img {
+  transition: transform 0.4s ease !important;
+}
+.hero-hot-item:hover .hero-hot-img {
+  transform: scale(1.08);
+}
+.hero-hot-badge {
+  font-size: 0.55rem !important;
+  padding: 2px 7px !important;
+  background: linear-gradient(135deg,#f97316,#ef4444) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+}
+
+/* ---------- 4. SIDEBAR DESTINATION ITEMS ---------- */
+.sidebar-dest-item {
+  border-radius: 0.875rem !important;
+  transition: all 0.22s cubic-bezier(0.4,0,0.2,1) !important;
+  animation: fadeInLeft 0.35s ease both;
+}
+.sidebar-dest-item:nth-child(1) { animation-delay: 0.05s; }
+.sidebar-dest-item:nth-child(2) { animation-delay: 0.10s; }
+.sidebar-dest-item:nth-child(3) { animation-delay: 0.15s; }
+.sidebar-dest-item:nth-child(4) { animation-delay: 0.20s; }
+.sidebar-dest-item:nth-child(5) { animation-delay: 0.25s; }
+
+.sidebar-dest-item:hover {
+  background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(96,165,250,0.07)) !important;
+  border-color: rgba(96,165,250,0.4) !important;
+  box-shadow: 0 4px 16px rgba(59,130,246,0.15);
+  transform: translateX(5px) !important;
+}
+.sidebar-dest-img {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 0.6rem !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease;
+}
+.sidebar-dest-item:hover .sidebar-dest-img {
+  transform: scale(1.08);
+}
+.sidebar-dest-info strong { font-size: 0.82rem !important; }
+.sidebar-dest-badge {
+  background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.25)) !important;
+  color: #93c5fd !important;
+  border: 1px solid rgba(96,165,250,0.25) !important;
+  border-radius: 999px !important;
+  font-size: 0.55rem !important;
+  font-weight: 900 !important;
+  padding: 2px 7px !important;
+}
+
+/* ---------- 5. SIDEBAR STATS — Gradient Numbers ---------- */
+.sidebar-stat-item {
+  border-radius: 0.75rem !important;
+  background: linear-gradient(135deg, rgba(59,130,246,0.06), rgba(16,185,129,0.04)) !important;
+  border: 1px solid rgba(96,165,250,0.15) !important;
+  transition: all 0.2s ease;
+}
+.sidebar-stat-item:hover {
+  border-color: rgba(96,165,250,0.35) !important;
+  background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(16,185,129,0.08)) !important;
+}
+.sidebar-stat-num {
+  background: linear-gradient(135deg, #60a5fa, #34d399) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-size: 1.05rem !important;
+  font-weight: 900 !important;
+}
+
+/* ---------- 6. TRAVEL TIPS ITEMS ---------- */
+.travel-tip-item {
+  border-radius: 0.875rem !important;
+  transition: all 0.22s ease !important;
+  animation: staggerFade 0.4s ease both;
+}
+.travel-tip-item:hover {
+  background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(96,165,250,0.06)) !important;
+  border-color: rgba(96,165,250,0.3) !important;
+  transform: translateX(5px) !important;
+  box-shadow: 0 4px 14px rgba(59,130,246,0.12);
+}
+.tip-icon { font-size: 1.3rem !important; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+.tip-content strong { font-size: 0.78rem !important; }
+.tip-content p { line-height: 1.5 !important; }
+
+/* ---------- 7. REGION CARDS — Glassmorphism Shine ---------- */
+.region-card {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.28s cubic-bezier(0.4,0,0.2,1) !important;
+  animation: staggerFade 0.4s ease both;
+}
+.region-card::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -60%;
+  width: 40%; height: 200%;
+  background: linear-gradient(105deg, transparent, rgba(255,255,255,0.07), transparent);
+  transform: skewX(-15deg);
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+.region-card:hover::before { left: 160%; }
+.region-card:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+  box-shadow: 0 10px 28px rgba(59,130,246,0.2) !important;
+  border-color: rgba(96,165,250,0.5) !important;
+}
+.region-card.active { animation: pulseGlow 2s ease infinite !important; }
+.region-card-icon { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25)); }
+
+/* ---------- 8. DESTINATION CARDS (horizontal scroll) ---------- */
+.region-dest-card {
+  border-radius: 1rem !important;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1) !important;
+  animation: fadeInUp 0.4s ease both;
+}
+.region-dest-card:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: 0 16px 32px rgba(0,0,0,0.5) !important;
+  border-color: rgba(96,165,250,0.5) !important;
+}
+.dest-card-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.region-dest-card:hover .dest-card-image::after { opacity: 1; }
+.dest-card-image img {
+  transition: transform 0.5s cubic-bezier(0.4,0,0.2,1) !important;
+}
+.region-dest-card:hover .dest-card-image img { transform: scale(1.12) !important; }
+
+/* ---------- 9. STYLE CHIPS ---------- */
+.style-chip {
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1) !important;
+  overflow: hidden;
+}
+.style-chip:hover {
+  transform: translateY(-2px) scale(1.04) !important;
+  box-shadow: 0 6px 16px rgba(59,130,246,0.2) !important;
+}
+.style-chip.active {
+  background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(37,99,235,0.3)) !important;
+  border-color: #60a5fa !important;
+  color: #bfdbfe !important;
+  box-shadow: 0 4px 14px rgba(59,130,246,0.25) !important;
+}
+
+/* ---------- 10. FORM INPUTS — Premium Focus ---------- */
+.planner-input:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96,165,250,0.18), 0 4px 14px rgba(59,130,246,0.1) !important;
+  outline: none !important;
+}
+
+/* ---------- 11. AI CHAT BUBBLES ---------- */
+.chat-message.bot .chat-bubble,
+.chat-msg.bot .chat-bubble {
+  background: linear-gradient(135deg, rgba(30,58,138,0.35), rgba(15,23,42,0.6)) !important;
+  border: 1px solid rgba(96,165,250,0.2) !important;
+  border-radius: 1.25rem 1.25rem 1.25rem 0.25rem !important;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.25) !important;
+  animation: fadeInUp 0.3s ease !important;
+}
+.chat-message.user .chat-bubble,
+.chat-msg.user .chat-bubble {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border-radius: 1.25rem 1.25rem 0.25rem 1.25rem !important;
+  box-shadow: 0 4px 18px rgba(37,99,235,0.35) !important;
+  animation: fadeInUp 0.3s ease !important;
+}
+
+/* ---------- 12. TYPING DOTS ---------- */
+.chat-typing-dots,
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.6rem 0.875rem;
+  background: rgba(30,58,138,0.3);
+  border: 1px solid rgba(96,165,250,0.18);
+  border-radius: 1rem;
+  animation: fadeInUp 0.25s ease;
+}
+.chat-typing-dots span,
+.typing-indicator span {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #60a5fa;
+  animation: dotBlink 1.3s ease infinite;
+  display: inline-block;
+}
+.chat-typing-dots span:nth-child(2),
+.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing-dots span:nth-child(3),
+.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ---------- 13. SKELETON LOADING ---------- */
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.09) 50%,
+    rgba(255,255,255,0.04) 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 0.5rem;
+}
+.skeleton-text   { height: 0.8rem; margin-bottom: 0.5rem; border-radius: 999px; }
+.skeleton-image  { width: 100%; aspect-ratio: 4/3; border-radius: 0.75rem; }
+.skeleton-card   { padding: 1rem; border-radius: 1rem; border: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+.skeleton-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; }
+
+/* ---------- 14. CHAT INPUT & SEND BUTTON ---------- */
+#chatInput:focus, .chat-input-box:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96,165,250,0.15) !important;
+  outline: none !important;
+}
+#chatSendBtn, .chat-send-btn {
+  border-radius: 0.875rem !important;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(37,99,235,0.35) !important;
+  transition: all 0.2s ease !important;
+}
+#chatSendBtn:hover, .chat-send-btn:hover {
+  transform: scale(1.04) translateY(-1px) !important;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.45) !important;
+}
+
+/* ---------- 15. AI SUGGESTION / DISCOVERY CARDS ---------- */
+.discovery-card, .suggestion-card {
+  border-radius: 1rem !important;
+  border: 1px solid rgba(96,165,250,0.18) !important;
+  background: rgba(30,58,138,0.12) !important;
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1) !important;
+  animation: fadeInUp 0.35s ease both;
+}
+.discovery-card:hover, .suggestion-card:hover {
+  transform: translateY(-4px) !important;
+  border-color: rgba(96,165,250,0.4) !important;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.35) !important;
+}
+.discovery-card img, .suggestion-card img {
+  transition: transform 0.4s ease !important;
+}
+.discovery-card:hover img, .suggestion-card:hover img {
+  transform: scale(1.1) !important;
+}
+
+/* ---------- 16. ITINERARY TIMELINE ---------- */
+.itinerary-item, .timeline-item {
+  animation: fadeInUp 0.38s ease both;
+  transition: all 0.22s ease !important;
+}
+.itinerary-item:hover, .timeline-item:hover {
+  transform: translateX(4px) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25) !important;
+}
+.itinerary-item.active, .timeline-item.active {
+  animation: pulseGlow 2.5s ease infinite !important;
+  border-color: rgba(96,165,250,0.5) !important;
+}
+
+/* ---------- 17. GENERATE BUTTON ---------- */
+.btn-generate-plan, #btnGeneratePlan {
+  border-radius: 1rem !important;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #4f46e5 100%) !important;
+  background-size: 200% auto !important;
+  border: none !important;
+  box-shadow: 0 8px 24px rgba(37,99,235,0.4) !important;
+  transition: all 0.3s ease !important;
+  font-weight: 800 !important;
+}
+.btn-generate-plan:hover, #btnGeneratePlan:hover {
+  background-position: right center !important;
+  transform: translateY(-2px) scale(1.01) !important;
+  box-shadow: 0 12px 32px rgba(37,99,235,0.5) !important;
+}
+
+/* ---------- 18. SIDEBAR SECTION TITLE GRADIENT ---------- */
+.sidebar-section-title {
+  background: linear-gradient(90deg, #60a5fa, #818cf8) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  font-size: 0.7rem !important;
+  letter-spacing: 1.5px !important;
+}
+
+/* ---------- 19. RATING STARS ---------- */
+.star-interactive {
+  font-size: 1.4rem !important;
+  cursor: pointer;
+  transition: transform 0.15s ease, color 0.15s ease !important;
+  color: rgba(255,255,255,0.2) !important;
+  display: inline-block;
+}
+.star-interactive:hover, .star-interactive.active {
+  color: #fbbf24 !important;
+  transform: scale(1.25) !important;
+  filter: drop-shadow(0 0 6px rgba(251,191,36,0.5));
+}
+
+/* ---------- 20. PREMIUM SCROLLBARS ---------- */
+.planner-form-body::-webkit-scrollbar { width: 4px; }
+.planner-form-body::-webkit-scrollbar-track { background: transparent; }
+.planner-form-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #3b82f6, #7c3aed);
+  border-radius: 999px;
+}
+
+/* ---------- 21. RESPONSIVE TOUCH UX ---------- */
+@media (max-width: 900px) {
+  .region-card:hover { transform: none !important; }
+  .sidebar-dest-item:hover { transform: none !important; }
+  .region-dest-card:hover { transform: translateY(-3px) !important; }
+}
+
+/* =====================================================================
+   END PREMIUM UI ENHANCEMENT LAYER
+   ===================================================================== */

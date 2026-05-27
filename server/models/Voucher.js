@@ -69,7 +69,6 @@ const voucherSchema = new mongoose.Schema({
 });
 
 // Index để tìm kiếm nhanh
-voucherSchema.index({ code: 1 });
 voucherSchema.index({ createdBy: 1, ownerId: 1 });
 voucherSchema.index({ status: 1, startDate: 1, endDate: 1 });
 

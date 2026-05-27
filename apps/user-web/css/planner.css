@@ -3101,6 +3101,25 @@ a {
   min-height: 150px;
   position: relative;
   overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+.planner-hero-header > * {
+  transition: opacity 0.3s ease, transform 0.3s ease !important;
+}
+
+.planner-hero-header.collapsed {
+  max-height: 0 !important;
+  min-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.planner-hero-header.collapsed > * {
+  opacity: 0 !important;
+  transform: translateY(-20px) !important;
 }
 
 /* Video background inside hero */

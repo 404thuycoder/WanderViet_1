@@ -106,7 +106,6 @@ router.get('/analytics', businessAuth, async (req, res) => {
 router.get('/dashboard/stats', businessAuth, async (req, res) => {
   try {
     const ownerId = req.user.id;
-    const BusinessActivity = getModel('BusinessActivity');
     
     // 1. Get Totals from Places
     const places = await Place.find({ ownerId });
@@ -125,7 +124,10 @@ router.get('/dashboard/stats', businessAuth, async (req, res) => {
     const activities = await BusinessActivity.find({ 
       ownerId, 
       createdAt: { $gte: thirtyDaysAgo } 
-    }).lean();
+    }).lean().catch(err => {
+      console.warn('[Dashboard Stats] BusinessActivity query failed:', err.message);
+      return []; // Return empty array as fallback
+    });
 
     const totalInteractions = activities.length;
     const views = activities.filter(a => ['view_menu', 'map_view'].includes(a.type)).length;
@@ -177,7 +179,6 @@ router.get('/places', businessAuth, async (req, res) => {
 // 1b. Get stats for business dashboard
 router.get('/stats', businessAuth, async (req, res) => {
   try {
-    const BookingModel = getModel('Booking');
     const days = parseInt(req.query.days) || 7; // Default 7 days
     
     const now = new Date();
@@ -187,7 +188,7 @@ router.get('/stats', businessAuth, async (req, res) => {
 
     const [places, allBookings, messages] = await Promise.all([
       Place.find({ ownerId: req.user.id }),
-      BookingModel.find({ ownerId: req.user.id }),
+      Booking.find({ ownerId: req.user.id }),
       BusinessMessage.find({ businessId: req.user.id, isRead: false, senderRole: 'customer' })
     ]);
 
@@ -206,11 +207,13 @@ router.get('/stats', businessAuth, async (req, res) => {
     const pendingBookings = allBookings.filter(b => b.status === 'pending').length;
     const lowReviews = places.reduce((sum, p) => sum + (p.reviews ? p.reviews.filter(r => r.rating <= 2).length : 0), 0);
 
-    // General Stats - NOW USING REAL ACTIVITY DATA
-    const BusinessActivity = getModel('BusinessActivity');
+    // General Stats - Using imported BusinessActivity model
     const totalViews = await BusinessActivity.countDocuments({ 
       ownerId: req.user.id, 
       type: { $in: ['view_menu', 'map_view', 'view_detail'] } 
+    }).catch(err => {
+      console.warn('[Stats] BusinessActivity query failed:', err.message);
+      return 0; // Return 0 as fallback
     });
     
     const totalReviews = places.reduce((sum, p) => sum + (p.reviewCount || 0), 0);
@@ -283,30 +286,48 @@ router.get('/stats', businessAuth, async (req, res) => {
     res.json({
       success: true,
       data: {
+        // Services
         totalServices: places.length,
         activeServices: places.filter(p => p.status === 'approved').length,
-        totalViews,
+        // Reviews & Rating
         totalReviews,
         avgRating,
-        totalBookings: currentBookings.length, // Filtered by range
+        // Bookings
+        totalBookings: allBookings.length, // All bookings, not just filtered
         bookingsToday,
-        revenueTotal: currentRevenue, // Filtered by range
+        totalConfirmedBookings: allBookings.filter(b => validStatuses.includes(b.status)).length,
+        // Revenue
+        revenueTotal: currentRevenue,
         revenueToday,
-        newMessages: messages.length,
+        // Engagement & Views
+        totalViews,
+        totalFavorites: places.reduce((sum, p) => sum + (p.favoritesCount || 0), 0),
+        totalEngagement: places.reduce((sum, p) => sum + (p.favoritesCount || 0) + (p.reviewCount || 0), 0),
+        // Followers (from BusinessAccount)
+        totalFollowers: req.user && req.user.followersCount ? req.user.followersCount : 0,
+        // Trends
         trends: {
-            revenue: revenueTrend,
-            bookings: bookingTrend
+          revenue: revenueTrend,
+          bookings: bookingTrend,
+          views: totalViews > 0 ? Math.round(((currentBookings.length / totalViews) * 100)) : 0,
+          followers: 0, // No historical data available
+          engagement: 0,
+          trending: Math.round((totalReviews / Math.max(places.length, 1)) * 10) // Simple trending calc
         },
-        actionableAlerts: {
-            pendingBookings,
-            lowReviews,
-            unreadMessages: messages.length,
-            tomorrowGuests
-        },
+        // Business Performance
         conversionRate: totalViews > 0 ? ((currentBookings.length / totalViews) * 100).toFixed(1) : 0,
+        pendingBookings,
+        // Actionable Alerts
+        actionableAlerts: {
+          pendingBookings,
+          lowReviews,
+          unreadMessages: messages.length,
+          tomorrowGuests
+        },
+        // Revenue breakdown by place
         charts: {
-            revenueSeries: revenueChartData,
-            revenueBreakdown: revenueBreakdown.sort((a,b) => b.value - a.value).slice(0, 5) // Top 5
+          revenueSeries: revenueChartData,
+          revenueBreakdown: revenueBreakdown.sort((a,b) => b.value - a.value).slice(0, 5)
         }
       }
     });
@@ -326,11 +347,13 @@ router.get('/dashboard/activities', businessAuth, async (req, res) => {
       query.businessCategory = category;
     }
 
-    const BookingModel = getModel('Booking');
-    const bookings = await BookingModel.find(query)
+    const bookings = await Booking.find(query)
                                        .sort({ createdAt: -1 })
                                        .limit(10)
-                                       .lean();
+                                       .lean().catch(err => {
+                                         console.warn('[Dashboard Activities] Booking query failed:', err.message);
+                                         return [];
+                                       });
 
     const recentBookings = bookings.map(b => ({
       id: b._id.toString().substring(18), // Short ID
@@ -354,9 +377,6 @@ router.get('/dashboard/activities', businessAuth, async (req, res) => {
 // 1d. AI Business Analytics PRO
 router.get('/ai-analytics', businessAuth, async (req, res) => {
   try {
-    const BookingModel = getModel('Booking');
-    const AIInsightModel = getModel('AIInsight');
-    const PlaceModel = getModel('Place');
     const bizId = req.user.id;
 
     // Time ranges
@@ -368,10 +388,10 @@ router.get('/ai-analytics', businessAuth, async (req, res) => {
 
     // 1. Trend & Time Comparison
     const [currWeekBookings, prevWeekBookings, currMonthBookings, todayBookings] = await Promise.all([
-      BookingModel.countDocuments({ ownerId: bizId, createdAt: { $gte: weekAgo } }),
-      BookingModel.countDocuments({ ownerId: bizId, createdAt: { $gte: twoWeeksAgo, $lt: weekAgo } }),
-      BookingModel.countDocuments({ ownerId: bizId, createdAt: { $gte: monthAgo } }),
-      BookingModel.countDocuments({ ownerId: bizId, createdAt: { $gte: dayAgo } })
+      Booking.countDocuments({ ownerId: bizId, createdAt: { $gte: weekAgo } }),
+      Booking.countDocuments({ ownerId: bizId, createdAt: { $gte: twoWeeksAgo, $lt: weekAgo } }),
+      Booking.countDocuments({ ownerId: bizId, createdAt: { $gte: monthAgo } }),
+      Booking.countDocuments({ ownerId: bizId, createdAt: { $gte: dayAgo } })
     ]);
 
     let trend = 'ổn định';
@@ -386,7 +406,7 @@ router.get('/ai-analytics', businessAuth, async (req, res) => {
     }
 
     // 2. Conversion Rate
-    const myPlaces = await PlaceModel.find({ ownerId: bizId }).select('region priceFrom favoritesCount reviewCount');
+    const myPlaces = await Place.find({ ownerId: bizId }).select('region priceFrom favoritesCount reviewCount');
     const totalViews = myPlaces.reduce((s, p) => s + (p.favoritesCount || 0), 0) || 100;
     const conversionRate = ((currMonthBookings / totalViews) * 100).toFixed(1);
 
@@ -402,7 +422,7 @@ router.get('/ai-analytics', businessAuth, async (req, res) => {
     }
 
     // 4. Hot Locations & Market Price
-    const hotLocsRaw = await BookingModel.aggregate([
+    const hotLocsRaw = await Booking.aggregate([
       { $match: { createdAt: { $gte: monthAgo } } },
       { $group: { _id: "$placeId", count: { $sum: 1 }, name: { $first: "$placeName" } } },
       { $sort: { count: -1 } },
@@ -411,7 +431,7 @@ router.get('/ai-analytics', businessAuth, async (req, res) => {
 
     const placeIds = hotLocsRaw.map(l => l._id).filter(Boolean);
     // placeIds are custom string IDs, NOT MongoDB ObjectIds — only query by 'id' field
-    const placesInfo = placeIds.length > 0 ? await PlaceModel.find({ id: { $in: placeIds } }).select('region name') : [];
+    const placesInfo = placeIds.length > 0 ? await Place.find({ id: { $in: placeIds } }).select('region name') : [];
     
     const regionStats = {};
     hotLocsRaw.forEach(l => {
@@ -426,7 +446,7 @@ router.get('/ai-analytics', businessAuth, async (req, res) => {
     let marketPrice = 0;
     let priceEvaluation = 'Chưa có dữ liệu';
     if (myRegions.length > 0) {
-      const marketPlaces = await PlaceModel.find({ region: { $in: myRegions }, priceFrom: { $gt: 0 } }).select('priceFrom');
+      const marketPlaces = await Place.find({ region: { $in: myRegions }, priceFrom: { $gt: 0 } }).select('priceFrom');
       if (marketPlaces.length > 0) {
         const totalMarketPrice = marketPlaces.reduce((s, p) => s + (Number(p.priceFrom) || 0), 0);
         marketPrice = Math.round(totalMarketPrice / marketPlaces.length);
@@ -460,7 +480,7 @@ router.get('/ai-analytics', businessAuth, async (req, res) => {
 
     // 6. Save Insight to History (Safe-Fail)
     try {
-      await new AIInsightModel({
+      await new AIInsight({
         ownerId: bizId,
         type: anomaly ? 'anomaly' : 'suggestion',
         title: 'AI Insight hàng ngày',

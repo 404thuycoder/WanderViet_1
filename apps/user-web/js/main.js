@@ -1,10 +1,21 @@
-﻿"use strict";
+"use strict";
 
 (function () {
   "use strict";
 
   // PLACES sẽ được nạp từ API MongoDB, fallback về dữ liệu tĩnh nếu API lỗi
   var PLACES = [];
+
+  // Inline SVG placeholder – never 404, no external file needed
+  // Exposed on window so inline onerror handlers can access it
+  var PLACEHOLDER_SVG = window.PLACEHOLDER_SVG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%231e293b'/%3E%3Ccircle cx='40' cy='30' r='14' fill='%2338bdf8'/%3E%3Cellipse cx='40' cy='65' rx='22' ry='14' fill='%2338bdf8'/%3E%3C/svg%3E";
+
+  // Local image helper – falls back to window.getSafeImage (SharedUI) if available,
+  // otherwise uses a simple inline implementation so load order doesn't matter.
+  function getSafeImage(src, fallback) {
+    if (typeof window.getSafeImage === 'function') return window.getSafeImage(src, fallback);
+    return src || fallback;
+  }
   var userPos = null; // Tọa độ GPS người dùng
   var routeLayer = null; // Layer vẽ đường đi OSRM
   var transportMode = "driving"; // "driving" (ô tô) hoặc "motorcycle" (xe máy)
@@ -98,7 +109,7 @@
 
         container.innerHTML = doubleData.map(biz => `
           <a href="business-profile.html?id=${biz._id || biz.customId}" class="partner-card">
-            <img src="${biz.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(biz.displayName||biz.name||'WV') + '&background=6366f1&color=fff&size=80'}" class="partner-avatar" alt="${biz.displayName}" onerror="this.src='https://ui-avatars.com/api/?name=WV&background=6366f1&color=fff&size=80'" />
+            <img src="${getSafeImage(biz.avatar, PLACEHOLDER_SVG)}" class="partner-avatar" alt="${biz.displayName}" onerror="this.onerror=null;this.src=window.PLACEHOLDER_SVG" />
             <div class="partner-info">
               <div class="partner-name">${biz.displayName || biz.name} ${biz.isVerified ? '✅' : ''}</div>
               <div class="partner-cat">${biz.category}</div>
@@ -3150,7 +3161,7 @@
           matches.forEach(function(p) {
             var li = document.createElement('div');
             li.className = 'search-item';
-            li.innerHTML = '<img src="' + (p.image || 'assets/img/default-place.jpg') + '" class="search-item__img" alt="">' +
+            li.innerHTML = '<img src="' + (p.image || window.PLACEHOLDER_SVG) + '" class="search-item__img" alt="">' +
                            '<div class="search-item__info">' +
                              '<span class="search-item__name">' + p.name + '</span>' +
                              '<span class="search-item__meta">📍 ' + (p.province || p.region) + '</span>' +

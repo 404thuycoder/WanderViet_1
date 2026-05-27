@@ -14,6 +14,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   };
 
+  // Global image helper fallback
+  window.getSafeImage = function(src, fallback) {
+    if (!src) return fallback;
+    return src;
+  };
+
   // ─── Global Loading System ───────────────────────────────────────────────
   let loaderCount = 0;
   function showLoading(message = 'Đang xử lý...') {
@@ -808,7 +814,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
              <li><a href="quests.html" class="nav-link" data-link="quests">🎯 Nhiệm vụ</a></li>
              <li><a href="history.html" class="nav-link" data-link="history">⌛ Lịch sử</a></li>
              <li><a href="leaderboard.html" class="nav-link" data-link="leaderboard">🏆 BXH</a></li>
-             <li><a href="business-directory.html" class="nav-link" data-link="business">🏨 Doanh nghiệp</a></li>
+             <li><a href="business-directory.html" class="nav-link" data-link="business">🏨 Dịch vụ</a></li>
           </ul>
           
           <div class="site-nav__mobile-footer">
@@ -1476,10 +1482,10 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                   
                   <div class="chat-widget-card widget-weather">
                     <div class="widget-weather__info">
-                      <span class="widget-weather__city">📍 Hà Nội</span>
-                      <span class="widget-weather__desc">Thời tiết du lịch rất đẹp ☀️</span>
+                      <span class="widget-weather__city" id="chatbot-weather-city">📍 Hà Nội</span>
+                      <span class="widget-weather__desc" id="chatbot-weather-desc">Thời tiết du lịch rất đẹp ☀️</span>
                     </div>
-                    <div class="widget-weather__temp">28°C</div>
+                    <div class="widget-weather__temp" id="chatbot-weather-temp">28°C</div>
                   </div>
 
                   <!-- Dynamic WanderQuiz Interactive Widget -->
@@ -2673,6 +2679,293 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     const form = document.getElementById('global-chat-form');
     const input = document.getElementById('global-chat-input');
     const log = document.getElementById('global-chat-log');
+
+    function updateChatbotWeather() {
+      const cityEl = document.getElementById('chatbot-weather-city');
+      const descEl = document.getElementById('chatbot-weather-desc');
+      const tempEl = document.getElementById('chatbot-weather-temp');
+      if (!cityEl && !descEl && !tempEl) return;
+
+      // Hàm đánh giá thời tiết cho du lịch
+      function getTravelRecommendation(tempC, code, weatherDesc) {
+        const t = Number(tempC);
+        const c = Number(code);
+        const d = (weatherDesc || '').toLowerCase();
+
+        let isThunder = false;
+        let isSnow = false;
+        let isRain = false;
+        let isFog = false;
+        let isCloudy = false;
+        let isSunny = false;
+
+        // Ưu tiên khớp theo mã thời tiết chính xác (hỗ trợ cả Open-Meteo và WWO/wttr.in)
+        if (!isNaN(c)) {
+          if ([95, 96, 99, 200, 386, 389, 392, 395].includes(c)) {
+            isThunder = true;
+          } else if ([71, 73, 75, 77, 85, 86, 182, 185, 227, 230, 323, 326, 329, 332, 335, 338, 350, 368, 371, 374, 377].includes(c)) {
+            isSnow = true;
+          } else if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 176, 263, 266, 293, 296, 299, 302, 305, 308, 311, 314, 317, 320, 353, 356, 359, 362, 365].includes(c)) {
+            isRain = true;
+          } else if ([45, 48, 143, 248, 260].includes(c)) {
+            isFog = true;
+          } else if ([1, 2, 3, 116, 119, 122].includes(c)) {
+            isCloudy = true;
+          } else if ([0, 113].includes(c)) {
+            isSunny = true;
+          }
+        }
+
+        // Tự động phân tích chuỗi nếu mã thời tiết chưa khớp được loại cụ thể nào
+        if (!isThunder && !isSnow && !isRain && !isFog && !isCloudy && !isSunny) {
+          isRain = d.includes('rain') || d.includes('mưa') || d.includes('shower') || d.includes('drizzle');
+          isThunder = d.includes('thunder') || d.includes('sấm') || d.includes('storm') || d.includes('giông') || d.includes('dông');
+          isSnow = d.includes('snow') || d.includes('tuyết');
+          isFog = d.includes('fog') || d.includes('mist') || d.includes('sương');
+          isCloudy = d.includes('cloud') || d.includes('overcast') || d.includes('mây');
+          isSunny = d.includes('sun') || d.includes('clear') || d.includes('nắng');
+        }
+
+        if (isThunder) return 'Có giông sét, nên hạn chế ra ngoài ⛈️';
+        if (isSnow) return 'Tuyết rơi, cảnh đẹp nhưng cần giữ ấm ❄️';
+        if (isRain && t < 20) return 'Mưa và se lạnh, nên ở trong nhà 🌧️';
+        if (isRain && t >= 20) return 'Có mưa, nhớ mang ô nếu ra ngoài 🌦️';
+        if (isFog) return 'Sương mù, tầm nhìn hạn chế 🌫️';
+        if (t >= 40) return 'Nắng nóng gay gắt, hạn chế hoạt động ngoài trời 🥵';
+        if (t >= 35) return 'Trời khá nóng, nhớ uống nhiều nước ☀️';
+        if (t >= 25 && isSunny) return 'Thời tiết du lịch rất đẹp ☀️';
+        if (t >= 25 && isCloudy) return 'Mát mẻ dễ chịu, lý tưởng để dạo phố 🌤️';
+        if (t >= 20) return 'Thời tiết dễ chịu, rất hợp tham quan 😊';
+        if (t >= 15) return 'Se lạnh, mang thêm áo khoác nhé 🧥';
+        if (t >= 10) return 'Trời lạnh, thích hợp ngắm cảnh núi rừng 🏔️';
+        return 'Trời rất lạnh, giữ ấm khi ra ngoài 🥶';
+      }
+
+      // Hàm reverse geocode lấy tên tỉnh/thành phố tiếng Việt
+      async function reverseGeocode(lat, lon) {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=vi&zoom=10`);
+          const data = await res.json();
+          if (data && data.address) {
+            const addr = data.address;
+            // Ưu tiên: city > town > county > state > province
+            let name = addr.city || addr.town || addr.county || addr.state || addr.province || '';
+            // Loại bỏ prefix thừa
+            name = name.replace(/^(Thành phố |Tỉnh |TP\.?\s*)/i, '').trim();
+            if (name) return name;
+          }
+        } catch (e) {
+          console.warn('Reverse geocode failed', e);
+        }
+        return '';
+      }
+
+      const fetchWeatherData = async (lat, lon, customName = '') => {
+        try {
+          let temp = null;
+          let code = null;
+          let desc = '';
+          let areaName = customName;
+
+          // Lấy tên địa danh bằng GPS song song
+          let geoPromise = Promise.resolve('');
+          if (!areaName && lat != null && lon != null) {
+            geoPromise = reverseGeocode(lat, lon);
+          }
+
+          // Lấy dữ liệu thời tiết bằng GPS
+          if (lat != null && lon != null) {
+            try {
+              // Ưu tiên dùng Open-Meteo vì độ chính xác thời gian thực cực cao và cập nhật liên tục
+              const openMeteoUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode`;
+              const [weatherRes, geoName] = await Promise.all([
+                fetch(openMeteoUrl).then(r => r.json()),
+                geoPromise
+              ]);
+
+              if (weatherRes && weatherRes.current) {
+                temp = Math.round(weatherRes.current.temperature_2m);
+                code = weatherRes.current.weathercode;
+                // Map weather code to Vietnamese description for fallback recommendation
+                const weatherDescMap = {
+                  0: 'Trời trong lành',
+                  1: 'Trời có sương mù',
+                  2: 'Mây lẻ tấm',
+                  3: 'Nhiều mây che phủ',
+                  45: 'Mưa phùn',
+                  48: 'Mưa đóng băng',
+                  51: 'Mưa nhẹ',
+                  53: 'Mưa vừa',
+                  55: 'Mưa mạnh',
+                  56: 'Mưa đóng băng nhẹ',
+                  57: 'Mưa đóng băng mạnh',
+                  61: 'Mưa mưa bão nhẹ',
+                  63: 'Mưa mưa bão vừa',
+                  65: 'Mưa mưa bão mạnh',
+                  66: 'Mưa mưa bão rất mạnh',
+                  71: 'Băng tuyết nhẹ',
+                  73: 'Băng tuyết vừa',
+                  75: 'Băng tuyết mạnh',
+                  80: 'Mưa rào nhẹ',
+                  81: 'Mưa rào vừa',
+                  82: 'Mưa rào mạnh',
+                  95: 'Bão mạnh',
+                  96: 'Bão kèm mưa đá',
+                  99: 'Bão cực mạnh'
+                };
+                desc = weatherDescMap[code] || '';
+                if (!areaName) areaName = geoName;
+              }
+            } catch (err) {
+              console.warn('Open-Meteo failed, falling back to wttr.in', err);
+            }
+          }
+
+          // Fallback hoặc khi không có GPS (dùng IP qua wttr.in)
+          if (temp === null) {
+            const weatherQuery = (lat != null && lon != null) ? `${lat},${lon}` : '';
+            const weatherUrl = weatherQuery
+              ? `https://wttr.in/${encodeURIComponent(weatherQuery)}?format=j1&lang=vi`
+              : `https://wttr.in/?format=j1&lang=vi`;
+
+            const [weatherRes, geoName] = await Promise.all([
+              fetch(weatherUrl).then(r => r.json()),
+              geoPromise
+            ]);
+
+            if (weatherRes && weatherRes.current_condition && weatherRes.current_condition[0]) {
+              const current = weatherRes.current_condition[0];
+              temp = Math.round(Number(current.temp_C));
+              code = Number(current.weatherCode);
+              desc = current.weatherDesc && current.weatherDesc[0] ? current.weatherDesc[0].value : '';
+
+              if (lat != null && lon != null) {
+                if (!areaName) areaName = geoName;
+              }
+              if (!areaName && weatherRes.nearest_area && weatherRes.nearest_area[0]) {
+                const area = weatherRes.nearest_area[0];
+                if (area.region && area.region[0] && area.region[0].value) {
+                  areaName = area.region[0].value;
+                } else if (area.areaName && area.areaName[0]) {
+                  areaName = area.areaName[0].value;
+                }
+              }
+            }
+          }
+
+          if (areaName) {
+            areaName = areaName.replace(/^(Thành phố |Tỉnh |TP\.?\s*)/i, '').trim();
+          }
+          if (!areaName) areaName = 'Vị trí hiện tại';
+
+          if (temp !== null) {
+            if (tempEl) tempEl.textContent = `${temp}°C`;
+            if (cityEl) {
+              cityEl.textContent = `📍 ${areaName}`;
+              cityEl.title = 'Bấm để đổi tỉnh/thành phố khác';
+              cityEl.style.cursor = 'pointer';
+              cityEl.style.textDecoration = 'underline dotted';
+              cityEl.onclick = async () => {
+                const inputCity = prompt('Nhập tên Tỉnh/Thành phố của bạn để xem thời tiết chính xác (ví dụ: Hà Nội, Tuyên Quang, Hải Dương, Đà Nẵng...):', areaName);
+                if (inputCity && inputCity.trim()) {
+                  try {
+                    cityEl.textContent = '📍 Đang định vị...';
+                    const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(inputCity.trim() + ', Vietnam')}&format=json&limit=1`;
+                    const res = await fetch(geocodeUrl);
+                    const data = await res.json();
+                    if (data && data[0]) {
+                      const newLat = parseFloat(data[0].lat);
+                      const newLon = parseFloat(data[0].lon);
+                      let displayName = data[0].display_name.split(',')[0];
+                      displayName = displayName.replace(/^(Thành phố |Tỉnh |TP\.?\s*)/i, '').trim();
+                      
+                      localStorage.setItem('preferred_weather_city', JSON.stringify({ name: displayName, lat: newLat, lon: newLon }));
+                      fetchWeatherData(newLat, newLon, displayName);
+                    } else {
+                      alert('Không tìm thấy địa điểm này. Vui lòng nhập lại chính xác tên Tỉnh/Thành phố.');
+                      cityEl.textContent = `📍 ${areaName}`;
+                    }
+                  } catch (err) {
+                    console.error('Geocoding failed', err);
+                    alert('Lỗi kết nối khi định vị. Vui lòng thử lại sau.');
+                    cityEl.textContent = `📍 ${areaName}`;
+                  }
+                }
+              };
+            }
+            if (descEl) descEl.textContent = getTravelRecommendation(temp, code, desc);
+          }
+        } catch (e) {
+          console.warn('Chatbot weather fetch failed', e);
+        }
+      };
+
+      // Hàm lấy tọa độ dựa trên IP (fallback khi trình duyệt chặn GPS)
+      async function getIPCoordinates() {
+        try {
+          const res = await fetch('https://freeipapi.com/api/json');
+          const data = await res.json();
+          if (data && data.latitude != null && data.longitude != null) {
+            return { lat: data.latitude, lon: data.longitude };
+          }
+        } catch (e) {
+          console.warn('IP-based geo fallback 1 failed', e);
+        }
+        try {
+          const res = await fetch('https://ipapi.co/json/');
+          const data = await res.json();
+          if (data && data.latitude != null && data.longitude != null) {
+            return { lat: data.latitude, lon: data.longitude };
+          }
+        } catch (e) {
+          console.warn('IP-based geo fallback 2 failed', e);
+        }
+        return null;
+      }
+
+      const runWeatherUpdate = async () => {
+        // 1. Kiểm tra vị trí đã lưu trong localStorage trước
+        const cachedCity = localStorage.getItem('preferred_weather_city');
+        if (cachedCity) {
+          try {
+            const { name, lat, lon } = JSON.parse(cachedCity);
+            if (lat != null && lon != null) {
+              fetchWeatherData(lat, lon, name);
+              return;
+            }
+          } catch (e) {
+            console.warn('Failed to parse cached city', e);
+          }
+        }
+
+        // 2. Định vị tự động
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              fetchWeatherData(position.coords.latitude, position.coords.longitude);
+            },
+            async () => {
+              const coords = await getIPCoordinates();
+              if (coords) {
+                fetchWeatherData(coords.lat, coords.lon);
+              } else {
+                fetchWeatherData(null, null);
+              }
+            },
+            { timeout: 5000 }
+          );
+        } else {
+          const coords = await getIPCoordinates();
+          if (coords) {
+            fetchWeatherData(coords.lat, coords.lon);
+          } else {
+            fetchWeatherData(null, null);
+          }
+        }
+      };
+
+      runWeatherUpdate();
+    }
 
     function togglePanel() {
       const isOpen = !panel.hidden;

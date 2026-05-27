@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 
 <head>
@@ -41,7 +41,7 @@
     href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=4" />
-  <link rel="stylesheet" href="css/planner.css?v=20260518_v36" />
+  <link rel="stylesheet" href="css/planner.css?v=20260527_v1" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="/planner_spot_detail_css_helper.css?v=1" />
   <style id="hotfix-cache-buster">
@@ -391,7 +391,7 @@
     /* --- Region Destination Grid (large cards like screenshot 2) --- */
     .region-dest-scroll {
       display: grid !important;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(3, minmax(140px, 1fr));
       gap: 1rem;
       padding: 0.6rem 0.2rem;
       align-items: start;
@@ -474,9 +474,28 @@
     .dest-card-location { color:var(--text-muted); font-size:0.75rem; }
     .dest-card-name { font-weight:800; font-size:1rem; color:var(--text); }
     .dest-card-desc { color:var(--text-muted); font-size:0.85rem; line-height:1.2; flex:1; }
-    .dest-card-actions { display:flex; justify-content:space-between; align-items:center; gap:0.5rem; margin-top:0.25rem; }
-    .dest-card-actions .link-detail { color:var(--link, #60a5fa); font-weight:700; text-decoration:none; }
-    .dest-card-actions .btn-go { background: linear-gradient(90deg,#7c3aed,#06b6d4); color:#fff; border:none; padding:0.45rem 0.7rem; border-radius:0.6rem; cursor:pointer; }
+    .dest-card-actions { margin-top: 0.6rem; }
+    .dest-card-actions .btn-go {
+      width: 100%;
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      color: #fff;
+      border: none;
+      padding: 0.55rem;
+      border-radius: 0.75rem;
+      font-weight: 700;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(124, 58, 237, 0.15);
+    }
+    .dest-card-actions .btn-go:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(124, 58, 237, 0.3);
+      filter: brightness(1.08);
+    }
     .spot-action-btn, .spot-select-btn {
       border: 1px solid rgba(255,255,255,0.12);
       background: rgba(255,255,255,0.06);
@@ -703,7 +722,7 @@
     .spot-detail-review-stars { color:#fbbf24; font-size:0.9rem; }
     .spot-detail-review-text { margin:0.15rem 0 0 0; color:#cbd5e1; font-size:0.88rem; line-height:1.5; }
     @media (max-width: 900px) {
-      .region-dest-scroll { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+      .region-dest-scroll { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
       .region-dest-card { min-height: 260px; }
       .dest-card-image { height:120px; }
       .spot-detail-body { grid-template-columns: 1fr; }
@@ -2500,7 +2519,6 @@
               <span class="meta-tag cost">💰 ${cost}</span>
             </div>
             <div class="dest-card-actions">
-              <a href="#" class="link-detail" onclick="event.preventDefault(); selectDestination('${dest.name.replace("'","\'")}', this.closest('.region-dest-card'))">Chi tiết →</a>
               <button class="btn-go" onclick="event.stopPropagation(); selectDestination('${dest.name.replace("'","\'")}', this.closest('.region-dest-card'))">+ Chuyến đi</button>
             </div>
           </div>
@@ -5244,6 +5262,45 @@
       </div>
     </div>
   </div>
+
+  <!-- Collapsible Hero Header Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      (function initCollapsibleHero() {
+        const hero = document.getElementById('plannerHeroHeader');
+        if (!hero) return;
+
+        let lastScrollY = {};
+
+        document.addEventListener('scroll', function(event) {
+          const target = event.target;
+          if (
+            target && 
+            target.classList && (
+              target.classList.contains('planner-form-body') || 
+              target.classList.contains('planner-sidebar')
+            )
+          ) {
+            const containerId = target.className + '-' + (target.id || 'no-id');
+            const currentScrollY = target.scrollTop;
+            const prevScrollY = lastScrollY[containerId] || 0;
+            const diff = currentScrollY - prevScrollY;
+
+            // Scroll down and past 30px -> collapse
+            if (diff > 5 && currentScrollY > 30) {
+              hero.classList.add('collapsed');
+            } 
+            // Scroll up or near the top -> expand
+            else if (diff < -8 || currentScrollY <= 5) {
+              hero.classList.remove('collapsed');
+            }
+
+            lastScrollY[containerId] = currentScrollY;
+          }
+        }, true); // Capture phase is required for scroll event delegation
+      })();
+    });
+  </script>
 
 </body>
 </html>

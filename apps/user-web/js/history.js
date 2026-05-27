@@ -176,7 +176,7 @@
   function cardV(p) { 
     return `
       <div class="v-card">
-        <div class="v-img-wrap"><img src="${p.image||LOGO}"><div class="v-badge-top">⭐ ${p.ratingAvg||5}</div></div>
+        <div class="v-img-wrap">          <img src="${getSafeImage(p.image, LOGO)}" onerror="this.onerror=null;this.src=LOGO;"><div class="v-badge-top">⭐ ${p.ratingAvg||5}</div></div>
         <div class="v-body">
           <p class="v-cat">${p.category||'Địa điểm'}</p>
           <h4 class="v-title">${p.name}</h4>
@@ -195,7 +195,7 @@
     const isDone = b.status === 'completed';
     return `
       <div class="v-card">
-        <div class="v-img-wrap"><img src="${pl.image||LOGO}"><div class="v-status-tag tag-${c}">${l}</div></div>
+        <div class="v-img-wrap"><img src="${getSafeImage(pl.image, LOGO)}" onerror="this.onerror=null;this.src=LOGO;"><div class="v-status-tag tag-${c}">${l}</div></div>
         <div class="v-body">
           <p class="v-cat">${pl.category||'Dịch vụ'}</p>
           <h4 class="v-title">${b.placeName}</h4>
@@ -235,7 +235,7 @@
     const isDone = b.status === 'completed';
     return `
       <div class="v-card">
-        <div class="v-img-wrap"><img src="${pl.image || LOGO}"><div class="v-status-tag tag-${c}">${l}</div><div class="v-badge-top">🚗 Thuê xe</div></div>
+        <div class="v-img-wrap"><img src="${getSafeImage(pl.image, LOGO)}" onerror="this.onerror=null;this.src=LOGO;"><div class="v-status-tag tag-${c}">${l}</div><div class="v-badge-top">🚗 Thuê xe</div></div>
         <div class="v-body">
           <p class="v-cat" style="color:#f59e0b">THUÊ XE / ĐẶT XE</p>
           <h4 class="v-title">${b.placeName}</h4>
@@ -255,10 +255,10 @@
 
   function cardX(t) { 
     const b = bookingMap[t.bookingId]; 
-    const img = (t.type === 'upgrade') ? LOGO : (b ? placeMap[b.placeId]?.image : LOGO);
+    const imgSrc = (t.type === 'upgrade') ? LOGO : (b ? placeMap[b.placeId]?.image : LOGO);
     return `
       <div class="v-card">
-        <div class="v-img-wrap"><img src="${img||LOGO}"><div class="v-badge-top">${fmtVND(t.amount)}</div></div>
+        <div class="v-img-wrap"><img src="${getSafeImage(imgSrc, LOGO)}" onerror="this.onerror=null;this.src=LOGO;"><div class="v-badge-top">${fmtVND(t.amount)}</div></div>
         <div class="v-body">
           <p class="v-cat" style="color:${t.type==='refund'?'#10b981':'var(--accent)'}">${t.type.toUpperCase()}</p>
           <h4 class="v-title">${t.description}</h4>

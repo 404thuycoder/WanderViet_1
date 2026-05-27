@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 /**
  * Dữ liệu điểm đến — WanderViet AI (fallback phía client khi MongoDB không khả dụng)
@@ -37,7 +37,7 @@ window.WANDER_PLACES = [{
   }],
   amusementPlaces: [{
     name: "VinWonders Phú Quốc",
-    image: "https://images.unsplash.com/photo-1582650625119-3a31f8fa2699?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1559592413-7cec096d7b88?w=400&q=80",
     rating: 4.8,
     description: "Công viên chủ đề lớn nhất Việt Nam với hơn 100 trò chơi hấp dẫn, khu vui chơi thế giới nước và thủy cung sứa vô cùng ấn tượng.",
     ticketPrice: "950,000 VND",
@@ -45,7 +45,7 @@ window.WANDER_PLACES = [{
     address: "Bãi Dài, Gành Dầu, Phú Quốc, Kiên Giang"
   }, {
     name: "Sun World Hòn Thơm",
-    image: "https://images.unsplash.com/photo-1544971587-b842c27f8e14?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1596895111956-bf1cf0599ce5?w=400&q=80",
     rating: 4.9,
     description: "Khu du lịch sinh thái bao gồm cáp treo vượt biển dài nhất thế giới, công viên nước Aquatopia và nhiều bãi biển đẹp tuyệt vời.",
     ticketPrice: "600,000 VND (Cáp khứ hồi)",
@@ -53,7 +53,7 @@ window.WANDER_PLACES = [{
     address: "Bãi Đất Đỏ, An Thới, Phú Quốc, Kiên Giang"
   }, {
     name: "Grand World Phú Quốc",
-    image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=400&q=80",
     rating: 4.6,
     description: "Thành phố không ngủ lấy cảm hứng từ các thành phố Châu Âu, có sông Venice, khu chợ đêm và các show diễn hoành tráng.",
     ticketPrice: "Vào cửa Miễn phí",
@@ -70,7 +70,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Nhà hàng Xin Chào",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=400&q=80",
     rating: 4.5,
     description: "Nhà hàng view biển trung tâm.",
     priceRange: "300k - 1M VND",
@@ -78,7 +78,7 @@ window.WANDER_PLACES = [{
   }],
   checkInSpots: [{
     name: "Sunset Sanato Beach Club",
-    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1506953823976-52e1fdc0149a?w=400&q=80",
     rating: 4.7,
     description: "Điểm check-in hoàng hôn nổi tiếng.",
     address: "Dương Tơ, Phú Quốc"
@@ -117,7 +117,7 @@ window.WANDER_PLACES = [{
   }],
   amusementPlaces: [{
     name: "VinWonders Nam Hội An",
-    image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&q=80",
     rating: 4.7,
     description: "River Safari - Đi thuyền ngắm động vật hoang dã và Công viên Văn hóa.",
     ticketPrice: "600,000 VND",
@@ -125,7 +125,7 @@ window.WANDER_PLACES = [{
     address: "Bình Minh, Thăng Bình, Quảng Nam"
   }, {
     name: "Ký ức Hội An (Hoian Memories Land)",
-    image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1598970434795-0c54fe7c0648?w=400&q=80",
     rating: 4.9,
     description: "Show diễn thực cảnh hoành tráng tái hiện lịch sử giao thương xưa.",
     ticketPrice: "600,000 VND (Vé show)",
@@ -142,7 +142,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Bánh mì Phượng",
-    image: "https://images.unsplash.com/photo-1509722747041-074f18d68246?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1600353068440-6361ef3a86e8?w=400&q=80",
     rating: 4.6,
     description: "Tiệm bánh mì trứ danh thế giới.",
     priceRange: "20k - 40k VND",
@@ -170,7 +170,7 @@ window.WANDER_PLACES = [{
   top: true,
   verified: true,
   text: "Sa Pa chinh phục mọi du khách với đỉnh Fansipan hùng vĩ, ruộng bậc thang uốn lượn và bản sắc văn hóa dân tộc rực rỡ sắc màu Tây Bắc.",
-  image: "/assets/img/sa-pa.png",
+  image: "file:///C:/Users/ADMIN/.gemini/antigravity-ide/brain/76c8c329-f852-45f8-bebc-a8f8984e7621/sa_pa_image_1779842336100.png",
   lat: 22.3364,
   lng: 103.8438,
   transportTips: "Xe giường nằm hoặc tàu đêm từ Hà Nội (6-8h). Sa Pa lạnh quanh năm — luôn mang áo ấm.",
@@ -189,7 +189,7 @@ window.WANDER_PLACES = [{
   }],
   amusementPlaces: [{
     name: "Sun World Fansipan Legend",
-    image: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1605538032432-a9f0c8d9baac?w=400&q=80",
     rating: 4.9,
     description: "Hệ thống cáp treo đạt kỷ lục Guinness giúp chinh phục đỉnh Fansipan nhanh chóng.",
     ticketPrice: "800,000 VND",
@@ -214,7 +214,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Nhà hàng A Phủ",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80",
     rating: 4.5,
     description: "Đặc sản gà nướng tiêu xanh vùng cao.",
     priceRange: "150k - 400k VND",
@@ -260,7 +260,7 @@ window.WANDER_PLACES = [{
   }],
   amusementPlaces: [{
     name: "Sun World Ha Long",
-    image: "https://images.unsplash.com/photo-1533038590840-1cde6b5697df?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1573843981267-be1999ff37cd?w=400&q=80",
     rating: 4.8,
     description: "Tổ hợp giải trí với vòng quay Mặt trời khổng lồ.",
     ticketPrice: "350k - 700k VND",
@@ -277,7 +277,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Nhà hàng Hồng Hạnh 3",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80",
     rating: 4.6,
     description: "Hải sản tươi ngon nổi tiếng Hạ Long.",
     priceRange: "400k - 1.2M VND",
@@ -323,7 +323,7 @@ window.WANDER_PLACES = [{
   }],
   amusementPlaces: [{
     name: "VinKE & Vinpearl Aquarium",
-    image: "https://images.unsplash.com/photo-1500091517711-1332a912aee8?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=400&q=80",
     rating: 4.6,
     description: "Thủy cung lớn nhất Hà Nội tại Times City.",
     ticketPrice: "170k - 250k VND",
@@ -340,7 +340,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Phở Thìn Lò Đúc",
-    image: "https://images.unsplash.com/photo-1509722747041-074f18d68246?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1503764654157-72d979d9af2f?w=400&q=80",
     rating: 4.4,
     description: "Phở tái lăn trứ danh Hà Nội.",
     priceRange: "60k - 100k VND",
@@ -367,7 +367,7 @@ window.WANDER_PLACES = [{
   meta: "Thành phố ngàn hoa & Khí hậu mát mẻ quanh năm",
   top: true,
   text: "Đà Lạt trên cao nguyên Langbiang nổi tiếng với vườn hoa bát ngát, đồi chè xanh mướt, kiến trúc Pháp cổ điển và cà phê specialty.",
-  image: "https://images.unsplash.com/photo-1539367628448-4bc5c9d171c8?w=800&q=80",
+  image: "https://images.unsplash.com/photo-1586595050178-4673f3a12681?w=800&q=80",
   lat: 11.9404,
   lng: 108.4583,
   transportTips: "Xe giường nằm từ TP.HCM (6-7h) hoặc bay đến sân bay Liên Khương. Đà Lạt dốc — thuê xe máy cần kinh nghiệm.",
@@ -394,7 +394,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Lẩu gà lá é Tao Ngộ",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=400&q=80",
     rating: 4.5,
     description: "Món lẩu đặc trưng không thể bỏ qua.",
     priceRange: "200k - 400k VND",
@@ -457,7 +457,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Mì Quảng Bà Mua",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&q=80",
     rating: 4.5,
     description: "Mì Quảng gia truyền nổi tiếng.",
     priceRange: "40k - 80k VND",
@@ -574,7 +574,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Lẩu mắm Dạ Lý",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=80",
     rating: 4.6,
     description: "Lẩu mắm chuẩn vị miền Tây.",
     priceRange: "300k - 600k VND",
@@ -628,7 +628,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Nhà hàng Chính Thư",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=400&q=80",
     rating: 4.5,
     description: "Chuyên các món dê núi nổi tiếng.",
     priceRange: "200k - 500k VND",
@@ -682,7 +682,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Bún Bò Huế O Xuân",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1569058242567-93de6f36f8e6?w=400&q=80",
     rating: 4.6,
     description: "Bún bò chuẩn vị người bản địa.",
     priceRange: "40k - 70k VND",
@@ -709,7 +709,7 @@ window.WANDER_PLACES = [{
   meta: "Cung đường đèo hiểm trở & Hoa tam giác mạch",
   top: true,
   text: "Tỉnh địa đầu Tổ quốc Hà Giang chinh phục phượt thủ bằng đèo Mã Pí Lèng huyền thoại, Đồng Văn Cổ Trấn cổ kính và mùa hoa tam giác mạch tím ngát tháng 10-11.",
-  image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
+  image: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800&q=80",
   lat: 23.2241,
   lng: 104.9834,
   transportTips: "Xe khách từ Hà Nội ~7-8h. Thuê moto tại thị xã hoặc đặt off-road tour có guide kinh nghiệm.",
@@ -736,7 +736,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Cháo ấu tẩu Hương",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1547573854-74d2a71d0826?w=400&q=80",
     rating: 4.5,
     description: "Món cháo độc đáo gắn liền vùng cao.",
     priceRange: "40k - 60k VND",
@@ -790,7 +790,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Ốc Vú Nàng Côn Đảo",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=400&q=80",
     rating: 4.6,
     description: "Hải sản tươi sống đặc trưng đảo.",
     priceRange: "200k - 500k VND",
@@ -898,7 +898,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Lẩu thả Mũi Né",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400&q=80",
     rating: 4.6,
     description: "Món lẩu đặc sản Bình Thuận.",
     priceRange: "200k - 500k VND",
@@ -952,7 +952,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Bánh mì Huỳnh Hoa",
-    image: "https://images.unsplash.com/photo-1509722747041-074f18d68246?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1600353068440-6361ef3a86e8?w=400&q=80",
     rating: 4.7,
     description: "Ổ bánh mì đầy ắp các loại chả.",
     priceRange: "60k - 80k VND",
@@ -1006,7 +1006,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Bún đỏ Buôn Ma Thuột",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400&q=80",
     rating: 4.5,
     description: "Món ăn đường phố đặc trưng sợi bún đỏ.",
     priceRange: "30k - 50k VND",
@@ -1060,7 +1060,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Su su Tam Đảo xào tỏi",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1543353071-873f17a7a088?w=400&q=80",
     rating: 4.7,
     description: "Đặc sản rau xanh nổi tiếng vùng núi.",
     priceRange: "50k - 150k VND",
@@ -1114,7 +1114,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Hải sản vỉa hè Cổ Thạch",
-    image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1579783928621-7a13d66a62d1?w=400&q=80",
     rating: 4.5,
     description: "Hải sản tươi rói chế biến đơn giản.",
     priceRange: "100k - 300k VND",
@@ -1141,7 +1141,7 @@ window.WANDER_PLACES = [{
   meta: "Nóc nhà Đông Dương 3.143m",
   top: true,
   text: "Đỉnh núi cao nhất Việt Nam và bán đảo Đông Dương. Lên bằng cáp treo ngắm biển mây hùng vĩ hoặc trekking chinh phục đỉnh cao.",
-  image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=800&q=80",
+  image: "https://images.unsplash.com/photo-1605538032432-a9f0c8d9baac?w=800&q=80",
   lat: 22.3045,
   lng: 103.7719,
   transportTips: "Cáp treo Sun World Fansipan Legend lên đỉnh chỉ 15 phút. Xuất phát từ Sa Pa trung tâm.",
@@ -1222,7 +1222,7 @@ window.WANDER_PLACES = [{
   }],
   diningPlaces: [{
     name: "Bê chao Mộc Châu",
-    image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1546833998-877b37c2e5c6?w=400&q=80",
     rating: 4.6,
     description: "Món ngon trứ danh thảo nguyên.",
     priceRange: "100k - 300k VND",
@@ -1249,7 +1249,7 @@ window.WANDER_PLACES = [{
   meta: "Vương quốc Hang Động & Động Sơn Đoòng lớn nhất TG",
   top: true,
   text: "Vườn quốc gia với hơn 300 hang động lớn nhỏ, sông ngầm hùng vĩ. Nơi có động Sơn Đoòng — lớn nhất thế giới — và hàng loạt trải nghiệm phiêu lưu đỉnh cao.",
-  image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
+  image: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=800&q=80",
   lat: 17.5898,
   lng: 106.281,
   transportTips: "Bay đến sân bay Đồng Hới hoặc đi tàu ga Đồng Hới. Thuê xe máy vào thị trấn Phong Nha.",
@@ -1284,7 +1284,7 @@ window.WANDER_PLACES = [{
   }],
   checkInSpots: [{
     name: "Sông Son",
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80",
+    image: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=400&q=80",
     rating: 4.8,
     description: "Dòng sông xanh ngắt chảy xuyên hang động.",
     address: "Phong Nha, Quảng Bình"

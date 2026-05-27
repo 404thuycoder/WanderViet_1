@@ -15,23 +15,114 @@
         return null;
     }
 
+    // Cache for real services data
+    let _cachedServices = null;
+    let _servicesCacheTime = 0;
+    const SERVICES_CACHE_MS = 60000; // 1 minute cache
+
+    /**
+     * Get services from API (real data)
+     * @returns {Array} Array of service objects
+     */
     function getServices() {
+        // Return cached data if available and fresh
+        if (_cachedServices && (Date.now() - _servicesCacheTime) < SERVICES_CACHE_MS) {
+            return _cachedServices;
+        }
+        
         const stored = JSON.parse(localStorage.getItem('biz_services') || '[]');
         if (stored.length > 0) return stored;
-        return [
-            { id: 1, name: 'Tour Hạ Long VIP 2N1Đ',    price: 2500000, bookings: 124, views: 3250, likes: 450, rating: 4.8, status: 'active',  image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&q=80' },
-            { id: 2, name: 'Khách sạn Mường Thanh',     price: 1800000, bookings: 87,  views: 1980, likes: 310, rating: 4.5, status: 'active',  image: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&q=80' },
-            { id: 3, name: 'Nhà hàng Bếp Việt Hội An',  price: 350000,  bookings: 203, views: 4400, likes: 890, rating: 4.7, status: 'active',  image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80' },
-            { id: 4, name: 'Tour Sapa Trekking 3N2Đ',   price: 3200000, bookings: 45,  views: 1620, likes: 125, rating: 4.9, status: 'pending', image: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&q=80' },
-        ];
+        
+        // Return empty array if no cached data - real data will be loaded via loadRealServices()
+        return [];
     }
 
-    // Data will be fetched from API
+    /**
+     * Load real services from API and cache them
+     * Called on dashboard initialization
+     */
+    function loadRealServices() {
+        return window.apiFetch('/api/business/places')
+            .then(json => {
+                if (json.success && json.data) {
+                    // Transform Place model to service format for dashboard compatibility
+                    _cachedServices = json.data.map(p => ({
+                        id: p._id || p.id,
+                        name: p.name || 'Dịch vụ không tên',
+                        type: p.kind || 'other',
+                        price: Number(p.priceFrom) || Number(p.price) || 0,
+                        unit: p.kind === 'khach-san' ? 'đêm' : 'người',
+                        location: p.address || p.region || '',
+                        status: p.status === 'approved' ? 'active' : (p.status || 'pending'),
+                        createdDate: p.createdAt ? new Date(p.createdAt).toISOString().split('T')[0] : '',
+                        image: p.image || (p.images && p.images[0]) || '',
+                        rating: parseFloat(p.ratingAvg) || 0,
+                        bookings: p.reviewCount || 0,
+                        views: p.viewsCount || p.favoritesCount || 0,
+                        likes: p.favoritesCount || 0,
+                        reviewCount: p.reviewCount || 0,
+                        priceFrom: Number(p.priceFrom) || 0,
+                        priceTo: Number(p.priceTo) || 0,
+                        kind: p.kind,
+                        region: p.region,
+                        businessCategory: p.businessCategory,
+                        ownerId: p.ownerId
+                    }));
+                    _servicesCacheTime = Date.now();
+                    
+                    // Also save to localStorage for offline access
+                    try {
+                        localStorage.setItem('biz_services', JSON.stringify(_cachedServices));
+                    } catch(e) {}
+                    
+                    // Update the catalog if it exists
+                    updateCatalogWithRealData();
+                    
+                    return _cachedServices;
+                }
+                return [];
+            })
+            .catch(err => {
+                console.warn('[Dashboard] Failed to load real services:', err);
+                return [];
+            });
+    }
 
-    const reviews = [
-        { user: 'Hoàng Văn E', av: 'H', rating: 5, text: 'Tuyệt vời! Trải nghiệm khó quên.', svc: 'Tour Hạ Long', time: '1 ngày trước' },
-        { user: 'Phạm Thu D',   av: 'P', rating: 4, text: 'Dịch vụ tốt, nhân viên thân thiện.', svc: 'Khách sạn Đà Nẵng', time: '2 ngày trước' },
-    ];
+    /**
+     * Update the catalog grid with real services data
+     */
+    function updateCatalogWithRealData() {
+        const grid = document.getElementById('overview-catalog-grid');
+        if (!grid) return;
+        
+        const svcs = getServices();
+        if (svcs.length === 0) {
+            grid.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted); font-size:13px;">Chưa có dịch vụ nào.</div>';
+            return;
+        }
+        
+        // Apply current filter if any
+        const activeTab = document.querySelector('.hp-catalog-tab.active');
+        const currentCategory = activeTab ? activeTab.getAttribute('data-category') || 'all' : 'all';
+        
+        const filtered = currentCategory === 'all' ? svcs : svcs.filter(s => 
+            s.businessCategory === currentCategory || s.kind === currentCategory
+        );
+        
+        grid.innerHTML = filtered.slice(0, 4).map(s => `
+            <div class="hp-svc" onclick="window.navigateToView('services')">
+                <img src="${s.image || 'https://via.placeholder.com/80x70?text=No+Image'}" class="hp-svc-img" style="width:60px; height:60px;" onerror="this.src='https://via.placeholder.com/80x70?text=No+Image'">
+                <div class="hp-svc-info">
+                    <div class="hp-svc-name">${s.name}</div>
+                    <div class="hp-svc-meta">⭐ ${s.rating > 0 ? s.rating.toFixed(1) : 'Chưa có'} • ${s.reviewCount || 0} đánh giá</div>
+                    <div style="font-size:14px;font-weight:800;color:#10b981;margin-top:6px">${s.price > 0 ? formatMoney(s.price) : 'Liên hệ'}</div>
+                </div>
+            </div>
+        `).join('') || '<div style="text-align:center; padding:2rem; color:var(--text-muted); font-size:13px;">Chưa có dịch vụ thuộc nhóm này.</div>';
+    }
+
+    // Reviews data (will be loaded from API)
+    const reviews = [];
 
     // ── Utils ────────────────────────────────────────────────────
     function formatMoney(n) { return new Intl.NumberFormat('vi-VN').format(n) + ' đ'; }
@@ -623,16 +714,7 @@
                                 <button class="hp-catalog-tab" onclick="window.filterOverviewCatalog(this, 'trai-nghiem')">Tour</button>
                             </div>
                             <div class="hp-svcs" id="overview-catalog-grid" style="grid-template-columns: 1fr; gap: 16px;">
-                                ${svcs.slice(0, 3).map(s => `
-                                    <div class="hp-svc" onclick="window.navigateToView('services')">
-                                        <img src="${s.image}" class="hp-svc-img" style="width:60px; height:60px;">
-                                        <div class="hp-svc-info">
-                                            <div class="hp-svc-name">${s.name}</div>
-                                            <div class="hp-svc-meta">⭐ ${s.rating} • ${s.bookings} lượt đặt</div>
-                                            <div style="font-size:14px;font-weight:800;color:#10b981;margin-top:6px">${formatMoney(s.price)}</div>
-                                        </div>
-                                    </div>
-                                `).join('')}
+                                <div style="text-align:center; padding:2rem; color:var(--text-muted)">Đang tải dịch vụ...</div>
                             </div>
                         </div>
                     </div>
@@ -742,6 +824,15 @@
         updateIdentity();
         
         // Load Real Data from API
+        // Load services first, then other data
+        loadRealServices().then(() => {
+            // Update catalog with loaded services
+            updateCatalogWithRealData();
+            // Update ranking board with real data
+            initRankingBoard();
+        });
+        
+        // Load other dashboard data
         loadDashboardStats();
         loadDashboardActivities();
         loadRealReviews();
@@ -752,7 +843,6 @@
         // Cần chờ DOM render xong để vẽ Chart và Bảng xếp hạng
         setTimeout(() => {
             initChart();
-            initRankingBoard();
             updateBusinessRank();
         }, 50);
     };
@@ -1115,13 +1205,27 @@
 
         const svcs = getServices();
         
+        // If no real services, show empty state
+        if (!svcs || svcs.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted); font-size:13px;">Chưa có dữ liệu dịch vụ.</div>';
+            return;
+        }
+        
+        // Map criteria to actual field names in Place model
+        const fieldMap = {
+            bookings: 'reviewCount', // Using reviewCount as proxy for engagement
+            views: 'viewsCount',
+            likes: 'favoritesCount'
+        };
+        const field = fieldMap[criteria] || criteria;
+        
         // Sort services based on criteria
-        const sorted = [...svcs].sort((a, b) => (b[criteria] || 0) - (a[criteria] || 0));
-        const maxVal = Math.max(...sorted.map(s => s[criteria] || 0), 1);
+        const sorted = [...svcs].sort((a, b) => (b[field] || 0) - (a[field] || 0));
+        const maxVal = Math.max(...sorted.map(s => s[field] || 0), 1);
 
         const labels = {
-            bookings: 'lượt đăng ký',
-            views: 'lượt sử dụng',
+            bookings: 'lượt đặt',
+            views: 'lượt xem',
             likes: 'lượt yêu thích'
         };
 
@@ -1132,8 +1236,8 @@
         };
 
         container.innerHTML = sorted.slice(0, 5).map((s, idx) => {
-            const val = s[criteria] || 0;
-            const pct = (val / maxVal) * 100;
+            const val = s[field] || 0;
+            const pct = maxVal > 0 ? (val / maxVal) * 100 : 0;
             const rankClass = idx < 3 ? `top-${idx + 1}` : '';
             
             return `
@@ -1150,7 +1254,7 @@
                     </div>
                 </div>
             `;
-        }).join('') || '<div style="text-align:center; padding:2rem; color:var(--text-muted)">Chưa có dữ liệu xếp hạng.</div>';
+        }).join('');
     }
 
 
@@ -1953,6 +2057,7 @@
         btn.classList.add('active');
 
         const svcs = getServices();
+        
         const filtered = category === 'all' ? svcs : svcs.filter(s => 
             s.businessCategory === category || s.kind === category
         );
@@ -1960,13 +2065,18 @@
         const grid = document.getElementById('overview-catalog-grid');
         if (!grid) return;
 
+        if (!svcs || svcs.length === 0) {
+            grid.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-muted); font-size:13px;">Chưa có dịch vụ nào. Hãy tạo dịch vụ đầu tiên của bạn.</div>';
+            return;
+        }
+
         grid.innerHTML = filtered.slice(0, 4).map(s => `
             <div class="hp-svc" onclick="window.navigateToView('services')">
-                <img src="${s.image}" class="hp-svc-img" style="width:60px; height:60px;">
+                <img src="${s.image || 'https://via.placeholder.com/80x70?text=No+Image'}" class="hp-svc-img" style="width:60px; height:60px;" onerror="this.src='https://via.placeholder.com/80x70?text=No+Image'">
                 <div class="hp-svc-info">
                     <div class="hp-svc-name">${s.name}</div>
-                    <div class="hp-svc-meta">⭐ ${s.rating} • ${s.bookings} lượt đặt</div>
-                    <div style="font-size:14px;font-weight:800;color:#10b981;margin-top:6px">${formatMoney(s.price)}</div>
+                    <div class="hp-svc-meta">⭐ ${s.rating > 0 ? s.rating.toFixed(1) : 'Chưa có'} • ${s.reviewCount || 0} đánh giá</div>
+                    <div style="font-size:14px;font-weight:800;color:#10b981;margin-top:6px">${s.price > 0 ? formatMoney(s.price) : 'Liên hệ'}</div>
                 </div>
             </div>
         `).join('') || '<div style="text-align:center; padding:2rem; color:var(--text-muted); font-size:13px;">Chưa có dịch vụ thuộc nhóm này.</div>';

@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const Place = require('../models/Place');
@@ -9,6 +9,15 @@ const { syncBusinessXP } = require('../utils/rankUtils');
 const fs = require('fs');
 const path = require('path');
 const BusinessAccount = require('../models/BusinessAccount');
+
+router.get('/temp-list-all-places', async (req, res) => {
+  try {
+    const places = await Place.find({}).select('id name kind image images region city').lean();
+    res.json({ success: true, count: places.length, data: places });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 
 // Fallback logic
 let placesData = [];

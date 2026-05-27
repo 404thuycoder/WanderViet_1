@@ -170,7 +170,7 @@ window.WANDER_PLACES = [{
   top: true,
   verified: true,
   text: "Sa Pa chinh phục mọi du khách với đỉnh Fansipan hùng vĩ, ruộng bậc thang uốn lượn và bản sắc văn hóa dân tộc rực rỡ sắc màu Tây Bắc.",
-  image: "file:///C:/Users/ADMIN/.gemini/antigravity-ide/brain/76c8c329-f852-45f8-bebc-a8f8984e7621/sa_pa_image_1779842336100.png",
+  image: "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=800&q=80",
   lat: 22.3364,
   lng: 103.8438,
   transportTips: "Xe giường nằm hoặc tàu đêm từ Hà Nội (6-8h). Sa Pa lạnh quanh năm — luôn mang áo ấm.",
@@ -241,7 +241,11 @@ window.WANDER_PLACES = [{
   meta: "Kỳ quan thiên nhiên thế giới 2 lần UNESCO",
   top: true,
   text: "Hàng nghìn đảo đá vôi sừng sững giữa làn nước ngọc bích — Vịnh Hạ Long là Di sản Thiên nhiên Thế giới và biểu tượng du lịch Việt Nam.",
-  image: "/assets/img/ha-long.png",
+  image: "https://cdn-media.sforum.vn/storage/app/media/anh-vinh-ha-long-28.jpg",
+  images: [
+    "https://cdn-media.sforum.vn/storage/app/media/anh-vinh-ha-long-28.jpg",
+    "https://indotel.com.vn/wp-content/uploads/2022/07/hinh-anh-du-lich-ha-long.jpg"
+  ],
   lat: 20.9101,
   lng: 107.1839,
   transportTips: "Cao tốc Hà Nội–Quảng Ninh rút ngắn còn 2-2.5 giờ. Nên đặt tour du thuyền 1-3 đêm.",
@@ -304,7 +308,12 @@ window.WANDER_PLACES = [{
   meta: "Thủ đô nghìn năm văn hiến & Ẩm thực đường phố",
   top: false,
   text: "Hà Nội pha trộn lịch sử nghìn năm với nhịp sống hiện đại, nổi danh toàn cầu bởi phở, bún chả và cà phê trứng độc đáo.",
-  image: "/assets/img/ha-noi.png",
+  image: "https://bizweb.dktcdn.net/100/242/347/files/album-anh-ve-ha-noi-01-0cbc70a3-b767-46e7-9904-d09ad5092662.jpg?v=1720771375029",
+  images: [
+    "https://bizweb.dktcdn.net/100/242/347/files/album-anh-ve-ha-noi-01-0cbc70a3-b767-46e7-9904-d09ad5092662.jpg?v=1720771375029",
+    "https://sqhx-hanoi.mediacdn.vn/91579363132710912/2025/10/9/photo-1760020776654-17600207769341261558618.jpeg",
+    "https://vietnamtourism.vn/imguploads/news/2014/T9/24TPHanoi02.jpg"
+  ],
   lat: 21.0285,
   lng: 105.8542,
   transportTips: "Dùng Grab hoặc xe ôm app. Phố cổ nên đi bộ; tránh giờ cao điểm 7-9h và 17-19h.",
@@ -421,7 +430,11 @@ window.WANDER_PLACES = [{
   meta: "Thành phố đáng sống & Biển Mỹ Khê tuyệt đẹp",
   top: false,
   text: "Đà Nẵng được mệnh danh thành phố đáng sống nhất Việt Nam với biển Mỹ Khê trong xanh, Bà Nà Hills kỳ thú và Cầu Vàng nổi tiếng thế giới.",
-  image: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&q=80",
+  image: "https://cdn-media.sforum.vn/storage/app/media/ctvseo_MH/%E1%BA%A3nh%20%C4%91%E1%BA%B9p%20%C4%91%C3%A0%20n%E1%BA%B5ng/anh-dep-da-nang-thumb.jpg",
+  images: [
+    "https://cdn-media.sforum.vn/storage/app/media/ctvseo_MH/%E1%BA%A3nh%20%C4%91%E1%BA%B9p%20%C4%91%C3%A0%20n%E1%BA%B5ng/anh-dep-da-nang-thumb.jpg",
+    "https://skyrealty.vn/wp-content/uploads/da-nang-thanh-pho-dang-song2.jpg"
+  ],
   lat: 16.0544,
   lng: 108.2022,
   transportTips: "Sân bay Quốc tế Đà Nẵng cách trung tâm 5-10 phút. Thuê xe máy hoặc dùng Grab.",
@@ -925,7 +938,12 @@ window.WANDER_PLACES = [{
   meta: "Thành phố năng động nhất Việt Nam",
   top: false,
   text: "TP.HCM bừng sáng liên tục với ẩm thực đường phố phong phú, bảo tàng lịch sử sâu sắc và đời sống văn hóa cực kỳ đa dạng và hiện đại.",
-  image: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&q=80",
+  image: "https://bcp.cdnchinhphu.vn/334894974524682240/2025/10/31/tphcm-hinh-ah-17619225878251619451780.jpg",
+  images: [
+    "https://bcp.cdnchinhphu.vn/334894974524682240/2025/10/31/tphcm-hinh-ah-17619225878251619451780.jpg",
+    "https://media.istockphoto.com/id/1324017792/vi/anh/%E1%BA%A3nh-ch%E1%BB%A5p-t%E1%BB%AB-tr%C3%AAn-cao-tuy%E1%BB%87t-%C4%91%E1%BA%B9p-c%E1%BB%A7a-s%C3%A0i-g%C3%B2n-th%C3%A0nh-ph%E1%BB%9F-h%E1%BB%93-ch%C3%AD-minh-v%E1%BB%81-%C4%91%C3%AAm.jpg?s=612x612&w=0&k=20&c=poxrZh-Oy",
+    "https://media.istockphoto.com/id/1757396329/vi/anh/nh%C3%ACn-t%E1%BB%AB-tr%C3%AAn-kh%C3%B4ng-v%C3%A0o-s%C3%A1ng-s%E1%BB%9Bm-t%E1%BA%A1i-landmark-81.jpg?s=612x612&w=0&k=20&c=ZtrLBnVoRhn4Ckg7bxpjlqUz3IkVKAiZt-pCVTF7ufA="
+  ],
   lat: 10.8231,
   lng: 106.6297,
   transportTips: "Grab tiện lợi nhất. Tránh cao điểm 7-9h sáng và 17-19h chiều.",
@@ -1376,4 +1394,73 @@ window.WANDER_PLACES = [{
   }],
   sourceName: "Cổng TTĐT Tỉnh Phú Yên",
   sourceUrl: "https://phuyen.gov.vn/"
+}, {
+  id: "tuyen-quang",
+  name: "Tuyên Quang",
+  region: "Tuyên Quang",
+  tags: ["leo núi", "văn hóa", "nghỉ dưỡng"],
+  budget: 1,
+  pace: "cham",
+  habits: ["gia đình", "đi một mình", "cặp đôi"],
+  interests: ["thác nước", "hang động", "lễ hội", "thiên nhiên"],
+  meta: "Vùng đất cổ kính & Lễ hội Lồng Tồng rực rỡ",
+  top: false,
+  verified: true,
+  text: "Tuyên Quang ẩn chứa vẻ đẹp hoang sơ với thác Na Hang hùng vĩ, lòng hồ thủy điện xanh ngắt, các bản làng dân tộc và Lễ hội Lồng Tồng đặc sắc.",
+  image: "https://vcdn1-dulich.vnecdn.net/2023/12/28/nahang4-1703754248-1703754258-3629-1703758253.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=s2XbmocQKHKJ10fyFgRQrQ",
+  images: [
+    "https://vcdn1-dulich.vnecdn.net/2023/12/28/nahang4-1703754248-1703754258-3629-1703758253.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=s2XbmocQKHKJ10fyFgRQrQ",
+    "https://khodulieu.sohoa.tuyenquang.gov.vn/congthongtin/media/bb5f347023b39d227da9c62e6ea4c34c.webp",
+    "https://osky.1cdn.vn/thumbs/1200x630/2025/06/26/cot-co-lung-cu.jpg"
+  ],
+  lat: 21.8230,
+  lng: 105.2180,
+  transportTips: "Xe khách hoặc ô tô từ Hà Nội ~3-4 tiếng. Trong tỉnh thuê xe máy hoặc xe ôm để đến các điểm xa.",
+  activities: [{
+    dayPart: "Sáng",
+    title: "Tham quan Khu di tích Kim Bình",
+    tip: "Nơi gắn liền lịch sử Cách mạng Việt Nam — mang trang phục lịch sự."
+  }, {
+    dayPart: "Chiều",
+    title: "Du thuyền lòng hồ Na Hang",
+    tip: "Lòng hồ xanh ngắt bao quanh núi đá vôi — đặt tour sớm vào mùa hè."
+  }, {
+    dayPart: "Tối",
+    title: "Ẩm thực đặc sản vịt bầu & cá lăng",
+    tip: "Vịt bầu Tuyên Quang và cá lăng hồ Na Hang là đặc sản không thể bỏ qua."
+  }],
+  amusementPlaces: [{
+    name: "Khu du lịch Na Hang",
+    image: "https://vcdn1-dulich.vnecdn.net/2023/12/28/nahang4-1703754248-1703754258-3629-1703758253.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=s2XbmocQKHKJ10fyFgRQrQ",
+    rating: 4.7,
+    description: "Khu bảo tồn thiên nhiên Na Hang với lòng hồ thủy điện xanh ngắt và nhiều thác nước hùng vĩ.",
+    ticketPrice: "Vé thuyền 150,000 VND",
+    openingHours: "06:00 - 18:00",
+    address: "Huyện Na Hang, Tuyên Quang"
+  }],
+  accommodations: [{
+    name: "Khách sạn An Bình Tuyên Quang",
+    image: "https://images.unsplash.com/photo-1551882547-ff43c619363d?w=400&q=80",
+    rating: 4.2,
+    description: "Khách sạn trung tâm thành phố tiện lợi.",
+    priceRange: "400k - 900k VND",
+    address: "Tân Quang, Tuyên Quang"
+  }],
+  diningPlaces: [{
+    name: "Cá lăng nướng Na Hang",
+    image: "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&q=80",
+    rating: 4.6,
+    description: "Đặc sản cá lăng sông hồ nướng trui thơm ngon.",
+    priceRange: "200k - 500k VND",
+    address: "Thị trấn Na Hang"
+  }],
+  checkInSpots: [{
+    name: "Cột cờ Lũng Cú - biểu tượng cực Bắc",
+    image: "https://osky.1cdn.vn/thumbs/1200x630/2025/06/26/cot-co-lung-cu.jpg",
+    rating: 4.8,
+    description: "Biểu tượng chủ quyền quốc gia tại cực Bắc Tổ quốc.",
+    address: "Lũng Cú, Đồng Văn, Hà Giang"
+  }],
+  sourceName: "Cổng TTĐT Tỉnh Tuyên Quang",
+  sourceUrl: "https://tuyenquang.gov.vn/"
 }];

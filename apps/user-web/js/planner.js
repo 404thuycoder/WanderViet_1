@@ -3,93 +3,94 @@ window.WanderPlanner = window.WanderPlanner || {};
 
 const VN_DESTINATION_PHOTOS = {
   // --- MIỀN BẮC ---
-  "hà nội": ["https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop", "https://images.unsplash.com/photo-1599708153386-62e26066265e?w=800&fit=crop", "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop"],
-  "hoàn kiếm": ["https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop"],
-  "phố cổ": ["https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop"],
-  "hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1547950515-e65383569762?w=800&fit=crop", "https://images.unsplash.com/photo-1508809159021-4171206013a2?w=800&fit=crop"],
+  "hà nội": ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop", "https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=800&fit=crop", "https://images.unsplash.com/photo-1509233725247-49e657c54213?w=800&fit=crop"],
+  "hoàn kiếm": ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop"],
+  "phố cổ": ["https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=800&fit=crop"],
+  "hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
   "vịnh hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
   "sapa": ["https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop", "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"],
   "fansipan": ["https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"],
   "cát cát": ["https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"],
   "ninh bình": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"],
   "tràng an": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "hà giang": ["https://images.unsplash.com/photo-1581691101914-df07ba063852?w=800&fit=crop", "https://images.unsplash.com/photo-1625834317364-b32c140fd360?w=800&fit=crop"],
-  "đồng văn": ["https://images.unsplash.com/photo-1581691101914-df07ba063852?w=800&fit=crop"],
-  "mộc châu": ["https://images.unsplash.com/photo-1623863484089-9e8c4f03943d?w=800&fit=crop"],
+  "hà giang": ["https://images.unsplash.com/photo-1524230572899-a752b3835840?w=800&fit=crop", "https://images.unsplash.com/photo-1625834317364-b32c140fd360?w=800&fit=crop"],
+  "đồng văn": ["https://images.unsplash.com/photo-1524230572899-a752b3835840?w=800&fit=crop"],
+  "mộc châu": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop"],
   "cao bằng": ["https://images.unsplash.com/photo-1575986767340-5d17ae767ab0?w=800&fit=crop", "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop"],
-  "mai châu": ["https://images.unsplash.com/photo-1589146162335-c340b498425d?w=800&fit=crop", "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"],
-  "tam đảo": ["https://images.unsplash.com/photo-1594910403541-610116e09c85?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
-  "ba vì": ["https://images.unsplash.com/photo-1616853215286-353d9154a1d8?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop"],
-  "cát bà": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1547950515-e65383569762?w=800&fit=crop"],
+  "mai châu": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"],
+  "tam đảo": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
+  "ba vì": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop"],
+  "cát bà": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
   "vịnh lan hạ": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
-  "yên bái": ["https://images.unsplash.com/photo-1581177653526-70e28f309e3e?w=800&fit=crop", "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"],
-  "mù cang chải": ["https://images.unsplash.com/photo-1581177653526-70e28f309e3e?w=800&fit=crop", "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"],
-  "điện biên": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1581691101914-df07ba063852?w=800&fit=crop"],
-  "lạng sơn": ["https://images.unsplash.com/photo-1587588354456-ae376af7182f?w=800&fit=crop"],
-  "bắc kạn": ["https://images.unsplash.com/photo-1596395817260-2440f3131759?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
+  "yên bái": ["https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop"],
+  "mù cang chải": ["https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop"],
+  "điện biên": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1524230572899-a752b3835840?w=800&fit=crop"],
+  "lạng sơn": ["https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=800&fit=crop"],
+  "bắc kạn": ["https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
   "tuyên quang": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop"],
-  "thái nguyên": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1623863484089-9e8c4f03943d?w=800&fit=crop"],
+  "thái nguyên": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop"],
   "đảo cô tô": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"],
 
   // --- MIỀN TRUNG ---
-  "đà nẵng": ["https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&fit=crop", "https://images.unsplash.com/photo-1583547378393-271501b4cfa1?w=800&fit=crop", "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&fit=crop"],
+  "đà nẵng": ["https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&fit=crop"],
   "hội an": ["https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&fit=crop", "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
-  "huế": ["https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=800&fit=crop", "https://images.unsplash.com/photo-1605538032432-a2a0ec8c9dbb?w=800&fit=crop", "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop"],
+  "huế": ["https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop"],
   "nha trang": ["https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop", "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "đà lạt": ["https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
-  "đà lạc": ["https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop"],
-  "quy nhơn": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1586542158380-49272304d9a5?w=800&fit=crop"],
-  "phú yên": ["https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop", "https://images.unsplash.com/photo-1587588354456-ae376af7182f?w=800&fit=crop"],
-  "tuy hòa": ["https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop", "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop"],
-  "mũi né": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1584981772656-78711422700f?w=800&fit=crop"],
-  "phan thiết": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1584981772656-78711422700f?w=800&fit=crop"],
+  "đà lạt": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
+  "đà lạc": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop"],
+  "quy nhơn": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
+  "phú yên": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
+  "tuy hòa": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop"],
+  "mũi né": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+  "phan thiết": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
   "bình thuận": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop"],
-  "phong nha": ["https://images.unsplash.com/photo-1584305886638-348e3e4e9663?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "quảng bình": ["https://images.unsplash.com/photo-1584305886638-348e3e4e9663?w=800&fit=crop"],
+  "phong nha": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
+  "quảng bình": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop"],
   "bình ba": ["https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "pleiku": ["https://images.unsplash.com/photo-1596395817260-2440f3131759?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
-  "gia lai": ["https://images.unsplash.com/photo-1596395817260-2440f3131759?w=800&fit=crop"],
+  "pleiku": ["https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&fit=crop", "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop"],
+  "gia lai": ["https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&fit=crop"],
   "buôn ma thuột": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop", "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"],
   "đắk lắk": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop"],
-  "kon tum": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop"],
+  "kon tum": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop"],
   "lý sơn": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
-  "quảng ngãi": ["https://images.unsplash.com/photo-1559592443-7f87a030062a?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+  "quảng ngãi": ["https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
   "quảng trị": ["https://images.unsplash.com/photo-1587922546307-776227941871?w=800&fit=crop", "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=800&fit=crop"],
   "vịnh vân phong": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
 
   // --- MIỀN NAM ---
-  "tp.hcm": ["https://images.unsplash.com/photo-1583547378393-271501b4cfa1?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11dc3?w=800&fit=crop", "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop"],
-  "sài gòn": ["https://images.unsplash.com/photo-1583547378393-271501b4cfa1?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11dc3?w=800&fit=crop"],
+  "tp.hcm": ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
+  "sài gòn": ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop"],
   "vũng tàu": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"],
   "phú quốc": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
   "cần thơ": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"],
   "côn đảo": ["https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "an giang": ["https://images.unsplash.com/photo-1563812739347-1906a5996055?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "tây ninh": ["https://images.unsplash.com/photo-1596395817260-2440f3131759?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop"],
+  "an giang": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
+  "tây ninh": ["https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
   "bến tre": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
   "kiên giang": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
   "đồng tháp": ["https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
   "cà mau": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
   "mũi cà mau": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop"],
-  "bạc liêu": ["https://images.unsplash.com/photo-1587588354456-ae376af7182f?w=800&fit=crop", "https://images.unsplash.com/photo-1543632970-d47f9ed300c3?w=800&fit=crop"],
-  "sóc trăng": ["https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop", "https://images.unsplash.com/photo-1599708153386-62e26066265e?w=800&fit=crop"],
+  "bạc liêu": ["https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
+  "sóc trăng": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
   "trà vinh": ["https://images.unsplash.com/photo-1590054387835-ab72678fef01?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"],
   "hậu giang": ["https://images.unsplash.com/photo-1587922546307-776227941871?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
   "vĩnh long": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "tiền giang": ["https://images.unsplash.com/photo-1596422846543-75c6fc18a594?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
+  "tiền giang": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
   "đảo nam du": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"],
-  "hòn sơn": ["https://images.unsplash.com/photo-1544735724-449ad2bdd335?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "châu đốc": ["https://images.unsplash.com/photo-1563812739347-1906a5996055?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"]
+  "hòn sơn": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+  "châu đốc": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"]
 };
 
 const GENERIC_VN_PHOTOS = [
   "https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop",
-  "https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop",
-  "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop",
+  "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop",
   "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop",
   "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop",
-  "https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=800&fit=crop",
-  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop"
+  "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop",
+  "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop",
+  "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&fit=crop",
+  "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop"
 ];
 
 const VN_PLACES_VIDEOS = {
@@ -2607,11 +2608,11 @@ const initPlanner = function () {
           <div class="content-source-tag">Nguồn: WanderViet Photography</div>
         </div>
         <div class="modal-photo-item">
-          <img class="ken-burns" src="${getVNPhoto(actName + ' nature', 1)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1509060464153-4466739f78d0?w=800&fit=crop';">
+          <img class="ken-burns" src="${getVNPhoto(actName + ' nature', 1)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop';">
           <div class="content-source-tag">Nguồn: TripAdvisor User</div>
         </div>
         <div class="modal-photo-item">
-          <img class="ken-burns" src="${getVNPhoto(actName + ' culture', 2)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=800&fit=crop';">
+          <img class="ken-burns" src="${getVNPhoto(actName + ' culture', 2)}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop';">
           <div class="content-source-tag">Nguồn: Instagram Community</div>
         </div>
       </div>

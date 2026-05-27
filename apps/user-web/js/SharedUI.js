@@ -3238,12 +3238,23 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       return (unsafe || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // Helper: Cuộn xuống cuối một cách an toàn
-    function scrollToBottom() {
+    // Helper: Cuộn xuống cuối - chỉ scroll nếu người dùng đang ở gần cuối
+    // Tránh giật giật khi user đang kéo lên đọc nội dung cũ hơn
+    let _userScrolledUp = false;
+    if (log) {
+        log.addEventListener('scroll', () => {
+            const threshold = 120; // px from bottom to consider "near bottom"
+            _userScrolledUp = log.scrollTop < (log.scrollHeight - log.clientHeight - threshold);
+        }, { passive: true });
+    }
+
+    function scrollToBottom(force = false) {
         if (!log) return;
-        setTimeout(() => { log.scrollTop = log.scrollHeight; }, 50);
-        setTimeout(() => { log.scrollTop = log.scrollHeight; }, 300);
-        setTimeout(() => { log.scrollTop = log.scrollHeight; }, 800);
+        // Nếu user đang kéo lên đọc nội dung cũ → không force scroll (trừ khi force=true)
+        if (_userScrolledUp && !force) return;
+        requestAnimationFrame(() => {
+            log.scrollTop = log.scrollHeight;
+        });
     }
 
     function renderSuggestions(options = []) {
@@ -4619,12 +4630,32 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     function getDestinationImage(destination) {
         const dest = (destination || '').toLowerCase().trim();
         
+        // 1. Prioritize centralized verified registry
+        if (window.WANDER_PLACES_IMAGES) {
+            for (const key of Object.keys(window.WANDER_PLACES_IMAGES)) {
+                if (dest === key || dest.includes(key) || key.includes(dest)) {
+                    const imgs = window.WANDER_PLACES_IMAGES[key];
+                    if (Array.isArray(imgs) && imgs.length > 0) return imgs[0];
+                }
+            }
+        }
+
+        // 2. Fallback to WANDER_PLACES configuration
+        if (window.WANDER_PLACES) {
+            const found = window.WANDER_PLACES.find(p => {
+                const name = (p.name || '').toLowerCase().trim();
+                const id = (p.id || '').toLowerCase().trim();
+                return dest === name || dest === id || dest.includes(name) || name.includes(dest);
+            });
+            if (found && found.image) return found.image;
+        }
+
         // Image map - each destination has unique accurate image
         const imgMap = {
             // === TÂY BẮC ===
-            'sapa': 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400&h=300&fit=crop', // terraced rice fields
-            'sa pa': 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400&h=300&fit=crop',
-            'lào cai': 'https://images.unsplash.com/photo-1528181304800-259b08848526?w=400&h=300&fit=crop',
+            'sapa': 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=800&q=80', // sapa verified
+            'sa pa': 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=800&q=80',
+            'lào cai': 'https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=800&q=80',
             'hà giang': 'https://images.unsplash.com/photo-1563190095-2296374d5d20?w=400&h=300&fit=crop', // ha giang winding road
             'yên bái': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop', // yen bai terraced fields
             'mai châu': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop', // mai chau
@@ -4632,12 +4663,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             'điện biên': 'https://images.unsplash.com/photo-1562783700-74fc9d4e1b83?w=400&h=300&fit=crop',
             'lai châu': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
             'sơn la': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
-            'tuyên quang': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
+            'tuyên quang': 'https://vcdn1-dulich.vnecdn.net/2023/12/28/nahang4-1703754248-1703754258-3629-1703758253.jpg?w=1200&h=0&q=100&dpr=1&fit=crop&s=s2XbmocQKHKJ10fyFgRQrQ',
             'hoà bình': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
             
             // === ĐÔNG BẮC ===
-            'quảng ninh': 'https://images.unsplash.com/photo-1528127269322-539801943592?w=400&h=300&fit=crop', // ha long bay
-            'hạ long': 'https://images.unsplash.com/photo-1528127269322-539801943592?w=400&h=300&fit=crop',
+            'quảng ninh': 'https://cdn-media.sforum.vn/storage/app/media/anh-vinh-ha-long-28.jpg',
+            'hạ long': 'https://cdn-media.sforum.vn/storage/app/media/anh-vinh-ha-long-28.jpg',
             'hải phòng': 'https://images.unsplash.com/photo-1528127269322-539801943592?w=400&h=300&fit=crop',
             'bắc ninh': 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&h=300&fit=crop',
             'bắc kạn': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
@@ -4645,7 +4676,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             'lạng sơn': 'https://images.unsplash.com/photo-1553179459-4518c8ca4f24?w=400&h=300&fit=crop',
             
             // === ĐỒNG BẰNG BẮC BỘ ===
-            'hà nội': 'https://images.unsplash.com/photo-1509030450996-dd1a26dda07d?w=400&h=300&fit=crop', // hanoi old quarter
+            'hà nội': 'https://bizweb.dktcdn.net/100/242/347/files/album-anh-ve-ha-noi-01-0cbc70a3-b767-46e7-9904-d09ad5092662.jpg?v=1720771375029', // hanoi verified
             'hải dương': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
             'hưng yên': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
             'thái bình': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
@@ -4660,7 +4691,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             'quảng trị': 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&h=300&fit=crop',
             'thừa thiên huế': 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&h=300&fit=crop', // hue imperial
             'huế': 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=400&h=300&fit=crop',
-            'đà nẵng': 'https://images.unsplash.com/photo-1583422409516-2895a77efded?w=400&h=300&fit=crop', // danang dragon bridge
+            'đà nẵng': 'https://cdn-media.sforum.vn/storage/app/media/ctvseo_MH/%E1%BA%A3nh%20%C4%91%E1%BA%B9p%20%C4%91%C3%A0%20n%E1%BA%B5ng/anh-dep-da-nang-thumb.jpg', // danang verified
             'quảng nam': 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&h=300&fit=crop',
             
             // === NAM TRUNG BỘ ===
@@ -4683,8 +4714,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
             'kon tum': 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop',
             
             // === ĐÔNG NAM BỘ ===
-            'hồ chí minh': 'https://images.unsplash.com/photo-1550807002-6c2e4d8f0f3e?w=400&h=300&fit=crop', // saigon
-            'tp hcm': 'https://images.unsplash.com/photo-1550807002-6c2e4d8f0f3e?w=400&h=300&fit=crop',
+            'hồ chí minh': 'https://bcp.cdnchinhphu.vn/334894974524682240/2025/10/31/tphcm-hinh-ah-17619225878251619451780.jpg', // HCMC verified
+            'tp hcm': 'https://bcp.cdnchinhphu.vn/334894974524682240/2025/10/31/tphcm-hinh-ah-17619225878251619451780.jpg',
             'bình dương': 'https://images.unsplash.com/photo-1550807002-6c2e4d8f0f3e?w=400&h=300&fit=crop',
             'đồng nai': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',
             'tây ninh': 'https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=400&h=300&fit=crop',

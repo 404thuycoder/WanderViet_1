@@ -4851,3 +4851,984 @@ html:not([data-theme="dark"]) .btn-back-step:hover,
 /* =====================================================================
    END PREMIUM UI ENHANCEMENT LAYER
    ===================================================================== */
+
+/* =====================================================================
+   🤖 AI ASSISTANT & ITINERARY TIMELINE ENHANCEMENTS v3.0
+   ===================================================================== */
+
+/* --- A. AI Assistant & Discovery Chat Console --- */
+.discovery-console {
+  background: rgba(15, 23, 42, 0.45) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 1.5rem !important;
+  transition: all 0.3s ease;
+}
+
+.console-header {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding: 1.25rem 1.5rem !important;
+}
+
+.console-status {
+  color: #10b981 !important;
+  font-weight: 800 !important;
+  letter-spacing: 1.5px !important;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.3) !important;
+}
+
+.console-messages {
+  background: rgba(10, 18, 30, 0.2) !important;
+  scrollbar-width: thin;
+  padding: 1.5rem !important;
+  gap: 1.25rem !important;
+}
+
+.console-input-area {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding: 1.25rem !important;
+}
+
+.console-form {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 1.25rem !important;
+  padding: 0.5rem !important;
+  transition: all 0.25s ease;
+}
+
+.console-form:focus-within {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.console-form input {
+  font-family: inherit;
+  font-size: 0.9rem !important;
+  padding: 0.6rem 0.875rem !important;
+}
+
+.console-form button {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+  transition: all 0.2s ease !important;
+  border-radius: 0.85rem !important;
+  padding: 0.6rem 1.5rem !important;
+}
+
+.console-form button:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* --- B. Step Smart Wizard (Interactive Q&A) --- */
+.planner-path-wizard {
+  background: rgba(15, 23, 42, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  border-radius: 1.5rem !important;
+  padding: 1.5rem !important;
+  box-shadow: var(--shadow) !important;
+  animation: fadeInUp 0.45s ease both;
+}
+
+.wizard-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  padding-bottom: 1rem !important;
+  margin-bottom: 1.25rem !important;
+}
+
+.wizard-header h3 {
+  margin: 0.25rem 0 0 !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  color: #fff !important;
+}
+
+.wizard-messages {
+  max-height: 280px !important;
+  padding: 0.75rem !important;
+  background: rgba(0, 0, 0, 0.15) !important;
+  border-radius: 1rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.04) !important;
+  scrollbar-width: thin;
+}
+
+.wizard-input-row form {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 1.25rem !important;
+  padding: 0.4rem !important;
+  transition: all 0.25s ease;
+}
+
+.wizard-input-row form:focus-within {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+.wizard-input-row input {
+  background: transparent !important;
+  border: none !important;
+  font-family: inherit;
+  padding: 0.6rem 0.75rem !important;
+}
+
+.wizard-input-row button {
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
+  border-radius: 0.85rem !important;
+  padding: 0.6rem 1.5rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.wizard-input-row button:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35) !important;
+}
+
+/* --- C. Dynamic Chat Bubble Customization --- */
+.chat-bubble {
+  border-radius: 1.25rem !important;
+  padding: 1.1rem 1.35rem !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.65 !important;
+  margin-bottom: 1.25rem !important;
+  animation: fadeInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.chat-bubble.ai {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.9)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-top-left-radius: 0.25rem !important;
+}
+
+.chat-bubble.user {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.25)) !important;
+  border: 1px solid rgba(96, 165, 250, 0.3) !important;
+  border-top-right-radius: 0.25rem !important;
+}
+
+.chat-bubble.ai .chat-header {
+  border-bottom-color: rgba(255, 255, 255, 0.07) !important;
+  margin-bottom: 0.6rem !important;
+}
+
+/* --- D. Timeline Result & Itinerary Custom Styles --- */
+.itinerary-column-wrapper {
+  animation: fadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.timeline-header-premium-v2 {
+  border-radius: 1.5rem !important;
+  padding: 1.75rem 2rem !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+  border-left-width: 5px !important;
+  margin-bottom: 2rem !important;
+  backdrop-filter: blur(12px);
+}
+
+.main-itinerary-title-v2 {
+  font-size: 1.65rem !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.5px;
+  background: linear-gradient(90deg, #ffffff, #cbd5e1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.destination-badge-v2 {
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  padding: 4px 12px !important;
+  border-radius: 20px !important;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.25) !important;
+}
+
+.itinerary-day-block-v2 {
+  animation: fadeInUp 0.4s ease both;
+}
+
+.day-number-circle {
+  width: 44px !important;
+  height: 44px !important;
+  font-size: 1.05rem !important;
+  font-weight: 900 !important;
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #fff !important;
+}
+
+.day-title-v2 {
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: #fff !important;
+  margin: 0 !important;
+}
+
+.premium-activity-card-v2 {
+  transition: all 0.3s ease;
+}
+
+/* Image zoom and banner overlay logic */
+.premium-activity-card-v2 img {
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.premium-activity-card-v2:hover img {
+  transform: scale(1.08) !important;
+}
+
+/* Smooth refinements block styling */
+#refineBox {
+  background: rgba(15, 23, 42, 0.5) !important;
+  backdrop-filter: blur(24px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 1.5rem !important;
+  padding: 1.75rem !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+  animation: fadeInUp 0.4s 0.2s both;
+}
+
+#refineBox h3 {
+  font-weight: 800 !important;
+  color: #fff !important;
+}
+
+#refineForm {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 1.25rem !important;
+  padding: 0.4rem !important;
+  transition: all 0.25s ease;
+}
+
+#refineForm:focus-within {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15) !important;
+}
+
+#refineInput {
+  background: transparent !important;
+  border: none !important;
+  padding: 0.6rem 0.75rem !important;
+  color: #fff !important;
+}
+
+#refineInput::placeholder {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+#refineBtn {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: #fff !important;
+  border-radius: 0.85rem !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25) !important;
+  transition: all 0.2s ease !important;
+}
+
+#refineBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35) !important;
+}
+
+/* Save Trip Action Button */
+#btnSaveTrip {
+  background: linear-gradient(135deg, #f43f5e, #e11d48) !important;
+  box-shadow: 0 6px 20px rgba(225, 29, 72, 0.3) !important;
+  border-radius: 1rem !important;
+  padding: 0.85rem 2rem !important;
+  font-weight: 800 !important;
+  transition: all 0.25s ease !important;
+  border: none !important;
+}
+
+#btnSaveTrip:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(225, 29, 72, 0.45) !important;
+}
+
+/* =====================================================================
+   🎯 PLANNER UI v3.1 — CONFIRMATION, MODAL & POST-ITINERARY LAYER
+   ===================================================================== */
+
+/* ── A. WIZARD CONFIRMATION AREA ── */
+.wizard-confirmation {
+  animation: fadeInUp 0.45s ease both;
+}
+
+#detectedDataSummary {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 1.5rem;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 1rem;
+  transition: all 0.25s ease;
+}
+
+.summary-item:hover {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.25);
+  transform: translateY(-1px);
+}
+
+.summary-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(16, 185, 129, 0.12);
+  border-radius: 0.75rem;
+}
+
+.summary-text p {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0 0 0.2rem;
+}
+
+.summary-text h4 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Final generate button */
+.planner-btn.final-action {
+  width: 100%;
+  padding: 1rem 2rem;
+  font-size: 1.15rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #10b981, #059669, #047857) !important;
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+  border: none;
+  border-radius: 1rem;
+  color: #fff;
+  box-shadow: 0 8px 28px rgba(16, 185, 129, 0.4), 0 2px 0 rgba(255,255,255,0.1) inset;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.planner-btn.final-action:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 14px 36px rgba(16, 185, 129, 0.55);
+}
+
+.planner-btn.final-action:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── B. VERSION TABS (enhanced) ── */
+.version-tab {
+  white-space: nowrap;
+  padding: 0.65rem 1.35rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.3px;
+}
+
+.version-tab:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.version-tab.active {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: #10b981;
+  color: #10b981;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
+}
+
+/* ── C. ACTIVITY DETAIL MODAL ── */
+/* Activity modal overlay — JS sets style.display = 'flex' to open */
+.activity-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.activity-modal {
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.97), rgba(10, 18, 32, 0.99));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.75rem;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.03);
+  animation: slideUpModal 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
+}
+
+@keyframes slideUpModal {
+  from { opacity: 0; transform: translateY(30px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.activity-modal::-webkit-scrollbar { width: 5px; }
+.activity-modal::-webkit-scrollbar-track { background: transparent; }
+.activity-modal::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.3);
+  border-radius: 999px;
+}
+
+.activity-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.75rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1.75rem 1.75rem 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(20px);
+}
+
+.activity-modal-close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.activity-modal-close:hover {
+  background: rgba(244, 63, 94, 0.2);
+  border-color: rgba(244, 63, 94, 0.4);
+  color: #f43f5e;
+  transform: rotate(90deg);
+}
+
+.activity-modal-body {
+  padding: 0 0 2rem;
+}
+
+/* Photo grid inside modal */
+.modal-photo-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 0.5rem;
+}
+
+.modal-photo-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: rgba(255,255,255,0.04);
+  height: 200px;
+}
+
+.modal-photo-main {
+  grid-row: span 2;
+  height: 100%;
+  min-height: 280px;
+}
+
+.modal-photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.modal-photo-item:hover img { transform: scale(1.05); }
+
+.content-source-tag {
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.4);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* Activity info section inside modal */
+.activity-modal-info {
+  padding: 0 2rem 1rem;
+}
+
+.activity-modal-title {
+  background: linear-gradient(135deg, #fff, #cbd5e1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.detail-section {
+  margin-bottom: 2rem;
+}
+
+.detail-section-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.activity-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+.activity-main-col { width: 100%; }
+
+.activity-video-container {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #000;
+}
+
+.activity-video-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.review-item-premium {
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 1rem;
+  margin-bottom: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.review-item-premium:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.review-source {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.35);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+/* Map iframe */
+.map-iframe-wrapper {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.map-iframe-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* ── D. MAP ZOOM MODAL ── */
+/* Map zoom overlay — JS uses classList.add('active') to open */
+.map-zoom-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.map-zoom-overlay.active { display: flex; }
+
+.map-zoom-content {
+  width: 100%;
+  max-width: 960px;
+  max-height: 90vh;
+  background: rgba(15, 23, 42, 0.98);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 30px 90px rgba(0,0,0,0.7);
+  animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-zoom-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: rgba(0,0,0,0.3);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.map-zoom-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.map-zoom-close {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.08);
+  border: none;
+  border-radius: 50%;
+  color: rgba(255,255,255,0.7);
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.map-zoom-close:hover {
+  background: rgba(244, 63, 94, 0.2);
+  color: #f43f5e;
+  transform: rotate(90deg);
+}
+
+.map-zoom-body {
+  flex: 1;
+  min-height: 400px;
+}
+
+.map-zoom-body iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  border: none;
+}
+
+.map-zoom-gps {
+  padding: 1rem 1.5rem;
+  background: rgba(0,0,0,0.2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ── E. ACCOMMODATION CARD (in timeline) ── */
+.accomm-premium-card {
+  animation: fadeInUp 0.4s 0.1s ease both;
+}
+
+.accomm-premium-card:hover {
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  box-shadow: 0 15px 45px rgba(0,0,0,0.3), 0 0 0 1px rgba(59,130,246,0.1) !important;
+  transition: all 0.3s ease;
+}
+
+/* ── F. STAT BOXES (in timeline header) ── */
+.stat-box-v2 {
+  transition: all 0.25s ease !important;
+  cursor: default;
+}
+
+.stat-box-v2:hover {
+  background: rgba(255,255,255,0.07) !important;
+  border-color: rgba(255,255,255,0.18) !important;
+  transform: translateY(-2px);
+}
+
+.stat-label-v2 {
+  display: block;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.stat-value-v2 {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+/* ── G. POST-SAVE ACTIONS ── */
+#postSaveActions {
+  animation: fadeInUp 0.35s ease both;
+}
+
+#postSaveActions a,
+#postSaveActions button {
+  transition: all 0.2s ease !important;
+}
+
+#postSaveActions a:hover,
+#postSaveActions button:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25) !important;
+}
+
+/* ── H. VIEW MODE HEADER (saved trip banner) ── */
+#viewModeHeader {
+  animation: fadeInUp 0.4s ease both;
+  border-radius: 1rem !important;
+  background: rgba(16, 185, 129, 0.06) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+/* ── I. RESULT PLACEHOLDER ── */
+.result-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  gap: 1rem;
+  animation: fadeInUp 0.5s ease both;
+}
+
+.placeholder-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  opacity: 0.7;
+  filter: drop-shadow(0 8px 24px rgba(16,185,129,0.2));
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+.result-placeholder h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.85);
+  margin: 0;
+}
+
+.result-placeholder p {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.45);
+  max-width: 380px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ── J. AI LOADER ── */
+.ai-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.ai-loader-visual {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.ai-loader-spinner {
+  width: 80px;
+  height: 80px;
+  border: 3px solid rgba(16, 185, 129, 0.15);
+  border-top-color: #10b981;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.ai-loader-pulse {
+  position: absolute;
+  inset: 10px;
+  background: rgba(16, 185, 129, 0.08);
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── K. BACK TO FORM BUTTON ── */
+.back-to-form-wrap button {
+  border: 1.5px solid rgba(16,185,129,0.35) !important;
+  color: #10b981 !important;
+  border-radius: 0.75rem !important;
+  padding: 0.6rem 1.25rem !important;
+  font-weight: 700 !important;
+  font-size: 0.88rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  transition: all 0.2s ease !important;
+  background: rgba(16,185,129,0.06) !important;
+}
+
+.back-to-form-wrap button:hover {
+  background: rgba(16,185,129,0.12) !important;
+  border-color: #10b981 !important;
+  transform: translateX(-3px) !important;
+}
+
+/* ── L. TRANSIT CONNECTOR PILL ── */
+.transit-connector {
+  margin: -0.5rem 0 1rem 97px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #38bdf8;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: rgba(56,189,248,0.05);
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(56,189,248,0.15);
+  width: fit-content;
+  transition: all 0.2s ease;
+}
+
+.transit-connector:hover {
+  background: rgba(56,189,248,0.1);
+  border-color: rgba(56,189,248,0.3);
+}
+
+/* ── M. RESPONSIVE: MODAL & CARDS ON MOBILE ── */
+@media (max-width: 768px) {
+  .activity-modal {
+    max-height: 95vh;
+    border-radius: 1.25rem;
+  }
+
+  .modal-photo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-photo-main { min-height: 200px; }
+  .modal-photo-item { height: 140px; }
+  .modal-photo-item:not(.modal-photo-main) { display: none; }
+
+  .activity-modal-info {
+    padding: 0 1rem 1rem;
+  }
+
+  #detectedDataSummary {
+    padding: 1.25rem;
+  }
+
+  .summary-item {
+    padding: 0.75rem 1rem;
+  }
+
+  .timeline-header-premium-v2 {
+    padding: 1.25rem !important;
+  }
+
+  .itinerary-stats-grid-v2 {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .stat-box-v2 {
+    padding: 0.875rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .planner-btn.final-action {
+    font-size: 1rem;
+    padding: 0.875rem 1.5rem;
+  }
+
+  .itinerary-stats-grid-v2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .map-zoom-content {
+    border-radius: 1rem;
+  }
+}
+
+/* =====================================================================
+   END PLANNER UI v3.1
+   ===================================================================== */

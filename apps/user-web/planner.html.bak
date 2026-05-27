@@ -41,7 +41,7 @@
     href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=4" />
-  <link rel="stylesheet" href="css/planner.css?v=20260527_v1" />
+  <link rel="stylesheet" href="css/planner.css?v=20260525_v37" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="/planner_spot_detail_css_helper.css?v=1" />
   <style id="hotfix-cache-buster">
@@ -285,9 +285,6 @@
       border-color: #cbd5e1 !important;
       box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
     }
-    .review-spot-card:hover .spot-img-inner {
-      transform: scale(1.05);
-    }
     .review-spot-card.selected {
       background: linear-gradient(135deg, #eff6ff, #ecfeff) !important;
       border-color: #06b6d4 !important;
@@ -295,19 +292,6 @@
     }
     .review-spot-card.selected .spot-card-name {
       color: #0891b2 !important;
-    }
-    .spot-img-inner {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-      display: block;
-    }
-    .spot-select-btn:hover {
-      transform: scale(1.15) !important;
-    }
-    .spot-map-btn:hover {
-      background: rgba(16,185,129,0.85) !important;
     }
     #reviewPanelSpots::-webkit-scrollbar {
       width: 4px;
@@ -407,7 +391,7 @@
     /* --- Region Destination Grid (large cards like screenshot 2) --- */
     .region-dest-scroll {
       display: grid !important;
-      grid-template-columns: repeat(3, minmax(140px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 1rem;
       padding: 0.6rem 0.2rem;
       align-items: start;
@@ -490,28 +474,9 @@
     .dest-card-location { color:var(--text-muted); font-size:0.75rem; }
     .dest-card-name { font-weight:800; font-size:1rem; color:var(--text); }
     .dest-card-desc { color:var(--text-muted); font-size:0.85rem; line-height:1.2; flex:1; }
-    .dest-card-actions { margin-top: 0.6rem; }
-    .dest-card-actions .btn-go {
-      width: 100%;
-      background: linear-gradient(135deg, #7c3aed, #06b6d4);
-      color: #fff;
-      border: none;
-      padding: 0.55rem;
-      border-radius: 0.75rem;
-      font-weight: 700;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 10px rgba(124, 58, 237, 0.15);
-    }
-    .dest-card-actions .btn-go:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 15px rgba(124, 58, 237, 0.3);
-      filter: brightness(1.08);
-    }
+    .dest-card-actions { display:flex; justify-content:space-between; align-items:center; gap:0.5rem; margin-top:0.25rem; }
+    .dest-card-actions .link-detail { color:var(--link, #60a5fa); font-weight:700; text-decoration:none; }
+    .dest-card-actions .btn-go { background: linear-gradient(90deg,#7c3aed,#06b6d4); color:#fff; border:none; padding:0.45rem 0.7rem; border-radius:0.6rem; cursor:pointer; }
     .spot-action-btn, .spot-select-btn {
       border: 1px solid rgba(255,255,255,0.12);
       background: rgba(255,255,255,0.06);
@@ -738,7 +703,7 @@
     .spot-detail-review-stars { color:#fbbf24; font-size:0.9rem; }
     .spot-detail-review-text { margin:0.15rem 0 0 0; color:#cbd5e1; font-size:0.88rem; line-height:1.5; }
     @media (max-width: 900px) {
-      .region-dest-scroll { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      .region-dest-scroll { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
       .region-dest-card { min-height: 260px; }
       .dest-card-image { height:120px; }
       .spot-detail-body { grid-template-columns: 1fr; }
@@ -1082,8 +1047,8 @@
                   <span class="hero-hot-badge">Biển</span>
                 </div>
               </div>
-              <div class="hero-hot-item" onclick="selectHeroDestination('Đà Lạt', 'Đà Lạt, Lâm Đồng', 'https://images.unsplash.com/photo-1615880480595-f5f9b4fb530e?w=300&q=80')">
-                <div class="hero-hot-img" style="background-image:url('https://images.unsplash.com/photo-1615880480595-f5f9b4fb530e?w=300&q=80')"></div>
+              <div class="hero-hot-item" onclick="selectHeroDestination('Đà Lạt', 'Đà Lạt, Lâm Đồng', 'https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=300&q=80')">
+                <div class="hero-hot-img" style="background-image:url('https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=300&q=80')"></div>
                 <div class="hero-hot-info">
                   <span class="hero-hot-name">Đà Lạt</span>
                   <span class="hero-hot-badge">Mát</span>
@@ -1119,7 +1084,7 @@
                   <span class="sidebar-dest-badge">Biển</span>
                 </div>
                 <div class="sidebar-dest-item" onclick="document.getElementById('dest').value='Đà Lạt'; document.getElementById('destination').value='Đà Lạt, Lâm Đồng'">
-                  <div class="sidebar-dest-img" style="background-image:url('https://images.unsplash.com/photo-1615880480595-f5f9b4fb530e?w=120&q=80')"></div>
+                  <div class="sidebar-dest-img" style="background-image:url('https://images.unsplash.com/photo-1571619294955-03f0e5c64f15?w=120&q=80')"></div>
                   <div class="sidebar-dest-info"><strong>Đà Lạt</strong><span>Lâm Đồng</span></div>
                   <span class="sidebar-dest-badge">Mát</span>
                 </div>
@@ -2306,48 +2271,48 @@
 
     const REGION_DESTINATIONS = {
       'Miền Bắc': [
-        { name: 'Hà Nội', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200&h=150&fit=crop', spots: ['Hồ Hoàn Kiếm', 'Lăng Bác', 'Phố Cổ'] },
+        { name: 'Hà Nội', img: 'https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=200&h=150&fit=crop', spots: ['Hồ Hoàn Kiếm', 'Lăng Bác', 'Phố Cổ'] },
         { name: 'Hạ Long', img: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=200&h=150&fit=crop', spots: ['Vịnh Hạ Long', 'Đảo Ti Tốp', 'Hang Sửng Sốt'] },
-        { name: 'Sapa', img: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=150&fit=crop', spots: ['Fansipan', 'Cát Cát', 'Đèo Ô Quy Hồ'] },
-        { name: 'Ninh Bình', img: 'https://images.unsplash.com/photo-1571637539223-27c9cd20e2d5?w=200&h=150&fit=crop', spots: ['Tràng An', 'Bái Đính', 'Hang Múa'] },
-        { name: 'Hà Giang', img: 'https://images.unsplash.com/photo-1570829460005-c840387bb1ca?w=200&h=150&fit=crop', spots: ['Mã Pí Lèng', 'Cột cờ Lũng Cú', 'Dốc Thẩm Mã'] },
-        { name: 'Mộc Châu', img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200&h=150&fit=crop', spots: ['Đồi chè Trái Tim', 'Thác Dải Yếm', 'Bản Áng'] },
-        { name: 'Cao Bằng', img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200&h=150&fit=crop', spots: ['Thác Bản Giốc', 'Động Ngườm Ngao', 'Pác Bó'] },
-        { name: 'Mai Châu', img: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=200&h=150&fit=crop', spots: ['Đèo Đá Trắng', 'Bản Lác', 'Hang Chiều'] },
-        { name: 'Tam Đảo', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Cổng Trời', 'Nhà thờ cổ', 'Cầu Mây'] },
-        { name: 'Ba Vì', img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200&h=150&fit=crop', spots: ['Vườn quốc gia', 'Nhà thờ đổ', 'Khoang Xanh'] },
+        { name: 'Sapa', img: 'https://images.unsplash.com/photo-1508809159021-4171206013a2?w=200&h=150&fit=crop', spots: ['Fansipan', 'Cát Cát', 'Đèo Ô Quy Hồ'] },
+        { name: 'Ninh Bình', img: 'https://images.unsplash.com/photo-1599708153386-62e26066265e?w=200&h=150&fit=crop', spots: ['Tràng An', 'Bái Đính', 'Hang Múa'] },
+        { name: 'Hà Giang', img: 'https://images.unsplash.com/photo-1581691101914-df07ba063852?w=200&h=150&fit=crop', spots: ['Mã Pí Lèng', 'Cột cờ Lũng Cú', 'Dốc Thẩm Mã'] },
+        { name: 'Mộc Châu', img: 'https://images.unsplash.com/photo-1623863484089-9e8c4f03943d?w=200&h=150&fit=crop', spots: ['Đồi chè Trái Tim', 'Thác Dải Yếm', 'Bản Áng'] },
+        { name: 'Cao Bằng', img: 'https://images.unsplash.com/photo-1563812739347-1906a5996055?w=200&h=150&fit=crop', spots: ['Thác Bản Giốc', 'Động Ngườm Ngao', 'Pác Bó'] },
+        { name: 'Mai Châu', img: 'https://images.unsplash.com/photo-1589146162335-c340b498425d?w=200&h=150&fit=crop', spots: ['Đèo Đá Trắng', 'Bản Lác', 'Hang Chiều'] },
+        { name: 'Tam Đảo', img: 'https://images.unsplash.com/photo-1594910403541-610116e09c85?w=200&h=150&fit=crop', spots: ['Cổng Trời', 'Nhà thờ cổ', 'Cầu Mây'] },
+        { name: 'Ba Vì', img: 'https://images.unsplash.com/photo-1616853215286-353d9154a1d8?w=200&h=150&fit=crop', spots: ['Vườn quốc gia', 'Nhà thờ đổ', 'Khoang Xanh'] },
         { name: 'Cát Bà', img: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=200&h=150&fit=crop', spots: ['Vịnh Lan Hạ', 'Đảo Khỉ', 'Pháo đài Thần công'] },
-        { name: 'Yên Bái', img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=150&fit=crop', spots: ['Mù Cang Chải', 'Hồ Thác Bà', 'Đèo Khau Phạ'] },
+        { name: 'Yên Bái', img: 'https://images.unsplash.com/photo-1581177653526-70e28f309e3e?w=200&h=150&fit=crop', spots: ['Mù Cang Chải', 'Hồ Thác Bà', 'Đèo Khau Phạ'] },
         { name: 'Điện Biên', img: 'https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=200&h=150&fit=crop', spots: ['Đồi A1', 'Hầm Đờ Cát', 'Sở chỉ huy Mường Phăng'] },
-        { name: 'Lạng Sơn', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Ải Chi Lăng', 'Mẫu Sơn', 'Chợ Đông Kinh'] },
-        { name: 'Bắc Kạn', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=200&h=150&fit=crop', spots: ['Hồ Ba Bể', 'Động Puông', 'Thác Đầu Đẳng'] },
+        { name: 'Lạng Sơn', img: 'https://images.unsplash.com/photo-1587588354456-ae376af7182f?w=200&h=150&fit=crop', spots: ['Ải Chi Lăng', 'Mẫu Sơn', 'Chợ Đông Kinh'] },
+        { name: 'Bắc Kạn', img: 'https://images.unsplash.com/photo-1596395817260-2440f3131759?w=200&h=150&fit=crop', spots: ['Hồ Ba Bể', 'Động Puông', 'Thác Đầu Đẳng'] },
         { name: 'Tuyên Quang', img: 'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=200&h=150&fit=crop', spots: ['Khu di tích Tân Trào', 'Na Hang', 'Suối khoáng Mỹ Lâm'] },
         { name: 'Thái Nguyên', img: 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=200&h=150&fit=crop', spots: ['Hồ Núi Cốc', 'Đồi chè Tân Cương', 'Hang Phượng Hoàng'] },
         { name: 'Đảo Cô Tô', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Bãi Hồng Vành', 'Bãi Vàn Chảy', 'Ngọn hải đăng'] },
-        { name: 'Mù Cang Chải', img: 'https://images.unsplash.com/photo-1570829460005-c840387bb1ca?w=200&h=150&fit=crop', spots: ['Ruộng bậc thang', 'Đèo Khau Phạ', 'Đồi mâm xôi'] },
-        { name: 'Đồng Văn', img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200&h=150&fit=crop', spots: ['Phố cổ Đồng Văn', 'Dinh thự họ Vương', 'Lũng Cú'] },
+        { name: 'Mù Cang Chải', img: 'https://images.unsplash.com/photo-1581691101914-df07ba063852?w=200&h=150&fit=crop', spots: ['Ruộng bậc thang', 'Đèo Khau Phạ', 'Đồi mâm xôi'] },
+        { name: 'Đồng Văn', img: 'https://images.unsplash.com/photo-1563812739347-1906a5996055?w=200&h=150&fit=crop', spots: ['Phố cổ Đồng Văn', 'Dinh thự họ Vương', 'Lũng Cú'] },
         { name: 'Vịnh Lan Hạ', img: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=200&h=150&fit=crop', spots: ['Bãi tắm Cát Cò', 'Đảo Khỉ', 'Làng chài Cửa Vạn'] },
       ],
       'Miền Trung': [
-        { name: 'Đà Nẵng', img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200&h=150&fit=crop', spots: ['Cầu Vàng', 'Bà Nà Hills', 'Ngũ Hành Sơn'] },
+        { name: 'Đà Nẵng', img: 'https://images.unsplash.com/photo-1559592443-7f87a030062a?w=200&h=150&fit=crop', spots: ['Cầu Vàng', 'Bà Nà Hills', 'Ngũ Hành Sơn'] },
         { name: 'Hội An', img: 'https://images.unsplash.com/photo-1587922546307-776227941871?w=200&h=150&fit=crop', spots: ['Chùa Cầu', 'Sông Hoài', 'Rừng dừa Cẩm Thanh'] },
         { name: 'Huế', img: 'https://images.unsplash.com/photo-1590054387835-ab72678fef01?w=200&h=150&fit=crop', spots: ['Đại Nội', 'Lăng Khải Định', 'Chùa Thiên Mụ'] },
         { name: 'Nha Trang', img: 'https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=200&h=150&fit=crop', spots: ['VinWonders', 'Tháp Bà Ponagar', 'Hòn Mun'] },
-        { name: 'Đà Lạc', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Hồ Tuyền Lâm', 'Vườn hoa TP', 'Langbiang'] },
-        { name: 'Quy Nhơn', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=200&h=150&fit=crop', spots: ['Kỳ Co', 'Eo Gió', 'Tháp Bánh Ít'] },
-        { name: 'Mũi Né', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Đồi Cát Đỏ', 'Bàu Trắng', 'Suối Tiên'] },
-        { name: 'Phong Nha', img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=150&fit=crop', spots: ['Động Phong Nha', 'Động Thiên Đường', 'Sông Chày'] },
-        { name: 'Phú Yên', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Gành Đá Đĩa', 'Bãi Xép', 'Mũi Điện'] },
+        { name: 'Đà Lạc', img: 'https://images.unsplash.com/photo-1600100398055-149d56a3151b?w=200&h=150&fit=crop', spots: ['Hồ Tuyền Lâm', 'Vườn hoa TP', 'Langbiang'] },
+        { name: 'Quy Nhơn', img: 'https://images.unsplash.com/photo-1586542158380-49272304d9a5?w=200&h=150&fit=crop', spots: ['Kỳ Co', 'Eo Gió', 'Tháp Bánh Ít'] },
+        { name: 'Mũi Né', img: 'https://images.unsplash.com/photo-1584981772656-78711422700f?w=200&h=150&fit=crop', spots: ['Đồi Cát Đỏ', 'Bàu Trắng', 'Suối Tiên'] },
+        { name: 'Phong Nha', img: 'https://images.unsplash.com/photo-1584305886638-348e3e4e9663?w=200&h=150&fit=crop', spots: ['Động Phong Nha', 'Động Thiên Đường', 'Sông Chày'] },
+        { name: 'Phú Yên', img: 'https://images.unsplash.com/photo-1587588354456-ae376af7182f?w=200&h=150&fit=crop', spots: ['Gành Đá Đĩa', 'Bãi Xép', 'Mũi Điện'] },
         { name: 'Bình Ba', img: 'https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?w=200&h=150&fit=crop', spots: ['Bãi Nồm', 'Bãi Chướng', 'Bãi Nhà Cũ'] },
         { name: 'Tuy Hòa', img: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=200&h=150&fit=crop', spots: ['Tháp Nhạn', 'Bãi Xép', 'Vịnh Vũng Rô'] },
-        { name: 'Pleiku', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=200&h=150&fit=crop', spots: ['Biển Hồ T\'Nơng', 'Chùa Minh Thành', 'Thủy điện Yaly'] },
+        { name: 'Pleiku', img: 'https://images.unsplash.com/photo-1596395817260-2440f3131759?w=200&h=150&fit=crop', spots: ['Biển Hồ T\'Nơng', 'Chùa Minh Thành', 'Thủy điện Yaly'] },
         { name: 'Buôn Ma Thuột', img: 'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=200&h=150&fit=crop', spots: ['Bảo tàng Cà phê', 'Thác Dray Nur', 'Buôn Đôn'] },
         { name: 'Kon Tum', img: 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=200&h=150&fit=crop', spots: ['Nhà thờ Gỗ', 'Cầu treo Kon Klor', 'Măng Đen'] },
         { name: 'Lý Sơn', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Đỉnh Thới Lới', 'Hang Câu', 'Cổng Tò Vò'] },
         { name: 'Phan Thiết', img: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=200&h=150&fit=crop', spots: ['Tháp Poshanư', 'Trường Dục Thanh', 'Hải đăng Kê Gà'] },
         { name: 'Quảng Trị', img: 'https://images.unsplash.com/photo-1587922546307-776227941871?w=200&h=150&fit=crop', spots: ['Thành cổ Quảng Trị', 'Địa đạo Vịnh Mốc', 'Cầu Hiền Lương'] },
-        { name: 'Quảng Ngãi', img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200&h=150&fit=crop', spots: ['Núi Ấn sông Trà', 'Biển Mỹ Khê', 'Khu chứng tích Sơn Mỹ'] },
-        { name: 'Bình Thuận', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Mũi Né', 'Bàu Trắng', 'Đảo Phú Quý'] },
+        { name: 'Quảng Ngãi', img: 'https://images.unsplash.com/photo-1559592443-7f87a030062a?w=200&h=150&fit=crop', spots: ['Núi Ấn sông Trà', 'Biển Mỹ Khê', 'Khu chứng tích Sơn Mỹ'] },
+        { name: 'Bình Thuận', img: 'https://images.unsplash.com/photo-1584981772656-78711422700f?w=200&h=150&fit=crop', spots: ['Mũi Né', 'Bàu Trắng', 'Đảo Phú Quý'] },
         { name: 'Vịnh Vân Phong', img: 'https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=200&h=150&fit=crop', spots: ['Đảo Điệp Sơn', 'Mũi Đôi', 'Bãi biển Đại Lãnh'] },
       ],
       'Miền Nam': [
@@ -2356,21 +2321,21 @@
         { name: 'Cần Thơ', img: 'https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=200&h=150&fit=crop', spots: ['Chợ nổi Cái Răng', 'Bến Ninh Kiều', 'Thiền viện Trúc Lâm'] },
         { name: 'Vũng Tàu', img: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?w=200&h=150&fit=crop', spots: ['Tượng Chúa Kito', 'Bãi Sau', 'Hải đăng Vũng Tàu'] },
         { name: 'Côn Đảo', img: 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=200&h=150&fit=crop', spots: ['Nhà tù Côn Đảo', 'Bãi Đầm Trầu', 'Hàng Dương'] },
-        { name: 'An Giang', img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200&h=150&fit=crop', spots: ['Rừng tràm Trà Sư', 'Miếu Bà Chúa Xứ', 'Núi Cấm'] },
-        { name: 'Tây Ninh', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=200&h=150&fit=crop', spots: ['Núi Bà Đen', 'Tòa thánh Tây Ninh', 'Hồ Dầu Tiếng'] },
+        { name: 'An Giang', img: 'https://images.unsplash.com/photo-1563812739347-1906a5996055?w=200&h=150&fit=crop', spots: ['Rừng tràm Trà Sư', 'Miếu Bà Chúa Xứ', 'Núi Cấm'] },
+        { name: 'Tây Ninh', img: 'https://images.unsplash.com/photo-1596395817260-2440f3131759?w=200&h=150&fit=crop', spots: ['Núi Bà Đen', 'Tòa thánh Tây Ninh', 'Hồ Dầu Tiếng'] },
         { name: 'Bến Tre', img: 'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=200&h=150&fit=crop', spots: ['Cồn Phụng', 'Khu du lịch Lan Vương', 'Sân chim Vàm Hồ'] },
         { name: 'Kiên Giang', img: 'https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=200&h=150&fit=crop', spots: ['Đảo Nam Du', 'Hòn Tre', 'Hà Tiên'] },
         { name: 'Đồng Tháp', img: 'https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?w=200&h=150&fit=crop', spots: ['Vườn quốc gia Tràm Chim', 'Làng hoa Sa Đéc', 'Xẻo Quýt'] },
         { name: 'Mũi Cà Mau', img: 'https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=200&h=150&fit=crop', spots: ['Cột mốc tọa độ', 'Đất Mũi', 'Lâm viên Cà Mau'] },
-        { name: 'Bạc Liêu', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Nhà Công tử Bạc Liêu', 'Cánh đồng Điện gió', 'Chùa Xiêm Cán'] },
-        { name: 'Sóc Trăng', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200&h=150&fit=crop', spots: ['Chùa Dơi', 'Chùa Đất Sét', 'Chùa Chén Kiểu'] },
+        { name: 'Bạc Liêu', img: 'https://images.unsplash.com/photo-1587588354456-ae376af7182f?w=200&h=150&fit=crop', spots: ['Nhà Công tử Bạc Liêu', 'Cánh đồng Điện gió', 'Chùa Xiêm Cán'] },
+        { name: 'Sóc Trăng', img: 'https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=200&h=150&fit=crop', spots: ['Chùa Dơi', 'Chùa Đất Sét', 'Chùa Chén Kiểu'] },
         { name: 'Trà Vinh', img: 'https://images.unsplash.com/photo-1590054387835-ab72678fef01?w=200&h=150&fit=crop', spots: ['Ao Bà Om', 'Chùa Hang', 'Biển Ba Động'] },
         { name: 'Hậu Giang', img: 'https://images.unsplash.com/photo-1587922546307-776227941871?w=200&h=150&fit=crop', spots: ['Chợ nổi Ngã Bảy', 'Khu bảo tồn Lung Ngọc Hoàng'] },
         { name: 'Vĩnh Long', img: 'https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=200&h=150&fit=crop', spots: ['Chùa Phật Ngọc Xá Lợi', 'Cù lao An Bình', 'Lò gạch Mang Thít'] },
-        { name: 'Tiền Giang', img: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=200&h=150&fit=crop', spots: ['Chùa Vĩnh Tràng', 'Chợ nổi Cái Bè', 'Cù lao Thới Sơn'] },
+        { name: 'Tiền Giang', img: 'https://images.unsplash.com/photo-1596422846543-75c6fc18a594?w=200&h=150&fit=crop', spots: ['Chùa Vĩnh Tràng', 'Chợ nổi Cái Bè', 'Cù lao Thới Sơn'] },
         { name: 'Đảo Nam Du', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Bãi Ngự', 'Hòn Lớn', 'Bãi Chướng'] },
-        { name: 'Hòn Sơn', img: 'https://images.unsplash.com/photo-1578894381163-e72c17f2d45f?w=200&h=150&fit=crop', spots: ['Bãi Bàng', 'Đỉnh Ma Thiên Lãnh', 'Bãi Thiên Tuế'] },
-        { name: 'Châu Đốc', img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=200&h=150&fit=crop', spots: ['Chợ Châu Đốc', 'Tây An Cổ Tự', 'Làng nổi Châu Đốc'] }
+        { name: 'Hòn Sơn', img: 'https://images.unsplash.com/photo-1544735724-449ad2bdd335?w=200&h=150&fit=crop', spots: ['Bãi Bàng', 'Đỉnh Ma Thiên Lãnh', 'Bãi Thiên Tuế'] },
+        { name: 'Châu Đốc', img: 'https://images.unsplash.com/photo-1563812739347-1906a5996055?w=200&h=150&fit=crop', spots: ['Chợ Châu Đốc', 'Tây An Cổ Tự', 'Làng nổi Châu Đốc'] }
       ]
     };
 
@@ -2535,6 +2500,7 @@
               <span class="meta-tag cost">💰 ${cost}</span>
             </div>
             <div class="dest-card-actions">
+              <a href="#" class="link-detail" onclick="event.preventDefault(); selectDestination('${dest.name.replace("'","\'")}', this.closest('.region-dest-card'))">Chi tiết →</a>
               <button class="btn-go" onclick="event.stopPropagation(); selectDestination('${dest.name.replace("'","\'")}', this.closest('.region-dest-card'))">+ Chuyến đi</button>
             </div>
           </div>
@@ -2563,7 +2529,7 @@
 
     const detailsMap = {
       "Hà Nội": {
-        rating: "4.9", banner: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=600&q=80",
+        rating: "4.9", banner: "https://images.unsplash.com/photo-1509060464153-44667396260f?auto=format&fit=crop&w=600&q=80",
         safety: "Rất tốt", popularity: "Xu hướng", cost: "Hợp lý", weather: "Mát mẻ",
         ageTips: {
           kids: { spot: "Công viên Thủ Lệ", food: "Phở cuốn Ngũ Xã", play: "Xem múa rối nước" },
@@ -2579,7 +2545,7 @@
         ],
         photos: [
           "https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=400&h=250&fit=crop",
-          "https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=400&h=250&fit=crop",
+          "https://images.unsplash.com/photo-1569517282132-25d22f4573e6?w=400&h=250&fit=crop",
           "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&h=250&fit=crop",
           "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop"
         ],
@@ -2590,11 +2556,11 @@
           { name: "Cà Phê Trứng Đắng", type: "cafe", rating: "4.6", distance: "1.5km", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=150&fit=crop" }
         ],
         spots: [
-          { name: "Lăng Bác & Chùa Một Cột", category: "attraction", desc: "Khu di tích lịch sử văn hóa thiêng liêng quốc gia.", reviews: 234, rating: 4.9, photos: ["https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?w=400&h=250&fit=crop"] },
-          { name: "Hồ Hoàn Kiếm & Đền Ngọc Sơn", category: "attraction", desc: "Biểu tượng lịch sử, trái tim của thủ đô Hà Nội.", reviews: 567, rating: 4.8, photos: ["https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=400&h=250&fit=crop"] },
+          { name: "Lăng Bác & Chùa Một Cột", category: "attraction", desc: "Khu di tích lịch sử văn hóa thiêng liêng quốc gia.", reviews: 234, rating: 4.9, photos: ["https://images.unsplash.com/photo-1583468982228-19f19164aee2?w=400&h=250&fit=crop"] },
+          { name: "Hồ Hoàn Kiếm & Đền Ngọc Sơn", category: "attraction", desc: "Biểu tượng lịch sử, trái tim của thủ đô Hà Nội.", reviews: 567, rating: 4.8, photos: ["https://images.unsplash.com/photo-1509233725247-49e657c54213?w=400&h=250&fit=crop"] },
           { name: "Phở Thìn Bờ Hồ", category: "restaurant", desc: "Hương vị phở bò gia truyền thơm ngon đậm vị.", reviews: 189, rating: 4.7, photos: ["https://images.unsplash.com/photo-1583224964978-2257b960c3d3?w=400&h=250&fit=crop"] },
           { name: "Bún Chả Đắc Kim", category: "restaurant", desc: "Bún chả gia truyền nổi tiếng phố Hàng Mành.", reviews: 312, rating: 4.8, photos: ["https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=250&fit=crop"] },
-          { name: "Xem Múa Rối Nước Bông Sen", category: "experience", desc: "Nghệ thuật sân khấu dân gian độc đáo của Việt Nam.", reviews: 456, rating: 4.9, photos: ["https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=250&fit=crop"] },
+          { name: "Xem Múa Rối Nước Bông Sen", category: "experience", desc: "Nghệ thuật sân khấu dân gian độc đáo của Việt Nam.", reviews: 456, rating: 4.9, photos: ["https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=400&h=250&fit=crop"] },
           { name: "Tour Đêm Nhà Tù Hỏa Lò", category: "experience", desc: "Trải nghiệm nhập vai lịch sử đầy cảm xúc và ý nghĩa.", reviews: 278, rating: 4.6, photos: ["https://images.unsplash.com/photo-1590054387835-ab72678fef01?w=400&h=250&fit=crop"] }
         ]
       },
@@ -2620,18 +2586,18 @@
         photos: [
           "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&h=250&fit=crop",
           "https://images.unsplash.com/photo-1590054387835-ab72678fef01?w=400&h=250&fit=crop",
-          "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=250&fit=crop",
+          "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=400&h=250&fit=crop",
           "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400&h=250&fit=crop"
         ],
         nearbyPlaces: [
           { name: "Cơm Tấm Ba Ghiền", type: "restaurant", rating: "4.8", distance: "0.5km", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=200&h=150&fit=crop" },
           { name: "Hủ Tiếu Nam Vang", type: "restaurant", rating: "4.7", distance: "1.2km", img: "https://images.unsplash.com/photo-1583224964978-2257b960c3d3?w=200&h=150&fit=crop" },
           { name: "Cà Phê Bitexco", type: "cafe", rating: "4.6", distance: "0.8km", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=150&fit=crop" },
-          { name: "Chợ Bến Thành", type: "restaurant", rating: "4.5", distance: "1.5km", img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200&h=150&fit=crop" }
+          { name: "Chợ Bến Thành", type: "restaurant", rating: "4.5", distance: "1.5km", img: "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=200&h=150&fit=crop" }
         ],
         spots: [
           { name: "Dinh Độc Lập", category: "attraction", desc: "Di tích lịch sử quốc gia đặc biệt, minh chứng ngày giải phóng.", reviews: 456, rating: 4.8, photos: ["https://images.unsplash.com/photo-1590054387835-ab72678fef01?w=400&h=250&fit=crop"] },
-          { name: "Nhà Thờ Đức Bà", category: "attraction", desc: "Kiến trúc cổ kính kiểu Pháp đặc trưng giữa lòng Sài Gòn.", reviews: 567, rating: 4.9, photos: ["https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=250&fit=crop"] },
+          { name: "Nhà Thờ Đức Bà", category: "attraction", desc: "Kiến trúc cổ kính kiểu Pháp đặc trưng giữa lòng Sài Gòn.", reviews: 567, rating: 4.9, photos: ["https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?w=400&h=250&fit=crop"] },
           { name: "Cơm Tấm Nguyễn Văn Cừ", category: "restaurant", desc: "Đĩa cơm tấm sườn bì chả nướng ngon nức tiếng.", reviews: 234, rating: 4.7, photos: ["https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=250&fit=crop"] },
           { name: "Hủ Tiếu Thanh Xuân", category: "restaurant", desc: "Quán hủ tiếu gia truyền hơn 70 năm đậm đà.", reviews: 189, rating: 4.6, photos: ["https://images.unsplash.com/photo-1583224964978-2257b960c3d3?w=400&h=250&fit=crop"] },
           { name: "Du Thuyền Sông Sài Gòn", category: "experience", desc: "Ngắm thành phố lung linh về đêm từ sông Sài Gòn.", reviews: 345, rating: 4.8, photos: ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&h=250&fit=crop"] },
@@ -2643,7 +2609,7 @@
       "Đà Lạc": null,
       "Đà Nẵng": {
         rating: "4.9",
-        banner: "https://images.unsplash.com/photo-1533106418989-4a4ed9c2bda4?auto=format&fit=crop&w=600&q=80",
+        banner: "https://images.unsplash.com/photo-1559592413-7ece350ac12a?auto=format&fit=crop&w=600&q=80",
         safety: "Tuyệt vời",
         popularity: "Yêu thích nhất",
         cost: "Bình dân",
@@ -2661,10 +2627,10 @@
           { name: "Phạm My", rating: 5, text: "Hải sản tươi ngon, bánh tráng cuốn thịt heo ngon bất ngờ!" }
         ],
         photos: [
-          "https://images.unsplash.com/photo-1533106418989-4a4ed9c2bda4?w=400&h=250&fit=crop",
+          "https://images.unsplash.com/photo-1559592413-7ece350ac12a?w=400&h=250&fit=crop",
           "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=250&fit=crop",
           "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=400&h=250&fit=crop",
-          "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&h=250&fit=crop"
+          "https://images.unsplash.com/photo-1563812739347-1906a5996055?w=400&h=250&fit=crop"
         ],
         nearbyPlaces: [
           { name: "Bánh Tráng Trần", type: "restaurant", rating: "4.8", distance: "0.5km", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=200&h=150&fit=crop" },
@@ -2673,11 +2639,11 @@
           { name: "Cà Phê Mitora", type: "cafe", rating: "4.6", distance: "0.8km", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=150&fit=crop" }
         ],
         spots: [
-          { name: "Ngũ Hành Sơn", category: "attraction", desc: "Năm ngọn núi đá vôi tâm linh huyền bí.", reviews: 345, rating: 4.8, photos: ["https://images.unsplash.com/photo-1533106418989-4a4ed9c2bda4?w=400&h=250&fit=crop"] },
+          { name: "Ngũ Hành Sơn", category: "attraction", desc: "Năm ngọn núi đá vôi tâm linh huyền bí.", reviews: 345, rating: 4.8, photos: ["https://images.unsplash.com/photo-1559592413-7ece350ac12a?w=400&h=250&fit=crop"] },
           { name: "Cầu Vàng Bà Nà Hills", category: "attraction", desc: "Kỳ quan kiến trúc nổi tiếng được nâng bởi đôi tay khổng lồ.", reviews: 678, rating: 4.9, photos: ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=400&h=250&fit=crop"] },
           { name: "Bánh Tráng Trần", category: "restaurant", desc: "Thương hiệu bánh tráng cuốn thịt heo nổi tiếng nhất Đà Thành.", reviews: 234, rating: 4.8, photos: ["https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=250&fit=crop"] },
           { name: "Mì Quảng Bà Mua", category: "restaurant", desc: "Hương vị mì Quảng gia truyền chuẩn vị miền Trung.", reviews: 189, rating: 4.7, photos: ["https://images.unsplash.com/photo-1583224964978-2257b960c3d3?w=400&h=250&fit=crop"] },
-          { name: "Dù Lượn Trên Bán Đảo Sơn Trà", category: "experience", desc: "Bay lượn trên bầu trời ngắm toàn cảnh biển Đà Nẵng từ trên cao.", reviews: 456, rating: 4.9, photos: ["https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=400&h=250&fit=crop"] },
+          { name: "Dù Lượn Trên Bán Đảo Sơn Trà", category: "experience", desc: "Bay lượn trên bầu trời ngắm toàn cảnh biển Đà Nẵng từ trên cao.", reviews: 456, rating: 4.9, photos: ["https://images.unsplash.com/photo-1563812739347-1906a5996055?w=400&h=250&fit=crop"] },
           { name: "Du Thuyền Sông Hàn Ngắm Cầu Rồng", category: "experience", desc: "Trải nghiệm ngắm Cầu Rồng phun lửa, nước sống động về đêm.", reviews: 312, rating: 4.8, photos: ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=250&fit=crop"] }
         ]
       },
@@ -2783,7 +2749,7 @@
       },
       "Hội An": {
         rating: "4.9",
-        banner: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=600&q=80",
+        banner: "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=600&q=80",
         safety: "Tuyệt vời",
         popularity: "Cực hot",
         cost: "Hợp lý",
@@ -2843,7 +2809,7 @@
       },
       "Cần Thơ": {
         rating: "4.7",
-        banner: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=600&q=80",
+        banner: "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?auto=format&fit=crop&w=600&q=80",
         safety: "Tuyệt vời",
         popularity: "Sông nước",
         cost: "Bình dân",
@@ -2863,7 +2829,7 @@
       },
       // ===== MIỀN BẮC =====
       "Hà Giang": {
-        rating: "4.7", banner: "https://images.unsplash.com/photo-1570829460005-c840387bb1ca?auto=format&fit=crop&w=600&q=80",
+        rating: "4.7", banner: "https://images.unsplash.com/photo-1581691101914-df07ba063852?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Khám phá", cost: "Trung bình",
         ageTips: { kids: { spot: "Đồng Văn", food: "Thắng cố", play: "Check-in Cột cờ Lũng Cú" }, adults: { spot: "Mã Pí Lèng", food: "Lợn cảnh nướng", play: "Trekking Cao Nguyên Đá" }, elderly: { spot: "Phố cổ Đồng Văn", food: "Bánh ngói", play: "Ngắm hoa tam giác mạch" } },
         spots: [
@@ -2876,7 +2842,7 @@
         ]
       },
       "Mộc Châu": {
-        rating: "4.6", banner: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80",
+        rating: "4.6", banner: "https://images.unsplash.com/photo-1623863484089-9e8c4f03943d?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Nghỉ dưỡng", cost: "Hợp lý",
         ageTips: { kids: { spot: "Đồi chè Trái Tim", food: "Thịt trâu gác bếp", play: "Thác Dải Yếm" }, adults: { spot: "Vườn apple", food: "Cơm lam", play: "Cắm trại núi rừng" }, elderly: { spot: "Thịt trấu", food: "Bánh đa", play: "Dạo thung lũng mận" } },
         spots: [
@@ -2889,7 +2855,7 @@
         ]
       },
       "Cao Bằng": {
-        rating: "4.5", banner: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80",
+        rating: "4.5", banner: "https://images.unsplash.com/photo-1563812739347-1906a5996055?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Khám phá", cost: "Bình dân",
         ageTips: { kids: { spot: "Thác Bản Giốc", food: "Miến dong", play: "Chụp ảnh thác nước" }, adults: { spot: "Pác Bó", food: "Cá anh vũ", play: "Thăm khu di tích" }, elderly: { spot: "Động Ngườm Ngao", food: "Khâu nhục", play: "Ngắm phong cảnh núi rừng" } },
         spots: [
@@ -2902,7 +2868,7 @@
         ]
       },
       "Mai Châu": {
-        rating: "4.6", banner: "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80",
+        rating: "4.6", banner: "https://images.unsplash.com/photo-1589146162335-c340b498425d?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Nghỉ dưỡng", cost: "Hợp lý",
         ageTips: { kids: { spot: "Bản Lác", food: "Cơm lam", play: "Đạp xe đồng lúa" }, adults: { spot: "Đèo Đá Trắng", food: "Thịt trâu", play: "Trekking núi rừng" }, elderly: { spot: "Hang Chiều", food: "Rau rừng", play: "Dạo làng bản" } },
         spots: [
@@ -2915,7 +2881,7 @@
         ]
       },
       "Tam Đảo": {
-        rating: "4.5", banner: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+        rating: "4.5", banner: "https://images.unsplash.com/photo-1594910403541-610116e09c85?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Nghỉ dưỡng", cost: "Trung bình",
         ageTips: { kids: { spot: "Cổng Trời", food: "Thịt dê", play: "Thác Bạc" }, adults: { spot: "Nhà thờ cổ", food: "Cá brook", play: "Cà phê sáng mây" }, elderly: { spot: "Đỉnh Tam Đảo", food: "Rau rừng", play: "Dạo phố cổ" } },
         spots: [
@@ -2928,7 +2894,7 @@
         ]
       },
       "Ba Vì": {
-        rating: "4.4", banner: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80",
+        rating: "4.4", banner: "https://images.unsplash.com/photo-1616853215286-353d9154a1d8?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Gần HN", cost: "Hợp lý",
         ageTips: { kids: { spot: "Vườn quốc gia", food: "Gà đồi", play: "Khoang Xanh" }, adults: { spot: "Khoang Xanh", food: "Bún ốc", play: "Tắm suối" }, elderly: { spot: "Nhà thờ đổ", food: "Rau sạch", play: "Dạo rừng" } },
         spots: [
@@ -2954,7 +2920,7 @@
         ]
       },
       "Yên Bái": {
-        rating: "4.5", banner: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80",
+        rating: "4.5", banner: "https://images.unsplash.com/photo-1581177653526-7e8d74a8c9e0?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Khám phá", cost: "Bình dân",
         ageTips: { kids: { spot: "Mù Cang Chải", food: "Cơm lam", play: "Check-in ruộng bậc thang" }, adults: { spot: "Hồ Thác Bà", food: "Cá thơm", play: "Du thuyền hồ" }, elderly: { spot: "Đèo Khau Phạ", food: "Thịt lợn", play: "Ngắm cảnh" } },
         spots: [
@@ -2980,7 +2946,7 @@
         ]
       },
       "Lạng Sơn": {
-        rating: "4.4", banner: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+        rating: "4.4", banner: "https://images.unsplash.com/photo-1587588354456-ae376af7182f?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Biên giới", cost: "Bình dân",
         ageTips: { kids: { spot: "Mẫu Sơn", food: "Vịt quay", play: "Check-in nhãn" }, adults: { spot: "Ải Chi Lăng", food: "Thịt trâu", play: "Thăm động" }, elderly: { spot: "Chợ Đông Kinh", food: "Bánh coóng", play: "Mua quà" } },
         spots: [
@@ -3045,7 +3011,7 @@
         ]
       },
       "Mù Cang Chải": {
-        rating: "4.7", banner: "https://images.unsplash.com/photo-1570829460005-c840387bb1ca?auto=format&fit=crop&w=600&q=80",
+        rating: "4.7", banner: "https://images.unsplash.com/photo-1581691101914-df07ba063852?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Check-in", cost: "Hợp lý",
         ageTips: { kids: { spot: "Ruộng bậc thang", food: "Cơm lam", play: "Chụp ảnh" }, adults: { spot: "Đồi mâm xôi", food: "Thắng cố", play: "Trekking" }, elderly: { spot: "Đèo Khau Phạ", food: "Rau rừng", play: "Ngắm lúa" } },
         spots: [
@@ -3058,7 +3024,7 @@
         ]
       },
       "Đồng Văn": {
-        rating: "4.6", banner: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80",
+        rating: "4.6", banner: "https://images.unsplash.com/photo-1563812739347-1906a5996055?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Văn hóa", cost: "Trung bình",
         ageTips: { kids: { spot: "Phố cổ", food: "Bánh ngói", play: "Chụp ảnh" }, adults: { spot: "Dinh thự họ Vương", food: "Thắng cố", play: "Thăm chợ" }, elderly: { spot: "Lũng Cú", food: "Miến", play: "Ngắm cảnh" } },
         spots: [
@@ -3072,7 +3038,7 @@
       },
       // ===== MIỀN TRUNG =====
       "Quy Nhơn": {
-        rating: "4.7", banner: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80",
+        rating: "4.7", banner: "https://images.unsplash.com/photo-1586542158380-49272304d9a5?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Biển", cost: "Hợp lý",
         ageTips: { kids: { spot: "Kỳ Co", food: "Bánh hỏi", play: "Tắm biển" }, adults: { spot: "Eo Gió", food: "Hải sản", play: "Chèo SUP" }, elderly: { spot: "Tháp Bánh Ít", food: "Bún cá", play: "Dạo biển" } },
         spots: [
@@ -3085,7 +3051,7 @@
         ]
       },
       "Mũi Né": {
-        rating: "4.5", banner: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+        rating: "4.5", banner: "https://images.unsplash.com/photo-1584981772656-78711422700f?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Biển", cost: "Trung bình",
         ageTips: { kids: { spot: "Suối Tiên", food: "Hải sản", play: "Tắm suối" }, adults: { spot: "Đồi Cát Đỏ", food: "Cua", play: "Trượt cát" }, elderly: { spot: "Bàu Trắng", food: "Cá", play: "Ngắm cảnh" } },
         spots: [
@@ -3098,7 +3064,7 @@
         ]
       },
       "Phong Nha": {
-        rating: "4.8", banner: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80",
+        rating: "4.8", banner: "https://images.unsplash.com/photo-1584305886638-348e3e4e9663?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Hang động", cost: "Trung bình",
         ageTips: { kids: { spot: "Động Phong Nha", food: "Bún", play: "Đi thuyền" }, adults: { spot: "Động Thiên Đường", food: "Cá", play: "Trekking" }, elderly: { spot: "Sông Chày", food: "Rau rừng", play: "Dạo thuyền" } },
         spots: [
@@ -3111,7 +3077,7 @@
         ]
       },
       "Phú Yên": {
-        rating: "4.6", banner: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+        rating: "4.6", banner: "https://images.unsplash.com/photo-1587588354456-ae376af7182f?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Biển", cost: "Bình dân",
         ageTips: { kids: { spot: "Bãi Xép", food: "Bánh đúc", play: "Tắm biển" }, adults: { spot: "Gành Đá Đĩa", food: "Hải sản", play: "Chụp ảnh" }, elderly: { spot: "Mũi Điện", food: "Cá", play: "Ngắm cảnh" } },
         spots: [
@@ -3150,7 +3116,7 @@
         ]
       },
       "Pleiku": {
-        rating: "4.4", banner: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80",
+        rating: "4.4", banner: "https://images.unsplash.com/photo-1596395817260-2440f3131759?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Tây Nguyên", cost: "Bình dân",
         ageTips: { kids: { spot: "Biển Hồ", food: "Cơm lam", play: "Cho cá ăn" }, adults: { spot: "Chùa Minh Thành", food: "Thịt gác bếp", play: "Uống cà phê" }, elderly: { spot: "Thủy điện Yaly", food: "Rau rừng", play: "Thăm nhà máy" } },
         spots: [
@@ -3228,7 +3194,7 @@
         ]
       },
       "Quảng Ngãi": {
-        rating: "4.3", banner: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80",
+        rating: "4.3", banner: "https://images.unsplash.com/photo-1559592443-7f87a030062a?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Biển", cost: "Bình dân",
         ageTips: { kids: { spot: "Biển Mỹ Khê", food: "Bánh đúc", play: "Tắm biển" }, adults: { spot: "Núi Ấn", food: "Hải sản", play: "Chụp ảnh" }, elderly: { spot: "Khu chứng tích", food: "Cơm", play: "Thăm di tích" } },
         spots: [
@@ -3241,7 +3207,7 @@
         ]
       },
       "Bình Thuận": {
-        rating: "4.4", banner: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+        rating: "4.4", banner: "https://images.unsplash.com/photo-1584981772656-78711422700f?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Biển", cost: "Hợp lý",
         ageTips: { kids: { spot: "Đảo Phú Quý", food: "Cá", play: "Tắm biển" }, adults: { spot: "Mũi Né", food: "Hải sản", play: "Trượt cát" }, elderly: { spot: "Bàu Trắng", food: "Bánh canh", play: "Ngắm cảnh" } },
         spots: [
@@ -3294,7 +3260,7 @@
         ]
       },
       "An Giang": {
-        rating: "4.4", banner: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80",
+        rating: "4.4", banner: "https://images.unsplash.com/photo-1563812739347-1906a5996055?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Miền Tây", cost: "Bình dân",
         ageTips: { kids: { spot: "Rừng tràm", food: "Bánh xèo", play: "Chèo thuyền" }, adults: { spot: "Núi Cấm", food: "Cá", play: "Thăm chùa" }, elderly: { spot: "Miếu Bà", food: "Bánh pía", play: "Lên chùa" } },
         spots: [
@@ -3307,7 +3273,7 @@
         ]
       },
       "Tây Ninh": {
-        rating: "4.3", banner: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=600&q=80",
+        rating: "4.3", banner: "https://images.unsplash.com/photo-1596395817260-2440f3131759?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Tâm linh", cost: "Bình dân",
         ageTips: { kids: { spot: "Núi Bà Đen", food: "Bánh tráng", play: "Cáp treo" }, adults: { spot: "Tòa thánh", food: "Cơm", play: "Thăm đền" }, elderly: { spot: "Hồ Dầu Tiếng", food: "Bánh canh", play: "Cắm trại" } },
         spots: [
@@ -3372,7 +3338,7 @@
         ]
       },
       "Bạc Liêu": {
-        rating: "4.3", banner: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
+        rating: "4.3", banner: "https://images.unsplash.com/photo-1587588354456-ae376af7182f?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Miền Tây", cost: "Bình dân",
         ageTips: { kids: { spot: "Cánh đồng điện gió", food: "Bánh xèo", play: "Chụp ảnh" }, adults: { spot: "Nhà Công tử", food: "Cá", play: "Thăm nhà cổ" }, elderly: { spot: "Chùa Xiêm Cán", food: "Cơm", play: "Lên chùa" } },
         spots: [
@@ -3385,7 +3351,7 @@
         ]
       },
       "Sóc Trăng": {
-        rating: "4.3", banner: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=600&q=80",
+        rating: "4.3", banner: "https://images.unsplash.com/photo-1555944411-9a258e7a2b0a?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Văn hóa", cost: "Bình dân",
         ageTips: { kids: { spot: "Chùa Dơi", food: "Bánh", play: "Xem dơi" }, adults: { spot: "Chùa Đất Sét", food: "Cá", play: "Thăm chùa" }, elderly: { spot: "Chùa Chén Kiểu", food: "Cơm", play: "Tính ngưỡng" } },
         spots: [
@@ -3437,7 +3403,7 @@
         ]
       },
       "Tiền Giang": {
-        rating: "4.4", banner: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=600&q=80",
+        rating: "4.4", banner: "https://images.unsplash.com/photo-1596422846543-75c6fc18a594?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Miền Tây", cost: "Bình dân",
         ageTips: { kids: { spot: "Cù lao Thới Sơn", food: "Trái cây", play: "Chèo xuồng" }, adults: { spot: "Chùa Vĩnh Tràng", food: "Bánh", play: "Thăm chùa" }, elderly: { spot: "Chợ nổi", food: "Cá", play: "Mua hàng" } },
         spots: [
@@ -3463,7 +3429,7 @@
         ]
       },
       "Hòn Sơn": {
-        rating: "4.5", banner: "https://images.unsplash.com/photo-1578894381163-e72c17f2d45f?auto=format&fit=crop&w=600&q=80",
+        rating: "4.5", banner: "https://images.unsplash.com/photo-1544735724-449ad2bdd335?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Biển đảo", cost: "Hợp lý",
         ageTips: { kids: { spot: "Bãi Bàng", food: "Hải sản", play: "Tắm biển" }, adults: { spot: "Đỉnh Ma Thiên Lãnh", food: "Cá", play: "Trekking" }, elderly: { spot: "Bãi Thiên Tuế", food: "Bánh", play: "Ngắm cảnh" } },
         spots: [
@@ -3476,7 +3442,7 @@
         ]
       },
       "Châu Đốc": {
-        rating: "4.4", banner: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80",
+        rating: "4.4", banner: "https://images.unsplash.com/photo-1563812739347-1906a5996055?auto=format&fit=crop&w=600&q=80",
         safety: "Tốt", popularity: "Miền Tây", cost: "Bình dân",
         ageTips: { kids: { spot: "Chợ Châu Đốc", food: "Bánh", play: "Mua quà" }, adults: { spot: "Tây An Cổ Tự", food: "Cá", play: "Thăm chùa" }, elderly: { spot: "Làng nổi", food: "Cơm", play: "Ngắm cảnh" } },
         spots: [
@@ -3496,34 +3462,43 @@
     
     window.toggleSpotSelection = function(cardEl, name, category, cityName) {
       const existingIdx = window.selectedAttractionData.findIndex(a => a.name === name);
-      const isSelected = existingIdx === -1;
-      
-      if (!isSelected) {
+      if (existingIdx > -1) {
         window.selectedAttractionData.splice(existingIdx, 1);
         delete window.selectedAttractionCards[name];
+        if (cardEl) {
+          cardEl.classList.remove('selected');
+          const btn = cardEl.querySelector('.spot-select-btn');
+          if (btn) {
+            btn.innerHTML = '✓ Chọn';
+            btn.style.background = 'rgba(59,130,246,0.1)';
+            btn.style.borderColor = 'rgba(59,130,246,0.3)';
+            btn.style.color = '#3b82f6';
+          }
+        }
       } else {
         window.selectedAttractionData.push({ name, category, cityName });
         window.selectedAttractionCards[name] = true;
-      }
-
-      if (cardEl) {
-        cardEl.classList.toggle('selected', isSelected);
-        const btn = cardEl.querySelector('.spot-select-btn');
-        if (btn) {
-          btn.innerHTML = isSelected ? '✓' : '+';
-          btn.style.background = isSelected ? '#10b981' : 'rgba(15,23,42,0.6)';
-          btn.style.boxShadow = isSelected ? '0 0 10px rgba(16,185,129,0.65)' : 'none';
+        if (cardEl) {
+          cardEl.classList.add('selected');
+          const btn = cardEl.querySelector('.spot-select-btn');
+          if (btn) {
+            btn.innerHTML = '✓ Đã chọn';
+            btn.style.background = 'rgba(16,185,129,0.2)';
+            btn.style.borderColor = '#10b981';
+            btn.style.color = '#10b981';
+          }
         }
       }
-      
       updateSelectedAttractionsDisplay();
       updateAdditionalInfoWithAttractions();
       
+      // Cập nhật chi phí dự kiến
       if (typeof updateBudgetEstimate === 'function') {
         setTimeout(() => updateBudgetEstimate(), 100);
       }
     };
     
+    // Render selected attractions display
     window.updateSelectedAttractionsDisplay = function() {
       const container = document.getElementById('selectedAttractionsDisplay');
       if (!container) return;
@@ -3558,6 +3533,7 @@
         </div>
       `;
       
+      // Group by category and render
       ['attraction', 'restaurant', 'experience'].forEach(catKey => {
         const cat = categories[catKey];
         const items = window.selectedAttractionData.filter(a => a.category === catKey);
@@ -3794,72 +3770,75 @@
         card.setAttribute('data-category', spot.category);
         card.setAttribute('data-spot-name', spot.name);
         
-        const isSelected = window.selectedAttractionCards && window.selectedAttractionCards[spot.name];
-        if (isSelected) card.classList.add('selected');
-
         card.style.cssText = `
-          position: relative;
-          border-radius: 0.75rem;
-          padding: 0.55rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.3rem;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+          background: rgba(255,255,255,0.03); 
+          border: 1px solid rgba(255,255,255,0.06); 
+          border-radius: 0.75rem; 
+          padding: 0.6rem 0.75rem; 
+          display: flex; 
+          flex-direction: column; 
+          gap: 0.2rem; 
+          cursor: pointer; 
+          transition: all 0.2s;
         `;
-
-        const spotRating = spot.rating ? `<span style="font-size:0.6rem; color:#fbbf24;">⭐ ${spot.rating}</span>` : '';
-        const spotReviews = spot.reviews ? `<span style="font-size:0.55rem; color:var(--text-muted);">(${spot.reviews})</span>` : '';
-
-        const photoUrl = (spot.photos && spot.photos[0])
-          ? spot.photos[0]
-          : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80';
-
-        const selBg = isSelected ? '#10b981' : 'rgba(15,23,42,0.6)';
-        const selBorder = isSelected ? '#10b981' : 'rgba(255,255,255,0.5)';
-        const selShadow = isSelected ? '0 0 10px rgba(16,185,129,0.65)' : 'none';
-        const selIcon = isSelected ? '✓' : '+';
-
+        
+        // Add rating and review count if available
+        const spotRating = spot.rating ? `<span style="font-size:0.6rem; color:#fbbf24;">⭐${spot.rating}</span>` : '';
+        const spotReviews = spot.reviews ? `<span style="font-size:0.55rem; color:var(--text-muted);">(${spot.reviews} đánh giá)</span>` : '';
+        const photoHtml = spot.photos && spot.photos[0] ? `<img src="${spot.photos[0]}" alt="${spot.name}" style="width:100%; height:80px; object-fit:cover; border-radius:6px; margin-bottom:0.4rem;" onerror="this.style.display='none'">` : '';
+        
+        // Check if already selected
+        const isSelected = window.selectedAttractionCards && window.selectedAttractionCards[spot.name];
+        const selectBtnClass = isSelected ? 'selected' : '';
+        const selectBtnText = isSelected ? '✓ Đã chọn' : '✓ Chọn';
+        const selectBtnStyle = isSelected 
+          ? 'background:rgba(16,185,129,0.2); border-color:#10b981; color:#10b981;' 
+          : 'background:rgba(59,130,246,0.1); border-color:rgba(59,130,246,0.3); color:#3b82f6;';
+        
         card.innerHTML = `
-          <div style="position:relative; width:100%; height:95px; border-radius:8px; overflow:hidden; margin-bottom:0.2rem; flex-shrink:0;">
-            <img class="spot-img-inner" src="${photoUrl}" alt="${spot.name}"
-              onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80'">
-            <button class="spot-select-btn" title="Chọn địa điểm này"
-              onclick="event.stopPropagation(); window.toggleSpotSelection(this.closest('.review-spot-card'), '${spot.name.replace(/'/g, "\\'")}', '${spot.category}', '${cityName.replace(/'/g, "\\'")}');"
-              style="position:absolute; top:6px; right:6px; width:26px; height:26px; border-radius:50%;
-                border:1.5px solid ${selBorder}; display:flex; align-items:center; justify-content:center;
-                font-size:0.8rem; font-weight:700; color:#fff; cursor:pointer;
-                transition:all 0.25s cubic-bezier(0.4,0,0.2,1); z-index:2; outline:none;
-                background:${selBg}; box-shadow:${selShadow};">${selIcon}</button>
-            <button class="spot-map-btn" title="Xem bản đồ"
-              onclick="event.stopPropagation(); window.getSpotDirections('${spot.name.replace(/'/g, "\\'")}', '${cityName.replace(/'/g, "\\'")}');"
-              style="position:absolute; bottom:6px; right:6px; padding:3px 8px; border-radius:12px;
-                border:1px solid rgba(255,255,255,0.2); background:rgba(15,23,42,0.65);
-                backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-                color:#fff; font-size:0.55rem; font-weight:600; cursor:pointer;
-                transition:all 0.2s; z-index:2; display:flex; align-items:center; gap:3px;">📍 Bản đồ</button>
-          </div>
-          <div style="display:flex; align-items:flex-start; gap:0.3rem;">
-            <div style="flex:1; min-width:0;">
-              <div class="spot-card-name" style="font-size:0.75rem; font-weight:700; color:var(--text);
-                white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${spot.name}</div>
-              <div style="display:flex; gap:0.25rem; align-items:center; margin-top:2px; flex-wrap:wrap;">
-                ${spotRating}${spotReviews}
+          ${photoHtml}
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <span style="font-size:1rem;">${catInfo.icon}</span>
+            <div style="flex:1;">
+              <div style="font-size:0.75rem; font-weight:700; color:var(--text);">${spot.name}</div>
+              <div style="display:flex; gap:0.3rem; align-items:center; margin-top:2px;">
+                ${spotRating}
+                ${spotReviews}
               </div>
             </div>
-            <span style="font-size:0.55rem; padding:2px 5px; background:rgba(${catInfo.rgb},0.12);
-              color:${catInfo.color}; border-radius:4px; font-weight:600; flex-shrink:0; margin-top:1px;">${catInfo.icon} ${catInfo.label}</span>
+            <span style="font-size:0.6rem; padding:2px 6px; background:rgba(${catInfo.rgb},0.15); color:${catInfo.color}; border-radius:4px; font-weight:600;">${catInfo.label}</span>
           </div>
-          <p class="spot-card-desc" style="margin:0; font-size:0.63rem; color:var(--text-muted); line-height:1.35;
-            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${spot.desc || ''}</p>
+          <p style="margin:0; font-size:0.65rem; color:var(--text-muted); line-height:1.3;">${spot.desc || ''}</p>
+          <div style="display:flex; gap:0.3rem; margin-top:0.3rem;">
+            <button class="spot-select-btn" onclick="event.stopPropagation(); window.toggleSpotSelection(this.closest('.review-spot-card'), '${spot.name.replace(/'/g, "\\'")}', '${spot.category}', '${cityName.replace(/'/g, "\\'")}')" style="
+              flex:1; padding:5px 6px; border-radius:6px; border:1px solid; 
+              font-size:0.65rem; cursor:pointer; transition:all 0.2s; ${selectBtnStyle}
+            ">${selectBtnText}</button>
+            <button onclick="event.stopPropagation(); openSpotDetail('${spot.name.replace(/'/g, "\\'")}', '${cityName.replace(/'/g, "\\'")}')" style="
+              padding:5px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.1); 
+              background:rgba(255,255,255,0.05); color:var(--text); font-size:0.65rem; cursor:pointer;
+              transition:all 0.2s;
+            ">👁️</button>
+            <button onclick="event.stopPropagation(); window.getSpotDirections('${spot.name.replace(/'/g, "\\'")}', '${cityName.replace(/'/g, "\\'")}')" style="
+              padding:5px 8px; border-radius:6px; border:1px solid rgba(16,185,129,0.3); 
+              background:rgba(16,185,129,0.1); color:#10b981; font-size:0.65rem; cursor:pointer;
+              transition:all 0.2s;
+            ">📍</button>
+          </div>
         `;
-
+        
+        // Apply selected class if already selected
+        if (isSelected) {
+          card.classList.add('selected');
+        }
+        
+        // Click on card opens detail
         card.addEventListener('click', function(e) {
           if (!e.target.closest('button')) {
             openSpotDetail(spot.name, cityName);
           }
         });
-
+        
         listContainer.appendChild(card);
       });
 
@@ -4324,7 +4303,7 @@
       "Phố Cổ Hà Nội": [
         "https://images.unsplash.com/photo-1528127269322-539801943592?w=640&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=640&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=640&auto=format&fit=crop&q=80"
+        "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=640&auto=format&fit=crop&q=80"
       ],
       // Đà Nẵng
       "Cầu Vàng Bà Nà Hills": [
@@ -4333,7 +4312,7 @@
         "https://images.unsplash.com/photo-1528127269322-539801943592?w=640&auto=format&fit=crop&q=80"
       ],
       "Ngũ Hành Sơn": [
-        "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1559592487-7c70d2683959?w=640&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=640&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=640&auto=format&fit=crop&q=80"
       ],
@@ -4350,7 +4329,7 @@
       ],
       "Chợ Bến Thành": [
         "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=640&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=640&auto=format&fit=crop&q=80",
+        "https://images.unsplash.com/photo-1540959733332-eab4deceeaf7?w=640&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=640&auto=format&fit=crop&q=80"
       ],
       // Đà Lạt
@@ -5265,68 +5244,6 @@
       </div>
     </div>
   </div>
-
-  <!-- Collapsible Hero Header Logic -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      (function initCollapsibleHero() {
-        const hero = document.getElementById('plannerHeroHeader');
-        if (!hero) return;
-
-        let lastScrollY = {};
-        let isTransitioning = false;
-
-        document.addEventListener('scroll', function(event) {
-          if (isTransitioning) return;
-
-          const target = event.target;
-          if (
-            target && 
-            target.classList && (
-              target.classList.contains('planner-form-body') || 
-              target.classList.contains('planner-sidebar')
-            )
-          ) {
-            const containerId = target.className + '-' + (target.id || 'no-id');
-            const currentScrollY = target.scrollTop;
-            const prevScrollY = lastScrollY[containerId] || 0;
-            const diff = currentScrollY - prevScrollY;
-
-            // Scroll down past 40px -> collapse
-            if (diff > 8 && currentScrollY > 40) {
-              if (!hero.classList.contains('collapsed')) {
-                hero.classList.add('collapsed');
-                isTransitioning = true;
-                // Lock scroll listener during transition to avoid feedback loop
-                setTimeout(() => {
-                  isTransitioning = false;
-                  // Sync final scroll position
-                  lastScrollY[containerId] = target.scrollTop;
-                }, 450);
-              }
-            } 
-            // Scroll up or near the top -> expand
-            else if (diff < -12 || currentScrollY <= 5) {
-              if (hero.classList.contains('collapsed')) {
-                hero.classList.remove('collapsed');
-                isTransitioning = true;
-                // Lock scroll listener during transition to avoid feedback loop
-                setTimeout(() => {
-                  isTransitioning = false;
-                  // Sync final scroll position
-                  lastScrollY[containerId] = target.scrollTop;
-                }, 450);
-              }
-            }
-
-            if (!isTransitioning) {
-              lastScrollY[containerId] = currentScrollY;
-            }
-          }
-        }, true); // Capture phase is required for scroll event delegation
-      })();
-    });
-  </script>
 
 </body>
 </html>

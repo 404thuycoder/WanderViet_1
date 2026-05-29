@@ -3,83 +3,83 @@ window.WanderPlanner = window.WanderPlanner || {};
 
 const VN_DESTINATION_PHOTOS = {
   // --- MIỀN BẮC ---
-  "hà nội": ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop", "https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=800&fit=crop", "https://images.unsplash.com/photo-1509233725247-49e657c54213?w=800&fit=crop"],
+  "hà nội": ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop", "https://ktmt.vnmediacdn.com/images/2023/01/23/51-1674468322-mot-goc-ha-noi-nhin-tu-tren-cao.jpg", "https://nads.1cdn.vn/2024/07/10/W_z5620227067098_17422a1d9f705e524396421d93fb68c1_1.jpg"],
   "hoàn kiếm": ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop"],
-  "phố cổ": ["https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=800&fit=crop"],
-  "hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+  "phố cổ": ["https://ktmt.vnmediacdn.com/images/2023/01/23/51-1674468322-mot-goc-ha-noi-nhin-tu-tren-cao.jpg"],
+  "hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://upload.wikimedia.org/wikipedia/commons/4/42/Ha_Long_2019_taken_by_DJI_FC220.jpg"],
   "vịnh hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
-  "sapa": ["https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop", "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"],
-  "fansipan": ["https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"],
-  "cát cát": ["https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"],
-  "ninh bình": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"],
-  "tràng an": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "hà giang": ["https://images.unsplash.com/photo-1524230572899-a752b3835840?w=800&fit=crop", "https://images.unsplash.com/photo-1625834317364-b32c140fd360?w=800&fit=crop"],
-  "đồng văn": ["https://images.unsplash.com/photo-1524230572899-a752b3835840?w=800&fit=crop"],
-  "mộc châu": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop"],
-  "cao bằng": ["https://images.unsplash.com/photo-1575986767340-5d17ae767ab0?w=800&fit=crop", "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop"],
-  "mai châu": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"],
-  "tam đảo": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "ba vì": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop"],
-  "cát bà": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "vịnh lan hạ": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
-  "yên bái": ["https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop"],
-  "mù cang chải": ["https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop"],
-  "điện biên": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1524230572899-a752b3835840?w=800&fit=crop"],
-  "lạng sơn": ["https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=800&fit=crop"],
-  "bắc kạn": ["https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "tuyên quang": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop"],
-  "thái nguyên": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop"],
-  "đảo cô tô": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"],
+  "sapa": ["https://booking.muongthanh.com/upload_images/images/Nhung/review-dia-diem-du-lich-sapa.jpg", "https://phetravel.com/uploads/30-06-2023-14-53-09-du-lich-sa-pa-0.jpg.webp", "https://topasecolodge.com/wp-content/uploads/2025/06/best-time-to-visit-sapa-04.jpg"],
+  "fansipan": ["https://booking.muongthanh.com/upload_images/images/Nhung/review-dia-diem-du-lich-sapa.jpg"],
+  "cát cát": ["https://phetravel.com/uploads/30-06-2023-14-53-09-du-lich-sa-pa-0.jpg.webp"],
+  "ninh bình": ["https://cdn-media.sforum.vn/storage/app/media/ctvseo_16/danh%20lam%20th%E1%BA%AFng%20c%E1%BA%A3nh%20Ninh%20B%C3%ACnh/danh-lam-thang-canh-ninh-binh-thumbnail.jpg", "https://sodulich.ninhbinh.gov.vn/uploads/images/trang-an-bd_1737078235160%20(1).jpg", "https://thanhnienviet.mediacdn.vn/91575133199802368/2025/5/26/photo-1748230467546-17482304703661238448265.jpeg"],
+  "tràng an": ["https://cdn-media.sforum.vn/storage/app/media/ctvseo_16/danh%20lam%20th%E1%BA%AFng%20c%E1%BA%A3nh%20Ninh%20B%C3%ACnh/danh-lam-thang-canh-ninh-binh-thumbnail.jpg"],
+  "hà giang": ["https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:format(webp):quality(75)/20_dia_diem_du_lich_ha_giang_a_b3ae766474.jpg", "https://vitracotour.com/wp-content/uploads/2023/12/ha-giang-2.jpg", "https://media.vietravel.com/images/Content/kinh-nghiem-du-lich-ha-giang-1.png"],
+  "đồng văn": ["https://admin.vov.gov.vn/UploadFolder/KhoTin/Images/UploadFolder/VOVVN/Images/w800/uploaded/9eqrbt2uv7o/2020_05_12/co_co_lung_cu_odic.jpg", "https://media.vneconomy.vn/images/upload/2023/06/21/dong-van1.jpg", "https://mia.vn/media/uploads/blog-du-lich/kinh-nghiem-di-du-lich-dong-van-ha-giang-tu-tuc-an-toan-thu-vi-04-1644768700.jpg"],
+  "mộc châu": ["https://danviet.ex-cdn.com/files/f1/296231569849192448/2023/1/31/fb-img-1661773812403-16751561958281410777665.jpg", "https://media.baosonla.org.vn/public/hieupt/2023-01-19/33.jpg", "https://media.vov.vn/sites/default/files/styles/large_watermark/public/2021-10/image_6487327_2_29-10-2021-15-10-25.jpeg"],
+  "cao bằng": ["https://encrypted-tbn0.gstatic.com/licensed-image?q=tbn:ANd9GcTdJKOd4THyqbYkrpvTdiTBAnW6ukIb_pgWZQm7X1WxumEqb6ktu1Oy0lnIc8P9REvwPBGzHACY8yX-ZefyzG9xtOQ&s=19", "https://lh3.googleusercontent.com/gps-cs-s/APNQkAFwwWDupSZ9a7JuOakhXIoFDM8JhOWvriiV1lfJUzN5V0jAJuSeh7E8Z7nq7EtumfnSrbws0IIdkY87AwpRPihVZCX6=w675-h390-n-k-no", "https://lh3.googleusercontent.com/gps-cs-s/APNQkAFqxpn8B7Ibl1d47l2oKvX4gZGbbfn83-c6dvXPVvSvFeuQ0qfbTp0q2Od4zFu0_cyy4SRSADij3fxQ_dA2Dl3Peb9vaPImweQWnSJWhOOfCjoimYVDfNy3o-33pYjQq5iP4BJ9QkQKKoFw=w675-h390-n-k-no"],
+  "mai châu": ["https://phuotvivu.com/blog/wp-content/uploads/2021/07/Mai-Ch%C3%A2u-1.jpg", "https://maichauhideaway.com/Data/Sites/1/media/dia-diem-du-lich-mai-chau/image16.png", "https://maichau.ecolodge.asia/ckfinder/userfiles/images/lich-su-hinh-thanh-va-phat-trien-cua-huyen-mai-chau-1.jpg"],
+  "tam đảo": ["https://media-cdn-v2.laodong.vn/storage/newsportal/2025/5/1/1500300/Tam-Dao-2.jpg", "https://thesinhtour.com/wp-content/uploads/2015/01/tour-tam-dao-vinh-phuc.jpg", "https://ik.imagekit.io/tvlk/blog/2024/09/cong-troi-tam-dao-1.jpeg?tr=q-70,c-at_max,w-1000,h-600"],
+  "ba vì": ["https://1i.com.vn/wp-content/uploads/2026/03/du-lich-ba-vi-5.jpg", "https://dulichbavi.com/wp-content/uploads/2019/08/vqg-2-960x530.jpg", "https://dulichbalo.org/wp-content/uploads/2018/01/vuon-quoc-gia-ba-vi-9.jpg"],
+  "cát bà": ["https://images2.thanhnien.vn/528068263637045248/2023/9/20/cat-ba-16951925051211188301415.jpg", "https://phuquocxanh.com/vi/wp-content/uploads/2023/05/cat-ba-2.jpg", "https://catbaexpress.com/upload/images/Thi-Tran-Cat-Ba.jpg"],
+  "vịnh lan hạ": ["https://statics.vinwonders.com/Anh%203%20Vinh%20lan%20ha%20cat%20ba_1624379518.jpg", "https://bizweb.dktcdn.net/100/512/250/products/dream-cruise-cat-ba-1-45a2b834-d74e-4c23-8048-baa019c76caa.jpg?v=1725089255307", "https://catba.net.vn/wp-content/uploads/2022/12/Lang-Chai-Cai-Beo-min.jpg"],
+  "yên bái": ["https://bcp.cdnchinhphu.vn/334894974524682240/2023/9/12/3311102-1694508091768808652599.jpg", "https://mekongasean.vn/stores/news_dataimages/mekongaseanvn/092023/19/09/yenbai-16950711919851517700440-1110.jpg", "https://bcp.cdnchinhphu.vn/334894974524682240/2025/3/27/bia-dulichyb-17430449970871765001707.png"],
+  "mù cang chải": ["https://img.baobacninhtv.vn/Medias/6281/2025/12/26/92.jpg", "https://nads.1cdn.vn/2024/02/26/dji_0376_1.jpg", "https://cdn3.ivivu.com/2025/12/tour-Mu-Cang-Chai-iVIVU-Trip-2.jpg"],
+  "điện biên": ["https://ik.imagekit.io/tvlk/blog/2022/03/dia-diem-du-lich-dien-bien-cover.jpeg", "https://cdn-media.sforum.vn/storage/app/media/ctv_seo4/danh-lam-thang-canh-dien-bien-thumb.jpg", "https://dulichviet.com.vn/images/bandidau/kham-pha-18-dia-diem-du-lich-dien-bien-mang-dam-dau-an-lich-su.jpg"],
+  "lạng sơn": ["https://lh3.googleusercontent.com/gps-cs-s/APNQkAF23ttWkX7HOY-XbiWzfzjK1n9zdWcrwiKlDk1XmEJiD4sdVtzXXcKGg3_iIaiCXcg1XYOs3-Ai24gsBDQ56cs1KvOKsEEAhFfIbWw7Wpu17WFS78QCZ59y2oA0mH4lS54BJqV4D92KsEQm=w675-h390-n-k-no", "https://lh3.googleusercontent.com/gps-cs-s/APNQkAHqSLsZS1hpK11XYgofRxJ0IgMyTYlWxK4RYoXOEtA6Ov-KAh1KvsF9pD3CJ9V26NSlNLYcK2SDnCPpbZyelql8pXuUFu9scjuTIa_wg1orXGULTVnlFGtHfdam1kRQrptMDmSs=w675-h390-n-k-no", "https://cdn-media.sforum.vn/storage/app/media/ctvseo_MH/%E1%BA%A3nh%20%C4%91%E1%BA%B9p%20l%E1%BA%A1ng%20s%C6%A1n/anh-dep-lang-son-thumbnail.jpg"],
+  "bắc kạn": ["https://ik.imagekit.io/tvlk/blog/2021/09/kinh-nghiem-du-lich-bac-kan.jpg?tr=q-70,c-at_max,w-1000,h-600", "https://s-aicmscdn.vietnamhoinhap.vn/vnhn-media/20/7/7/image-20200707145234-1.jpg", "https://dntt.mediacdn.vn/197608888129458176/2022/8/2/1-1659435219831479184619.jpg"],
+  "tuyên quang": ["https://lh3.googleusercontent.com/gps-cs-s/APNQkAFQQTNryd3zbSSvP4Ujh6G0iIkEkLGY5HN-hbTlrL-QHSKphJkMj-tbJdIDcQ4BLIqFVirN2-L8_A-dKZVFl-6VirhqLNTRn88WgKM_f41w133faQ66ipEixKdRJfjsCb5bZOy29Hpjvn4=w675-h390-n-k-no", "https://khodulieu.sohoa.tuyenquang.gov.vn/congthongtin/media/1c80ed35126d3f9c341e1c5fb367a7a7.jpg", "https://images.vietnamtourism.gov.vn/vn//images/2025/thang_9/2309.tuyen-quang-ket-noi-1.jpg"],
+  "thái nguyên": ["https://baothainguyen.vn/file/oldimage/baothainguyen/UserFiles/image/gioithieuchungvetinhthainguyen-05.jpg", "https://congnghiepmoitruong.vn/stores/news_dataimages/2023/112023/23/05/in_article/vung-che-dep-hap-dan-du-khach-trai-nghiem20231123054802.jpg?rt=20231123054803", "https://bvhttdl.gov.vn/uploads/oldscontents/20251209083639096/0812thai-nguyen-ban-hoa-ca-1-1765243960323-17652439606001961333645.jpg"],
+  "đảo cô tô": ["https://www.bambooairways.com/documents/20122/1165110/du-lich-dao-co-to-1-1281x1024.jpg/fca4b273-fa50-4ac8-d22a-36bee3ac46e7?t=1695020655667", "https://media.quangninh.gov.vn/d07e4659-2aae-4343-a2d5-478b67c08003/Libraries/HinhAnhBaiViet/MINH%20NGUYET/thang%204/van%20don/1%20Ng%C3%B4i%20sao%20tr%C3%AAn%20bi%E1%BB%83n%20C%C3%B4%20T%C3%B4.jpg", "https://flytime.vn/upload/images/Travel/hai%20dang%20coto.jpg"],
 
   // --- MIỀN TRUNG ---
-  "đà nẵng": ["https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&fit=crop"],
-  "hội an": ["https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&fit=crop", "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
-  "huế": ["https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop"],
-  "nha trang": ["https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop", "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "đà lạt": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
-  "đà lạc": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop", "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800&fit=crop"],
-  "quy nhơn": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "phú yên": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
-  "tuy hòa": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop"],
-  "mũi né": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "phan thiết": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "bình thuận": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop"],
-  "phong nha": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "quảng bình": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop"],
-  "bình ba": ["https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "pleiku": ["https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&fit=crop", "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop"],
-  "gia lai": ["https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&fit=crop"],
-  "buôn ma thuột": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop", "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop"],
-  "đắk lắk": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop"],
-  "kon tum": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop"],
-  "lý sơn": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
-  "quảng ngãi": ["https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "quảng trị": ["https://images.unsplash.com/photo-1587922546307-776227941871?w=800&fit=crop", "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=800&fit=crop"],
-  "vịnh vân phong": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
+  "đà nẵng": ["https://cdn-media.sforum.vn/storage/app/media/ctvseo_MH/%E1%BA%A3nh%20%C4%91%E1%BA%B9p%20%C4%91%C3%A0%20n%E1%BA%B5ng/anh-dep-da-nang-thumb.jpg", "https://cdn-media.sforum.vn/storage/app/media/wp-content/uploads/2024/01/dia-diem-du-lich-da-nang-thumb.jpg", "https://statics.vinwonders.com/du-lich-da-nang-3-ngay-2-dem-anh-1.jpg"],
+  "hội an": ["https://bcp.cdnchinhphu.vn/334894974524682240/2025/9/18/cdhoian5-17581621538711341831070.jpeg", "https://danangfantasticity.com/wp-content/uploads/2025/09/hoi-an-ve-dem-flycam-1024x576.jpg", "https://www.victoriahotels.asia/wp-content/uploads/2025/06/Top-historical-landmarks-to-visit.jpg"],
+  "huế": ["https://cdn-media.sforum.vn/storage/app/media/wp-content/uploads/2024/01/cac-dia-diem-du-lich-o-hue-thumb.jpg", "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/10/30/1-1730286328125213276220.jpg", "https://tapchidongnama.vn/wp-content/uploads/2024/10/z5960127075782_b80d031bfd905d559fd387ad7b77d14f.jpg"],
+  "nha trang": ["https://letsflytravel.vn/wp-content/uploads/2024/08/nha-trang-2.webp", "https://baokhanhhoa.vn/file/e7837c02857c8ca30185a8c39b582c03/052026/copilot_20260526_213230_20260526213249.png", "https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/adgahjd-1755152740753.jpg"],
+  "đà lạt": ["https://phetravel.com/uploads/dnt-da-lat.jpg", "https://booking.muongthanh.com/upload_images/images/H%60/thanh-pho-da-lat.jpg", "https://samtenhills.vn/wp-content/uploads/2024/11/kinh-nghiem-du-lich-da-lat-1-minh.jpg"],
+  "đà lạc": ["https://phetravel.com/uploads/dnt-da-lat.jpg", "https://booking.muongthanh.com/upload_images/images/H%60/thanh-pho-da-lat.jpg"],
+  "quy nhơn": ["https://vcdn1-dulich.vnecdn.net/2022/04/02/dulichQuyNhon-1648878861-3106-1648880222.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=wFYxIbRCAt_Yy6OCMqXkOg", "https://ik.imagekit.io/tvlk/blog/2024/08/thoi-tiet-quy-nhon-1.jpg?tr=q-70,c-at_max,w-1000,h-600", "https://statics.vinwonders.com/quy-nhon-thuoc-mien-nao-1_1711465470.jpg"],
+  "phú yên": ["https://pystravel.vn/_next/image?url=https%3A%2F%2Fbooking.pystravel.vn%2Fuploads%2Fposts%2Falbums%2F17773%2F3a8d3766296cf2d88980c7641cece7c2.png&w=1920&q=75", "https://images2.thanhnien.vn/528068263637045248/2024/6/18/song-cau-1-1718686277229613062622.jpg", "https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/depositphotos595528698xl-1736473488122.jpg"],
+  "tuy hòa": ["https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/abcss-1645419251625.png", "https://statics.vinwonders.com/ve-dep-bai-bien-tuy-hoa-phu-yen_1761366703.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/de/TuyHoaCT.jpg"],
+  "mũi né": ["https://lalago.vn/wp-content/uploads/2025/05/image7-5.jpg", "https://vcdn1-dulich.vnecdn.net/2022/04/03/MuiNeVNExpress3075891542181990-8691-6492-1648974014.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=E-1Y-hG3RxXRjUXHFvKQ6Q", "https://dulichyenviet.com/wp-content/uploads/2023/11/maxresdefault-4.jpg"],
+  "phan thiết": ["https://dulichyenviet.com/wp-content/uploads/2023/11/maxresdefault-4.jpg", "https://ik.imagekit.io/tvlk/blog/2024/08/phan-thiet-thuoc-mien-nao-1-1024x665.jpeg?tr=q-70,c-at_max,w-1000,h-600", "https://media-cdn-v2.laodong.vn/storage/newsportal/2025/3/13/1476485/Du-Lich-2.jpg"],
+  "bình thuận": ["https://vcdn1-dulich.vnecdn.net/2024/05/24/Mui-Ne-5293-1716545117.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=vTbzzU6pfQ-1vYvrCdwh5w", "https://booking.muongthanh.com/upload_images/images/H%60/dia-diem-du-lich-binh-thuan.jpg", "https://pystravel.vn/_next/image?url=https%3A%2F%2Fbooking.pystravel.vn%2Fuploads%2Fposts%2Falbums%2F17657%2Fd8655c4696dd1facb88c4fe0e020b352.jpg&w=1920&q=75"],
+  "phong nha": ["https://ecotour.com.vn/wp-content/uploads/2025/05/du-lich-dong-phong-nha-ke-bang-quang-binh.jpeg", "https://nld.mediacdn.vn/thumb_w/640/291774122806476800/2024/11/18/dong-phong-nha-ke-bang-dep-den-choang-ngop-17319168370561406931222.jpg", "https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/x3-1716260705273.jpg"],
+  "quảng bình": ["https://booking.muongthanh.com/upload_images/images/H%60/phong-nha-ke-bang.jpg", "https://phuotvivu.com/blog/wp-content/uploads/2021/06/qu%E1%BA%A3ng-b%C3%ACnh1.jpg", "https://cdn2.tuoitre.vn/471584752817336320/2025/6/28/hava-2-1751087059466388960030.jpg"],
+  "bình ba": ["https://vcdn1-dulich.vnecdn.net/2022/04/12/Binh-Ba-du-lich-2-8797-1649732806.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=_wurQ9knpWOEebBvwfh89Q", "https://www.homepaylater.vn/static/648a2b021a7045eabdfbefeac5e9304b/9d72c/2_dao_binh_ba_nam_trong_vinh_cam_ranh_mot_trong_nhung_vinh_dep_nhat_viet_nam_95f62c4b2a.jpg", "https://cdn3.ivivu.com/2014/07/bb5.jpg"],
+  "pleiku": ["https://media.thanhtra.com.vn/public/data/images/0/2024/02/27/btnguyenanh/1.jpg?w=1319", "https://storage.googleapis.com/blogvxr-uploads/2026/03/26e520f4-toi-choi-gi-o-pleiku-3874464.jpg", "https://storage.googleapis.com/blogvxr-uploads/2026/03/bbf2cca5-kinh-nghiem-du-lich-pleiku-gia-lai-5480609-1250x715.jpg"],
+  "gia lai": ["https://upload.wikimedia.org/wikipedia/commons/9/9c/Chi%E1%BB%81u_cao_nguy%C3%AAn_-_Late_afternoon_in_the_Central_High_Plateaux_-_panoramio.jpg", "https://www.vietnambooking.com/wp-content/uploads/2024/01/dia-diem-du-lich-gia-lai-1.jpg", "https://i.ex-cdn.com/nhadautu.vn/files/content/2026/05/20/gia-lai-1416.jpg"],
+  "buôn ma thuột": ["https://buonmathuot.daklak.gov.vn/uploads/bmt/nam2025/thang6/bu%C3%B4n%20ma%20thu%E1%BB%99t.jpg", "https://cdn.vntrip.vn/cam-nang/wp-content/uploads/2017/11/gia-lai-2.jpg", "https://ik.imagekit.io/tvlk/blog/2022/12/du-lich-buon-ma-thuot-1.jpg?tr=q-70,c-at_max,w-1000,h-600"],
+  "đắk lắk": ["https://xdcs.cdnchinhphu.vn/446259493575335936/2025/6/22/buon-ma-thuot-17505911105701483930449.jpeg", "https://media.vneconomy.vn/images/upload/2024/01/18/anh-dak-lak-huslwvfl.jpeg", "https://baodaklak.vn/file/fb9e3a03798789de0179a1704dea238e/022026/11_20260209151700.jpg?width=1800"],
+  "kon tum": ["", "https://bcp.cdnchinhphu.vn/334894974524682240/2023/1/10/2227231duong-vao-tp-kon-tum-hom-nay-16733534268881822416821.jpg", "https://www.vietnambooking.com/wp-content/uploads/2017/03/dia-diem-du-lich-kon-tum-1.jpg", "https://cdn.tgdd.vn/Files/2021/07/02/1365007/kham-pha-5-dia-diem-du-lich-tuyet-dep-o-kon-tum-202310041439144987.jpg"],
+  "lý sơn": ["https://images2.thanhnien.vn/528068263637045248/2025/12/25/hang-cau-ly-son-1766659704100696047246.jpg", "https://statics.vinwonders.com/vi-tri-dao-ly-son_1743165853.jpg", "https://media-cdn-v2.laodong.vn/storage/newsportal/2025/6/30/1532428/Rsz_Dao_Ly_Son.jpg"],
+  "quảng ngãi": ["https://cdn-media.sforum.vn/storage/app/media/qu%E1%BA%A3ng%20ng%C3%A3i%20mi%E1%BB%81n%20n%C3%A0o/quang-ngai-mien-nao-1.jpg", "https://images2.thanhnien.vn/528068263637045248/2026/2/2/bien-my-kheeee-1769993871087719720719.jpg", "https://images2.thanhnien.vn/528068263637045248/2026/2/20/z7548439976624e058cb7ca5fca7a5a3227b5ed9b0d6151-17715674663931320960388.jpg"],
+  "quảng trị": ["https://nads.1cdn.vn/2025/06/25/W_dji_0944-copy-3.jpg", "https://nads.1cdn.vn/2024/02/03/W_z5132196215012_59ce7d52fc0d958aeb038855d1ccc007.jpg", "https://sgtt.thesaigontimes.vn/wp-content/uploads/2025/09/thanh-co-quang-tri-8.jpg"],
+  "vịnh vân phong": ["https://statics.vinwonders.com/vinh-van-phong-4_1689755820.jpg", "https://cdn3.ivivu.com/2023/02/vinh-van-phong-ivivu-1.jpg", "https://sgtourism.vn/wp-content/uploads/2024/10/vinh-van-phong-o-dau.jpg"],
 
   // --- MIỀN NAM ---
-  "tp.hcm": ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
-  "sài gòn": ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop", "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop"],
-  "vũng tàu": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"],
-  "phú quốc": ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"],
-  "cần thơ": ["https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"],
-  "côn đảo": ["https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "an giang": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "tây ninh": ["https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
-  "bến tre": ["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
-  "kiên giang": ["https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "đồng tháp": ["https://images.unsplash.com/photo-1614531341773-3bff8b7cb3fc?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
-  "cà mau": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "mũi cà mau": ["https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop"],
-  "bạc liêu": ["https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
-  "sóc trăng": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
-  "trà vinh": ["https://images.unsplash.com/photo-1590054387835-ab72678fef01?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"],
-  "hậu giang": ["https://images.unsplash.com/photo-1587922546307-776227941871?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
-  "vĩnh long": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop"],
-  "tiền giang": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop"],
-  "đảo nam du": ["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop", "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"],
-  "hòn sơn": ["https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop", "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop"],
-  "châu đốc": ["https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop", "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"]
+  "tp.hcm": ["https://cdnmedia.baotintuc.vn/Upload/c2tvplmdloSDblsn03qN2Q/files/2020/11/04/thanh-pho-thu-duc-tp-ho-chi-minh-41120.jpg", "https://travel-bus-files.s3.ap-southeast-1.amazonaws.com/images/3601bd2d-4e5c-4a33-bce8-748e684046f3.jpeg", "https://bvbnd.vn/wp-content/uploads/2025/04/thanh_pho_ho_chi_minh.jpg"],
+  "sài gòn": ["https://ik.imagekit.io/tvlk/blog/2022/12/song-sai-gon-1.jpg", "https://cdn3.ivivu.com/2014/10/du-lich-sai-gon-cam-nang-tu-a-den-z-iVIVU.com-1.jpeg", "https://uploads.nguoidothi.net.vn/content/d46a8d7d-99f1-4a9c-adf2-c35f98dd54f6.jpg"],
+  "vũng tàu": ["https://cdn-media.sforum.vn/storage/app/media/ctv_seo4/le-hoi-vung-tau-thumb.jpg", "https://homepage.momocdn.net/blogscontents/momo-upload-api-221013140622-638012667825895595.jpeg", "https://owa.bestprice.vn/images/destinations/uploads/vung-tau-56440d55ca575.jpg"],
+  "phú quốc": ["https://luhanhtour.com/wp-content/uploads/2025/02/PQ-WEB-sao-che%CC%81p.jpg", "https://phetravel.com/uploads/173062315558phu-quoc-da-xinh-dep-roi-gio-can-quyet-liet-1730950394161-1730950394301377124644-1.jpg.webp", "https://cdn.daidoanket.vn/w3840/uploaded/images/2025/10/13/2786714c-4930-4dc5-a5a9-9cf243b61b81.jpg"],
+  "cần thơ": ["https://ik.imagekit.io/tvlk/blog/2021/11/dia-diem-du-lich-can-tho-cover.jpg", "https://tinviettravel.com/uploads/tours/images/can_tho/tour-can-tho-2-ngay-1-dem.jpg", "https://tinviettravel.com.vn/uploads/cam-nang-du-lich/2025_12/du-lich-can-thocover.png"],
+  "côn đảo": ["https://pystravel.vn/_next/image?url=https%3A%2F%2Fbooking.pystravel.vn%2Fuploads%2Fposts%2Favatar%2F1760513565.jpg&w=3840&q=75", "https://www.condaopark.com.vn/vnt_upload/weblink/ben-dam-paner.jpg", "https://datviettour.com.vn/uploads/images/tin-tuc-SEO/mien-nam/Con-Dao/danh-thang/cac-diem-den-noi-bat-trong-tour-du-lich-con-dao.jpg"],
+  "an giang": ["https://cdn2.tuoitre.vn/471584752817336320/2023/4/9/hinh-3-16810338473161395787464.jpg", "https://cdn2.tuoitre.vn/471584752817336320/2023/4/9/hinh-8-16810338473552060873789.jpg", "https://r2.nucuoimekong.com/wp-content/uploads/diem-den-noi-bat-an-giang-nu-cuoi-me-kong.webp"],
+  "tây ninh": ["https://tinviettravel.com/uploads/tours/2022_11/du-lich-tay-ninh-nui-ba-den.jpg", "https://sun-ecommerce-cdn.azureedge.net/ecommerce/service-sites/asset/SunWorldBaDen/swold/kinh-nghiem-du-lich-tay-ninh/1-tong-hop-du-lich-tay-ninh.png", "https://ik.imagekit.io/tvlk/blog/2022/02/dia-diem-du-lich-tay-ninh-cover.jpeg"],
+  "bến tre": ["https://bizweb.dktcdn.net/100/514/927/files/khu-du-lich-sinh-thai-ben-tre-phan-van-travel-1.webp?v=1763371309470", "https://vntravel.org.vn/uploads/images/blog/lethytheu/2025/04/11/giai-ba-nhon-nhip-cho-dem-va-cau-ben-tre-tg-nguyen-minh-tan-tp-hcm-1744350816.jpg", "https://zoomtravel.vn/upload/images/TOUR%20TI%E1%BB%80N%20GIANG%20-%20B%E1%BA%BEN%20TRE.jpg"],
+  "kiên giang": ["https://cdn3.ivivu.com/2024/09/cam-nang-du-lich-kien-giang-ivivu1.jpg", "https://nld.mediacdn.vn/2019/7/28/anh-chot-3-1564321423972329966976.jpg", "https://phongnhadiscovery.com/sites/default/files/dua_thuyen.jpg"],
+  "đồng tháp": ["https://ukh.edu.vn/Portals/0/Khoa_KHXHVNV/Ho%E1%BA%A1t%20%C4%91%E1%BB%99ng/du_lich_dong_thap_muoi_canh_dong_sen_gonatour.jpg", "https://ngaodu.com.vn/wp-content/uploads/2024/11/du-lich-dong-thap-tet-2025.jpg", "https://thamhiemmekong.com/wp-content/uploads/2020/05/khubaotonsinhthaidongthapmuoi4.jpg"],
+  "cà mau": ["https://baocamau.vn/image/ckeditor/2025/20250921/images/7C-1.jpg", "https://static1.cafeland.vn/cafelandnew/hinh-anh/2022/06/22/194/CM1.png", "https://nld.mediacdn.vn/thumb_w/640/291774122806476800/2023/12/10/anh-phoi-canh-5-17022053379671163862999.jpg"],
+  "mũi cà mau": ["https://nld.mediacdn.vn/thumb_w/640/291774122806476800/2023/12/10/anh-phoi-canh-5-17022053379671163862999.jpg", "https://cungphuot.info/wp-content/uploads/2021/04/kinh-nghiem-du-lich-ca-mau.jpg", "https://cdn.tgdd.vn/Files/2022/03/25/1422293/kinh-nghiem-du-lich-mui-ca-mau-cuc-nam-cua-to-quoc-202203250805483016.jpg"],
+  "bạc liêu": ["https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2022/12/1/1122790/Bac-Lieu-1.jpg", "https://images2.thanhnien.vn/528068263637045248/2024/9/24/a1-172717071561221753639.jpg", "https://dulichnhamat.vn/wp-content/uploads/z3922905390618_67dbba774009f008c0f5bfed5fa6fa11.webp"],
+  "sóc trăng": ["https://nads.1cdn.vn/2020/01/04/vapa.org.vn-uploads-article-minhphuong-2020-1-3-_tren-dong-song-trang-hoang-kim-thanh.jpg", "https://media-cdn-v2.laodong.vn/storage/newsportal/2024/2/4/1300938/Linh-Vat-10.jpg", "https://cdn.vetaucaotoc.net/wp-content/uploads/thoi-diem-ly-tuong-de-du-lich-soc-trang-la-tu-thang-11.webp"],
+  "trà vinh": ["https://hoabientourist.com/upload/product/1-2-8895.jpg", "https://i.ex-cdn.com/danviet.vn/files/content/2026/02/10/phuong-tra-vinh-tinh-vinh-long-moi-tuc-dia-phan-thanh-pho-tra-vinh-tinh-tra-vinh-truoc-day-1-1055.jpg", "https://vegiagoc.com/Upload/images/kham-pha-8-dia-diem-du-lich-tra-vinh-doc-dao-an-tuong(1).jpg"],
+  "hậu giang": ["https://cdn-media.sforum.vn/storage/app/media/ctvseo_MH/%E1%BA%A3nh%20%C4%91%E1%BA%B9p%20h%E1%BA%ADu%20giang/anh-dep-hau-giang-thumb.jpg", "https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2020/10/13/844565/Hau-Giang-7.jpg", "https://images.baoangiang.com.vn/image/fckeditor/upload/2024/20240304/images/SB3967-10.jpg"],
+  "vĩnh long": ["https://s-aicmscdn.vietnamhoinhap.vn/vnhn-media/25/7/10/vl_686f8be971320.jpg", "https://vietdiscoverytravel.vn/wp-content/uploads/2023/02/VINH-SANG-NEN.png", "https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2022/12/2/1123294/Vinh-Long-1.jpg"],
+  "tiền giang": ["https://cdn-media.sforum.vn/storage/app/media/wp-content/uploads/2024/04/ma-buu-chinh-tien-giang-thumbnail.jpg", "https://i.ytimg.com/vi/juIIpOfrqog/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLB8WNJCQK-3GWflaSaSQLWe18k5Wg", "https://cdn-media.sforum.vn/storage/app/media/ctvseo_MH/%E1%BA%A3nh%20%C4%91%E1%BA%B9p%20Ti%E1%BB%81n%20Gian/anh-dep-tien-giang-1.jpg"],
+  "đảo nam du": ["https://bizweb.dktcdn.net/100/514/927/files/du-lich-dao-nam-du-kien-giang-1.webp?v=1762411119327", "https://louistravel.com.vn/wp-content/uploads/2025/02/Dao-Nam-Du.jpg", "https://cdn3.ivivu.com/2022/11/%C4%91i-xe-m%C3%A1y-tr%C3%AAn-%C4%91%E1%BA%A3o-Nam-Du-ivivu.jpg"],
+  "hòn sơn": ["https://r2.nucuoimekong.com/wp-content/uploads/combo-hon-son-fly-up-resort-toan-canh-nu-cuoi-me-kong.webp", "https://annhientravels.com.vn/upload/product/hon-son-5690.jpg", "https://dulichhaugiang.com.vn/wp-content/uploads/2024/02/HonSon-vinhtour.png"],
+  "châu đốc": ["https://annhientravels.com.vn/upload/product/z489485762248241114de7d62a24ceb41f4647e81b07cd-6598.jpg", "https://datviettour.com.vn/uploads/images/mien-nam/an-giang/hinh-danh-thang/chua-phat-lon-800px.jpg", "https://cdn.tgdd.vn/Files/2021/06/29/1364146/top-15-dia-diem-check-in-mien-phi-o-chau-doc-202206031124000280.jpg"]
 };
 
 const GENERIC_VN_PHOTOS = [
@@ -136,7 +136,7 @@ const VN_PLACES_VIDEOS = {
 function getVNPhoto(query, idx = 0) {
   if (!query) return GENERIC_VN_PHOTOS[idx % GENERIC_VN_PHOTOS.length];
   const qLower = query.toLowerCase().trim();
-  
+
   // Kiểm tra điểm đến cụ thể trước
   for (const [key, photos] of Object.entries(VN_DESTINATION_PHOTOS)) {
     if (qLower.includes(key) || key.includes(qLower)) {
@@ -145,7 +145,7 @@ function getVNPhoto(query, idx = 0) {
       return photos[photoIdx];
     }
   }
-  
+
   return GENERIC_VN_PHOTOS[(Math.abs(idx) + qLower.length) % GENERIC_VN_PHOTOS.length];
 }
 window.getVNPhoto = getVNPhoto;
@@ -170,13 +170,13 @@ function getVNVideoId(query) {
   return '1dodeGKcr1A';
 }
 
-window.getGPSDirections = function(destinationName, event) {
+window.getGPSDirections = function (destinationName, event) {
   if (event) event.preventDefault();
-  
+
   if (navigator.geolocation) {
     if (window.WanderToast) window.WanderToast.info("📡 Đang kết nối tín hiệu GPS của bạn...");
     else console.log("Đang kết nối GPS...");
-    
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const lat = position.coords.latitude;
@@ -223,17 +223,17 @@ const initPlanner = function () {
   // =====================================================
   // Initialize new Step 2 features
   // =====================================================
-  
+
   // Set up event listeners for new features
   const setupStep2Listeners = () => {
     // Days/Nights auto-sync
     const daysInput = document.getElementById('days');
     const nightsInput = document.getElementById('nights');
-    
+
     // Ensure default values
     if (daysInput && !daysInput.value) daysInput.value = 3;
     if (nightsInput && !nightsInput.value) nightsInput.value = 2;
-    
+
     if (daysInput) {
       daysInput.addEventListener('input', () => {
         const days = parseInt(daysInput.value) || 1;
@@ -258,7 +258,7 @@ const initPlanner = function () {
         updateBudgetEstimate();
       });
     }
-    
+
     // Budget select change
     const budgetSelect = document.getElementById('budget');
     if (budgetSelect) {
@@ -270,19 +270,19 @@ const initPlanner = function () {
         updateBudgetEstimate();
       });
     }
-    
+
     // Trip date change
     const tripDate = document.getElementById('tripDate');
     if (tripDate) {
       tripDate.addEventListener('change', updateDateTimeHints);
     }
-    
+
     // Departure time change
     const departureTime = document.getElementById('departureTime');
     if (departureTime) {
       departureTime.addEventListener('change', updateDateTimeHints);
     }
-    
+
     // Điểm đến thay đổi -> cập nhật chi phí di chuyển
     const destInput = document.getElementById('dest');
     if (destInput) {
@@ -293,7 +293,7 @@ const initPlanner = function () {
         updateBudgetEstimate();
       });
     }
-    
+
     // Member inputs
     ['adults', 'children', 'toddlers', 'seniors'].forEach(type => {
       const input = document.getElementById(type);
@@ -304,15 +304,15 @@ const initPlanner = function () {
         });
       }
     });
-    
+
     updateTotalMembers();
     updateBudgetEstimate();
     updateDateTimeHints();
   };
-  
+
   // Run setup after a small delay to ensure DOM is ready
   setTimeout(setupStep2Listeners, 100);
-  
+
   // Initialize travel tier selection (highlight the default tier)
   setTimeout(() => {
     if (typeof selectTravelTier === 'function') {
@@ -323,7 +323,7 @@ const initPlanner = function () {
   // =====================================================
   // FORM STEP NAVIGATION (2 Bước)
   // =====================================================
-  window.switchFormStep = function(step) {
+  window.switchFormStep = function (step) {
     const step1 = document.getElementById('formStep1');
     const step2 = document.getElementById('formStep2');
     const tabs = document.querySelectorAll('.form-step-tab');
@@ -342,7 +342,7 @@ const initPlanner = function () {
         tab.classList.toggle('active', tab.dataset.step === '2');
       });
       currentFormStep = 2;
-      
+
       // Sync data from Step 1 to Step 2
       syncStep1ToStep2();
     }
@@ -360,16 +360,16 @@ const initPlanner = function () {
       }
       // If no array but there's existing value, keep it
     }
-    
+
     // Sync selected destinations preview
     syncSelectedDestinationsPreview();
-    
+
     // Update date/time hints
     updateDateTimeHints();
-    
+
     // Initialize budget estimate
     updateBudgetEstimate();
-    
+
     // Update total members
     updateTotalMembers();
   }
@@ -381,27 +381,27 @@ const initPlanner = function () {
     const emptyMsg = document.getElementById('selectedDestEmpty');
     const countSpan = document.getElementById('selectedCount');
     const destInput = document.getElementById('dest');
-    
+
     if (!chipsContainer) return;
-    
+
     // Get selected destinations from Step 1
     const selectedDests = window.selectedDestinations || [];
     const destText = destInput?.value?.trim() || '';
-    
+
     // Always show the preview section when in step 2
     if (preview) {
       preview.style.display = 'block';
     }
-    
+
     // Update count based on array length or text
     if (countSpan) {
       const count = selectedDests.length || (destText ? 1 : 0);
       countSpan.textContent = count > 0 ? ` (${count} địa điểm)` : '';
     }
-    
+
     // Clear container
     chipsContainer.innerHTML = '';
-    
+
     // If no destinations at all, show empty state
     if (selectedDests.length === 0 && !destText) {
       if (emptyMsg) {
@@ -409,11 +409,11 @@ const initPlanner = function () {
       }
       return;
     }
-    
+
     if (emptyMsg) {
       emptyMsg.style.display = 'none';
     }
-    
+
     // If we have destination objects from Step 1
     if (selectedDests.length > 0) {
       selectedDests.forEach((dest, index) => {
@@ -421,13 +421,13 @@ const initPlanner = function () {
         const chip = createDestChip(destName, index);
         chipsContainer.appendChild(chip);
       });
-      
+
       // Add "Delete all" button if multiple destinations
       if (selectedDests.length > 1) {
         const deleteAllBtn = createDeleteAllButton();
         chipsContainer.appendChild(deleteAllBtn);
       }
-    } 
+    }
     // If we just have text in dest input (manually typed)
     else if (destText) {
       const chip = createDestChip(destText, -1);
@@ -450,7 +450,7 @@ const initPlanner = function () {
       color: #60a5fa;
       font-weight: 600;
     `;
-    
+
     // Remove button only if we have array data
     const removeBtn = index >= 0 ? `
       <button type="button" onclick="removeDestinationFromStep2(${index})" style="
@@ -469,7 +469,7 @@ const initPlanner = function () {
         padding: 0;
       ">×</button>
     ` : '';
-    
+
     chip.innerHTML = `<span>📍 ${destName}</span>${removeBtn}`;
     return chip;
   }
@@ -504,17 +504,17 @@ const initPlanner = function () {
   }
 
   // Remove a destination from the selected list in Step 2
-  window.removeDestinationFromStep2 = function(index) {
+  window.removeDestinationFromStep2 = function (index) {
     if (!window.selectedDestinations || window.selectedDestinations.length === 0) return;
-    
+
     window.selectedDestinations.splice(index, 1);
-    
+
     // Update hidden dest field
     const destInput = document.getElementById('dest');
     if (destInput) {
       destInput.value = window.selectedDestinations.map(d => d.name || d.destination || d).join(', ');
     }
-    
+
     syncSelectedDestinationsPreview();
   };
 
@@ -524,15 +524,15 @@ const initPlanner = function () {
     const departureTime = document.getElementById('departureTime');
     const dateHint = document.getElementById('tripDateHint');
     const timeHint = document.getElementById('departureTimeHint');
-    
+
     if (tripDate && tripDate.value && dateHint) {
       const date = new Date(tripDate.value);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      
+
       const diffTime = date.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
+
       if (diffDays === 0) {
         dateHint.textContent = 'Hôm nay';
       } else if (diffDays === 1) {
@@ -543,11 +543,11 @@ const initPlanner = function () {
         dateHint.textContent = date.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'numeric' });
       }
     }
-    
+
     if (departureTime && departureTime.value && timeHint) {
       const [hours, minutes] = departureTime.value.split(':');
       const hour = parseInt(hours);
-      
+
       if (hour >= 5 && hour < 12) {
         timeHint.textContent = 'Buổi sáng';
       } else if (hour >= 12 && hour < 18) {
@@ -561,49 +561,49 @@ const initPlanner = function () {
   }
 
   // Days/Nights adjustment
-  window.adjustDays = function(delta) {
+  window.adjustDays = function (delta) {
     const daysInput = document.getElementById('days');
     const nightsInput = document.getElementById('nights');
     if (!daysInput || !nightsInput) return;
-    
+
     let days = parseInt(daysInput.value) || 3;
     days = Math.max(1, Math.min(14, days + delta));
     daysInput.value = days;
-    
+
     // Nights = days - 1 (for typical trip)
     const nights = Math.max(0, days - 1);
     nightsInput.value = nights;
-    
+
     updateBudgetEstimate();
   };
 
-  window.adjustNights = function(delta) {
+  window.adjustNights = function (delta) {
     const daysInput = document.getElementById('days');
     const nightsInput = document.getElementById('nights');
     if (!daysInput || !nightsInput) return;
-    
+
     let nights = parseInt(nightsInput.value) || 2;
     nights = Math.max(0, Math.min(13, nights + delta));
     nightsInput.value = nights;
-    
+
     // Days = nights + 1
     const days = nights + 1;
     daysInput.value = days;
-    
+
     updateBudgetEstimate();
   };
 
   // Member count adjustment
-  window.adjustMember = function(type, delta) {
+  window.adjustMember = function (type, delta) {
     const input = document.getElementById(type);
     if (!input) return;
-    
+
     let count = parseInt(input.value) || 0;
     const max = type === 'adults' ? 10 : 10;
     const min = type === 'adults' ? 1 : 0;
     count = Math.max(min, Math.min(max, count + delta));
     input.value = count;
-    
+
     updateTotalMembers();
     updateBudgetEstimate();
   };
@@ -615,12 +615,12 @@ const initPlanner = function () {
     const toddlers = parseInt(document.getElementById('toddlers')?.value) || 0;
     const seniors = parseInt(document.getElementById('seniors')?.value) || 0;
     const total = adults + children + toddlers + seniors;
-    
+
     const totalDisplay = document.getElementById('totalMembers');
     if (totalDisplay) {
       totalDisplay.textContent = total + ' người';
     }
-    
+
     // Update companion select
     const companion = document.getElementById('companion');
     if (companion) {
@@ -633,7 +633,7 @@ const initPlanner = function () {
 
   // Travel tier selection
   let currentTravelTier = 'normal';
-  
+
   // Chi phí theo từng hạng mục (giá/người/ngày) - theo thị trường Việt Nam 2025
   const tierCosts = {
     // Budget - Tiết kiệm ( backpacker, khách sạn bình dân)
@@ -661,7 +661,7 @@ const initPlanner = function () {
       entertain: 200000                                // 200K/người/ngày
     }
   };
-  
+
   // ================================================
   // DATABASE CHI PHÍ ĐỊA ĐIỂM NỔI BẬT
   // ================================================
@@ -676,7 +676,7 @@ const initPlanner = function () {
     "Chả cá Lã Vọng": { ticket: 0, food: 200000, type: "restaurant" },
     "Trà Hạt Long An": { ticket: 0, food: 80000, type: "cafe" },
     "Phủ Tây Hồ": { ticket: 0, food: 0, type: "attraction" },
-    
+
     // ===== TP.HCM =====
     "Dinh Độc Lập": { ticket: 75000, food: 0, type: "attraction" },
     "Nhà Thờ Đức Bà": { ticket: 0, food: 0, type: "attraction" },
@@ -692,7 +692,7 @@ const initPlanner = function () {
     "Cơm Tấm Kiều Giang": { ticket: 0, food: 60000, type: "restaurant" },
     "Hủ Tiếu Nam Vang Quảng Đức": { ticket: 0, food: 60000, type: "restaurant" },
     "Cà Phê Trung Nguyên Legend": { ticket: 0, food: 60000, type: "cafe" },
-    
+
     // ===== ĐÀ NẴNG =====
     "Ngũ Hành Sơn": { ticket: 0, food: 0, type: "attraction" },
     "Cầu Vàng Bà Nà Hills": { ticket: 750000, food: 0, type: "attraction" },
@@ -703,7 +703,7 @@ const initPlanner = function () {
     "Du Thuyền Sông Hàn Ngắm Cầu Rồng": { ticket: 350000, food: 150000, type: "experience" },
     "Cà Phê Mitora": { ticket: 0, food: 60000, type: "cafe" },
     "Hải Sản Năm Đảnh": { ticket: 0, food: 250000, type: "restaurant" },
-    
+
     // ===== HỘI AN =====
     "Chùa Cầu Nhật Bản": { ticket: 0, food: 0, type: "attraction" },
     "Rừng Dừa Bảy Mẫu": { ticket: 150000, food: 0, type: "attraction" },
@@ -711,7 +711,7 @@ const initPlanner = function () {
     "Cao Lầu Thanh": { ticket: 0, food: 60000, type: "restaurant" },
     "Thả Hoa Đăng Dòng Sông Hoài": { ticket: 50000, food: 0, type: "experience" },
     "Học Làm Đèn Lồng Truyền Thống": { ticket: 150000, food: 0, type: "experience" },
-    
+
     // ===== HUẾ =====
     "Đại Nội Huế (Hoàng Thành)": { ticket: 150000, food: 0, type: "attraction" },
     "Lăng Khải Định": { ticket: 100000, food: 0, type: "attraction" },
@@ -723,7 +723,7 @@ const initPlanner = function () {
     "Bánh Nậm Đông Ba": { ticket: 0, food: 30000, type: "restaurant" },
     "Cung An Định": { ticket: 150000, food: 0, type: "attraction" },
     "Lăng Vua Minh Mạng": { ticket: 100000, food: 0, type: "attraction" },
-    
+
     // ===== NHA TRANG =====
     "Tháp Bà Ponagar": { ticket: 0, food: 0, type: "attraction" },
     "Nhà Thờ Đá Nha Trang": { ticket: 0, food: 0, type: "attraction" },
@@ -732,7 +732,7 @@ const initPlanner = function () {
     "Hải Sản Thanh Sương": { ticket: 0, food: 200000, type: "restaurant" },
     "Lặn Biển Ngắm San Hô Hòn Mun": { ticket: 450000, food: 0, type: "experience" },
     "Tắm Bùn Khoáng Tháp Bà": { ticket: 250000, food: 0, type: "experience" },
-    
+
     // ===== SAPA =====
     "Bản Cát Cát": { ticket: 70000, food: 150000, type: "attraction" },
     "Đỉnh Fansipan": { ticket: 300000, food: 0, type: "attraction" },
@@ -742,7 +742,7 @@ const initPlanner = function () {
     "Nhà Hàng A Phủ": { ticket: 0, food: 150000, type: "restaurant" },
     "Tắm Lá Thuốc Dao Đỏ Ta Phìn": { ticket: 150000, food: 0, type: "experience" },
     "Chợ Tình Sapa Đêm Thứ Bảy": { ticket: 0, food: 0, type: "experience" },
-    
+
     // ===== HẠ LONG =====
     "Vịnh Hạ Long (Động Thiên Cung - Hang Sửng Sốt)": { ticket: 250000, food: 0, type: "attraction" },
     "Sun World Hạ Long Complex": { ticket: 350000, food: 0, type: "attraction" },
@@ -750,7 +750,7 @@ const initPlanner = function () {
     "Nhà Hàng Hồng Hạnh": { ticket: 0, food: 200000, type: "restaurant" },
     "Chèo Thuyền Kayak Qua Hang Luồn": { ticket: 150000, food: 0, type: "experience" },
     "Nghỉ Đêm Trên Du Thuyền 5 Sao": { ticket: 2000000, food: 500000, type: "experience" },
-    
+
     // ===== NINH BÌNH =====
     "Khu du lịch sinh thái Tràng An": { ticket: 250000, food: 0, type: "attraction" },
     "Hang Múa": { ticket: 100000, food: 0, type: "attraction" },
@@ -758,7 +758,7 @@ const initPlanner = function () {
     "Nhà Hàng Ba Cửa": { ticket: 0, food: 150000, type: "restaurant" },
     "Đi Đò Chèo Tràng An Hóa Thân Phim Ảnh": { ticket: 200000, food: 0, type: "experience" },
     "Đạp Xe Qua Các Bản Làng Tam Cốc": { ticket: 80000, food: 0, type: "experience" },
-    
+
     // ===== HÀ GIANG =====
     "Mã Pí Lèng": { ticket: 0, food: 0, type: "attraction" },
     "Cột Cờ Lũng Cú": { ticket: 0, food: 0, type: "attraction" },
@@ -766,7 +766,7 @@ const initPlanner = function () {
     "Quán Ăn Thanh Bình": { ticket: 0, food: 100000, type: "restaurant" },
     "Hoa Tam Giác Mạch Mùa Thu": { ticket: 0, food: 0, type: "experience" },
     "Trekking Cao Nguyên Đá": { ticket: 0, food: 0, type: "experience" },
-    
+
     // ===== MỘC CHÂU =====
     "Đồi Chè Trái Tim Mộc Châu": { ticket: 0, food: 0, type: "attraction" },
     "Thác Dải Yếm": { ticket: 50000, food: 0, type: "attraction" },
@@ -774,12 +774,12 @@ const initPlanner = function () {
     "Nhà Hàng Ba Liều": { ticket: 0, food: 120000, type: "restaurant" },
     "Cắm Trại Thung Lũng Mận": { ticket: 50000, food: 0, type: "experience" },
     "Bơi Suối Nước Nóng Mộc Châu": { ticket: 100000, food: 0, type: "experience" },
-    
+
     // ===== CAO BẰNG =====
     "Thác Bản Giốc": { ticket: 40000, food: 0, type: "attraction" },
     "Động Ngườm Ngao": { ticket: 80000, food: 0, type: "attraction" },
     "Pác Bó - Khu Di Tích Cách Mạng": { ticket: 0, food: 0, type: "attraction" },
-    
+
     // ===== ĐÀ LẠT =====
     "Hồ Tuyền Lâm & Thiền Viện Trúc Lâm": { ticket: 0, food: 0, type: "attraction" },
     "Thác Datanla": { ticket: 80000, food: 0, type: "attraction" },
@@ -790,7 +790,7 @@ const initPlanner = function () {
     "Cơm Lam Đà Lạt": { ticket: 0, food: 40000, type: "restaurant" },
     "Săn Mây Đồi Chè Cầu Đất": { ticket: 0, food: 0, type: "experience" },
     "Cắm Trại Đồi Đa Phú": { ticket: 50000, food: 0, type: "experience" },
-    
+
     // ===== PHÚ QUỐC =====
     "Bãi Sao": { ticket: 0, food: 0, type: "attraction" },
     "Grand World Phú Quốc": { ticket: 0, food: 0, type: "attraction" },
@@ -801,7 +801,7 @@ const initPlanner = function () {
     "Gỏi Cá Trích": { ticket: 0, food: 120000, type: "restaurant" },
     "Ngắm Hoàng Hôn Sunset Sanato": { ticket: 0, food: 0, type: "experience" },
     "Tour 4 Đảo Cano Phú Quốc": { ticket: 350000, food: 0, type: "experience" },
-    
+
     // ===== CẦN THƠ =====
     "Chợ Nổi Cái Răng": { ticket: 0, food: 50000, type: "attraction" },
     "Nhà Cổ Bình Thủy": { ticket: 30000, food: 0, type: "attraction" },
@@ -809,7 +809,7 @@ const initPlanner = function () {
     "Nem Nướng Thanh Vân": { ticket: 0, food: 80000, type: "restaurant" },
     "Trải Nghiệm Làm Bánh Hủ Tiếu Sông Nước": { ticket: 100000, food: 50000, type: "experience" },
     "Ăn Hủ Tiếu Gõ Trên Ghe Chợ Nổi": { ticket: 0, food: 50000, type: "experience" },
-    
+
     // ===== AN GIANG =====
     "Núi Sam": { ticket: 0, food: 0, type: "attraction" },
     "Chùa Phi Lai": { ticket: 0, food: 0, type: "attraction" },
@@ -818,7 +818,7 @@ const initPlanner = function () {
     "Bánh Pía Châu Đốc": { ticket: 0, food: 30000, type: "restaurant" },
     "Thăm Làng Nổi Trên Sông": { ticket: 80000, food: 0, type: "experience" },
     "Mua Sắm Chợ Biên Giới": { ticket: 0, food: 0, type: "experience" },
-    
+
     // ===== BÌNH BA =====
     "Bãi Nồm Bình Ba": { ticket: 0, food: 0, type: "attraction" },
     "Bãi Chướng Bình Ba": { ticket: 0, food: 0, type: "attraction" },
@@ -826,7 +826,7 @@ const initPlanner = function () {
     "Nhà Hàng Hải Sản Tươi Sống": { ticket: 0, food: 200000, type: "restaurant" },
     "Lặn Biển Ngắm San Hô": { ticket: 300000, food: 0, type: "experience" },
     "Nải Bình Ba": { ticket: 0, food: 0, type: "experience" },
-    
+
     // ===== TUY HÒA =====
     "Tháp Nhạn Tuy Hòa": { ticket: 0, food: 0, type: "attraction" },
     "Vịnh Vũng Rô": { ticket: 0, food: 0, type: "attraction" },
@@ -834,18 +834,18 @@ const initPlanner = function () {
     "Bánh Xèo Tuy Hòa": { ticket: 0, food: 60000, type: "restaurant" },
     "Chèo Thuyền Kayak Vịnh Vũng Rô": { ticket: 150000, food: 0, type: "experience" },
     "Ngắm Hoàng Hôn Bờ Biển": { ticket: 0, food: 0, type: "experience" },
-    
+
     // ===== PLEIKU =====
     "Biển Hồ T'Nơng Pleiku": { ticket: 0, food: 0, type: "attraction" },
     "Chùa Minh Thành": { ticket: 0, food: 0, type: "attraction" },
     "Thủy Điện Yaly": { ticket: 0, food: 0, type: "attraction" },
     "Nhà Hàng Đặc Sản Tây Nguyên": { ticket: 0, food: 150000, type: "restaurant" },
-    
+
     // ===== NÚI CẤP =====
     "Núi Cấp": { ticket: 30000, food: 0, type: "attraction" },
     "Chùa Vĩnh Nghiêm": { ticket: 0, food: 0, type: "attraction" },
   };
-  
+
   // Chi phí mặc định theo loại (nếu không có trong database)
   const DEFAULT_COSTS = {
     attraction: { ticket: 100000, food: 0 },
@@ -854,14 +854,14 @@ const initPlanner = function () {
     experience: { ticket: 150000, food: 0 },
     region: { ticket: 0, food: 0 }
   };
-  
+
   // Lấy chi phí cho một địa điểm
   function getSpotCost(spotName) {
     // Tìm chính xác
     if (SPOT_COSTS[spotName]) {
       return SPOT_COSTS[spotName];
     }
-    
+
     // Tìm gần đúng
     const normalizedName = spotName.toLowerCase();
     for (const [name, cost] of Object.entries(SPOT_COSTS)) {
@@ -869,18 +869,18 @@ const initPlanner = function () {
         return cost;
       }
     }
-    
+
     // Mặc định theo category
     return null;
   }
-  
+
   // Tính tổng chi phí các địa điểm đã chọn
   function calculateSelectedSpotsCost() {
     const spots = window.selectedAttractionData || [];
     let totalTicket = 0;
     let totalFood = 0;
     let spotCount = 0;
-    
+
     spots.forEach(spot => {
       const cost = getSpotCost(spot.name);
       if (cost) {
@@ -895,7 +895,7 @@ const initPlanner = function () {
         spotCount++;
       }
     });
-    
+
     return { totalTicket, totalFood, spotCount };
   }
 
@@ -928,7 +928,7 @@ const initPlanner = function () {
     "Thái Bình": { lat: 20.5366, lng: 106.3380 },
     "Nghệ An": { lat: 18.6791, lng: 105.6814 },
     "Thanh Hóa": { lat: 19.8067, lng: 105.7850 },
-    
+
     // Miền Trung
     "Hà Tĩnh": { lat: 18.3427, lng: 105.8960 },
     "Quảng Bình": { lat: 17.4689, lng: 106.6219 },
@@ -942,7 +942,7 @@ const initPlanner = function () {
     "Khánh Hòa": { lat: 12.2388, lng: 109.1966 },
     "Ninh Thuận": { lat: 11.5744, lng: 108.9999 },
     "Bình Thuận": { lat: 10.9294, lng: 108.0663 },
-    
+
     // Tây Nguyên
     "Đắk Lắk": { lat: 12.7100, lng: 108.2375 },
     "Đắk Nông": { lat: 12.2586, lng: 107.8387 },
@@ -950,7 +950,7 @@ const initPlanner = function () {
     "Kon Tum": { lat: 14.3496, lng: 108.0006 },
     "Lâm Đồng": { lat: 11.9403, lng: 108.4413 },
     "Đà Lạt": { lat: 11.9463, lng: 108.4413 },
-    
+
     // Miền Nam
     "TP.HCM": { lat: 10.8231, lng: 106.6297 },
     "Tây Ninh": { lat: 11.3353, lng: 106.0838 },
@@ -974,7 +974,7 @@ const initPlanner = function () {
     "Phú Quốc": { lat: 10.2278, lng: 103.9600 },
     "Côn Đảo": { lat: 8.7058, lng: 106.5955 }
   };
-  
+
   // ================================================
   // HÀM TÍNH KHOẢNG CÁCH (HAVERSINE FORMULA)
   // ================================================
@@ -982,13 +982,13 @@ const initPlanner = function () {
     const R = 6371; // Bán kính trái đất (km)
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLng = (lng2 - lng1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLng/2) * Math.sin(dLng/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c; // Khoảng cách km
   }
-  
+
   // ================================================
   // TÍNH CHI PHÍ DI CHUYỂN THEO KHOẢNG CÁCH
   // ================================================
@@ -997,14 +997,14 @@ const initPlanner = function () {
       // Cùng thành phố - gần như miễn phí (đi bộ, xe đạp)
       return tier === 'luxury' ? 50000 : (tier === 'normal' ? 30000 : 20000);
     }
-    
+
     // Chi phí theo km và tier (1 CHIỀU - đã tính khứ hồi)
     const costPerKm = {
       budget: 3500,    // 3,500 VNĐ/km (xe máy thuê ~100K/ngày + xăng)
       normal: 6000,    // 6,000 VNĐ/km (ô tô chia sẻ, taxi Grab)
       luxury: 12000    // 12,000 VNĐ/km (ô tô riêng/ thuê xe có tài xế)
     };
-    
+
     let baseCost = 0;
     if (distanceKm > 300) {
       // Ước tính vé máy bay khứ hồi
@@ -1020,10 +1020,10 @@ const initPlanner = function () {
       // Di chuyển nội vùng (khứ hồi)
       baseCost = distanceKm * costPerKm[tier] * 2;
     }
-    
+
     return Math.round(baseCost);
   }
-  
+
   // Lấy tọa độ điểm đến từ danh sách đã chọn
   function getDestinationCoords() {
     // Ưu tiên 1: Lấy trực tiếp từ input dest
@@ -1032,19 +1032,19 @@ const initPlanner = function () {
       const coords = getCoordsByName(destInput.value.trim());
       if (coords) return coords;
     }
-    
+
     // Ưu tiên 2: selectedDestinations (object array)
     let selectedDests = window.selectedDestinations || [];
-    
+
     // Ưu tiên 3: selectedDestNames (string array)
     if (selectedDests.length === 0) {
       selectedDests = window.selectedDestNames || [];
     }
-    
+
     if (selectedDests.length === 0) {
       return null;
     }
-    
+
     // Lấy tên điểm đến đầu tiên
     let destName = '';
     if (typeof selectedDests[0] === 'object') {
@@ -1052,26 +1052,26 @@ const initPlanner = function () {
     } else {
       destName = selectedDests[0] || '';
     }
-    
+
     return getCoordsByName(destName);
   }
-  
+
   // Tìm tọa độ theo tên
   function getCoordsByName(name) {
     if (!name) return null;
-    
+
     // Chuẩn hóa tên (bỏ dấu, lowercase)
     const normalizedName = name.toLowerCase().trim();
-    
+
     // Tìm trong database
     for (const [cityName, coords] of Object.entries(CITY_COORDS)) {
       const normalizedCity = cityName.toLowerCase();
-      
+
       // So khớp chính xác hoặc một phần
       if (normalizedCity.includes(normalizedName) || normalizedName.includes(normalizedCity)) {
         return coords;
       }
-      
+
       // Trường hợp TP.HCM / Sài Gòn
       if (normalizedName.includes('hcm') || normalizedName.includes('sài gòn')) {
         if (normalizedCity.includes('hcm') || normalizedCity.includes('sài gòn')) {
@@ -1081,15 +1081,15 @@ const initPlanner = function () {
     }
     return null;
   }
-  
+
   // Chi phí giảm cho trẻ em và người cao tuổi
   const CHILD_UNDER_5_DISCOUNT = 1.0;    // Miễn phí hoàn toàn
   const CHILD_6_11_DISCOUNT = 0.30;       // Giảm 30%
   const SENIOR_DISCOUNT = 0.20;            // Giảm 20%
 
-  window.selectTravelTier = function(tier) {
+  window.selectTravelTier = function (tier) {
     currentTravelTier = tier;
-    
+
     // Update button styles
     document.querySelectorAll('.travel-tier-btn').forEach(btn => {
       btn.classList.remove('active');
@@ -1097,7 +1097,7 @@ const initPlanner = function () {
       btn.style.background = '';
       btn.style.color = '';
     });
-    
+
     const activeBtn = document.querySelector(`.travel-tier-btn[data-tier="${tier}"]`);
     if (activeBtn) {
       activeBtn.classList.add('active');
@@ -1115,7 +1115,7 @@ const initPlanner = function () {
         activeBtn.style.color = '#8b5cf6';
       }
     }
-    
+
     updateBudgetEstimate();
   };
 
@@ -1127,29 +1127,29 @@ const initPlanner = function () {
     const children = parseInt(document.getElementById('children')?.value) || 0;  // 6-11 tuổi
     const toddlers = parseInt(document.getElementById('toddlers')?.value) || 0; // 0-5 tuổi
     const seniors = parseInt(document.getElementById('seniors')?.value) || 0;
-    
+
     // Lấy chi phí theo tier đã chọn
     const tier = tierCosts[currentTravelTier];
-    
+
     // ===== 1. TÍNH TIỀN PHÒNG KHÁCH SẠN =====
     // Tính số người cần tính phòng (trẻ dưới 5 tuổi ngủ chung miễn phí)
     const payablePeople = adults + children + seniors; // Trẻ 6-11 + NL + NC tuổi
     // Tính số phòng cần thiết (mỗi phòng tối đa 2 người)
     const roomsNeeded = Math.ceil(payablePeople / tier.hotel.maxPerRoom);
     const hotelTotal = tier.hotel.perRoom * roomsNeeded * nights;
-    
+
     // Chi tiết phòng
     const hotelDetail = document.getElementById('hotelDetail');
     if (hotelDetail) {
       hotelDetail.textContent = `${roomsNeeded} phòng × ${formatCurrency(tier.hotel.perRoom)} × ${nights} đêm`;
     }
-    
+
     // ===== 2. TÍNH TIỀN ĂN UỐNG =====
     // Người lớn & trẻ 6-11 & người cao tuổi: ăn đầy đủ
     // Trẻ dưới 5 tuổi: miễn phí ăn
     const mealPeople = adults + children + seniors;
     const foodTotal = tier.food.perAdult * mealPeople * days;
-    
+
     // Chi tiết ăn uống
     const foodDetail = document.getElementById('foodDetail');
     if (foodDetail) {
@@ -1157,47 +1157,47 @@ const initPlanner = function () {
       if (toddlers > 0) foodDesc += ` + ${toddlers} trẻ <5tuổi miễn phí`;
       foodDetail.textContent = foodDesc;
     }
-    
+
     // ===== 3. TÍNH TIỀN DI CHUYỂN (DỰA TRÊN GPS) =====
     // Lấy tọa độ khởi hành từ GPS hoặc mặc định Hà Nội
     const formStep2 = document.getElementById('aiPlannerFormStep2');
     const hasGPS = formStep2?.dataset?.lat && formStep2?.dataset?.lon;
     const depLat = parseFloat(formStep2?.dataset?.lat) || 21.0285; // Mặc định Hà Nội
     const depLng = parseFloat(formStep2?.dataset?.lon) || 105.8542;
-    
+
     // Lấy tọa độ điểm đến
     const destCoords = getDestinationCoords();
     const destLat = destCoords?.lat || 16.0544; // Mặc định Đà Nẵng
     const destLng = destCoords?.lng || 108.2022;
-    
+
     // Tính khoảng cách
     const distanceKm = calculateDistance(depLat, depLng, destLat, destLng);
     const transportTotal = calculateTransportCost(distanceKm, currentTravelTier);
-    
+
     const transportDetail = document.getElementById('transportDetail');
     const transportIcon = document.getElementById('transportIcon');
     const transportRoute = document.getElementById('transportRoute');
-    
+
     // Lấy tên điểm đến
     let destName = 'Điểm đến';
     const selectedDests = window.selectedDestinations || window.selectedDestNames || [];
     if (selectedDests.length > 0) {
-      destName = typeof selectedDests[0] === 'object' 
+      destName = typeof selectedDests[0] === 'object'
         ? (selectedDests[0].name || selectedDests[0].destination || 'Điểm đến')
         : selectedDests[0];
     } else {
       const destInput = document.getElementById('dest');
       if (destInput?.value) destName = destInput.value;
     }
-    
+
     // Lấy tên điểm khởi hành
     const depName = hasGPS ? (formStep2?.dataset?.departureName || 'Vị trí của bạn') : 'Hà Nội (mặc định)';
-    
+
     // Hiển thị tuyến đường
     if (transportRoute) {
       transportRoute.textContent = `📍 ${depName} → ${destName}`;
     }
-    
+
     // Hiển thị chi tiết và icon
     if (transportDetail) {
       if (distanceKm <= 5) {
@@ -1216,7 +1216,7 @@ const initPlanner = function () {
       else if (distanceKm > 100) transportIcon.textContent = '🚗';
       else transportIcon.textContent = '🛵';
     }
-    
+
     // ===== 4. TÍNH TIỀN VÉ THAM QUAN =====
     // Người lớn: 100%, Trẻ 6-11: giảm 30%, Trẻ <5: miễn phí, Người cao tuổi: giảm 20%
     const ticketAdults = tier.ticket * adults * days;
@@ -1224,7 +1224,7 @@ const initPlanner = function () {
     const ticketSeniors = tier.ticket * (1 - SENIOR_DISCOUNT) * seniors * days;
     const ticketToddlers = 0; // Miễn phí
     const ticketTotal = ticketAdults + ticketChildren + ticketSeniors + ticketToddlers;
-    
+
     const ticketDetail = document.getElementById('ticketDetail');
     if (ticketDetail) {
       let parts = [];
@@ -1234,22 +1234,22 @@ const initPlanner = function () {
       if (toddlers > 0) parts.push(`<5t: miễn phí`);
       ticketDetail.textContent = parts.join(' | ');
     }
-    
+
     // ===== 5. TÍNH TIỀN GIẢI TRÍ & ĐỒ UỐNG =====
     // Tất cả mọi người đều tính (trẻ dưới 5 giảm 50%)
     const totalPeople = adults + children + toddlers + seniors;
-    
+
     const entertainAdults = tier.entertain * (adults + seniors + children) * days;
     const entertainToddlers = tier.entertain * 0.5 * toddlers * days;
     const entertainTotal = entertainAdults + entertainToddlers;
-    
+
     const entertainDetail = document.getElementById('entertainDetail');
     if (entertainDetail) {
       let entertainDesc = `Người lớn: ${formatCurrency(tier.entertain)} × ${days} ngày`;
       if (toddlers > 0) entertainDesc += ` + Trẻ nhỏ -50%`;
       entertainDetail.textContent = entertainDesc;
     }
-    
+
     // ===== TÍNH CHI PHÍ ĐỊA ĐIỂM ĐÃ CHỌN =====
     const spotsCost = calculateSelectedSpotsCost();
     let spotsGrandTotal = 0;
@@ -1257,14 +1257,14 @@ const initPlanner = function () {
     const spotsTotalEl = document.getElementById('spotsTotal');
     const spotsDetailEl = document.getElementById('spotsDetail');
     const spotsListEl = document.getElementById('spotsList');
-    
+
     if (spotsCost.spotCount > 0) {
       if (spotsCostSection) spotsCostSection.style.display = 'block';
-      
+
       // Chi phí địa điểm cho tất cả mọi người
       const spotsPerPerson = spotsCost.totalTicket + spotsCost.totalFood;
       spotsGrandTotal = spotsPerPerson * totalPeople;
-      
+
       // Hiển thị
       if (spotsTotalEl) {
         spotsTotalEl.textContent = formatCurrency(spotsGrandTotal);
@@ -1282,28 +1282,28 @@ const initPlanner = function () {
     } else {
       if (spotsCostSection) spotsCostSection.style.display = 'none';
     }
-    
+
     // ===== TỔNG HỢP =====
     const grandTotal = hotelTotal + foodTotal + transportTotal + ticketTotal + entertainTotal + spotsGrandTotal;
     const perPerson = totalPeople > 0 ? Math.round(grandTotal / totalPeople) : 0;
-    
+
     // Cập nhật DOM
     document.getElementById('hotelTotal').textContent = formatCurrency(hotelTotal);
     document.getElementById('foodTotal').textContent = formatCurrency(foodTotal);
     document.getElementById('transportTotal').textContent = formatCurrency(transportTotal);
     document.getElementById('ticketTotal').textContent = formatCurrency(ticketTotal);
     document.getElementById('entertainTotal').textContent = formatCurrency(entertainTotal);
-    
+
     // Tổng cộng
     document.getElementById('totalBudget').textContent = formatCurrency(grandTotal);
     document.getElementById('perPersonBudget').textContent = formatCurrency(perPerson);
-    
+
     // Label thời gian
     const tripLabel = document.getElementById('tripDurationLabel');
     if (tripLabel) {
       tripLabel.textContent = `${days} ngày ${nights} đêm`;
     }
-    
+
     // Tóm tắt thành viên
     const membersSummary = document.getElementById('membersSummary');
     if (membersSummary) {
@@ -1328,49 +1328,49 @@ const initPlanner = function () {
   let locationMap = null;
   let locationMarker = null;
 
-  window.getCurrentLocation = function() {
+  window.getCurrentLocation = function () {
     if (!navigator.geolocation) {
       if (window.WanderToast) {
         window.WanderToast.warning("Trình duyệt không hỗ trợ định vị");
       }
       return;
     }
-    
+
     if (window.WanderToast) {
       window.WanderToast.info("📍 Đang lấy vị trí của bạn...");
     }
-    
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
-        
+
         // Show map container
         const mapContainer = document.getElementById('locationMapContainer');
         if (mapContainer) mapContainer.style.display = 'block';
-        
+
         // Initialize or update map
         await initLocationMap(lat, lon);
-        
+
         // Get address from coordinates
         try {
           const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
           const data = await response.json();
           const address = data.display_name || `Vị trí (${lat.toFixed(4)}, ${lon.toFixed(4)})`;
-          
+
           document.getElementById('selectedLocationDisplay').style.display = 'flex';
           document.getElementById('selectedLocationText').textContent = address;
           document.getElementById('departureLocation').value = address;
-          
+
           // Store in data attribute
           document.getElementById('aiPlannerFormStep2').dataset.lat = lat;
           document.getElementById('aiPlannerFormStep2').dataset.lon = lon;
           document.getElementById('aiPlannerFormStep2').dataset.departureName = address.split(',')[0]; // Lấy phần đầu của địa chỉ
-          
+
           if (window.WanderToast) {
             window.WanderToast.success("Đã xác định vị trí!");
           }
-          
+
           // Cập nhật chi phí di chuyển sau khi có GPS
           setTimeout(() => updateBudgetEstimate(), 100);
         } catch (err) {
@@ -1389,10 +1389,10 @@ const initPlanner = function () {
     );
   };
 
-  window.toggleManualLocation = function() {
+  window.toggleManualLocation = function () {
     const manualInput = document.getElementById('manualLocationInput');
     const mapContainer = document.getElementById('locationMapContainer');
-    
+
     if (manualInput) {
       manualInput.style.display = manualInput.style.display === 'none' ? 'block' : 'none';
     }
@@ -1404,13 +1404,13 @@ const initPlanner = function () {
   async function initLocationMap(lat, lon) {
     const mapDiv = document.getElementById('locationMap');
     if (!mapDiv) return;
-    
+
     // Check if Leaflet is loaded
     if (typeof L === 'undefined') {
       console.error("Leaflet not loaded");
       return;
     }
-    
+
     if (locationMap) {
       locationMap.setView([lat, lon], 13);
     } else {
@@ -1418,27 +1418,27 @@ const initPlanner = function () {
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap'
       }).addTo(locationMap);
-      
+
       // Click handler for map
       locationMap.on('click', async (e) => {
         const { lat: clickLat, lng: clickLon } = e.latlng;
-        
+
         if (locationMarker) {
           locationMarker.setLatLng(e.latlng);
         } else {
           locationMarker = L.marker(e.latlng).addTo(locationMap);
         }
-        
+
         // Get address
         try {
           const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${clickLat}&lon=${clickLon}`);
           const data = await response.json();
           const address = data.display_name || `Vị trí (${clickLat.toFixed(4)}, ${clickLon.toFixed(4)})`;
-          
+
           document.getElementById('selectedLocationDisplay').style.display = 'flex';
           document.getElementById('selectedLocationText').textContent = address;
           document.getElementById('departureLocation').value = address;
-          
+
           document.getElementById('aiPlannerFormStep2').dataset.lat = clickLat;
           document.getElementById('aiPlannerFormStep2').dataset.lon = clickLon;
         } catch (err) {
@@ -1446,7 +1446,7 @@ const initPlanner = function () {
         }
       });
     }
-    
+
     if (locationMarker) {
       locationMarker.setLatLng([lat, lon]);
     } else {
@@ -1455,7 +1455,7 @@ const initPlanner = function () {
   }
 
   // Submit form from Step 2 to Wizard
-  window.submitFormToWizard = function() {
+  window.submitFormToWizard = function () {
     // Get all form data from Step 2
     const dest = document.getElementById('dest')?.value || '';
     const days = parseInt(document.getElementById('days')?.value) || 1;
@@ -1465,14 +1465,14 @@ const initPlanner = function () {
     const additionalInfo = document.getElementById('additionalInfo')?.value || '';
     const tripDate = document.getElementById('tripDate')?.value || '';
     const departureTime = document.getElementById('departureTime')?.value || '08:00';
-    
+
     // Get member counts
     const adults = parseInt(document.getElementById('adults')?.value) || 0;
     const children = parseInt(document.getElementById('children')?.value) || 0;
     const toddlers = parseInt(document.getElementById('toddlers')?.value) || 0;
     const seniors = parseInt(document.getElementById('seniors')?.value) || 0;
     const totalMembers = adults + children + toddlers + seniors;
-    
+
     // Get departure location
     const departureLocation = document.getElementById('departureLocation')?.value || '';
     const formStep2 = document.getElementById('aiPlannerFormStep2');
@@ -1547,7 +1547,7 @@ const initPlanner = function () {
           }
           input.value = value;
         });
-        
+
         // Trigger the original submit flow
         if (typeof window.doGenerate === 'function') {
           window.doGenerate(formData);
@@ -1593,12 +1593,12 @@ const initPlanner = function () {
       const formStep2 = document.getElementById('formStep2');
       if (formStep1) formStep1.style.display = 'none';
       if (formStep2) formStep2.style.display = 'none';
-      
+
       // Other paths
       if (stepDiscovery) stepDiscovery.style.display = 'none';
       if (stepSmartWizard) stepSmartWizard.style.display = 'none';
       if (stepCompare) stepCompare.style.display = 'none';
-      
+
       // Form step nav (only show for Form mode)
       if (formStepNav) formStepNav.style.display = 'none';
 
@@ -1751,7 +1751,7 @@ const initPlanner = function () {
             discoveryForm.dataset.days = data.suggestedDays || 3;
           }
         }
-      } catch(err) { console.error(err); }
+      } catch (err) { console.error(err); }
     });
   }
 
@@ -1793,7 +1793,7 @@ const initPlanner = function () {
         this.dom.chatInput.value = '';
       });
       this.dom.btnFinal?.addEventListener('click', () => this.generateItinerary());
-      
+
       // Use both click and submit for maximum reliability
       this.dom.btnStartWizard?.addEventListener('click', () => {
         console.log("🔘 [SmartWizard] Start button clicked");
@@ -1820,32 +1820,32 @@ const initPlanner = function () {
             });
             const d = await res.json();
             if (d.success) {
-                document.getElementById('additionalInfo').value = d.answer.replace(/[""]/g, '').substring(0, 100);
+              document.getElementById('additionalInfo').value = d.answer.replace(/[""]/g, '').substring(0, 100);
             }
-          } catch(e) {}
+          } catch (e) { }
           btnAISuggest.textContent = '✨ AI Gợi ý';
         });
       }
     },
 
     prefillForm(data) {
-        if (!data) return;
-        if (data.destination) document.getElementById('dest').value = data.destination;
-        if (data.days) document.getElementById('days').value = data.days;
-        if (data.budget) document.getElementById('budget').value = data.budget;
-        
-        // Chuyển sang tab Planner nếu đang ở tab khác
-        const tabBtn = document.querySelector('a[href="planner.html"]');
-        if (tabBtn) tabBtn.click();
-        
-        // Cuộn tới form
-        document.querySelector('.planner-form-card')?.scrollIntoView({ behavior: 'smooth' });
+      if (!data) return;
+      if (data.destination) document.getElementById('dest').value = data.destination;
+      if (data.days) document.getElementById('days').value = data.days;
+      if (data.budget) document.getElementById('budget').value = data.budget;
+
+      // Chuyển sang tab Planner nếu đang ở tab khác
+      const tabBtn = document.querySelector('a[href="planner.html"]');
+      if (tabBtn) tabBtn.click();
+
+      // Cuộn tới form
+      document.querySelector('.planner-form-card')?.scrollIntoView({ behavior: 'smooth' });
     },
 
     startSmartWizardFromForm() {
       const dest = document.getElementById('dest').value.trim();
       const days = parseInt(document.getElementById('days').value);
-      
+
       if (!dest || isNaN(days)) {
         if (window.WanderToast) WanderToast.error("Vui lòng điền đầy đủ thông tin");
         else alert("Vui lòng điền đầy đủ thông tin");
@@ -1869,14 +1869,14 @@ const initPlanner = function () {
       const formStepNav = document.getElementById('formStepNav');
       const stepDiscovery = document.getElementById('stepDiscovery');
       const stepCompare = document.getElementById('stepCompare');
-      
+
       if (formStepNav) formStepNav.style.display = 'none';
       if (formStep1) formStep1.style.display = 'none';
       if (formStep2) formStep2.style.display = 'none';
       if (stepDiscovery) stepDiscovery.style.display = 'none';
       if (stepCompare) stepCompare.style.display = 'none';
       if (stepSmartWizard) stepSmartWizard.style.display = 'flex';
-      
+
       this.dom.chatArea.innerHTML = '';
       this.history = [];
       this.handleMessage(`Tôi muốn đi ${this.data.destination} trong ${this.data.days} ngày. Hãy tư vấn thêm để hoàn thiện lịch trình.`);
@@ -1892,15 +1892,15 @@ const initPlanner = function () {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: text, currentData: this.data, history: this.history })
         });
-        
+
         if (!response.ok) throw new Error("API Wizard Error");
-        
+
         const result = await response.json();
         if (result.success) {
           this.addBubble(result.aiMessage, 'ai');
           this.history.push({ role: 'user', content: text }, { role: 'assistant', content: result.aiMessage });
           if (result.detectedData) this.data = { ...this.data, ...result.detectedData };
-          
+
           const nextStep = result.nextStep ? result.nextStep.toLowerCase() : '';
           // Nếu AI nói sẵn sàng hoặc không trả về uiOptions hợp lệ, ta ép sang màn hình Xác nhận
           if (nextStep === 'ready' || !result.uiOptions || !result.uiOptions.groups || result.uiOptions.groups.length === 0) {
@@ -1912,8 +1912,8 @@ const initPlanner = function () {
             this.renderOptions(result.uiOptions);
           }
         }
-      } catch (error) { 
-        console.error(error); 
+      } catch (error) {
+        console.error(error);
         this.addBubble("Rất tiếc, AI đang gặp chút trục trặc. Bạn có thể thử nhập lại hoặc nhấn nút bên dưới để lên lịch ngay với thông tin hiện có.", 'ai');
         this.showConfirmation();
       }
@@ -1926,7 +1926,7 @@ const initPlanner = function () {
         let ft = text.trim();
         if (ft.startsWith(',')) ft = ft.substring(1).trim();
         ft = ft.replace(/(\d+ ĐẾN \d+ TRIỆU VNĐ)/gi, '<strong style="color: var(--accent);">$1</strong>')
-               .replace(/(\d+ ngày)/gi, '<strong style="color: var(--accent);">$1</strong>');
+          .replace(/(\d+ ngày)/gi, '<strong style="color: var(--accent);">$1</strong>');
         bubble.innerHTML = `<div class="chat-header"><span class="chat-icon">✨</span><span class="chat-name">WANDERAI</span></div><div class="chat-content">${ft}</div>`;
       } else { bubble.textContent = text; }
       this.dom.chatArea.appendChild(bubble);
@@ -1954,7 +1954,7 @@ const initPlanner = function () {
       skipAllBtn.onclick = () => this.handleMessage("Tôi muốn AI tự chọn tất cả, lên lịch ngay");
       topRow.appendChild(skipAllBtn);
       container.appendChild(topRow);
-      
+
       uiOptions.groups.forEach(group => {
         const groupHeader = document.createElement('div');
         groupHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-top:12px;margin-bottom:6px;';
@@ -1984,17 +1984,17 @@ const initPlanner = function () {
         };
         groupHeader.appendChild(refreshBtn);
         container.appendChild(groupHeader);
-        
+
         const chips = document.createElement('div');
         chips.className = 'planner-chat-chips-v2';
-        
+
         group.options.forEach(opt => {
           const chip = document.createElement('button');
           chip.type = 'button';
           chip.className = 'chat-chip-premium';
           if (this.isOptionSelected(group.id, opt.id)) chip.classList.add('active');
           const label = opt.label || opt.text || opt.title || "Lựa chọn";
-          
+
           // --- Icon Fallback Map ---
           const iconMap = {
             'hoạt động': '🧗', 'trải nghiệm': '🧗', 'nghỉ ngơi': '🧘', 'chill': '🧘', 'mua sắm': '🛍️', 'giải trí': '🛍️', 'văn hóa': '🏛️', 'di tích': '🏛️',
@@ -2004,13 +2004,13 @@ const initPlanner = function () {
           };
           let defaultIcon = "✨";
           for (let key in iconMap) {
-             if (label.toLowerCase().includes(key)) {
-                defaultIcon = iconMap[key];
-                break;
-             }
+            if (label.toLowerCase().includes(key)) {
+              defaultIcon = iconMap[key];
+              break;
+            }
           }
           const icon = opt.icon || opt.emoji || defaultIcon;
-          
+
           chip.innerHTML = `<span class="chip-icon">${icon}</span> <span class="chip-text">${label}</span>`;
           chip.addEventListener('click', (e) => {
             e.preventDefault();
@@ -2045,7 +2045,7 @@ const initPlanner = function () {
       if (actualType === 'single_select') {
         const allChips = chip.parentElement.querySelectorAll('.chat-chip, .chat-chip-premium');
         allChips.forEach(c => c.classList.remove('active', 'is-selected'));
-        
+
         this.data[g] = opt.id;
         chip.classList.add('active');
       } else {
@@ -2053,7 +2053,7 @@ const initPlanner = function () {
         if (!Array.isArray(this.data[g])) {
           this.data[g] = this.data[g] ? [this.data[g]] : [];
         }
-        
+
         const idx = this.data[g].indexOf(opt.id);
         if (idx > -1) {
           this.data[g].splice(idx, 1);
@@ -2069,10 +2069,10 @@ const initPlanner = function () {
       this.dom.optionsArea.innerHTML = '';
       this.dom.confirmationArea.style.display = 'block';
       this.dom.inputArea.style.display = 'none';
-      
+
       const d = this.data;
       const dateStr = d.tripDate ? new Date(d.tripDate).toLocaleDateString('vi-VN') : 'Tùy chọn';
-      
+
       this.dom.summary.innerHTML = `
         <div style="margin-bottom: 1.25rem; text-align: center;">
           <h4 style="color: var(--accent); margin-bottom: 0.25rem; font-size: 0.9rem; letter-spacing: 1px; font-weight: 900;">XÁC NHẬN HÀNH TRÌNH</h4>
@@ -2103,7 +2103,7 @@ const initPlanner = function () {
   };
 
   SmartWizard.init();
-  
+
   // Merge methods into global WanderPlanner
   window.WanderPlanner = window.WanderPlanner || {};
   window.WanderPlanner.prefill = (data) => SmartWizard.prefillForm(data);
@@ -2116,17 +2116,17 @@ const initPlanner = function () {
   async function doGenerate(data) {
     // PHASE 2: Switch to result view FIRST so loader is visible
     document.querySelector('.planner-container')?.classList.add('show-result');
-    
+
     placeholder.style.display = 'none';
     resultContainer.style.display = 'none';
     loader.style.display = 'flex';
-    
+
     // Clear comparison mode
     const container = document.getElementById('timelineContent');
     if (container) container.classList.remove('comparison-mode-active');
     const saveBtn = document.getElementById('btnSaveTrip');
     if (saveBtn) saveBtn.style.display = 'inline-flex';
-    
+
     try {
       const token = localStorage.getItem('wander_token');
       const res = await fetch('/api/planner/generate', {
@@ -2134,21 +2134,21 @@ const initPlanner = function () {
         headers: { 'Content-Type': 'application/json', 'x-auth-token': token || '' },
         body: JSON.stringify({ ...data, tripDate: data.tripDate || '' })
       });
-      
+
       if (!res.ok) throw new Error("API Generation Failed");
-      
+
       const json = await res.json();
       if (json.success) {
         currentItineraryId = json.itineraryId;
-        
+
         // SWITCH TO PHASE 2: RESULT FULL SCREEN
         document.querySelector('.planner-container')?.classList.add('show-result');
-        
+
         // Record Activity
         if (window.WanderUI && WanderUI.recordActivity) {
           WanderUI.recordActivity('itinerary_gen', `Đã tạo lịch trình AI đi ${data.destination}`, { destination: data.destination, days: data.days });
         }
-        
+
         // Handle multiple plans if they exist, or simulate for UI testing
         if (json.plans && json.plans.length > 0) {
           planHistory = json.plans;
@@ -2156,10 +2156,10 @@ const initPlanner = function () {
           planHistory = [json.plan];
           // Nếu yêu cầu 2 mà chỉ trả 1, ta có thể clone hoặc để người dùng tự tinh chỉnh
         }
-        
+
         currentPlanIndex = 0;
         renderVersionTabs();
-        
+
         if (data.optionCount === "2" && planHistory.length >= 2) {
           renderDualItinerary(planHistory[0], planHistory[1], data.destination, data.days, json.weather);
           // Tự động kích hoạt view So sánh/Phân tích sau khi render xong
@@ -2169,16 +2169,16 @@ const initPlanner = function () {
         } else {
           renderItinerary(planHistory[0], data.destination, data.days, data.tripDate, json.weather);
         }
-        
+
         resultContainer.style.display = 'block';
         refineBox.style.display = 'block';
-        
+
         // Ensure scroll to top of results
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         throw new Error(json.message || "Không thể tạo lịch trình");
       }
-    } catch(err) { 
+    } catch (err) {
       console.error(err);
       placeholder.style.display = 'flex';
       placeholder.innerHTML = `
@@ -2205,12 +2205,12 @@ const initPlanner = function () {
     ];
     const sources = ['TripAdvisor', 'Google Maps', 'WanderViet', 'Facebook Travel'];
     let html = '';
-    for(let i=0; i<6; i++) {
-      const name = names[Math.floor(Math.random()*names.length)];
-      const comment = comments[Math.floor(Math.random()*comments.length)];
-      const source = sources[Math.floor(Math.random()*sources.length)];
+    for (let i = 0; i < 6; i++) {
+      const name = names[Math.floor(Math.random() * names.length)];
+      const comment = comments[Math.floor(Math.random() * comments.length)];
+      const source = sources[Math.floor(Math.random() * sources.length)];
       const stars = '★'.repeat(5);
-      const time = Math.floor(Math.random()*10 + 1) + ' ngày trước';
+      const time = Math.floor(Math.random() * 10 + 1) + ' ngày trước';
       html += `
          <div class="review-item-premium">
             <div class="review-source">${source} - ${time}</div>
@@ -2230,7 +2230,7 @@ const initPlanner = function () {
     const container = document.getElementById('timelineContent');
     if (container) {
       container.classList.remove('dual-plan-view');
-      
+
       // Inject Back Button at the top
       const backBtnHtml = `
         <div class="back-to-form-wrap" style="margin-bottom: 1.5rem;">
@@ -2239,7 +2239,7 @@ const initPlanner = function () {
           </button>
         </div>
       `;
-      
+
       container.innerHTML = backBtnHtml + generateItineraryHtml(plan, dest, days, 1, weather);
     }
   }
@@ -2248,7 +2248,7 @@ const initPlanner = function () {
     const container = document.getElementById('timelineContent');
     if (container) {
       container.classList.add('dual-plan-view');
-      
+
       // Inject Back Button
       const backBtnHtml = `
         <div class="back-to-form-wrap" style="grid-column: span 2; margin-bottom: 1.5rem;">
@@ -2270,8 +2270,8 @@ const initPlanner = function () {
     if (container) {
       container.classList.add('dual-plan-view');
       // Mặc định so sánh cho 3 ngày để đồng bộ giao diện
-      const days = 3; 
-      
+      const days = 3;
+
       container.innerHTML = plans.map((plan, idx) => {
         const weather = weatherArray ? weatherArray[idx] : null;
         return generateItineraryHtml(plan, destinations[idx], days, idx + 1, weather);
@@ -2305,16 +2305,16 @@ const initPlanner = function () {
     if (weather) window.currentWeatherData = weather;
     window.currentDestName = typeof dest === 'object' ? (dest.name || dest.destination) : dest;
     const rawItinerary = plan.itinerary || [];
-    
+
     // Elite Enrichment: Deep cultural and travel insights
     const itinerary = rawItinerary.map(day => ({
       ...day,
       activities: (day.activities || []).map(act => {
         const descriptions = [
-          `Chào mừng bạn đến với ${act.task || act.activity || act.name}. Trải nghiệm khoảnh khắc bình minh tuyệt đẹp trên mặt biển tĩnh lặng tại đây. Bạn sẽ được chiêm ngưỡng sự chuyển mình của vạn vật khi ánh mặt trời đầu tiên len lỏi qua các hang động đá vôi kỳ vĩ. Đây là thời điểm lý tưởng để cảm nhận sự thư thái và ghi lại những thước phim nghệ thuật về di sản thiên nhiên thế giới. Không chỉ là ngắm cảnh, đây còn là hành trình đi sâu vào tâm hồn của vùng đất huyền thoại.`,
-          `Khám phá tinh hoa ẩm thực địa phương tại ${act.task || act.activity || act.name} - không gian sang trọng bậc nhất. Mỗi món ăn là một câu chuyện về văn hóa và lòng hiếu khách của người dân bản địa, được chế biến bởi những đầu bếp tài hoa nhất. Từ hải sản tươi sống đánh bắt trong ngày đến những gia vị bí truyền, tất cả tạo nên một bản hòa tấu hương vị khó quên, đánh thức mọi giác quan của người lữ khách.`,
-          `Hành trình chinh phục ${act.task || act.activity || act.name}, nơi bạn có thể bao quát toàn bộ vẻ đẹp ngoạn mục của vùng vịnh. Đường đi uốn lượn qua những cánh rừng xanh mướt, mang đến cơ hội tiếp cận gần hơn với hệ sinh thái đa dạng. Từ điểm dừng chân trên cao, cả một vùng kỳ quan thu nhỏ trong tầm mắt, mang lại cảm giác chinh phục và tự hào về vẻ đẹp của non sông gấm vóc Việt Nam.`,
-          `Đắm mình vào không gian văn hóa lịch sử lâu đời tại ${act.task || act.activity || act.name} với những công trình kiến trúc mang đậm dấu ấn thời gian. Từng viên gạch, từng họa tiết chạm khắc đều kể về một thời kỳ vàng son của dân tộc. Bạn sẽ được hướng dẫn viên chia sẻ những thông tin khảo cổ học quý báu, giúp hiểu sâu hơn về giá trị di sản phi vật thể và cách mà con người nơi đây đã bảo tồn văn hóa qua hàng thế kỷ.`
+          `Chào mừng bạn đến với ${act.task || act.activity || act.name}. Trải nghiệm khoảnh khắc bình minh tuyệt đẹp trên mặt biển tĩnh lặng tại đây. Bạn sẽ được chiêm ngưỡng sự chuyển mình của vạn vật khi ánh mặt trời đầu tiên len lỏi qua các hang động đá vôi kỳ vĩ. Đây là thời điểm lý tưởng để cảm nhận sự thư thái và ghi lại những thước phim nghệ thuật về di sản thiên nhiên thế giới.`,
+          `Khám phá tinh hoa ẩm thực địa phương tại ${act.task || act.activity || act.name} - không gian ẩm thực sang trọng bậc nhất. Mỗi món ăn là một câu chuyện về văn hóa và lòng hiếu khách của người dân bản địa, được chế biến bởi những đầu bếp tài hoa nhất.`,
+          `Hành trình chinh phục ${act.task || act.activity || act.name}, nơi bạn có thể bao quát toàn bộ vẻ đẹp ngoạn mục của vùng vịnh. Đường đi uốn lượn qua những cánh rừng xanh mướt, mang đến cơ hội tiếp cận gần hơn với hệ sinh thái đa dạng.`,
+          `Đắm mình vào không gian văn hóa lịch sử lâu đời tại ${act.task || act.activity || act.name} với những công trình kiến trúc mang đậm dấu ấn thời gian. Từng viên gạch, từng họa tiết chạm khắc đều kể về một thời kỳ vàng son của dân tộc.`
         ];
         return {
           ...act,
@@ -2322,13 +2322,6 @@ const initPlanner = function () {
         };
       })
     }));
-    
-    // Mock user data for reviews if not provided by AI
-    const mockUsers = [
-      { name: 'Hoàng Minh', avatar: 'https://ui-avatars.com/api/?name=Minh+Quan&background=random', text: 'Chỗ này cực kỳ đẹp, rất đáng để ghé qua!' },
-      { name: 'Linh Chi', avatar: 'https://ui-avatars.com/api/?name=Linh+Chi&background=random', text: 'Không gian yên tĩnh, đồ ăn rất ngon.' },
-      { name: 'Sơn Tùng', avatar: 'https://ui-avatars.com/api/?name=Son+Tung&background=random', text: 'View sống ảo đỉnh cao, nhân viên nhiệt tình.' }
-    ];
 
     let wTemp = weather ? Number(weather.temp) : 28;
     let wCond = weather ? weather.condition : 'Nắng ấm / Mát mẻ';
@@ -2341,250 +2334,706 @@ const initPlanner = function () {
     let aiHName = aiHotelRaw ? aiHotelRaw.split('-')[0].split('(')[0].replace(/Khách sạn/i, '').replace(/Resort/i, '').replace(/Homestay/i, '').trim() : '';
     if (!aiHName || aiHName.toLowerCase() === 'trung tâm') aiHName = cleanD;
 
+    // Generate daysHtml tabs dynamically
+    const daysHtml = itinerary.map((day, idx) => {
+      const dayNum = day.day || (idx + 1);
+      const dayStr = dayNum.toString();
+      const dayDigitMatch = dayStr.match(/\d+/);
+      const dayDigit = dayDigitMatch ? dayDigitMatch[0] : (idx + 1);
+      let dayTitle = dayStr.replace(/^\d+\s*-\s*/, '').replace(/Ngày /g, '');
+      if (dayTitle === dayDigit.toString()) dayTitle = 'Khám phá điểm đến';
+
+      // Generate activities HTML
+      const activitiesHtml = (day.activities || []).map((act, aIdx) => {
+        const actName = act.task || act.activity || act.name || '';
+        const actDesc = act.description || act.visualNote || '';
+        const actCost = act.cost || '';
+        const actTransport = act.transport || '';
+        const actRating = parseFloat(act.rating) || 0;
+        const actSession = act.session || '';
+        const actLocation = act.location || '';
+        const actAddress = act.address || act.location || '';
+        const sessionColor = actSession === 'Sáng' ? '#10b981' : actSession === 'Chiều' ? '#f59e0b' : '#818cf8';
+        const sessionEmoji = actSession === 'Sáng' ? '☀️' : actSession === 'Chiều' ? '⛅' : '🌙';
+
+        let starHtml = '';
+        if (actRating > 0) {
+          starHtml = Array.from({ length: 5 }, (_, i) =>
+            i < Math.floor(actRating) ? '★' : (i < actRating ? '½' : '☆')
+          ).join('');
+        }
+
+        const actData = JSON.stringify(act).replace(/'/g, "&apos;").replace(/\`/g, '&#96;');
+        let actMapQuery = actLocation || actAddress || actName;
+        if (window.currentDestName && !actMapQuery.toLowerCase().includes(window.currentDestName.toLowerCase())) {
+          actMapQuery += ', ' + window.currentDestName;
+        }
+
+        const costBadge = actCost
+          ? '<div style="position:absolute; top:12px; right:12px; background:rgba(251,191,36,0.95); color:#000; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:12px; backdrop-filter:blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.25);">💰 ' + actCost + '</div>'
+          : '<div style="position:absolute; top:12px; right:12px; background:rgba(16,185,129,0.9); color:#fff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:12px; backdrop-filter:blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.25);">Miễn phí</div>';
+
+        const sessionBadge = actSession
+          ? '<span style="font-size:0.65rem; font-weight:800; color:' + sessionColor + '; background:' + sessionColor + '20; border: 1px solid ' + sessionColor + '35; padding:3px 8px; border-radius:8px; white-space:nowrap; text-transform:uppercase;">' + sessionEmoji + ' ' + actSession + '</span>'
+          : '';
+
+        const locationBadge = actLocation
+          ? '<div style="position:absolute; bottom:12px; left:12px; display:flex; align-items:center; gap:4px; font-size:0.72rem; color:#fff; font-weight:700; background:rgba(15,23,42,0.65); backdrop-filter:blur(8px); padding:4px 10px; border-radius:12px; max-width:80%; border: 1px solid rgba(255,255,255,0.08); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📍 ' + actLocation + '</div>'
+          : '';
+
+        const ratingBadge = actRating > 0
+          ? '<div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0;"><span style="color:#fbbf24; font-size:0.72rem; letter-spacing:1px;">' + starHtml + '</span><span style="color:#fbbf24; font-size:0.72rem; font-weight:900;">' + actRating + '/5</span></div>'
+          : '';
+
+        const transportBadge = actTransport
+          ? '<div style="display:inline-flex; align-items:center; gap:5px; font-size:0.75rem; color:#38bdf8; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.2); padding:4px 12px; border-radius:20px; margin-bottom:0.75rem; font-weight:700;">🚗 ' + actTransport + '</div>'
+          : '';
+
+        const descParagraph = actDesc
+          ? '<p style="font-size:0.88rem; line-height:1.6; color:rgba(255,255,255,0.75); margin:0 0 1rem; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">' + actDesc + '</p>'
+          : '';
+
+        const transitHtml = act.transitToNext
+          ? '<div class="transit-step-v3"><span style="font-size:1rem;">⚡</span><span>' + act.transitToNext + '</span></div>'
+          : '';
+
+        return `
+          <div class="premium-activity-card-v3">
+            <div class="activity-time-block">
+              <span class="activity-time-val">${act.time || '--:--'}</span>
+              ${sessionBadge}
+            </div>
+
+            <div class="activity-content-card-v3">
+              <div class="activity-image-wrap-v3">
+                <img 
+                  class="activity-image-v3"
+                  src="${getVNPhoto(actName, aIdx)}" 
+                  alt="${actName}"
+                  loading="lazy"
+                  onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=600&fit=crop';"
+                >
+                <div class="activity-image-overlay-v3"></div>
+                ${locationBadge}
+                ${costBadge}
+                <div style="position:absolute; top:12px; left:12px; font-size:0.6rem; color:rgba(255,255,255,0.5); background:rgba(0,0,0,0.4); padding:2px 6px; border-radius:4px; font-weight:700;">📸 WANDERVIỆT</div>
+              </div>
+
+              <div style="padding:1.5rem 1.75rem 1.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; margin-bottom:0.6rem;">
+                  <h4 style="font-size:1.25rem; color:#fff; margin:0; font-weight:800; line-height:1.3; flex:1;">${actName}</h4>
+                  ${ratingBadge}
+                </div>
+
+                ${transportBadge}
+                ${descParagraph}
+
+                <div style="display:flex; gap:10px; flex-wrap:wrap; padding-top:0.9rem; border-top:1px solid rgba(255,255,255,0.08);">
+                  <button type="button" class="act-btn-v3 act-btn-details"
+                    onclick='showActivityDetails(${actData})'>
+                    🔍 Xem Chi Tiết & Review
+                  </button>
+                  <a href="#" class="act-btn-v3 act-btn-gps"
+                    onclick="window.getGPSDirections('${actMapQuery.replace(/'/g, "\\'")}', event)">
+                    📍 Bản đồ (GPS)
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          ${transitHtml}
+        `;
+      }).join('');
+
+      return `
+        <div class="itinerary-tab-panel" id="itinerary-day-panel-${dayDigit}" style="display: none;">
+          <div class="day-header-meta-v3">
+            <div class="day-circle-v3">D${dayDigit}</div>
+            <div style="display:flex; flex-direction:column;">
+               <h3 style="font-size: 1.5rem; font-weight: 800; color: #fff; margin: 0; font-family: 'Outfit', sans-serif;">Ngày ${dayDigit}: ${dayTitle}</h3>
+               <span style="font-size:0.78rem; color:#10b981; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-top:2px;">✨ Trải nghiệm đặc sắc trong ngày</span>
+            </div>
+            <div style="flex: 1; height: 1px; background: linear-gradient(90deg, rgba(16, 185, 129, 0.4), transparent); margin-left: 1rem;"></div>
+          </div>
+          
+          <div class="activities-list-v3">
+            ${activitiesHtml}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const accommodationHtml = `
+        <div class="itinerary-tab-panel" id="itinerary-stays-panel" style="display: none;">
+          <div class="accomm-premium-card-v3" style="margin-top: 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1.25rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span style="font-size: 2.25rem; filter: drop-shadow(0 0 10px rgba(59,130,246,0.3));">🏨</span>
+                <div>
+                  <h3 style="margin: 0; font-size: 1.35rem; font-weight: 800; color: #fff; font-family: 'Outfit', sans-serif; letter-spacing: 0.5px;">GỢI Ý LƯU TRÚ TỔNG HỢP • BỞI WANDER AI</h3>
+                  <span style="font-size: 0.85rem; color: rgba(255,255,255,0.55); font-weight:500;">Đầy đủ các phân khúc từ Bình dân đến Cao cấp tại address ${cleanD}</span>
+                </div>
+              </div>
+              <span style="background: rgba(59, 130, 246, 0.18); color: #60a5fa; font-size: 0.75rem; padding: 6px 16px; border-radius: 20px; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.35); box-shadow: 0 0 15px rgba(59,130,246,0.15); text-transform: uppercase; letter-spacing: 0.5px;">✨ Google Maps API Live</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+              <!-- AI Đề xuất / Tiêu chuẩn -->
+              <div class="stay-card-v3 stay-card-standard">
+                <div>
+                  <span class="stay-badge" style="position: absolute; top: 12px; right: 12px; background: #3b82f6; color: #fff;">⭐ AI Đề xuất</span>
+                  <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; padding-top: 10px;">
+                    <span style="font-size: 1.5rem;">${plan.accommodationSuggestion ? (plan.accommodationSuggestion.icon || '🏢') : '🏢'}</span>
+                    <span style="font-size: 0.8rem; font-weight: 800; color: #60a5fa; text-transform: uppercase; letter-spacing: 0.5px;">Khách sạn Tiêu chuẩn</span>
+                  </div>
+                  <h4 style="margin: 0 0 0.6rem 0; font-size: 1.2rem; color: #fff; font-weight: 800; line-height: 1.4;">${plan.accommodationSuggestion ? formatNameAndCost(plan.accommodationSuggestion.nameAndCost) : ('Khách sạn trung tâm ' + cleanD + ' (~800.000 VNĐ/đêm)')}</h4>
+                  <p style="margin: 0 0 1.25rem 0; font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.6; font-style: italic;">"${plan.accommodationSuggestion ? (plan.accommodationSuggestion.reason || 'Vị trí đắc địa, phòng ốc tiện nghi và dịch vụ chuyên nghiệp.') : 'Thuận tiện di chuyển, phòng sạch sẽ, tiện nghi đầy đủ.'}"</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((aiHName ? aiHName : 'Khách sạn') + ' ' + cleanD)}" target="_blank" class="stay-map-btn-v3 stay-map-btn-standard">
+                  <span>📍 Bản đồ & Đặt phòng</span>
+                </a>
+              </div>
+
+              <!-- Bình dân / Homestay -->
+              <div class="stay-card-v3 stay-card-budget">
+                <div>
+                  <span class="stay-badge" style="position: absolute; top: 12px; right: 12px; background: #10b981; color: #fff;">🏡 Bản địa</span>
+                  <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; padding-top: 10px;">
+                    <span style="font-size: 1.5rem;">🏡</span>
+                    <span style="font-size: 0.8rem; font-weight: 800; color: #34d399; text-transform: uppercase; letter-spacing: 0.5px;">Homestay / Tiết kiệm</span>
+                  </div>
+                  <h4 style="margin: 0 0 0.6rem 0; font-size: 1.2rem; color: #fff; font-weight: 800; line-height: 1.4;">Homestay Bản địa (~250.000 - 450.000 VNĐ/đêm)</h4>
+                  <p style="margin: 0 0 1.25rem 0; font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.6; font-style: italic;">"Không gian ấm cúng mang đậm phong vị địa phương, thiết kế gần gũi thiên nhiên, thích hợp tối ưu chi phí."</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Homestay ' + cleanD)}" target="_blank" class="stay-map-btn-v3 stay-map-btn-budget">
+                  <span>📍 Tìm Homestay</span>
+                </a>
+              </div>
+
+              <!-- Cao cấp / Resort 5 sao -->
+              <div class="stay-card-v3 stay-card-luxury">
+                <div>
+                  <span class="stay-badge" style="position: absolute; top: 12px; right: 12px; background: #f59e0b; color: #000;">👑 Thượng hạng</span>
+                  <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; padding-top: 10px;">
+                    <span style="font-size: 1.5rem;">👑</span>
+                    <span style="font-size: 0.8rem; font-weight: 800; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.5px;">Resort & Villa 5★</span>
+                  </div>
+                  <h4 style="margin: 0 0 0.6rem 0; font-size: 1.2rem; color: #fff; font-weight: 800; line-height: 1.4;">Resort Nghỉ dưỡng Cao cấp (~2.500.000+ VNĐ/đêm)</h4>
+                  <p style="margin: 0 0 1.25rem 0; font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.6; font-style: italic;">"Không gian nghỉ dưỡng đẳng cấp thượng lưu, tích hợp các tiện ích dịch vụ chuẩn 5 sao quốc tế."</p>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Resort 5 sao ' + cleanD)}" target="_blank" class="stay-map-btn-v3 stay-map-btn-luxury">
+                  <span>📍 Xem Luxury Resort</span>
+                </a>
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); padding: 1.5rem; border-radius: 1.5rem; border: 1px solid rgba(255,255,255,0.08);">
+              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((aiHName ? (aiHName + ' ') : 'Khách sạn ') + cleanD)}" target="_blank" style="padding: 0.9rem 2.5rem; font-size: 1rem; border-radius: 30px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 0.75rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.45); transition: all 0.3s ease;" onmouseenter="this.style.transform='scale(1.03)'; this.style.boxShadow='0 10px 30px rgba(16, 185, 129, 0.65)';" onmouseleave="this.style.transform=''; this.style.boxShadow='0 8px 25px rgba(16, 185, 129, 0.45)';">
+                <span>📍 Chuyển Trực Tiếp Đến Google Maps Để Đặt Ngay</span>
+              </a>
+            </div>
+          </div>
+        </div>
+    `;
+
+    // Generate Tab Headers dynamically
+    const tabHeadersHtml = itinerary.map((day, idx) => {
+      const dayNum = day.day || (idx + 1);
+      const dayStr = dayNum.toString();
+      const dayDigitMatch = dayStr.match(/\d+/);
+      const dayDigit = dayDigitMatch ? dayDigitMatch[0] : (idx + 1);
+      return `<button class="console-tab-btn" onclick="window.switchItineraryTab('day-panel-${dayDigit}', this)">📅 Ngày ${dayDigit}</button>`;
+    }).join('');
+
     return `
       <div class="itinerary-column-wrapper">
-        <div class="timeline-header-premium-v2" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(6, 78, 59, 0.2)); border-left: 4px solid var(--accent);">
-          <div class="timeline-header-content">
-            <div style="display:flex; justify-content: space-between; align-items: center;">
-               <div class="destination-badge-v2" style="background: var(--accent); color: white;">📍 ${dest}</div>
-               <div style="display:flex; gap: 0.5rem; align-items: center;">
-                  ${weather ? `<span class="version-badge" style="background:rgba(59,130,246,0.1); color:#60a5fa; border: 1px solid #3b82f6; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:800; display:flex; align-items:center; gap:4px;">☁️ ${wTemp}°C - ${wCond}</span>` : ''}
-                  <span class="version-badge" style="background:rgba(255,255,255,0.1); color:var(--accent); border: 1px solid var(--accent); padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:800;">✨ AI OPTIMIZED</span>
-               </div>
-            </div>
-            <h2 class="main-itinerary-title-v2" style="font-size: 1.5rem; margin-top: 0.75rem; color: #fff;">${plan.title || `Hành trình ${days} ngày`}</h2>
-            <p class="timeline-summary-v2" style="font-size: 0.9rem; line-height: 1.6; color: rgba(255,255,255,0.7);">${plan.tripSummary || plan.summary || 'Kế hoạch du lịch được WanderAI thiết kế riêng cho bạn.'}</p>
-          </div>
+        <style>
+          /* Full Modern Rebuild Style Section */
+          .travel-console-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            width: 100%;
+            margin-top: 1rem;
+          }
+
+          /* Majestic Glassmorphic Tab Bar */
+          .console-tabs-bar-v3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px;
+            border-radius: 30px;
+            width: 100%;
+            overflow-x: auto;
+            scrollbar-width: none; /* Hide scrollbar Firefox */
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+          }
+          .console-tabs-bar-v3::-webkit-scrollbar {
+            display: none; /* Hide scrollbar Chrome/Safari */
+          }
+
+          .console-tab-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.65);
+            padding: 10px 24px;
+            border-radius: 24px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          }
+          .console-tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-1px);
+          }
+          .console-tab-btn.active {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+          }
+
+          /* Active Panel Transition */
+          .itinerary-tab-panel {
+            animation: consolePanelFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            width: 100%;
+          }
+          @keyframes consolePanelFadeIn {
+            from {
+              opacity: 0;
+              transform: translateY(12px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          /* Card Container */
+          .timeline-header-premium-v3 {
+            background: linear-gradient(135deg, rgba(20, 30, 48, 0.6) 0%, rgba(36, 59, 85, 0.45) 100%) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border-radius: 2rem !important;
+            padding: 2.5rem !important;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.05) !important;
+            position: relative !important;
+            overflow: hidden !important;
+          }
+
+          /* Stat Box Layout */
+          .itinerary-stats-grid-v3 {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)) !important;
+            gap: 1.25rem !important;
+            margin-top: 2rem !important;
+          }
+          .stat-box-v3 {
+            background: rgba(15, 23, 42, 0.55) !important;
+            border: 1px solid rgba(255, 255, 255, 0.06) !important;
+            padding: 1.25rem !important;
+            border-radius: 1.25rem !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 1rem !important;
+            position: relative !important;
+            overflow: hidden !important;
+            cursor: pointer !important;
+          }
+          .stat-box-v3::before {
+            content: "" !important;
+            position: absolute !important;
+            inset: 0 !important;
+            background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.03)) !important;
+            opacity: 0 !important;
+            transition: opacity 0.3s ease !important;
+          }
+          .stat-box-v3:hover::before {
+            opacity: 1 !important;
+          }
+          .stat-box-v3:hover {
+            transform: translateY(-5px) scale(1.02) !important;
+            background: rgba(15, 23, 42, 0.7) !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+          }
           
-          <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
-            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#KhámPháViệtNam</span>
-            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#TốiƯuBởiAI</span>
-            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#DuLịchThôngMinh</span>
-            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 4px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">#${cleanD.replace(/\s+/g, '')}</span>
+          /* Colorful themes for each stat box */
+          .stat-box-cost:hover { border-color: rgba(16, 185, 129, 0.45) !important; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15) !important; }
+          .stat-box-pace:hover { border-color: rgba(245, 158, 11, 0.45) !important; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15) !important; }
+          .stat-box-vibe:hover { border-color: rgba(56, 189, 248, 0.45) !important; box-shadow: 0 10px 25px rgba(56, 189, 248, 0.15) !important; }
+          .stat-box-transport:hover { border-color: rgba(244, 114, 182, 0.45) !important; box-shadow: 0 10px 25px rgba(244, 114, 182, 0.15) !important; }
+          .stat-box-weather:hover { border-color: rgba(251, 191, 36, 0.45) !important; box-shadow: 0 10px 25px rgba(251, 191, 36, 0.15) !important; }
+          .stat-box-advice:hover { border-color: rgba(167, 139, 250, 0.45) !important; box-shadow: 0 10px 25px rgba(167, 139, 250, 0.15) !important; }
+
+          .stat-icon-wrap {
+            width: 44px !important;
+            height: 44px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 1.3rem !important;
+            flex-shrink: 0 !important;
+            transition: transform 0.4s ease !important;
+          }
+          .stat-box-v3:hover .stat-icon-wrap {
+            transform: scale(1.15) rotate(5deg) !important;
+          }
+
+          /* Accommodation styles */
+          .accomm-premium-card-v3 {
+            background: linear-gradient(135deg, rgba(20, 30, 48, 0.5) 0%, rgba(15, 23, 42, 0.75) 100%) !important;
+            border: 1px solid rgba(59, 130, 246, 0.25) !important;
+            border-left: 5px solid #3b82f6 !important;
+            padding: 2rem !important;
+            border-radius: 2rem !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45) !important;
+            transition: all 0.3s ease !important;
+          }
+          .accomm-premium-card-v3:hover {
+            box-shadow: 0 20px 55px rgba(59, 130, 246, 0.15), 0 20px 50px rgba(0,0,0,0.5) !important;
+          }
+          .stay-card-v3 {
+            background: rgba(15, 23, 42, 0.45) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            padding: 1.5rem !important;
+            border-radius: 1.5rem !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            position: relative !important;
+            overflow: hidden;
+          }
+          .stay-card-v3:hover {
+            transform: translateY(-5px) !important;
+            background: rgba(15, 23, 42, 0.65) !important;
+          }
+          .stay-card-standard:hover { border-color: rgba(59, 130, 246, 0.45) !important; box-shadow: 0 12px 30px rgba(59, 130, 246, 0.25) !important; }
+          .stay-card-budget:hover { border-color: rgba(16, 185, 129, 0.45) !important; box-shadow: 0 12px 30px rgba(16, 185, 129, 0.25) !important; }
+          .stay-card-luxury:hover { border-color: rgba(245, 158, 11, 0.45) !important; box-shadow: 0 12px 30px rgba(245, 158, 11, 0.25) !important; }
+
+          .stay-badge {
+            font-size: 0.65rem !important;
+            font-weight: 800 !important;
+            padding: 3px 10px !important;
+            border-radius: 12px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+          }
+
+          .stay-map-btn-v3 {
+            align-self: flex-start !important;
+            padding: 8px 16px !important;
+            border-radius: 20px !important;
+            font-size: 0.8rem !important;
+            font-weight: 700 !important;
+            text-decoration: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            transition: all 0.3s ease !important;
+          }
+          .stay-map-btn-standard { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; border: 1px solid rgba(59, 130, 246, 0.3) !important; }
+          .stay-map-btn-standard:hover { background: #3b82f6 !important; color: #fff !important; transform: scale(1.05) !important; }
+          .stay-map-btn-budget { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.3) !important; }
+          .stay-map-btn-budget:hover { background: #10b981 !important; color: #fff !important; transform: scale(1.05) !important; }
+          .stay-map-btn-luxury { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; border: 1px solid rgba(245, 158, 11, 0.3) !important; }
+          .stay-map-btn-luxury:hover { background: #f59e0b !important; color: #fff !important; transform: scale(1.05) !important; }
+
+          /* Day Header */
+          .day-header-meta-v3 {
+            margin-bottom: 2.25rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 1.5rem !important;
+          }
+          .day-circle-v3 {
+            flex-shrink: 0 !important;
+            width: 54px !important;
+            height: 54px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            color: white !important;
+            font-weight: 900 !important;
+            font-size: 1.25rem !important;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+          }
+
+          /* Activity Card layout - SMASH & REBUILD */
+          .premium-activity-card-v3 {
+            padding: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            margin-bottom: 2.5rem !important;
+            display: flex !important;
+            gap: 1.5rem !important;
+            position: relative !important;
+          }
+          /* Day list vertical line */
+          .activities-list-v3 {
+            padding-left: 30px !important;
+            border-left: 3px solid rgba(16, 185, 129, 0.2) !important;
+            margin-left: 25px !important;
+          }
+          .activity-time-block {
+            min-width: 80px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            padding-top: 20px !important;
+            gap: 6px !important;
+          }
+          .activity-time-val {
+            font-weight: 900 !important;
+            color: var(--accent, #10b981) !important;
+            font-size: 1.2rem !important;
+            letter-spacing: 0.5px !important;
+            line-height: 1 !important;
+          }
+
+          /* Rebuilt Glassmorphic Content Card */
+          .activity-content-card-v3 {
+            flex: 1 !important;
+            background: rgba(30, 41, 59, 0.45) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 1.75rem !important;
+            overflow: hidden !important;
+            transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.05) !important;
+            position: relative !important;
+          }
+          .activity-content-card-v3:hover {
+            border-color: rgba(16, 185, 129, 0.35) !important;
+            transform: translateY(-6px) scale(1.01) !important;
+            background: rgba(30, 41, 59, 0.6) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35), 0 0 25px rgba(16, 185, 129, 0.15) !important;
+          }
+
+          /* Fixed squished images - elegant 16:9 look */
+          .activity-image-wrap-v3 {
+            height: 220px !important; /* Elegant cinema height */
+            position: relative !important;
+            overflow: hidden !important;
+          }
+          .activity-image-v3 {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            transition: transform 0.6s ease !important;
+          }
+          .activity-content-card-v3:hover .activity-image-v3 {
+            transform: scale(1.06) !important;
+          }
+
+          /* Overlay gradient for premium readability */
+          .activity-image-overlay-v3 {
+            position: absolute !important;
+            inset: 0 !important;
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.4) 50%, transparent 100%) !important;
+          }
+
+          /* Action Buttons - Tactile & Premium */
+          .act-btn-v3 {
+            flex: 1 !important;
+            border: none !important;
+            padding: 11px 20px !important;
+            border-radius: 25px !important;
+            font-size: 0.8rem !important;
+            font-weight: 800 !important;
+            cursor: pointer !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            text-decoration: none !important;
+          }
+          .act-btn-details {
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+          }
+          .act-btn-details:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45) !important;
+          }
+          .act-btn-gps {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+          }
+          .act-btn-gps:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45) !important;
+          }
+
+          /* Transit Step styling */
+          .transit-step-v3 {
+            margin: -1rem 0 1.5rem 105px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            color: #38bdf8 !important;
+            font-size: 0.8rem !important;
+            font-weight: 700 !important;
+            background: rgba(56, 189, 248, 0.08) !important;
+            padding: 8px 16px !important;
+            border-radius: 20px !important;
+            border: 1px solid rgba(56, 189, 248, 0.2) !important;
+            width: fit-content !important;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.1) !important;
+            transition: all 0.3s ease !important;
+          }
+          .transit-step-v3:hover {
+            background: rgba(56, 189, 248, 0.15) !important;
+            border-color: rgba(56, 189, 248, 0.35) !important;
+            transform: translateX(4px) !important;
+          }
+        </style>
+
+        <div class="travel-console-container">
+          <!-- Majestic Navigation Console Tab Bar -->
+          <div class="console-tabs-bar-v3">
+            <button class="console-tab-btn active" onclick="window.switchItineraryTab('overview-panel', this)">📊 Tổng Quan</button>
+            <button class="console-tab-btn" onclick="window.switchItineraryTab('stays-panel', this)">🏨 Nơi Lưu Trú</button>
+            ${tabHeadersHtml}
           </div>
-          
-          <div class="itinerary-stats-grid-v2" style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem;">
-            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
-              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">💰 Dự toán chi phí</span>
-              <span class="stat-value-v2" style="color: var(--accent); font-size: 1.25rem; font-weight: 800; display: block;">${formatCost(plan.estimatedCost || plan.totalEstimatedCost)}</span>
-            </div>
-            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
-              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">🚶 Nhịp độ di chuyển</span>
-              <span class="stat-value-v2" style="color: #fff; font-size: 1.1rem; font-weight: 700; display: block;">${plan.pace || 'Vừa phải - Thư thái'}</span>
-            </div>
-            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
-              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">🎒 Phong cách / Thể loại</span>
-              <span class="stat-value-v2" style="color: #38bdf8; font-size: 1.1rem; font-weight: 700; display: block;">${plan.vibe || plan.style || 'Khám phá tự nhiên & Trải nghiệm'}</span>
-            </div>
-            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
-              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">🚗 Phương tiện đề xuất</span>
-              <span class="stat-value-v2" style="color: #f472b6; font-size: 1.1rem; font-weight: 700; display: block;">${plan.transport || plan.bestTransit || 'Ô tô / Xe máy phượt / Đi bộ'}</span>
-            </div>
-            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
-              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">🌤️ Thời tiết & Khí hậu</span>
-              <span class="stat-value-v2" style="color: #fbbf24; font-size: 1.1rem; font-weight: 700; display: block;">${weather ? `${wTemp}°C (${wCond})` : '28°C - 32°C (Nắng đẹp lý tưởng)'}</span>
-            </div>
-            <div class="stat-box-v2" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); padding: 1.25rem; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); backdrop-filter: blur(10px);">
-              <span class="stat-label-v2" style="font-size: 0.8rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 0.5rem;">💡 Lời khuyên chuẩn bị</span>
-              <span class="stat-value-v2" style="color: #a78bfa; font-size: 1.1rem; font-weight: 700; display: block;">Trang phục thoải mái, kem chống nắng, mũ rộng vành</span>
-            </div>
-          </div>
-        </div>
 
-        <div class="accomm-premium-card" style="margin-top: 2rem; background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8)); border: 1px solid rgba(59, 130, 246, 0.3); border-left: 4px solid #3b82f6; padding: 1.75rem; border-radius: 20px; backdrop-filter: blur(10px); box-shadow: 0 10px 35px rgba(0,0,0,0.2);">
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-              <span style="font-size: 2rem;">🏨</span>
-              <div>
-                <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #fff;">GỢI Ý LƯU TRÚ TỔNG HỢP • BỞI WANDER AI</h3>
-                <span style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">Đầy đủ lựa chọn từ Bình dân đến Cao cấp tại ${cleanD}</span>
-              </div>
-            </div>
-            <span style="background: rgba(59, 130, 246, 0.25); color: #60a5fa; font-size: 0.75rem; padding: 6px 14px; border-radius: 20px; font-weight: 800; border: 1px solid rgba(59, 130, 246, 0.4);">✨ Tích hợp Google Maps API</span>
-          </div>
-
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 1.75rem;">
-            <!-- AI Đề xuất / Tiêu chuẩn -->
-            <div style="background: rgba(59, 130, 246, 0.15); border: 2px solid #3b82f6; padding: 1.25rem; border-radius: 16px; position: relative; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                <span style="position: absolute; top: -12px; right: 16px; background: #3b82f6; color: #fff; font-size: 0.7rem; font-weight: 800; padding: 2px 10px; border-radius: 10px; text-transform: uppercase;">⭐ AI Đề xuất</span>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                  <span style="font-size: 1.5rem;">${plan.accommodationSuggestion ? (plan.accommodationSuggestion.icon || '🏢') : '🏢'}</span>
-                  <span style="font-size: 0.85rem; font-weight: 800; color: #93c5fd; text-transform: uppercase;">Khách sạn / Resort Tiêu chuẩn</span>
-                </div>
-                <h4 style="margin: 0 0 0.5rem 0; font-size: 1.15rem; color: #fff; font-weight: 800;">${plan.accommodationSuggestion ? formatNameAndCost(plan.accommodationSuggestion.nameAndCost) : `Khách sạn trung tâm ${cleanD} (~800.000 VNĐ/đêm)`}</h4>
-                <p style="margin: 0 0 1rem 0; font-size: 0.85rem; color: rgba(255,255,255,0.85); line-height: 1.5; font-style: italic;">"${plan.accommodationSuggestion ? (plan.accommodationSuggestion.reason || 'Vị trí đắc địa, dịch vụ chuẩn mực và không gian hòa hợp trọn vẹn với trải nghiệm chuyến đi.') : 'Vị trí thuận tiện di chuyển, phòng ốc sạch sẽ, tiện nghi đầy đủ.'}"</p>
-              </div>
-              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((aiHName ? aiHName : 'Khách sạn') + ' ' + cleanD)}" target="_blank" style="align-self: flex-start; background: rgba(59, 130, 246, 0.3); color: #93c5fd; padding: 6px 14px; border-radius: 15px; font-size: 0.8rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(59, 130, 246, 0.5); display: inline-flex; align-items: center; gap: 6px;">
-                <span>📍 Kiểm tra phòng trên Google Maps</span>
-              </a>
-            </div>
-
-            <!-- Bình dân / Homestay -->
-            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); padding: 1.25rem; border-radius: 16px; transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                  <span style="font-size: 1.5rem;">🏡</span>
-                  <span style="font-size: 0.85rem; font-weight: 800; color: #10b981; text-transform: uppercase;">Homestay / Bình dân</span>
-                </div>
-                <h4 style="margin: 0 0 0.5rem 0; font-size: 1.15rem; color: #fff; font-weight: 800;">Homestay Bản địa (~250.000 - 450.000 VNĐ/đêm)</h4>
-                <p style="margin: 0 0 1rem 0; font-size: 0.85rem; color: rgba(255,255,255,0.75); line-height: 1.5; font-style: italic;">"Không gian ấm cúng, thiết kế xinh xắn gần gũi thiên nhiên, cực kỳ phù hợp cho các bạn phượt thủ hoặc nhóm bạn trẻ tối ưu chi phí."</p>
-              </div>
-              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Homestay ' + cleanD)}" target="_blank" style="align-self: flex-start; background: rgba(16, 185, 129, 0.15); color: #34d399; padding: 6px 14px; border-radius: 15px; font-size: 0.8rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(16, 185, 129, 0.3); display: inline-flex; align-items: center; gap: 6px;">
-                <span>📍 Tìm Homestay trên Google Maps</span>
-              </a>
-            </div>
-
-            <!-- Cao cấp / Resort 5 sao -->
-            <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.15); padding: 1.25rem; border-radius: 16px; transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                  <span style="font-size: 1.5rem;">👑</span>
-                  <span style="font-size: 0.85rem; font-weight: 800; color: #f59e0b; text-transform: uppercase;">Resort & Villa 5★</span>
-                </div>
-                <h4 style="margin: 0 0 0.5rem 0; font-size: 1.15rem; color: #fff; font-weight: 800;">Resort Nghỉ dưỡng Thượng hạng (~2.500.000+ VNĐ/đêm)</h4>
-                <p style="margin: 0 0 1rem 0; font-size: 0.85rem; color: rgba(255,255,255,0.75); line-height: 1.5; font-style: italic;">"Trải nghiệm nghỉ dưỡng đẳng cấp 5 sao với hồ bơi vô cực, dịch vụ spa trọn gói và tầm nhìn toàn cảnh tuyệt mỹ."</p>
-              </div>
-              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('Resort 5 sao ' + cleanD)}" target="_blank" style="align-self: flex-start; background: rgba(245, 158, 11, 0.15); color: #fbbf24; padding: 6px 14px; border-radius: 15px; font-size: 0.8rem; font-weight: 700; text-decoration: none; border: 1px solid rgba(245, 158, 11, 0.3); display: inline-flex; align-items: center; gap: 6px;">
-                <span>📍 Khám phá Resort trên Google Maps</span>
-              </a>
-            </div>
-          </div>
-
-          <div style="display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); padding: 1.25rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);">
-            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((aiHName ? (aiHName + ' ') : 'Khách sạn ') + cleanD)}" target="_blank" class="btn" style="padding: 0.85rem 2.25rem; font-size: 1.05rem; border-radius: 30px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 0.75rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); transition: all 0.3s ease;">
-              <span>📍 Chuyển Trực Tiếp Đến Google Maps Để Xem Phòng & Đặt Ngay</span>
-            </a>
-          </div>
-        </div>
-
-        <div class="timeline-container-v2" style="padding: 1.5rem 0;">
-          ${itinerary.map((day, idx) => {
-            const dayNum = day.day || (idx + 1);
-            const dayStr = dayNum.toString();
-            const dayDigitMatch = dayStr.match(/\\d+/);
-            const dayDigit = dayDigitMatch ? dayDigitMatch[0] : (idx + 1);
-            let dayTitle = dayStr.replace(/^\\d+\\s*-\\s*/, '').replace(/Ngày /g, '');
-            if (dayTitle === dayDigit.toString()) dayTitle = 'Khám phá điểm đến';
+          <!-- Tab Content Panel Workspace -->
+          <div class="console-workspace-v3">
             
-            return `
-            <div class="itinerary-day-block-v2" style="margin-bottom: 3rem; position: relative;">
-              <div class="day-header-meta-v2" style="margin-bottom: 2rem; display: flex; align-items: center; gap: 1.5rem;">
-                <div class="day-number-circle" style="flex-shrink:0;">D${dayDigit}</div>
-                <div style="display:flex; flex-direction:column;">
-                   <h3 class="day-title-v2">Ngày ${dayDigit} (${dayTitle})</h3>
-                   <span style="font-size:0.75rem; color:rgba(255,255,255,0.4); font-weight:600; text-transform:uppercase; letter-spacing:1px;">Khởi đầu hành trình</span>
+            <!-- Panel 1: Overview Dashboard -->
+            <div class="itinerary-tab-panel" id="itinerary-overview-panel">
+              <div class="timeline-header-premium-v3">
+                <div class="timeline-header-content">
+                  <div style="display:flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+                     <div class="destination-badge-v2" style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.8rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 4px;">📍 ${dest}</div>
+                     <div style="display:flex; gap: 0.5rem; align-items: center;">
+                        ${weather ? `<span class="version-badge" style="background:rgba(59,130,246,0.15); color:#60a5fa; border: 1px solid rgba(59,130,246,0.3); padding:4px 12px; border-radius:20px; font-size:0.72rem; font-weight:800; display:flex; align-items:center; gap:4px; backdrop-filter:blur(4px);">☁️ ${wTemp}°C - ${wCond}</span>` : ''}
+                        <span class="version-badge" style="background:rgba(16,185,129,0.15); color:#34d399; border: 1px solid rgba(16,185,129,0.3); padding:4px 12px; border-radius:20px; font-size:0.72rem; font-weight:800; display:flex; align-items:center; gap:4px; backdrop-filter:blur(4px); box-shadow: 0 0 10px rgba(52,211,153,0.15);">✨ AI OPTIMIZED</span>
+                     </div>
+                  </div>
+                  <h2 class="main-itinerary-title-v2" style="font-size: 1.8rem; margin-top: 1.25rem; margin-bottom: 0.75rem; font-weight: 800; background: linear-gradient(135deg, #ffffff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Outfit', sans-serif;">${plan.title || ('Hành trình ' + days + ' ngày')}</h2>
+                  <p class="timeline-summary-v2" style="font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.75); margin: 0; font-weight: 400;">${plan.tripSummary || plan.summary || 'Kế hoạch du lịch được WanderAI thiết kế riêng cho bạn.'}</p>
                 </div>
-                <div style="flex: 1; height: 1px; background: linear-gradient(90deg, rgba(16, 185, 129, 0.3), transparent);"></div>
-              </div>
-              
-              <div class="activities-list" style="padding-left: 25px; border-left: 2px solid rgba(16, 185, 129, 0.15); margin-left: 22px;">
-                ${(day.activities || []).map((act, aIdx) => {
-                  const actName = act.task || act.activity || act.name || '';
-                  const actDesc = act.description || act.visualNote || '';
-                  const actCost = act.cost || '';
-                  const actTransport = act.transport || '';
-                  const actRating = parseFloat(act.rating) || 0;
-                  const actSession = act.session || '';
-                  const actLocation = act.location || '';
-                  const actAddress = act.address || act.location || '';
-                  const sessionColor = actSession === 'Sáng' ? '#f59e0b' : actSession === 'Chiều' ? '#f97316' : '#818cf8';
-                  const sessionEmoji = actSession === 'Sáng' ? '☀️' : actSession === 'Chiều' ? '⛅' : '🌙';
-                  const starHtml = actRating > 0 ? Array.from({length: 5}, (_, i) => 
-                    i < Math.floor(actRating) ? '★' : (i < actRating ? '½' : '☆')
-                  ).join('') : '';
-                  const actData = JSON.stringify(act).replace(/'/g, "&apos;").replace(/`/g, '&#96;');
-                  let actMapQuery = actLocation || actAddress || actName;
-                  if (window.currentDestName && !actMapQuery.toLowerCase().includes(window.currentDestName.toLowerCase())) {
-                    actMapQuery += ', ' + window.currentDestName;
-                  }
-                  return `
-                  <div class="premium-activity-card-v2" style="padding:0; background:transparent; border:none; margin-bottom:2rem; display:flex; gap:1.25rem; position:relative;">
-                    <!-- Time + Session Column -->
-                    <div style="min-width:72px; display:flex; flex-direction:column; align-items:center; padding-top:16px; gap:4px;">
-                      <span style="font-weight:900; color:var(--accent); font-size:1rem; letter-spacing:0.5px; line-height:1;">${act.time || '--:--'}</span>
-                      ${actSession ? `<span style="font-size:0.65rem; font-weight:700; color:${sessionColor}; background:${sessionColor}18; padding:2px 6px; border-radius:8px; white-space:nowrap;">${sessionEmoji} ${actSession}</span>` : ''}
-                    </div>
-
-                    <!-- Content Card - Compact Design -->
-                    <div style="flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:1.25rem; overflow:hidden; transition:all 0.3s ease; box-shadow:0 4px 20px rgba(0,0,0,0.15);" 
-                         onmouseenter="this.style.borderColor='rgba(16,185,129,0.3)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 30px rgba(0,0,0,0.25)'"
-                         onmouseleave="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.transform=''; this.style.boxShadow='0 4px 20px rgba(0,0,0,0.15)'">
-                      
-                      <!-- Image Banner (compact) -->
-                      <div style="height:140px; position:relative; overflow:hidden;">
-                        <img 
-                          src="${getVNPhoto(actName, aIdx)}" 
-                          alt="${actName}"
-                          loading="lazy"
-                          style="width:100%; height:100%; object-fit:cover;"
-                          onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=600&fit=crop';"
-                        >
-                        <!-- Overlay gradient -->
-                        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);"></div>
-                        <!-- Location chip on image -->
-                        ${actLocation ? `<div style="position:absolute; bottom:8px; left:10px; display:flex; align-items:center; gap:4px; font-size:0.7rem; color:#fff; font-weight:600; background:rgba(0,0,0,0.45); backdrop-filter:blur(4px); padding:3px 8px; border-radius:10px; max-width:80%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📍 ${actLocation}</div>` : ''}
-                        <!-- Cost badge top-right -->
-                        ${actCost ? `<div style="position:absolute; top:8px; right:8px; background:rgba(251,191,36,0.92); color:#000; font-size:0.72rem; font-weight:900; padding:3px 10px; border-radius:10px; backdrop-filter:blur(4px);">💰 ${actCost}</div>` : `<div style="position:absolute; top:8px; right:8px; background:rgba(16,185,129,0.85); color:#fff; font-size:0.72rem; font-weight:900; padding:3px 10px; border-radius:10px;">Miễn phí</div>`}
-                        <!-- Source tag -->
-                        <div class="content-source-tag" style="position:absolute; top:8px; left:8px; font-size:0.6rem; opacity:0.6;">📸 WanderViet</div>
-                      </div>
-
-                      <!-- Info Body -->
-                      <div style="padding:1rem 1.1rem 0.9rem;">
-                        <!-- Title Row -->
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; margin-bottom:0.5rem;">
-                          <h4 style="font-size:1rem; color:#fff; margin:0; font-weight:800; line-height:1.3; flex:1;">${actName}</h4>
-                          ${actRating > 0 ? `<div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0;">
-                            <span style="color:#fbbf24; font-size:0.7rem; letter-spacing:1px;">${starHtml}</span>
-                            <span style="color:#fbbf24; font-size:0.7rem; font-weight:800;">${actRating}/5</span>
-                          </div>` : ''}
-                        </div>
-
-                        <!-- Transport badge -->
-                        ${actTransport ? `<div style="display:inline-flex; align-items:center; gap:5px; font-size:0.72rem; color:#60a5fa; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.2); padding:3px 10px; border-radius:20px; margin-bottom:0.6rem; font-weight:600;">${actTransport}</div>` : ''}
-
-                        <!-- Description -->
-                        ${actDesc ? `<p style="font-size:0.82rem; line-height:1.6; color:rgba(255,255,255,0.65); margin:0 0 0.75rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${actDesc}</p>` : ''}
-
-                        <!-- Action Row -->
-                        <div style="display:flex; gap:8px; flex-wrap:wrap; padding-top:0.75rem; border-top:1px solid rgba(255,255,255,0.06);">
-                          <button type="button" 
-                            onclick='showActivityDetails(${actData})'
-                            style="flex:1; background:var(--accent); border:none; color:#fff; padding:7px 12px; border-radius:20px; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:5px; box-shadow:0 3px 12px rgba(16,185,129,0.3);"
-                            onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform=''">
-                            🔍 Xem chi tiết & Review
-                          </button>
-                          <a href="#" 
-                            onclick="window.getGPSDirections('${actMapQuery.replace(/'/g, "\\'")}', event)"
-                            style="flex:1; background:#1d4ed8; border:none; color:#fff; padding:7px 12px; border-radius:20px; font-size:0.78rem; font-weight:700; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:5px; text-decoration:none; box-shadow:0 3px 12px rgba(29,78,216,0.3);"
-                            onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform=''">
-                            🗺️ GPS
-                          </a>
-                        </div>
-                      </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1.5rem;">
+                  <span style="background: rgba(255,255,255,0.05); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.08); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(16, 185, 129, 0.15)'; this.style.color='#10b981'; this.style.borderColor='rgba(16, 185, 129, 0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#e2e8f0'; this.style.borderColor='rgba(255,255,255,0.08)';">#KhámPháViệtNam</span>
+                  <span style="background: rgba(255,255,255,0.05); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.08); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(16, 185, 129, 0.15)'; this.style.color='#10b981'; this.style.borderColor='rgba(16, 185, 129, 0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#e2e8f0'; this.style.borderColor='rgba(255,255,255,0.08)';">#TốiƯuBởiAI</span>
+                  <span style="background: rgba(255,255,255,0.05); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.08); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(16, 185, 129, 0.15)'; this.style.color='#10b981'; this.style.borderColor='rgba(16, 185, 129, 0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#e2e8f0'; this.style.borderColor='rgba(255,255,255,0.08)';">#DuLịchThôngMinh</span>
+                  <span style="background: rgba(255,255,255,0.05); color: #e2e8f0; border: 1px solid rgba(255,255,255,0.08); padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(16, 185, 129, 0.15)'; this.style.color='#10b981'; this.style.borderColor='rgba(16, 185, 129, 0.3)';" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.color='#e2e8f0'; this.style.borderColor='rgba(255,255,255,0.08)';">#${cleanD.replace(/\s+/g, '')}</span>
+                </div>
+                
+                <div class="itinerary-stats-grid-v3">
+                  <!-- Stat Box 1: cost -->
+                  <div class="stat-box-v3 stat-box-cost">
+                    <div class="stat-icon-wrap" style="background: rgba(16, 185, 129, 0.18); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981;">💰</div>
+                    <div>
+                      <span class="stat-label-v2" style="font-size: 0.7rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; display: block; font-weight: 700;">Dự toán chi phí</span>
+                      <span class="stat-value-v2" style="color: #10b981; font-size: 1.2rem; font-weight: 900; display: block; margin-top: 1px;">${formatCost(plan.estimatedCost || plan.totalEstimatedCost)}</span>
                     </div>
                   </div>
-                  ${act.transitToNext ? `
-                  <!-- Transit Connection -->
-                  <div style="margin: -0.5rem 0 1rem 97px; display:flex; align-items:center; gap:8px; color:#38bdf8; font-size:0.78rem; font-weight:600; background:rgba(56,189,248,0.05); padding:7px 14px; border-radius:20px; border:1px solid rgba(56,189,248,0.15); width:fit-content;">
-                     <span style="font-size:0.9rem;">⚡</span>
-                     <span>${act.transitToNext}</span>
+                  
+                  <!-- Stat Box 2: pace -->
+                  <div class="stat-box-v3 stat-box-pace">
+                    <div class="stat-icon-wrap" style="background: rgba(245, 158, 11, 0.18); border: 1px solid rgba(245, 158, 11, 0.3); color: #f59e0b;">🚶</div>
+                    <div>
+                      <span class="stat-label-v2" style="font-size: 0.7rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; display: block; font-weight: 700;">Nhịp độ di chuyển</span>
+                      <span class="stat-value-v2" style="color: #fbbf24; font-size: 0.95rem; font-weight: 800; display: block; margin-top: 1px; line-height: 1.2;">${plan.pace || 'Vừa phải - Thư thái'}</span>
+                    </div>
                   </div>
-                  ` : ''}
-                  `;
-                }).join('')}
+                  
+                  <!-- Stat Box 3: vibe -->
+                  <div class="stat-box-v3 stat-box-vibe">
+                    <div class="stat-icon-wrap" style="background: rgba(56, 189, 248, 0.18); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8;">🎒</div>
+                    <div>
+                      <span class="stat-label-v2" style="font-size: 0.7rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; display: block; font-weight: 700;">Phong cách du lịch</span>
+                      <span class="stat-value-v2" style="color: #38bdf8; font-size: 0.95rem; font-weight: 800; display: block; margin-top: 1px; line-height: 1.2;">${plan.vibe || plan.style || 'Khám phá & Trải nghiệm'}</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Stat Box 4: transport -->
+                  <div class="stat-box-v3 stat-box-transport">
+                    <div class="stat-icon-wrap" style="background: rgba(244, 114, 182, 0.18); border: 1px solid rgba(244, 114, 182, 0.3); color: #f472b6;">🚗</div>
+                    <div>
+                      <span class="stat-label-v2" style="font-size: 0.7rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; display: block; font-weight: 700;">Phương tiện đề xuất</span>
+                      <span class="stat-value-v2" style="color: #f472b6; font-size: 0.95rem; font-weight: 800; display: block; margin-top: 1px; line-height: 1.2;">${plan.transport || plan.bestTransit || 'Ô tô / Xe máy / Đi bộ'}</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Stat Box 5: weather -->
+                  <div class="stat-box-v3 stat-box-weather">
+                    <div class="stat-icon-wrap" style="background: rgba(251, 191, 36, 0.18); border: 1px solid rgba(251, 191, 36, 0.3); color: #fbbf24;">🌤️</div>
+                    <div>
+                      <span class="stat-label-v2" style="font-size: 0.7rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; display: block; font-weight: 700;">Khí hậu dự báo</span>
+                      <span class="stat-value-v2" style="color: #fbbf24; font-size: 0.95rem; font-weight: 800; display: block; margin-top: 1px; line-height: 1.2;">${weather ? (wTemp + '°C (' + wCond + ')') : '28°C - 32°C (Nắng đẹp)'}</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Stat Box 6: advice -->
+                  <div class="stat-box-v3 stat-box-advice">
+                    <div class="stat-icon-wrap" style="background: rgba(167, 139, 250, 0.18); border: 1px solid rgba(167, 139, 250, 0.3); color: #a78bfa;">💡</div>
+                    <div>
+                      <span class="stat-label-v2" style="font-size: 0.7rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; display: block; font-weight: 700;">Chuẩn bị hành lý</span>
+                      <span class="stat-value-v2" style="color: #a78bfa; font-size: 0.95rem; font-weight: 800; display: block; margin-top: 1px; line-height: 1.2;">Trang phục nhẹ, kem chống nắng, giày đi bộ</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="margin-top: 2rem; background: rgba(15, 23, 42, 0.45); border: 1px solid rgba(255, 255, 255, 0.08); padding: 1.5rem; border-radius: 1.5rem;">
+                   <h3 style="color: #fff; font-size: 1.2rem; font-weight: 800; margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">🗺️ Lịch trình bao quát</h3>
+                   <div style="display: flex; flex-direction: column; gap: 1rem;">
+                      ${itinerary.map((day, idx) => {
+                         const dayNum = day.day || (idx + 1);
+                         const dayStr = dayNum.toString();
+                         const dayDigitMatch = dayStr.match(/\d+/);
+                         const dNum = dayDigitMatch ? dayDigitMatch[0] : (idx + 1);
+                         let dTitle = dayStr.replace(/^\d+\s*-\s*/, '').replace(/Ngày /g, '');
+                         if (dTitle === dNum.toString()) dTitle = 'Khám phá điểm đến';
+                         const acts = (day.activities || []).map(a => a.task || a.activity || a.name || '').filter(Boolean).join(' ➔ ');
+                         return `
+                            <div style="display: flex; gap: 1rem; align-items: flex-start; padding-bottom: 1rem; border-bottom: 1px dashed rgba(255,255,255,0.1);">
+                               <div style="min-width: 65px; font-weight: 800; color: #10b981; font-size: 0.95rem; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 8px; text-align: center;">Ngày ${dNum}</div>
+                               <div style="flex: 1;">
+                                  <div style="color: #fff; font-weight: 700; margin-bottom: 4px; font-size: 0.95rem;">${dTitle}</div>
+                                  <div style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.5;">${acts}</div>
+                               </div>
+                            </div>
+                         `;
+                      }).join('')}
+                   </div>
+                </div>
               </div>
             </div>
-            `;
-          }).join('')}
+
+            ${accommodationHtml}
+            ${daysHtml}
+          </div>
         </div>
+
+
       </div>
     `;
   }
 
   // --- ACTIVITY DETAIL MODAL LOGIC (ELITE VERSION) ---
-  window.showActivityDetails = function(act) {
+  window.showActivityDetails = function (act) {
     const overlay = document.getElementById('activityDetailModalOverlay');
     const body = document.getElementById('activityModalBody');
     if (!overlay || !body) return;
@@ -2625,7 +3074,7 @@ const initPlanner = function () {
                <span>📍 ${act.address || act.location || actName}</span>
                <span style="color:rgba(255,255,255,0.2);">•</span>
                <div style="display:flex; align-items:center; gap:4px;">
-                 <span style="color:#fbbf24; font-size:1rem; letter-spacing:2px;">${Array.from({length: 5}, (_, i) => i < Math.floor(parseFloat(act.rating) || 4.5) ? '★' : (i < (parseFloat(act.rating) || 4.5) ? '½' : '☆')).join('')}</span>
+                 <span style="color:#fbbf24; font-size:1rem; letter-spacing:2px;">${Array.from({ length: 5 }, (_, i) => i < Math.floor(parseFloat(act.rating) || 4.5) ? '★' : (i < (parseFloat(act.rating) || 4.5) ? '½' : '☆')).join('')}</span>
                  <span style="color:#fbbf24; font-weight:800; margin-left:4px;">${parseFloat(act.rating) || 4.5}/5</span>
                </div>
              </div>
@@ -2708,7 +3157,7 @@ const initPlanner = function () {
             </div>
 
             <div class="detail-section" style="margin-top:2.5rem;">
-              <div class="detail-section-title">💬 Đánh giá từ cộng đồng (${Math.floor(Math.random()*50 + 20)} đánh giá)</div>
+              <div class="detail-section-title">💬 Đánh giá từ cộng đồng (${Math.floor(Math.random() * 50 + 20)} đánh giá)</div>
               <div class="multi-reviews-list">
                  ${generateRandomReviews()}
               </div>
@@ -2773,65 +3222,65 @@ const initPlanner = function () {
 
     overlay.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    
+
     // Khởi tạo render widget thời tiết sau khi DOM cập nhật
     if (window.renderDetailedWeatherWidget) {
-       window.renderDetailedWeatherWidget(window.currentDestName || actName, 'weatherWidgetContainer');
+      window.renderDetailedWeatherWidget(window.currentDestName || actName, 'weatherWidgetContainer');
     }
   };
 
   // --- HÀM RENDER WIDGET THỜI TIẾT TÙY CHỈNH ---
-  window.renderDetailedWeatherWidget = async function(destName, containerId) {
+  window.renderDetailedWeatherWidget = async function (destName, containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    
+
     try {
       const res = await fetch(`https://wttr.in/${encodeURIComponent(destName)}?format=j1&lang=vi`);
       const data = await res.json();
-      
+
       const current = data.current_condition[0];
       const days = data.weather; // array 3 days
-      
+
       const getIcon = (desc) => {
-         const d = desc.toLowerCase();
-         if (d.includes('rain') || d.includes('mưa') || d.includes('shower')) return '🌧️';
-         if (d.includes('cloud') || d.includes('mây')) return '⛅';
-         if (d.includes('sun') || d.includes('clear') || d.includes('nắng')) return '☀️';
-         if (d.includes('snow') || d.includes('tuyết')) return '❄️';
-         if (d.includes('thunder') || d.includes('sấm')) return '⛈️';
-         if (d.includes('fog') || d.includes('sương')) return '🌫️';
-         return '🌤️';
+        const d = desc.toLowerCase();
+        if (d.includes('rain') || d.includes('mưa') || d.includes('shower')) return '🌧️';
+        if (d.includes('cloud') || d.includes('mây')) return '⛅';
+        if (d.includes('sun') || d.includes('clear') || d.includes('nắng')) return '☀️';
+        if (d.includes('snow') || d.includes('tuyết')) return '❄️';
+        if (d.includes('thunder') || d.includes('sấm')) return '⛈️';
+        if (d.includes('fog') || d.includes('sương')) return '🌫️';
+        return '🌤️';
       };
 
       const translateDesc = (desc) => {
-         const d = desc.toLowerCase();
-         if (d.includes('partly cloudy')) return 'Trời có mây';
-         if (d.includes('clear')) return 'Trời quang đãng';
-         if (d.includes('sunny')) return 'Trời nắng';
-         if (d.includes('rain')) return 'Trời mưa';
-         if (d.includes('overcast')) return 'Trời u ám';
-         if (d.includes('patchy light drizzle')) return 'Mưa phùn nhẹ';
-         if (d.includes('light rain')) return 'Mưa nhẹ';
-         return desc;
+        const d = desc.toLowerCase();
+        if (d.includes('partly cloudy')) return 'Trời có mây';
+        if (d.includes('clear')) return 'Trời quang đãng';
+        if (d.includes('sunny')) return 'Trời nắng';
+        if (d.includes('rain')) return 'Trời mưa';
+        if (d.includes('overcast')) return 'Trời u ám';
+        if (d.includes('patchy light drizzle')) return 'Mưa phùn nhẹ';
+        if (d.includes('light rain')) return 'Mưa nhẹ';
+        return desc;
       };
 
       let daysHtml = days.map((day, index) => {
-         const dateParts = day.date.split('-');
-         const dateFmt = `${dateParts[2]}/${dateParts[1]}`;
-         const dayName = index === 0 ? 'Hôm nay' : index === 1 ? 'Ngày mai' : 'Ngày mốt';
-         
-         const hourlyHtml = day.hourly.filter((_, i) => i % 2 === 0).map(hour => {
-            const timeLabel = hour.time === "0" ? "00:00" : (hour.time.length === 3 ? hour.time.slice(0, 1) + ":00" : hour.time.slice(0, 2) + ":00");
-            return `
+        const dateParts = day.date.split('-');
+        const dateFmt = `${dateParts[2]}/${dateParts[1]}`;
+        const dayName = index === 0 ? 'Hôm nay' : index === 1 ? 'Ngày mai' : 'Ngày mốt';
+
+        const hourlyHtml = day.hourly.filter((_, i) => i % 2 === 0).map(hour => {
+          const timeLabel = hour.time === "0" ? "00:00" : (hour.time.length === 3 ? hour.time.slice(0, 1) + ":00" : hour.time.slice(0, 2) + ":00");
+          return `
               <div style="display:flex; flex-direction:column; align-items:center; min-width: 65px; padding: 12px 5px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.03)'">
                  <span style="font-size: 0.75rem; color: rgba(255,255,255,0.6); font-weight: 600;">${timeLabel}</span>
                  <span style="font-size: 1.6rem; margin: 8px 0; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">${getIcon(hour.weatherDesc[0].value)}</span>
                  <span style="font-weight: 800; font-size: 0.95rem; color: #fff;">${hour.tempC}°</span>
               </div>
             `;
-         }).join('');
+        }).join('');
 
-         return `
+        return `
            <div class="weather-day-block" style="margin-top: 20px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px;">
                  <span style="font-weight:700; color: #38bdf8; font-size: 0.95rem;">${dayName} <span style="color:rgba(255,255,255,0.4); font-size: 0.8rem; font-weight: normal; margin-left: 5px;">(${dateFmt})</span></span>
@@ -2859,23 +3308,23 @@ const initPlanner = function () {
            </div>
         </div>
       `;
-    } catch(e) {
+    } catch (e) {
       container.innerHTML = '<div style="padding: 30px; color: #f87171; text-align:center; font-weight: 600;">Không thể kết nối đến máy chủ thời tiết. Vui lòng thử lại sau.</div>';
     }
   };
 
-  window.closeActivityModal = function() {
+  window.closeActivityModal = function () {
     const overlay = document.getElementById('activityDetailModalOverlay');
     if (overlay) overlay.style.display = 'none';
     document.body.style.overflow = 'auto';
-    
+
     // Stop video when closing
     const body = document.getElementById('activityModalBody');
     if (body) body.innerHTML = '';
   };
 
   // Close modal on click outside
-  document.getElementById('activityDetailModalOverlay')?.addEventListener('click', function(e) {
+  document.getElementById('activityDetailModalOverlay')?.addEventListener('click', function (e) {
     if (e.target === this) closeActivityModal();
   });
 
@@ -2892,7 +3341,7 @@ const initPlanner = function () {
   };
 
   // --- GLOBAL DRAFT LOADER (Redefined inside DOMContentLoaded) ---
-  window.WanderPlanner.loadDraft = function(manualDraft) {
+  window.WanderPlanner.loadDraft = function (manualDraft) {
     console.log("📂 [WanderPlanner] loadDraft called with:", manualDraft ? "Manual Draft" : "LocalStorage");
     const draftRaw = manualDraft ? JSON.stringify(manualDraft) : localStorage.getItem('wander_itinerary_proposal_draft');
     if (!draftRaw) return;
@@ -2902,7 +3351,7 @@ const initPlanner = function () {
       if (!manualDraft) localStorage.removeItem('wander_itinerary_proposal_draft');
 
       console.log("📝 [WanderPlanner] Processing draft:", draft.title);
-      
+
       // 1. Điền vào form
       const destInput = document.getElementById('dest');
       const daysInput = document.getElementById('days');
@@ -2911,25 +3360,25 @@ const initPlanner = function () {
 
       if (destInput) destInput.value = draft.destination || '';
       if (daysInput) daysInput.value = draft.days || 3;
-      
+
       if (budgetInput) {
-          const budgetVal = parseInt(draft.budget);
-          if (budgetVal <= 1) budgetInput.value = "dưới 1 triệu VNĐ";
-          else if (budgetVal <= 3) budgetInput.value = "1 đến 3 triệu VNĐ";
-          else if (budgetVal <= 7) budgetInput.value = "3 đến 7 triệu VNĐ";
-          else budgetInput.value = "7 đến 15 triệu VNĐ";
+        const budgetVal = parseInt(draft.budget);
+        if (budgetVal <= 1) budgetInput.value = "dưới 1 triệu VNĐ";
+        else if (budgetVal <= 3) budgetInput.value = "1 đến 3 triệu VNĐ";
+        else if (budgetVal <= 7) budgetInput.value = "3 đến 7 triệu VNĐ";
+        else budgetInput.value = "7 đến 15 triệu VNĐ";
       }
       if (extraInput) extraInput.value = draft.style ? `Phong cách: ${draft.style}. ${draft.description || ''}` : '';
 
       // 2. Chuẩn bị dữ liệu cho AI
       const generationData = {
-          destination: draft.destination,
-          days: draft.days || 3,
-          budget: budgetInput?.value || "3 đến 7 triệu VNĐ",
-          tripDate: document.getElementById('tripDate')?.value || '',
-          companion: document.getElementById('companion')?.value || 'Bạn bè',
-          additionalInfo: extraInput?.value || '',
-          skipWizard: true
+        destination: draft.destination,
+        days: draft.days || 3,
+        budget: budgetInput?.value || "3 đến 7 triệu VNĐ",
+        tripDate: document.getElementById('tripDate')?.value || '',
+        companion: document.getElementById('companion')?.value || 'Bạn bè',
+        additionalInfo: extraInput?.value || '',
+        skipWizard: true
       };
 
       // 3. UI - Hide all form steps and other paths
@@ -2938,19 +3387,19 @@ const initPlanner = function () {
       const formStep2 = document.getElementById('formStep2');
       const stepDiscovery = document.getElementById('stepDiscovery');
       const stepCompare = document.getElementById('stepCompare');
-      
+
       if (formStepNav) formStepNav.style.display = 'none';
       if (formStep1) formStep1.style.display = 'none';
       if (formStep2) formStep2.style.display = 'none';
       if (stepDiscovery) stepDiscovery.style.display = 'none';
       if (stepCompare) stepCompare.style.display = 'none';
       if (stepSmartWizard) stepSmartWizard.style.display = 'none';
-      
+
       // 4. Generate
       doGenerate(generationData);
       if (window.WanderUI && WanderUI.showToast) WanderUI.showToast("Bỏ qua bước hỏi thêm, đang tạo lịch trình chi tiết...", "success");
-      
-    } catch(e) { console.error("❌ [WanderPlanner] Lỗi load draft:", e); }
+
+    } catch (e) { console.error("❌ [WanderPlanner] Lỗi load draft:", e); }
   };
 
   // Run initial check
@@ -2975,7 +3424,7 @@ const initPlanner = function () {
         renderItinerary(d.plan, SmartWizard.data.destination, SmartWizard.data.days, SmartWizard.data.tripDate);
         refineInput.value = '';
       }
-    } catch(err) { console.error(err); }
+    } catch (err) { console.error(err); }
     finally { loader.style.display = 'none'; }
   });
 
@@ -3015,40 +3464,40 @@ const initPlanner = function () {
         btnSaveTrip.disabled = false;
         btnSaveTrip.textContent = "Thử lại";
       }
-    } catch(e) { 
+    } catch (e) {
       console.error(e);
       btnSaveTrip.disabled = false;
       btnSaveTrip.textContent = "Lỗi lưu";
     }
   });
 
-  window.resetAIPlanner = function() {
+  window.resetAIPlanner = function () {
     document.querySelector('.planner-container')?.classList.remove('show-result');
     const plannerFormCard = document.getElementById('plannerFormCard');
     if (plannerFormCard) plannerFormCard.style.display = 'flex';
-    
+
     // Đưa các step về đúng trạng thái ban đầu
     // Form steps
     const formStep1 = document.getElementById('formStep1');
     const formStep2 = document.getElementById('formStep2');
     const formStepNav = document.getElementById('formStepNav');
-    
+
     if (formStepNav) formStepNav.style.display = 'flex';
     if (formStep1) {
       formStep1.style.display = 'block';
       formStep1.style.display = ''; // Remove inline style
     }
     if (formStep2) formStep2.style.display = 'none';
-    
+
     // Other paths
     const stepDiscovery = document.getElementById('stepDiscovery');
     const stepSmartWizard = document.getElementById('stepSmartWizard');
     const stepCompare = document.getElementById('stepCompare');
-    
+
     if (stepDiscovery) stepDiscovery.style.display = 'none';
     if (stepSmartWizard) stepSmartWizard.style.display = 'none';
     if (stepCompare) stepCompare.style.display = 'none';
-    
+
     // Đặt lại SmartWizard về trạng thái ban đầu (InputArea hiện, ConfirmationArea ẩn)
     const smartConfirmationArea = document.getElementById('smartConfirmationArea');
     if (smartConfirmationArea) smartConfirmationArea.style.display = 'none';
@@ -3086,7 +3535,7 @@ const initPlanner = function () {
   if (isViewMode && (savedTripJson || urlParams.get('itinId'))) {
     try {
       const itinId = urlParams.get('itinId');
-      
+
       const processPlan = (plan, destination, days) => {
         // Kích hoạt show-result để CSS hiển thị timelineResult và ẩn formCard
         document.querySelector('.planner-container')?.classList.add('show-result');
@@ -3097,11 +3546,11 @@ const initPlanner = function () {
 
         if (placeholder) placeholder.style.display = 'none';
         if (loader) loader.style.display = 'none';
-        
+
         // Hiển thị vùng kết quả
         if (resultContainer) resultContainer.style.display = 'block';
         if (refineBox) refineBox.style.display = 'block';
-        
+
         // Hiển thị banner View Mode
         const viewModeHeader = document.getElementById('viewModeHeader');
         if (viewModeHeader) viewModeHeader.style.display = 'flex';
@@ -3109,7 +3558,7 @@ const initPlanner = function () {
         // Store in planHistory for switching/refining
         planHistory = [plan];
         currentPlanIndex = 0;
-        
+
         // Render
         renderItinerary(plan, destination || plan.destination || 'Chuyến đi đã lưu', days || plan.days || 3);
         renderVersionTabs();
@@ -3172,7 +3621,7 @@ function updateSelectedChips() {
     container.style.display = 'none';
   } else {
     container.style.display = 'block';
-    list.innerHTML = window.selectedDestNames.map(function(name, idx) {
+    list.innerHTML = window.selectedDestNames.map(function (name, idx) {
       return '<span class="selected-dest-chip">' + name + ' <button type="button" class="remove-btn" onclick="removeDestChip(' + idx + ')">×</button></span>';
     }).join('');
   }
@@ -3210,7 +3659,7 @@ function openMapZoom() {
   overlay.classList.add('active');
 
   // Init Leaflet after modal opens
-  setTimeout(function() {
+  setTimeout(function () {
     if (typeof L !== 'undefined') {
       try {
         if (window.mapZoomInstance) {
@@ -3224,12 +3673,12 @@ function openMapZoom() {
 
         // Add user location
         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(pos) {
+          navigator.geolocation.getCurrentPosition(function (pos) {
             var userCoords = [pos.coords.latitude, pos.coords.longitude];
             L.circle(userCoords, { radius: 300, color: '#10b981', fillColor: '#10b981', fillOpacity: 0.2 }).addTo(window.mapZoomInstance);
             L.marker(userCoords, { icon: L.divIcon({ className: 'user-marker', html: '📍', iconSize: [24, 24] }) }).addTo(window.mapZoomInstance).bindPopup('📍 Vị trí của bạn');
             L.polyline([userCoords, currentCoords], { color: '#60a5fa', dashArray: '5, 10', weight: 2 }).addTo(window.mapZoomInstance);
-          }, function() {});
+          }, function () { });
         }
       } catch (e) {
         zoomBody.innerHTML = '<p style="color:#fff; text-align:center; padding:3rem;">Không thể tải bản đồ</p>';
@@ -3247,6 +3696,35 @@ function closeMapZoom(e) {
 }
 
 // ESC to close
-document.addEventListener('keydown', function(e) {
+document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') closeMapZoom();
 });
+
+// Define tab switching globally
+window.switchItineraryTab = function(panelId, btnEl) {
+  // Find all panels in the workspace
+  const container = btnEl.closest('.travel-console-container');
+  if (!container) return;
+
+  const panels = container.querySelectorAll('.itinerary-tab-panel');
+  panels.forEach(panel => {
+    panel.style.display = 'none';
+  });
+
+  // Show selected panel
+  const targetPanel = container.querySelector('#itinerary-' + panelId);
+  if (targetPanel) {
+    targetPanel.style.display = 'block';
+  }
+
+  // Update active state on buttons
+  const buttons = container.querySelectorAll('.console-tab-btn');
+  buttons.forEach(btn => {
+    btn.classList.remove('active');
+  });
+  btnEl.classList.add('active');
+
+  // Smooth scroll up to top of workspace
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+

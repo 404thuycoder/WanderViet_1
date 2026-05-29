@@ -212,7 +212,12 @@ const placesData = [
     interests: ["trekking", "bản làng", "ruộng bậc thang", "check-in"],
     meta: "Thiên đường mây & Ruộng bậc thang kỳ vĩ",
     text: "Thị trấn sương mù Sa Pa làm say lòng người với những đỉnh núi hùng vĩ, ruộng bậc thang uốn lượn và bản sắc văn hóa dân tộc rực rỡ sắc màu Tây Bắc. Fansipan — nóc nhà Đông Dương — là thử thách chinh phục của mọi phượt thủ.",
-    image: "assets/img/sa-pa.png",
+    image: "https://booking.muongthanh.com/upload_images/images/Nhung/review-dia-diem-du-lich-sapa.jpg",
+    images: [
+      "https://booking.muongthanh.com/upload_images/images/Nhung/review-dia-diem-du-lich-sapa.jpg",
+      "https://phetravel.com/uploads/30-06-2023-14-53-09-du-lich-sa-pa-0.jpg.webp",
+      "https://topasecolodge.com/wp-content/uploads/2025/06/best-time-to-visit-sapa-04.jpg"
+    ],
     lat: 22.3364, lng: 103.8438, top: true,
     transportTips: "Đi xe giường nằm hoặc tàu hỏa đêm cabin giường nằm từ Hà Nội (6-8 tiếng). Sa Pa lạnh quanh năm — luôn mang áo ấm.",
     activities: [
@@ -726,7 +731,12 @@ const placesData = [
     interests: ["trekking", "hang động", "UNESCO", "chùa"],
     meta: "Vịnh Hạ Long trên cạn & Quần thể Di sản Tràng An",
     text: "Ninh Bình là 'Vịnh Hạ Long trên cạn' với hệ thống núi đá vôi, sông nước và hang động tuyệt đẹp. Tràng An được UNESCO công nhận là Di sản Thế giới kép về cả văn hóa lẫn thiên nhiên.",
-    image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
+    image: "https://cdn-media.sforum.vn/storage/app/media/ctvseo_16/danh%20lam%20th%E1%BA%AFng%20c%E1%BA%A3nh%20Ninh%20B%C3%ACnh/danh-lam-thang-canh-ninh-binh-thumbnail.jpg",
+    images: [
+      "https://cdn-media.sforum.vn/storage/app/media/ctvseo_16/danh%20lam%20th%E1%BA%AFng%20c%E1%BA%A3nh%20Ninh%20B%C3%ACnh/danh-lam-thang-canh-ninh-binh-thumbnail.jpg",
+      "https://sodulich.ninhbinh.gov.vn/uploads/images/trang-an-bd_1737078235160%20(1).jpg",
+      "https://thanhnienviet.mediacdn.vn/91575133199802368/2025/5/26/photo-1748230467546-17482304703661238448265.jpeg"
+    ],
     lat: 20.2506, lng: 105.9745, top: true,
     transportTips: "Cách Hà Nội khoảng 100km, đi xe limousine khoảng 2 tiếng. Tại Ninh Bình, xe đạp thuê là cách lý tưởng nhất để khám phá.",
     activities: [
@@ -826,7 +836,12 @@ const placesData = [
     interests: ["trekking", "moto", "bản làng", "check-in"],
     meta: "Cung đường đèo hiểm trở & Hoa tam giác mạch bất tận",
     text: "Hà Giang — tỉnh địa đầu Tổ quốc — chinh phục mọi phượt thủ với cung đường Mã Pí Lèng huyền thoại, Đồng Văn Cổ Trấn cổ kính và mùa hoa tam giác mạch tím ngát tháng 10-11.",
-    image: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
+    image: "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:format(webp):quality(75)/20_dia_diem_du_lich_ha_giang_a_b3ae766474.jpg",
+    images: [
+      "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:format(webp):quality(75)/20_dia_diem_du_lich_ha_giang_a_b3ae766474.jpg",
+      "https://vitracotour.com/wp-content/uploads/2023/12/ha-giang-2.jpg",
+      "https://media.vietravel.com/images/Content/kinh-nghiem-du-lich-ha-giang-1.png"
+    ],
     lat: 23.2241, lng: 104.9834, top: true,
     transportTips: "Xe khách từ Hà Nội khoảng 7-8 tiếng. Thuê moto tại thị xã Hà Giang hoặc đặt off-road tour có guide kinh nghiệm.",
     activities: [

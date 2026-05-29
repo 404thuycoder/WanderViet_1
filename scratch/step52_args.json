@@ -1,6 +1,0 @@
-{
-  "Description": "\"Complete redesign of the review panel with cleaner 2-col layout, improved filter section, better spot cards with category icons, and cleaner age recommendations\"",
-  "Instruction": "\"Replace the entire review panel HTML with a cleaner, better-designed layout that fixes the awkward display, improves the filter section with proper category checkboxes (attraction, restaurant, experience), and makes the spot highlights section look better\n<truncated 2 bytes>",
-  "ReplacementChunks": "[{\"AllowMultiple\":false,\"EndLine\":1495,\"ReplacementContent\":\"                <!-- REVIEW PANEL: Redesigned Clean Dashboard -->\\n                <div id=\\\"v2DestReviewPanel\\\" style=\\\"display:none; position:relative; margin-top:1.5rem; background:rgba(9,16,3\n<truncated 22297 bytes>",
-  "TargetFile": "\"d:\\\\D_n_mới\\\\WanderViet_1\\\\apps\\\\user-web\\\\planner.html\""
-}

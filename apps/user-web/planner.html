@@ -234,97 +234,257 @@
       }
     }
 
-    /* --- v2DestReviewPanel CSS (Adaptive Light/Dark Theme Aesthetics) --- */
-    #v2DestReviewPanel {
-      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-      /* Light mode defaults */
-      background: #f8fafc !important;
-      border: 1px solid #e2e8f0 !important;
-      color: #0f172a !important;
-    }
-    .v2-age-title {
-      color: #0f172a !important;
-    }
-    .v2-age-text {
-      color: #334155 !important;
-    }
-    .v2-age-bold {
-      color: #1e293b !important;
+
+    /* ===== v2DestReviewPanel PREMIUM REDESIGN ===== */
+    #v2DestReviewPanel { transition: all 0.35s cubic-bezier(0.4,0,0.2,1); }
+
+    /* Icon buttons on banner */
+    .v2-icon-btn {
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 5px 12px;
+      color: #fff;
+      font-size: 0.72rem;
       font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
     }
-    .v2-filter-title {
-      color: #0f172a !important;
+    .v2-icon-btn:hover { background: rgba(255,255,255,0.2); }
+
+    /* Info tags on banner */
+    .v2-tag {
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: #fff;
     }
-    .v2-filter-label {
-      background: #ffffff !important;
-      border: 1px solid #cbd5e1 !important;
-      color: #334155 !important;
-      transition: all 0.2s !important;
+    .tag-green { background: rgba(16,185,129,0.85); }
+    .tag-orange { background: rgba(249,115,22,0.85); }
+    .tag-blue { background: rgba(59,130,246,0.85); }
+    .tag-sky { background: rgba(14,165,233,0.85); }
+
+    /* Score pills row */
+    .v2-score-pill {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      padding: 0.5rem 0.25rem;
+      background: var(--bg-card, #fff);
     }
-    .v2-filter-label:hover {
-      background: #f1f5f9 !important;
-      color: #0f172a !important;
-      border-color: #94a3b8 !important;
+    .v2-score-icon { font-size: 1rem; }
+    .v2-score-label { font-size: 0.55rem; color: var(--text-muted, #94a3b8); text-transform: uppercase; letter-spacing: 0.3px; }
+    .v2-score-val { font-size: 0.68rem; font-weight: 800; }
+
+    /* TAB BUTTONS */
+    .v2-tab {
+      flex: 0 0 auto;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border: none;
+      background: transparent;
+      color: var(--text-muted, #64748b);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
     }
+    .v2-tab.active {
+      color: #3b82f6;
+      border-bottom-color: #3b82f6;
+    }
+    .v2-tab:hover { color: #3b82f6; }
+
+    /* TAB PANELS */
+    .v2-tab-panel { animation: fadeTab 0.25s ease; }
+    @keyframes fadeTab { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes pulse {
+      0%   { transform: scale(1);    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); }
+      50%  { transform: scale(1.05); box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35); }
+      100% { transform: scale(1);    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); }
+    }
+
+    /* CHIP FILTERS */
+    .v2-chip-filter {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.3rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid var(--border, #e2e8f0);
+      background: var(--bg-elevated, #f8fafc);
+      color: var(--text-muted, #64748b);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .v2-chip-filter.active {
+      background: linear-gradient(135deg, #3b82f6, #7c3aed);
+      border-color: transparent;
+      color: #fff;
+    }
+
+    /* SPOT CARDS (2-col grid) */
     .review-spot-card {
-      background: #ffffff !important;
-      border: 1px solid #e2e8f0 !important;
-      color: #0f172a !important;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
-    .review-spot-card .spot-card-name {
-      color: #0f172a !important;
-    }
-    .review-spot-card .spot-card-desc {
-      color: #64748b !important;
+      position: relative;
+      border-radius: 0.85rem;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1.5px solid var(--border, #e2e8f0);
+      background: var(--bg-card, #fff);
+      transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
     .review-spot-card:hover {
-      transform: translateY(-2px);
-      background: #f8fafc !important;
-      border-color: #cbd5e1 !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
-    }
-    .review-spot-card:hover .spot-img-inner {
-      transform: scale(1.05);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
+      border-color: #3b82f6 !important;
     }
     .review-spot-card.selected {
-      background: linear-gradient(135deg, #eff6ff, #ecfeff) !important;
-      border-color: #06b6d4 !important;
-      box-shadow: 0 4px 12px rgba(6,182,212,0.18) !important;
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 2px rgba(16,185,129,0.25), 0 4px 16px rgba(16,185,129,0.15) !important;
     }
-    .review-spot-card.selected .spot-card-name {
-      color: #0891b2 !important;
-    }
-    .spot-img-inner {
+    .review-spot-card .spot-img-inner {
       width: 100%;
-      height: 100%;
+      height: 100px;
       object-fit: cover;
-      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
       display: block;
+      transition: transform 0.4s ease;
     }
-    .spot-select-btn:hover {
-      transform: scale(1.15) !important;
+    .review-spot-card:hover .spot-img-inner { transform: scale(1.06); }
+    .spot-card-info {
+      padding: 0.45rem 0.5rem 0.5rem;
     }
-    .spot-map-btn:hover {
-      background: rgba(16,185,129,0.85) !important;
+    .spot-card-name {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text, #0f172a);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
     }
-    #reviewPanelSpots::-webkit-scrollbar {
-      width: 4px;
+    .spot-card-desc {
+      font-size: 0.6rem;
+      color: var(--text-muted, #64748b);
+      line-height: 1.3;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin: 0;
     }
-    #reviewPanelSpots::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.02);
+    .spot-select-btn:hover { transform: scale(1.15) !important; }
+    .spot-map-btn:hover { background: rgba(16,185,129,0.85) !important; }
+
+    /* NEARBY PLACE CARDS */
+    .v2-nearby-card {
+      border-radius: 0.75rem;
+      overflow: hidden;
+      border: 1px solid var(--border, #e2e8f0);
+      background: var(--bg-card, #fff);
+      transition: all 0.2s;
     }
-    #reviewPanelSpots::-webkit-scrollbar-thumb {
-      background: rgba(0,0,0,0.1);
-      border-radius: 4px;
+    .v2-nearby-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+    .v2-nearby-card img { width:100%; height:75px; object-fit:cover; display:block; }
+    .v2-nearby-info { padding: 0.35rem 0.45rem; }
+    .v2-nearby-name { font-size: 0.68rem; font-weight: 700; color: var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .v2-nearby-meta { font-size: 0.58rem; color: var(--text-muted); margin-top: 1px; }
+
+    /* AGE CARDS */
+    .v2-age-card {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      background: var(--bg-elevated, #f8fafc);
+      border: 1px solid var(--border, #e2e8f0);
+      border-radius: 0.75rem;
+      padding: 0.65rem 0.75rem;
     }
-    #reviewPanelSpots::-webkit-scrollbar-thumb:hover {
-      background: rgba(0,0,0,0.2);
+    .v2-age-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 2px; }
+    .v2-age-title { font-size: 0.72rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .v2-age-row { font-size: 0.63rem; color: var(--text-muted); line-height: 1.6; }
+    .v2-age-bold { font-weight: 600; color: var(--text); }
+
+    /* GOOGLE REVIEW CARDS */
+    .v2-review-item {
+      background: var(--bg-elevated, #f8fafc);
+      border: 1px solid var(--border, #e2e8f0);
+      border-radius: 0.75rem;
+      padding: 0.65rem 0.75rem;
     }
-    .v2-filter-label input[type="checkbox"] {
-      cursor: pointer;
+    .v2-review-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.3rem; }
+    .v2-review-name { font-size: 0.72rem; font-weight: 700; color: var(--text); }
+    .v2-review-stars { font-size: 0.65rem; color: #fbbf24; }
+    .v2-review-text { font-size: 0.65rem; color: var(--text-muted); line-height: 1.45; margin: 0; }
+
+    /* scrollbar for reviewPanelSpots */
+    #reviewPanelSpots::-webkit-scrollbar { width: 4px; }
+    #reviewPanelSpots::-webkit-scrollbar-track { background: transparent; }
+    #reviewPanelSpots::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+
+    /* DARK THEME */
+    [data-theme="dark"] .v2-score-pill,
+    html[data-theme="dark"] .v2-score-pill { background: rgba(15,23,42,0.9); }
+
+    [data-theme="dark"] .review-spot-card,
+    html[data-theme="dark"] .review-spot-card {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.07);
     }
+    [data-theme="dark"] .review-spot-card:hover,
+    html[data-theme="dark"] .review-spot-card:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: #3b82f6 !important;
+    }
+    [data-theme="dark"] .review-spot-card.selected,
+    html[data-theme="dark"] .review-spot-card.selected {
+      border-color: #10b981 !important;
+      box-shadow: 0 0 0 2px rgba(16,185,129,0.3), 0 4px 16px rgba(16,185,129,0.2) !important;
+    }
+    [data-theme="dark"] .spot-card-name,
+    html[data-theme="dark"] .spot-card-name { color: #f1f5f9; }
+    [data-theme="dark"] .spot-card-desc,
+    html[data-theme="dark"] .spot-card-desc { color: #94a3b8; }
+
+    [data-theme="dark"] .v2-tab,
+    html[data-theme="dark"] .v2-tab { color: #94a3b8; }
+    [data-theme="dark"] .v2-tab.active,
+    html[data-theme="dark"] .v2-tab.active { color: #60a5fa; border-bottom-color: #60a5fa; }
+
+    [data-theme="dark"] .v2-chip-filter,
+    html[data-theme="dark"] .v2-chip-filter {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.1);
+      color: #94a3b8;
+    }
+    [data-theme="dark"] .v2-chip-filter.active,
+    html[data-theme="dark"] .v2-chip-filter.active { color: #fff; }
+
+    [data-theme="dark"] .v2-age-card,
+    html[data-theme="dark"] .v2-age-card {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.07);
+    }
+    [data-theme="dark"] .v2-review-item,
+    html[data-theme="dark"] .v2-review-item {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.07);
+    }
+    [data-theme="dark"] .v2-nearby-card,
+    html[data-theme="dark"] .v2-nearby-card {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(255,255,255,0.07);
+    }
+    /* ===== END v2DestReviewPanel ===== */
 
     /* ── Dark Theme (Adaptive Selector) ── */
     [data-theme="dark"] #v2DestReviewPanel,
@@ -427,7 +587,7 @@
     }
     .region-dest-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,23,0.5); }
     .dest-card-image { position:relative; height:150px; overflow:hidden; }
-    .dest-card-image img { width:100%; height:100%; object-fit:cover; display:block; }
+    .dest-card-image img { width:100%; height:100%; object-fit:cover; display:block; transition: opacity 0.5s ease, transform 0.5s ease; }
     .dest-card-badge { position:absolute; left:0.6rem; top:0.6rem; background: #ff4d8b; color:#fff; padding:0.28rem 0.5rem; border-radius:0.5rem; font-weight:700; font-size:0.72rem; }
     .dest-card-verified { position:absolute; right:0.6rem; top:0.6rem; background: rgba(0,0,0,0.35); color:#d1fae5; padding:0.18rem 0.45rem; border-radius:0.5rem; font-size:0.68rem; }
     .dest-card-info { padding:0.8rem; display:flex; flex-direction:column; gap:0.5rem; flex:1; }
@@ -1008,6 +1168,25 @@
       font-weight: 600;
     }
 
+    .sdm-tab {
+      transition: all 0.2s ease;
+      position: relative;
+      outline: none;
+    }
+    .sdm-tab:hover {
+      color: #60a5fa !important;
+      background: rgba(255,255,255,0.03);
+    }
+    .v2-nearby-card {
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .v2-nearby-card:hover {
+      transform: translateY(-4px) scale(1.02) !important;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2) !important;
+      border-color: rgba(59, 130, 246, 0.4) !important;
+    }
+
   </style>
 </head>
 
@@ -1415,208 +1594,174 @@
               <div id="regionDestCards" class="region-dest-scroll"></div>
               
               <!-- PREMIUM DESTINATION DISCOVERY PANEL -->
-              <div id="v2DestReviewPanel" style="display:none; position:relative; margin-top:1rem; border-radius:1.25rem; padding:0; box-shadow:0 4px 20px rgba(0,0,0,0.08); overflow:hidden;">
+              <div id="v2DestReviewPanel" style="display:none; position:relative; margin-top:1rem; border-radius:1.25rem; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,0.12);">
                 
                 <!-- GPS Status Toast -->
                 <div id="gpsStatus" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:100; background:rgba(0,0,0,0.85); color:#fff; padding:0.75rem 1.25rem; border-radius:0.75rem; font-size:0.85rem; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.3); max-width:280px;"></div>
                 
-                <!-- Header với Banner + Close Button -->
-                <div id="v2DestBanner" style="height:180px; position:relative; overflow:hidden;">
-                  <img id="v2DestBannerImg" src="" alt="Banner" style="width:100%; height:100%; object-fit:cover; filter:brightness(0.6);">
-                  <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);"></div>
-                  <div style="position:absolute; bottom:0; left:0; right:0; padding:1rem;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-                      <div style="flex:1;">
-                        <h4 id="v2DestTitle" style="margin:0 0 0.25rem; font-size:1.5rem; font-weight:800; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.5);">Đà Lạt</h4>
-                        
-                        <!-- Rating Stars -->
-                        <div id="v2DestRating" style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.5rem;">
-                          <span id="v2StarsDisplay" style="font-size:1rem; color:#fbbf24; letter-spacing:2px;">★★★★★</span>
-                          <span id="v2ScoreQuality" style="background:#fbbf24; color:#000; padding:2px 8px; border-radius:4px; font-size:0.75rem; font-weight:700;">4.9</span>
-                          <span style="color:#fff; font-size:0.8rem;">· Đánh giá từ du khách</span>
-                        </div>
-                        
-                        <!-- Quick Info Tags -->
-                        <div id="v2QuickInfo" style="display:flex; flex-wrap:wrap; gap:0.4rem;">
-                          <span id="v2SafetyTag" style="background:rgba(16,185,129,0.8); color:#fff; padding:3px 8px; border-radius:20px; font-size:0.65rem; font-weight:600;">🛡️ An toàn: Tốt</span>
-                          <span id="v2PopularTag" style="background:rgba(249,115,22,0.8); color:#fff; padding:3px 8px; border-radius:20px; font-size:0.65rem; font-weight:600;">🔥 Cực hot</span>
-                          <span id="v2CostTag" style="background:rgba(59,130,246,0.8); color:#fff; padding:3px 8px; border-radius:20px; font-size:0.65rem; font-weight:600;">💰 Chi phí: Trung bình</span>
-                          <span id="v2WeatherTag" style="background:rgba(14,165,233,0.8); color:#fff; padding:3px 8px; border-radius:20px; font-size:0.65rem; font-weight:600;">🌤️ Mát mẻ</span>
-                        </div>
+                <!-- HERO BANNER -->
+                <div id="v2DestBanner" style="height:200px; position:relative; overflow:hidden;">
+                  <img id="v2DestBannerImg" src="" alt="Banner" style="width:100%; height:100%; object-fit:cover; transition: opacity 0.5s ease;">
+                  <div id="v2BannerDots" style="position:absolute; bottom:10px; right:12px; display:flex; gap:5px; z-index:10;"></div>
+                  <!-- Gradient overlay -->
+                  <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.1) 100%); pointer-events:none;"></div>
+                  <!-- Top bar: back + close -->
+                  <div style="position:absolute; top:0; left:0; right:0; padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center; z-index:10;">
+                    <button type="button" onclick="closeV2ReviewPanel()" class="v2-icon-btn">
+                      ← Quay lại
+                    </button>
+                    <div style="display:flex; gap:0.5rem;">
+                      <button onclick="openMapZoom()" class="v2-icon-btn">🔍</button>
+                      <button id="btnGPSDirection" onclick="getGPSDirectionsV2()" class="v2-icon-btn">📍</button>
+                    </div>
+                  </div>
+                  <!-- City info overlay -->
+                  <div style="position:absolute; bottom:0; left:0; right:0; padding:1rem 1rem 0.85rem;">
+                    <h4 id="v2DestTitle" style="margin:0 0 0.35rem; font-size:1.55rem; font-weight:800; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,0.5); letter-spacing:-0.3px;"></h4>
+                    <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                      <span id="v2StarsDisplay" style="font-size:0.85rem; color:#fbbf24; letter-spacing:1px;">★★★★★</span>
+                      <span id="v2ScoreQuality" style="background:#fbbf24; color:#000; padding:2px 7px; border-radius:4px; font-size:0.7rem; font-weight:800;"></span>
+                      <div id="v2QuickInfo" style="display:flex; flex-wrap:wrap; gap:0.3rem; margin-left:0.2rem;">
+                        <span id="v2SafetyTag" class="v2-tag tag-green">🛡️ Tốt</span>
+                        <span id="v2PopularTag" class="v2-tag tag-orange">🔥 Hot</span>
+                        <span id="v2CostTag" class="v2-tag tag-blue">💰 Hợp lý</span>
+                        <span id="v2WeatherTag" class="v2-tag tag-sky">🌤️ Mát</span>
                       </div>
-                      <button type="button" onclick="closeV2ReviewPanel()" style="background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.2); border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; font-size:1.2rem;">×</button>
                     </div>
                   </div>
                 </div>
 
-                <!-- Nội dung chính - Single Column Layout -->
-                <div style="padding:1rem; display:flex; flex-direction:column; gap:1rem;">
+                <!-- QUICK SCORE PILLS -->
+                <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0; border-bottom:1px solid var(--border,#e2e8f0);">
+                  <div class="v2-score-pill">
+                    <span class="v2-score-icon" style="color:#10b981;">🛡️</span>
+                    <span class="v2-score-label">An toàn</span>
+                    <span id="v2ScoreSafety" class="v2-score-val" style="color:#10b981;">Tốt</span>
+                  </div>
+                  <div class="v2-score-pill" style="border-left:1px solid var(--border,#e2e8f0);">
+                    <span class="v2-score-icon" style="color:#f59e0b;">🔥</span>
+                    <span class="v2-score-label">Xu hướng</span>
+                    <span id="v2ScoreTrend" class="v2-score-val" style="color:#f59e0b;">Hot</span>
+                  </div>
+                  <div class="v2-score-pill" style="border-left:1px solid var(--border,#e2e8f0);">
+                    <span class="v2-score-icon" style="color:#ec4899;">💰</span>
+                    <span class="v2-score-label">Chi phí</span>
+                    <span id="v2ScoreCost" class="v2-score-val" style="color:#ec4899;">Hợp lý</span>
+                  </div>
+                  <div class="v2-score-pill" style="border-left:1px solid var(--border,#e2e8f0);">
+                    <span class="v2-score-icon" style="color:#3b82f6;">🌤️</span>
+                    <span class="v2-score-label">Thời tiết</span>
+                    <span id="v2ScoreWeather" class="v2-score-val" style="color:#3b82f6;">Mát</span>
+                  </div>
+                </div>
 
-                  <!-- GPS MAP + DIRECTION -->
-                  <div class="review-section-block">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                      <span style="font-size:0.75rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">🗺️ Bản đồ & Định vị</span>
+                <!-- TAB NAVIGATION -->
+                <div style="display:flex; border-bottom:1px solid var(--border,#e2e8f0); background:var(--bg-card,#fff); overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
+                  <button class="v2-tab active" onclick="switchV2Tab(this,'tab-spots')" data-tab="tab-spots">✨ Địa điểm</button>
+                  <button class="v2-tab" onclick="switchV2Tab(this,'tab-nearby')" data-tab="tab-nearby">📸 Quanh đây</button>
+                  <button class="v2-tab" onclick="switchV2Tab(this,'tab-age')" data-tab="tab-age">👨‍👩‍👧 Gợi ý</button>
+                  <button class="v2-tab" onclick="switchV2Tab(this,'tab-reviews')" data-tab="tab-reviews">⭐ Đánh giá</button>
+                </div>
+
+                <!-- TAB CONTENTS -->
+                <div style="background:var(--bg-card,#fff);">
+
+                  <!-- TAB: SPOTS -->
+                  <div id="tab-spots" class="v2-tab-panel" style="padding:0.85rem;">
+                    <!-- Filter chips -->
+                    <div style="display:flex; gap:0.4rem; margin-bottom:0.75rem; flex-wrap:wrap;">
+                      <label class="v2-chip-filter active" id="chip-attraction" onclick="toggleChipFilter(this,'attraction')">🏛️ Điểm chơi</label>
+                      <label class="v2-chip-filter active" id="chip-restaurant" onclick="toggleChipFilter(this,'restaurant')">🍜 Quán ăn</label>
+                      <label class="v2-chip-filter active" id="chip-experience" onclick="toggleChipFilter(this,'experience')">✨ Trải nghiệm</label>
                     </div>
-                    <div id="v2DestMapContainer" style="height:120px; border-radius:0.75rem; overflow:hidden; border:1px solid var(--border); position:relative;">
-                      <iframe id="v2DestMap" width="100%" height="100%" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                      <div style="position:absolute; bottom:0.5rem; right:0.5rem; display:flex; gap:0.4rem;">
-                        <button onclick="openMapZoom()" style="background:rgba(59,130,246,0.9); border:none; border-radius:0.4rem; padding:0.35rem 0.6rem; font-size:0.65rem; color:#fff; cursor:pointer;">🔍 Phóng to</button>
-                        <button id="btnGPSDirection" onclick="getGPSDirectionsV2()" style="background:rgba(16,185,129,0.9); border:none; border-radius:0.4rem; padding:0.35rem 0.6rem; font-size:0.65rem; color:#fff; cursor:pointer;">📍 Chỉ đường</button>
+                    <!-- Spots grid 2-col -->
+                    <div id="reviewPanelSpots" style="display:grid; grid-template-columns:1fr 1fr; gap:0.6rem;">
+                      <!-- Spots injected here -->
+                    </div>
+                  </div>
+
+                  <!-- TAB: NEARBY -->
+                  <div id="tab-nearby" class="v2-tab-panel" style="display:none; padding:0.85rem;">
+                    <div id="v2NearbyPlaces" style="display:grid; grid-template-columns:repeat(2,1fr); gap:0.6rem;"></div>
+                  </div>
+
+                  <!-- TAB: AGE TIPS -->
+                  <div id="tab-age" class="v2-tab-panel" style="display:none; padding:0.85rem; display:none;">
+                    <div style="display:flex; flex-direction:column; gap:0.6rem;">
+                      <div class="v2-age-card">
+                        <div class="v2-age-icon">🧸</div>
+                        <div>
+                          <div class="v2-age-title">Trẻ nhỏ &amp; Gia đình</div>
+                          <div class="v2-age-row">📍 <span id="v2AgeKidSpot" class="v2-age-bold">...</span></div>
+                          <div class="v2-age-row">🍜 <span id="v2AgeKidFood">...</span></div>
+                          <div class="v2-age-row">🎡 <span id="v2AgeKidPlay">...</span></div>
+                        </div>
+                      </div>
+                      <div class="v2-age-card">
+                        <div class="v2-age-icon">🏃</div>
+                        <div>
+                          <div class="v2-age-title">Người lớn &amp; Cặp đôi</div>
+                          <div class="v2-age-row">📍 <span id="v2AgeAdultSpot" class="v2-age-bold">...</span></div>
+                          <div class="v2-age-row">🍜 <span id="v2AgeAdultFood">...</span></div>
+                          <div class="v2-age-row">🧗 <span id="v2AgeAdultPlay">...</span></div>
+                        </div>
+                      </div>
+                      <div class="v2-age-card">
+                        <div class="v2-age-icon">🍵</div>
+                        <div>
+                          <div class="v2-age-title">Người cao tuổi</div>
+                          <div class="v2-age-row">📍 <span id="v2AgeElderSpot" class="v2-age-bold">...</span></div>
+                          <div class="v2-age-row">🍜 <span id="v2AgeElderFood">...</span></div>
+                          <div class="v2-age-row">🧘 <span id="v2AgeElderPlay">...</span></div>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <!-- GOOGLE REVIEWS - Đánh giá từ Google Maps -->
-                  <div class="review-section-block">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                      <span style="font-size:0.75rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">⭐ Đánh giá từ Google Maps</span>
-                      <button onclick="toggleReviewForm()" id="btnWriteReview" style="background:linear-gradient(135deg, #3b82f6, #7c3aed); border:none; border-radius:0.5rem; padding:4px 10px; font-size:0.65rem; color:#fff; cursor:pointer;">✏️ Viết đánh giá</button>
+                  <!-- TAB: REVIEWS -->
+                  <div id="tab-reviews" class="v2-tab-panel" style="display:none; padding:0.85rem;">
+                    <div style="display:flex; justify-content:flex-end; margin-bottom:0.6rem;">
+                      <button onclick="toggleReviewForm()" id="btnWriteReview" style="background:linear-gradient(135deg,#3b82f6,#7c3aed); border:none; border-radius:0.5rem; padding:5px 12px; font-size:0.7rem; color:#fff; cursor:pointer;">✏️ Viết đánh giá</button>
                     </div>
-                    
-                    <!-- Review Form (Hidden by default) -->
-                    <div id="reviewForm" style="display:none; background:var(--bg-card); border:1px solid var(--border); border-radius:0.75rem; padding:0.75rem; margin-bottom:0.75rem;">
+                    <div id="reviewForm" style="display:none; background:var(--bg-elevated,#f8fafc); border:1px solid var(--border,#e2e8f0); border-radius:0.75rem; padding:0.75rem; margin-bottom:0.75rem;">
                       <div style="margin-bottom:0.5rem;">
                         <label style="font-size:0.7rem; color:var(--text-muted);">Chọn số sao:</label>
                         <div id="ratingStars" style="display:flex; gap:4px; margin-top:4px;">
-                          <button onclick="setRating(1)" class="star-btn" data-rating="1" style="background:none; border:none; font-size:1.2rem; cursor:pointer; opacity:0.3;">⭐</button>
-                          <button onclick="setRating(2)" class="star-btn" data-rating="2" style="background:none; border:none; font-size:1.2rem; cursor:pointer; opacity:0.3;">⭐</button>
-                          <button onclick="setRating(3)" class="star-btn" data-rating="3" style="background:none; border:none; font-size:1.2rem; cursor:pointer; opacity:0.3;">⭐</button>
-                          <button onclick="setRating(4)" class="star-btn" data-rating="4" style="background:none; border:none; font-size:1.2rem; cursor:pointer; opacity:0.3;">⭐</button>
-                          <button onclick="setRating(5)" class="star-btn" data-rating="5" style="background:none; border:none; font-size:1.2rem; cursor:pointer; opacity:0.3;">⭐</button>
+                          <button onclick="setRating(1)" class="star-btn" data-rating="1" style="background:none;border:none;font-size:1.2rem;cursor:pointer;opacity:0.3;">⭐</button>
+                          <button onclick="setRating(2)" class="star-btn" data-rating="2" style="background:none;border:none;font-size:1.2rem;cursor:pointer;opacity:0.3;">⭐</button>
+                          <button onclick="setRating(3)" class="star-btn" data-rating="3" style="background:none;border:none;font-size:1.2rem;cursor:pointer;opacity:0.3;">⭐</button>
+                          <button onclick="setRating(4)" class="star-btn" data-rating="4" style="background:none;border:none;font-size:1.2rem;cursor:pointer;opacity:0.3;">⭐</button>
+                          <button onclick="setRating(5)" class="star-btn" data-rating="5" style="background:none;border:none;font-size:1.2rem;cursor:pointer;opacity:0.3;">⭐</button>
                         </div>
                       </div>
-                      <textarea id="reviewText" placeholder="Chia sẻ trải nghiệm của bạn..." style="width:100%; min-height:60px; border:1px solid var(--border); border-radius:0.5rem; padding:0.5rem; font-size:0.7rem; background:var(--bg-elevated); color:var(--text); resize:none; margin-bottom:0.5rem;"></textarea>
-                      <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
-                        <button onclick="toggleReviewForm()" style="padding:6px 12px; border-radius:0.5rem; border:1px solid var(--border); background:transparent; color:var(--text-muted); font-size:0.7rem; cursor:pointer;">Hủy</button>
-                        <button onclick="submitReview()" style="padding:6px 12px; border-radius:0.5rem; border:none; background:linear-gradient(135deg, #10b981, #059669); color:#fff; font-size:0.7rem; cursor:pointer;">Gửi đánh giá</button>
+                      <textarea id="reviewText" placeholder="Chia sẻ trải nghiệm của bạn..." style="width:100%;min-height:60px;border:1px solid var(--border);border-radius:0.5rem;padding:0.5rem;font-size:0.7rem;background:var(--bg-elevated);color:var(--text);resize:none;margin-bottom:0.5rem;box-sizing:border-box;"></textarea>
+                      <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+                        <button onclick="toggleReviewForm()" style="padding:6px 12px;border-radius:0.5rem;border:1px solid var(--border);background:transparent;color:var(--text-muted);font-size:0.7rem;cursor:pointer;">Hủy</button>
+                        <button onclick="submitReview()" style="padding:6px 12px;border-radius:0.5rem;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.7rem;cursor:pointer;">Gửi</button>
                       </div>
                     </div>
-                    
-                    <div id="v2GoogleReviews" style="background:var(--bg-card); border:1px solid var(--border); border-radius:0.75rem; padding:0.75rem; display:flex; flex-direction:column; gap:0.6rem;">
-                      <!-- Reviews will be injected here -->
-                    </div>
-                  </div>
-
-                  <!-- SCORES GRID -->
-                  <div class="review-section-block">
-                    <div class="v2-dest-scores" style="display:grid; grid-template-columns:repeat(4, 1fr); gap:0.4rem;">
-                      <div class="score-card" style="background:var(--bg-card); border:1px solid var(--border); padding:0.5rem; border-radius:0.5rem; text-align:center;">
-                        <span style="display:block; font-size:0.6rem; text-transform:uppercase; margin-bottom:2px; color:var(--text-muted);">An toàn</span>
-                        <span id="v2ScoreSafety" style="font-weight:800; color:#10b981; font-size:0.8rem;">Tốt</span>
-                      </div>
-                      <div class="score-card" style="background:var(--bg-card); border:1px solid var(--border); padding:0.5rem; border-radius:0.5rem; text-align:center;">
-                        <span style="display:block; font-size:0.6rem; text-transform:uppercase; margin-bottom:2px; color:var(--text-muted);">Xu hướng</span>
-                        <span id="v2ScoreTrend" style="font-weight:800; color:#f59e0b; font-size:0.8rem;">Cực hot</span>
-                      </div>
-                      <div class="score-card" style="background:var(--bg-card); border:1px solid var(--border); padding:0.5rem; border-radius:0.5rem; text-align:center;">
-                        <span style="display:block; font-size:0.6rem; text-transform:uppercase; margin-bottom:2px; color:var(--text-muted);">Chi phí</span>
-                        <span id="v2ScoreCost" style="font-weight:800; color:#ec4899; font-size:0.8rem;">Hợp lý</span>
-                      </div>
-                      <div class="score-card" style="background:var(--bg-card); border:1px solid var(--border); padding:0.5rem; border-radius:0.5rem; text-align:center;">
-                        <span style="display:block; font-size:0.6rem; text-transform:uppercase; margin-bottom:2px; color:var(--text-muted);">Thời tiết</span>
-                        <span id="v2ScoreWeather" style="font-weight:800; color:#3b82f6; font-size:0.8rem;">Mát mẻ</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- NEARBY PLACES - Ảnh & Quán xung quanh -->
-                  <div class="review-section-block">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                      <span style="font-size:0.75rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">📸 Địa điểm & Quán gần đây</span>
-                    </div>
-                    <div id="v2NearbyPlaces" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:0.5rem;">
-                      <!-- Nearby places will be injected here -->
-                    </div>
-                  </div>
-
-                  <!-- SELECTED ATTRACTIONS DISPLAY -->
-                  <div class="review-section-block" id="selectedAttractionsSection" style="background:linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.08)); border:1px solid rgba(16,185,129,0.2);">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                      <span style="font-size:0.75rem; font-weight:700; color:#10b981; text-transform:uppercase; letter-spacing:0.5px;">✓ Địa điểm đã chọn</span>
-                    </div>
-                    <div id="selectedAttractionsDisplay" style="min-height:60px;">
-                      <div style="text-align:center; padding:1rem; color:var(--text-muted);">
-                        <div style="font-size:1.5rem; margin-bottom:0.3rem;">📍</div>
-                        <p style="font-size:0.75rem; margin:0;">Chưa chọn địa điểm nào</p>
-                        <p style="font-size:0.65rem; margin:0.3rem 0 0; opacity:0.7;">Chọn từ danh sách bên dưới</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- AGE TIPS - Mẹo theo độ tuổi -->
-                  <div class="review-section-block">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                      <span style="font-size:0.75rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">👨‍👩‍👧 Gợi ý theo độ tuổi</span>
-                    </div>
-                    <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:0.75rem; padding:0.75rem; display:flex; flex-direction:column; gap:0.5rem;">
-                      <div style="display:flex; align-items:center; gap:0.5rem; padding-bottom:0.4rem; border-bottom:1px solid var(--border);">
-                        <span style="font-size:0.9rem;">🧸</span>
-                        <div style="flex:1;">
-                          <span style="font-size:0.7rem; font-weight:700; color:var(--text);">Trẻ nhỏ & Gia đình</span>
-                          <div style="font-size:0.65rem; color:var(--text-muted); margin-top:2px;">
-                            📍 <span id="v2AgeKidSpot" class="v2-age-bold">...</span> · 🍜 <span id="v2AgeKidFood">...</span> · 🎡 <span id="v2AgeKidPlay">...</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div style="display:flex; align-items:center; gap:0.5rem; padding-bottom:0.4rem; border-bottom:1px solid var(--border);">
-                        <span style="font-size:0.9rem;">🏃</span>
-                        <div style="flex:1;">
-                          <span style="font-size:0.7rem; font-weight:700; color:var(--text);">Người lớn & Cặp đôi</span>
-                          <div style="font-size:0.65rem; color:var(--text-muted); margin-top:2px;">
-                            📍 <span id="v2AgeAdultSpot" class="v2-age-bold">...</span> · 🍜 <span id="v2AgeAdultFood">...</span> · 🧗 <span id="v2AgeAdultPlay">...</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div style="display:flex; align-items:center; gap:0.5rem;">
-                        <span style="font-size:0.9rem;">🍵</span>
-                        <div style="flex:1;">
-                          <span style="font-size:0.7rem; font-weight:700; color:var(--text);">Người cao tuổi</span>
-                          <div style="font-size:0.65rem; color:var(--text-muted); margin-top:2px;">
-                            📍 <span id="v2AgeElderSpot" class="v2-age-bold">...</span> · 🍜 <span id="v2AgeElderFood">...</span> · 🧘 <span id="v2AgeElderPlay">...</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- SPOTS LIST -->
-                  <div class="review-section-block">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
-                      <span style="font-size:0.75rem; font-weight:700; color:var(--text); text-transform:uppercase; letter-spacing:0.5px;">✨ Địa điểm nổi bật</span>
-                    </div>
-                    <!-- Filter Checkboxes -->
-                    <div style="display:flex; gap:0.35rem; margin-bottom:0.5rem;">
-                      <label class="v2-filter-label" style="display:inline-flex; align-items:center; gap:0.2rem; padding:0.3rem 0.5rem; border-radius:0.4rem; font-size:0.65rem; cursor:pointer; user-select:none; background:var(--bg-card); border:1px solid var(--border);">
-                        <input type="checkbox" id="prefCategoryAttraction" checked onchange="applyReviewFilters()">
-                        <span>🏛️ Điểm chơi</span>
-                      </label>
-                      <label class="v2-filter-label" style="display:inline-flex; align-items:center; gap:0.2rem; padding:0.3rem 0.5rem; border-radius:0.4rem; font-size:0.65rem; cursor:pointer; user-select:none; background:var(--bg-card); border:1px solid var(--border);">
-                        <input type="checkbox" id="prefCategoryRestaurant" checked onchange="applyReviewFilters()">
-                        <span>🍜 Quán ăn</span>
-                      </label>
-                      <label class="v2-filter-label" style="display:inline-flex; align-items:center; gap:0.2rem; padding:0.3rem 0.5rem; border-radius:0.4rem; font-size:0.65rem; cursor:pointer; user-select:none; background:var(--bg-card); border:1px solid var(--border);">
-                        <input type="checkbox" id="prefCategoryExperience" checked onchange="applyReviewFilters()">
-                        <span>✨ Trải nghiệm</span>
-                      </label>
-                    </div>
-                    <!-- Spot list -->
-                    <div id="reviewPanelSpots" style="display:flex; flex-direction:column; gap:0.4rem; max-height:250px; overflow-y:auto;">
-                      <!-- Spots will be injected here -->
-                    </div>
+                    <div id="v2GoogleReviews" style="display:flex;flex-direction:column;gap:0.6rem;"></div>
                   </div>
 
                 </div>
+
+                <!-- SELECTED ATTRACTIONS (sticky bottom) -->
+                <div id="selectedAttractionsSection" style="border-top:1px solid var(--border,#e2e8f0); background:var(--bg-card,#fff); padding:0.75rem 0.85rem;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                    <span style="font-size:0.72rem; font-weight:700; color:#10b981;">✓ Địa điểm đã chọn</span>
+                  </div>
+                  <div id="selectedAttractionsDisplay" style="min-height:48px;">
+                    <div style="text-align:center; padding:0.75rem; color:var(--text-muted);">
+                      <div style="font-size:1.3rem; margin-bottom:0.25rem;">📍</div>
+                      <p style="font-size:0.72rem; margin:0;">Chưa chọn địa điểm nào</p>
+                      <p style="font-size:0.65rem; margin:0.2rem 0 0; opacity:0.7;">Chọn từ danh sách địa điểm nổi bật bên trên</p>
+                    </div>
+                  </div>
+                </div>
+
               </div>
-            </div>
 
-            <!-- Nút chuyển sang Bước 2 -->
-            <div style="margin-top: 1.5rem;">
-              <button type="button" id="btnNextStep2" class="planner-btn" onclick="switchFormStep(2)" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                <span>Tiếp theo — Chi tiết</span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-              </button>
-            </div>
-
+            </div><!-- end #regionDestinations -->
           </div><!-- end #formStep1 -->
 
           <!-- STEP 2: CHI TIẾT -->
@@ -2147,12 +2292,15 @@
 
         <!-- Trạng thái có kết quả -->
         <!-- Trạng thái có kết quả -->
-        <div id="viewModeHeader" style="display: none; align-items: center; justify-content: space-between; margin-bottom: 2rem; background: var(--bg-elevated); padding: 1.25rem 1.5rem; border-radius: 1rem; border: 2px solid var(--accent, #10b981);">
-          <div>
-            <h3 style="color: var(--color-primary); margin: 0; font-size: 1.2rem;">📂 Chế độ Xem Lịch Trình đã lưu</h3>
-            <p style="margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--text-muted);">Bạn đang xem lại lịch trình từ bộ sưu tập của mình.</p>
+        <div id="viewModeHeader" style="display: none; align-items: center; justify-content: space-between; margin-bottom: 2rem; background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.03)); padding: 1.25rem 1.5rem; border-radius: 1.25rem; border: 1px solid rgba(16, 185, 129, 0.35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(16, 185, 129, 0.08); transition: all 0.3s ease;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.4)); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); animation: pulse 2s infinite;">📂</div>
+            <div>
+              <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; background: linear-gradient(135deg, #10b981, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 0.5px;">Chế độ Xem Lịch Trình đã lưu</h3>
+              <p style="margin: 0.2rem 0 0; font-size: 0.8rem; color: rgba(255,255,255,0.6); font-weight: 500;">Bạn đang xem lại lịch trình từ bộ sưu tập cá nhân của mình.</p>
+            </div>
           </div>
-          <a href="my-trips.html" class="btn btn--ghost" style="padding: 0.5rem 1rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+          <a href="my-trips.html" class="btn btn--ghost" style="padding: 0.6rem 1.2rem; font-size: 0.85rem; border-radius: 10px; display: flex; align-items: center; gap: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255,255,255,0.03); color: #e2e8f0; font-weight: 700; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'; this.style.borderColor='rgba(255,255,255,0.2)';" onmouseout="this.style.background='rgba(255,255,255,0.03)'; this.style.borderColor='rgba(255,255,255,0.1)';">
             <span>🔙 Quay lại danh sách</span>
           </a>
         </div>
@@ -2333,7 +2481,7 @@
         { name: 'Hội An', img: 'https://images.unsplash.com/photo-1587922546307-776227941871?w=200&h=150&fit=crop', spots: ['Chùa Cầu', 'Sông Hoài', 'Rừng dừa Cẩm Thanh'] },
         { name: 'Huế', img: 'https://images.unsplash.com/photo-1590054387835-ab72678fef01?w=200&h=150&fit=crop', spots: ['Đại Nội', 'Lăng Khải Định', 'Chùa Thiên Mụ'] },
         { name: 'Nha Trang', img: 'https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=200&h=150&fit=crop', spots: ['VinWonders', 'Tháp Bà Ponagar', 'Hòn Mun'] },
-        { name: 'Đà Lạc', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Hồ Tuyền Lâm', 'Vườn hoa TP', 'Langbiang'] },
+        { name: 'Đà Lạt', img: 'https://phetravel.com/uploads/dnt-da-lat.jpg', spots: ['Hồ Tuyền Lâm', 'Vườn hoa TP', 'Langbiang'] },
         { name: 'Quy Nhơn', img: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=200&h=150&fit=crop', spots: ['Kỳ Co', 'Eo Gió', 'Tháp Bánh Ít'] },
         { name: 'Mũi Né', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=200&h=150&fit=crop', spots: ['Đồi Cát Đỏ', 'Bàu Trắng', 'Suối Tiên'] },
         { name: 'Phong Nha', img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=200&h=150&fit=crop', spots: ['Động Phong Nha', 'Động Thiên Đường', 'Sông Chày'] },
@@ -2495,6 +2643,12 @@
       }
     }
 
+    // Outer cards slideshow timers (staggered & randomized)
+    if (window._outerCardsTimers) {
+      window._outerCardsTimers.forEach(t => clearInterval(t));
+    }
+    window._outerCardsTimers = [];
+
     function renderDestinations() {
       const scrollContainer = document.getElementById('regionDestCards');
       const label = document.getElementById('regionDestLabel');
@@ -2503,9 +2657,14 @@
       if (!scrollContainer) return;
       scrollContainer.innerHTML = '';
 
+      if (window._outerCardsTimers) {
+        window._outerCardsTimers.forEach(t => clearInterval(t));
+      }
+      window._outerCardsTimers = [];
+
       const allDest = REGION_DESTINATIONS[currentRegion] || [];
       // Render as a larger grid of cards (tile view)
-      allDest.forEach(dest => {
+      allDest.forEach((dest, cardIdx) => {
         const card = document.createElement('div');
         card.className = 'region-dest-card';
         
@@ -2518,11 +2677,27 @@
         const popularity = cityData.popularity || 'Hot';
         const cost = cityData.cost || 'Trung bình';
 
-        const imgSrc = (typeof window.getVNPhoto === 'function') ? window.getVNPhoto(dest.name, Math.floor(Math.random()*100)) : (dest.img || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop');
+        // Gather all photos for this city
+        const photos = [];
+        if (typeof window.getVNPhoto === 'function') {
+          const seen = new Set();
+          for (let i = 0; i < 6; i++) {
+            const url = window.getVNPhoto(dest.name, i);
+            if (url && !seen.has(url)) {
+              seen.add(url);
+              photos.push(url);
+            }
+            if (photos.length >= 3) break;
+          }
+        }
+        if (photos.length === 0 && dest.img) photos.push(dest.img);
+        if (photos.length === 0) photos.push('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop');
+
+        const imgSrc = photos[0];
 
         card.innerHTML = `
           <div class="dest-card-image">
-            <img src="${imgSrc}" alt="${dest.name}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop';">
+            <img id="outerCardImg_${cardIdx}" src="${imgSrc}" alt="${dest.name}" style="transition: opacity 0.5s ease;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop';">
             <div class="dest-card-badge">⭐ ${rating}</div>
           </div>
           <div class="dest-card-info">
@@ -2535,12 +2710,35 @@
               <span class="meta-tag cost">💰 ${cost}</span>
             </div>
             <div class="dest-card-actions">
-              <button class="btn-go" onclick="event.stopPropagation(); selectDestination('${dest.name.replace("'","\'")}', this.closest('.region-dest-card'))">+ Chuyến đi</button>
+              <button class="btn-go" onclick="event.stopPropagation(); selectDestination('${dest.name.replace("'","\\'")}', this.closest('.region-dest-card'))">+ Chuyến đi</button>
             </div>
           </div>
-        `;
+`;
         card.onclick = () => selectDestination(dest.name, card);
         scrollContainer.appendChild(card);
+
+        // Start independent staggered timer for this card if it has multiple photos
+        if (photos.length > 1) {
+          // Staggered interval: randomized between 3.0s and 5.0s
+          const slideInterval = 3000 + Math.random() * 2000;
+          let currentPhotoIdx = 0;
+          
+          const timer = setInterval(() => {
+            const el = document.getElementById(`outerCardImg_${cardIdx}`);
+            if (!el) {
+              clearInterval(timer);
+              return;
+            }
+            currentPhotoIdx = (currentPhotoIdx + 1) % photos.length;
+            el.style.opacity = '0';
+            setTimeout(() => {
+              el.src = photos[currentPhotoIdx];
+              el.style.opacity = '1';
+            }, 300);
+          }, slideInterval);
+          
+          window._outerCardsTimers.push(timer);
+        }
       });
     }
 
@@ -2640,7 +2838,8 @@
       },
       // Alias for TP.HCM
       "TP.HCM": null,
-      "Đà Lạc": null,
+      // Alias kept for backward-compat (typo users may type 'Đà Lạc')
+      // "Đà Lạc" is handled via aliasMap → resolves to "Đà Lạt"
       "Đà Nẵng": {
         rating: "4.9",
         banner: "https://images.unsplash.com/photo-1533106418989-4a4ed9c2bda4?auto=format&fit=crop&w=600&q=80",
@@ -3489,6 +3688,8 @@
         ]
       }
     };
+    // Expose detailsMap globally so the Spot Detail Modal script can access it
+    window.detailsMap = detailsMap;
 
     // Selected attractions with full info
     window.selectedAttractionData = []; // Array of { name, category, cityName }
@@ -3635,7 +3836,42 @@
       }
     }
 
+    
+    // ===== Tab + Chip Helpers =====
+    window.switchV2Tab = function(btnEl, tabId) {
+      document.querySelectorAll('.v2-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.v2-tab-panel').forEach(p => { p.style.display = 'none'; });
+      btnEl.classList.add('active');
+      const panel = document.getElementById(tabId);
+      if (panel) { panel.style.setProperty('display', 'block', 'important'); }
+    };
+
+    window._activeChipFilters = { attraction: true, restaurant: true, experience: true };
+    window.toggleChipFilter = function(chipEl, category) {
+      window._activeChipFilters[category] = !window._activeChipFilters[category];
+      chipEl.classList.toggle('active', window._activeChipFilters[category]);
+      document.querySelectorAll('#reviewPanelSpots .review-spot-card').forEach(card => {
+        const cat = card.getAttribute('data-category');
+        card.style.display = window._activeChipFilters[cat] ? '' : 'none';
+      });
+    };
+    window.applyReviewFilters = function() {
+      document.querySelectorAll('#reviewPanelSpots .review-spot-card').forEach(card => {
+        const cat = card.getAttribute('data-category');
+        card.style.display = (window._activeChipFilters[cat] !== false) ? '' : 'none';
+      });
+    };
+    // ===== End Tab + Chip Helpers =====
+
     window.showCityAttractions = function(cityName) {
+      // Reset to first tab
+      document.querySelectorAll('.v2-tab').forEach((b,i) => b.classList.toggle('active', i===0));
+      document.querySelectorAll('.v2-tab-panel').forEach((p,i) => { p.style.display = i===0 ? 'block' : 'none'; });
+      // Reset chip filters
+      window._activeChipFilters = { attraction: true, restaurant: true, experience: true };
+      ['chip-attraction','chip-restaurant','chip-experience'].forEach(id => { const el=document.getElementById(id); if(el) el.classList.add('active'); });
+
+
       const panel = document.getElementById('v2DestReviewPanel');
       if (!panel) return;
       
@@ -3668,9 +3904,73 @@
         panel.style.transform = 'translateY(0)';
       });
 
-      // 1. Populate Banner & Title
+      // 1. Populate Banner & Title with auto-slideshow from VN_DESTINATION_PHOTOS
       document.getElementById('v2DestTitle').textContent = cityName;
-      document.getElementById('v2DestBannerImg').src = cityData.banner;
+
+      // Collect all photos for this city from getVNPhoto
+      const bannerPhotos = [];
+      if (typeof window.getVNPhoto === 'function') {
+        // Collect up to 3 distinct photos by rotating index
+        const seen = new Set();
+        for (let i = 0; i < 6; i++) {
+          const url = window.getVNPhoto(cityName, i);
+          if (url && !seen.has(url)) {
+            seen.add(url);
+            bannerPhotos.push(url);
+          }
+          if (bannerPhotos.length >= 3) break;
+        }
+      }
+      // Fallback to detailsMap.banner if no photos found
+      if (bannerPhotos.length === 0 && cityData.banner) bannerPhotos.push(cityData.banner);
+      if (bannerPhotos.length === 0) bannerPhotos.push('https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop');
+
+      // Setup slideshow
+      const bannerImg = document.getElementById('v2DestBannerImg');
+      const dotsEl = document.getElementById('v2BannerDots');
+      let bannerIdx = 0;
+
+      // Clear previous interval if any
+      if (window._bannerSlideTimer) clearInterval(window._bannerSlideTimer);
+
+      function renderDots() {
+        if (!dotsEl || bannerPhotos.length <= 1) {
+          if (dotsEl) dotsEl.innerHTML = '';
+          return;
+        }
+        dotsEl.innerHTML = bannerPhotos.map((_, i) =>
+          `<span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:${
+            i === bannerIdx ? '#fff' : 'rgba(255,255,255,0.4)'
+          }; transition:background 0.3s; cursor:pointer;" onclick="window._bannerGoTo(${i})"></span>`
+        ).join('');
+      }
+
+      function switchBanner(idx) {
+        bannerIdx = (idx + bannerPhotos.length) % bannerPhotos.length;
+        if (!bannerImg) return;
+        bannerImg.style.opacity = '0';
+        setTimeout(() => {
+          bannerImg.src = bannerPhotos[bannerIdx];
+          bannerImg.style.opacity = '1';
+          renderDots();
+        }, 300);
+      }
+
+      window._bannerGoTo = function(idx) {
+        clearInterval(window._bannerSlideTimer);
+        switchBanner(idx);
+        window._bannerSlideTimer = setInterval(() => switchBanner(bannerIdx + 1), 4000);
+      };
+
+      // Set first image immediately
+      bannerImg.src = bannerPhotos[0];
+      bannerImg.style.opacity = '1';
+      renderDots();
+
+      // Auto-cycle every 4s if multiple photos
+      if (bannerPhotos.length > 1) {
+        window._bannerSlideTimer = setInterval(() => switchBanner(bannerIdx + 1), 4000);
+      }
       
       // 2. Populate Scores - Stars and Tags
       const rating = cityData.rating || '4.8';
@@ -3721,21 +4021,28 @@
       const nearbyContainer = document.getElementById('v2NearbyPlaces');
       if (nearbyContainer) {
         if (cityData.nearbyPlaces && cityData.nearbyPlaces.length > 0) {
-          // Use detailed nearby places with restaurant info
-          nearbyContainer.innerHTML = cityData.nearbyPlaces.map(place => `
-            <div style="border-radius:0.5rem; overflow:hidden; position:relative; border:1px solid var(--border); background:var(--bg-card);">
-              <img src="${place.img}" alt="${place.name}" style="width:100%; height:70px; object-fit:cover;" onerror="this.style.display='none'">
-              <div style="padding:0.4rem;">
-                <div style="font-size:0.6rem; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${place.name}</div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
-                  <span style="font-size:0.55rem; color:${place.type === 'restaurant' ? '#10b981' : '#f59e0b'};">${place.type === 'restaurant' ? '🍜' : '☕'}</span>
-                  <span style="font-size:0.55rem; color:#fbbf24;">⭐${place.rating}</span>
-                  <span style="font-size:0.55rem; color:var(--text-muted);">${place.distance}</span>
-                </div>
-                <button onclick="window.getSpotDirections('${place.name.replace(/'/g, "\\'")}', '${cityName.replace(/'/g, "\\'")}')" style="width:100%; margin-top:4px; padding:3px; border-radius:4px; border:none; background:rgba(16,185,129,0.15); color:#10b981; font-size:0.55rem; cursor:pointer;">📍 Chỉ đường</button>
-              </div>
-            </div>
-          `).join('');
+          nearbyContainer.innerHTML = '';
+          cityData.nearbyPlaces.forEach(function(place, pi) {
+            const div = document.createElement('div');
+            div.className = 'v2-nearby-card';
+            const typeIcon = place.type === 'cafe' ? '☕' : '🍜';
+            const safeName = (place.name || '').replace(/'/g, "\'");
+            const safeCity = cityName.replace(/'/g, "\'");
+            div.innerHTML =
+              '<img src="' + (place.img || '') + '" alt="' + (place.name || '') + '" onerror="this.onerror=null;this.src=&quot;https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=200&amp;q=80&quot;;">' +
+              '<div class="v2-nearby-info">' +
+                '<div class="v2-nearby-name">' + (place.name || '') + '</div>' +
+                '<div class="v2-nearby-meta">' + typeIcon + ' ⭐' + (place.rating || '') + ' · ' + (place.distance || '') + '</div>' +
+                '<button onclick="window.getSpotDirections(\'' + safeName + '\',\'' + safeCity + '\')" style="width:100%;margin-top:4px;padding:3px;border-radius:5px;border:none;background:rgba(16,185,129,0.15);color:#10b981;font-size:0.55rem;cursor:pointer;">📍 Chỉ đường</button>' +
+              '</div>';
+            nearbyContainer.appendChild(div);
+          });
+          // Make nearby cards clickable → open detail modal
+          setTimeout(function() {
+            if (typeof window.patchNearbyCardsClickable === 'function') {
+              window.patchNearbyCardsClickable(cityName);
+            }
+          }, 50);
         } else if (cityData.photos && cityData.photos.length > 0) {
           // Fallback to photos
           nearbyContainer.innerHTML = cityData.photos.map((photo, idx) => `
@@ -3787,81 +4094,56 @@
         experience: { label: "Trải nghiệm", icon: "✨", color: "#f59e0b", rgb: "245, 158, 11" }
       };
 
-      cityData.spots.forEach(spot => {
+      cityData.spots.forEach((spot, spotIdx) => {
         const catInfo = categories[spot.category] || { label: "Khác", icon: "📍", color: "#6b7280", rgb: "107, 114, 128" };
         const card = document.createElement('div');
         card.className = 'review-spot-card';
         card.setAttribute('data-category', spot.category);
         card.setAttribute('data-spot-name', spot.name);
-        
+
         const isSelected = window.selectedAttractionCards && window.selectedAttractionCards[spot.name];
         if (isSelected) card.classList.add('selected');
 
-        card.style.cssText = `
-          position: relative;
-          border-radius: 0.75rem;
-          padding: 0.55rem;
-          display: flex;
-          flex-direction: column;
-          gap: 0.3rem;
-          cursor: pointer;
-          transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
-        `;
+        let photoUrl = 'https://images.unsplash.com/photo-1528127269322-539801943592?w=400&q=80';
+        if (typeof window.getVNPhoto === 'function') {
+          const fromCity = window.getVNPhoto(cityName, spotIdx);
+          if (fromCity) photoUrl = fromCity;
+        }
+        if (spot.photos && spot.photos[0] && !spot.photos[0].includes('unsplash.com')) {
+          photoUrl = spot.photos[0];
+        }
 
-        const spotRating = spot.rating ? `<span style="font-size:0.6rem; color:#fbbf24;">⭐ ${spot.rating}</span>` : '';
-        const spotReviews = spot.reviews ? `<span style="font-size:0.55rem; color:var(--text-muted);">(${spot.reviews})</span>` : '';
+        const spotRating = spot.rating ? '<span style="font-size:0.58rem;color:#fbbf24;">★ ' + spot.rating + '</span>' : '';
+        const spotReviews = spot.reviews ? '<span style="font-size:0.55rem;color:var(--text-muted);">(' + spot.reviews + ')</span>' : '';
 
-        const photoUrl = (spot.photos && spot.photos[0])
-          ? spot.photos[0]
-          : 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80';
-
-        const selBg = isSelected ? '#10b981' : 'rgba(15,23,42,0.6)';
-        const selBorder = isSelected ? '#10b981' : 'rgba(255,255,255,0.5)';
+        const selBg = isSelected ? '#10b981' : 'rgba(15,23,42,0.55)';
+        const selBorder = isSelected ? '#10b981' : 'rgba(255,255,255,0.6)';
         const selShadow = isSelected ? '0 0 10px rgba(16,185,129,0.65)' : 'none';
         const selIcon = isSelected ? '✓' : '+';
+        const safeSpotName = spot.name.replace(/'/g, "\\'");
+        const safeCityName = cityName.replace(/'/g, "\\'");
 
-        card.innerHTML = `
-          <div style="position:relative; width:100%; height:95px; border-radius:8px; overflow:hidden; margin-bottom:0.2rem; flex-shrink:0;">
-            <img class="spot-img-inner" src="${photoUrl}" alt="${spot.name}"
-              onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80'">
-            <button class="spot-select-btn" title="Chọn địa điểm này"
-              onclick="event.stopPropagation(); window.toggleSpotSelection(this.closest('.review-spot-card'), '${spot.name.replace(/'/g, "\\'")}', '${spot.category}', '${cityName.replace(/'/g, "\\'")}');"
-              style="position:absolute; top:6px; right:6px; width:26px; height:26px; border-radius:50%;
-                border:1.5px solid ${selBorder}; display:flex; align-items:center; justify-content:center;
-                font-size:0.8rem; font-weight:700; color:#fff; cursor:pointer;
-                transition:all 0.25s cubic-bezier(0.4,0,0.2,1); z-index:2; outline:none;
-                background:${selBg}; box-shadow:${selShadow};">${selIcon}</button>
-            <button class="spot-map-btn" title="Xem bản đồ"
-              onclick="event.stopPropagation(); window.getSpotDirections('${spot.name.replace(/'/g, "\\'")}', '${cityName.replace(/'/g, "\\'")}');"
-              style="position:absolute; bottom:6px; right:6px; padding:3px 8px; border-radius:12px;
-                border:1px solid rgba(255,255,255,0.2); background:rgba(15,23,42,0.65);
-                backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-                color:#fff; font-size:0.55rem; font-weight:600; cursor:pointer;
-                transition:all 0.2s; z-index:2; display:flex; align-items:center; gap:3px;">📍 Bản đồ</button>
-          </div>
-          <div style="display:flex; align-items:flex-start; gap:0.3rem;">
-            <div style="flex:1; min-width:0;">
-              <div class="spot-card-name" style="font-size:0.75rem; font-weight:700; color:var(--text);
-                white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${spot.name}</div>
-              <div style="display:flex; gap:0.25rem; align-items:center; margin-top:2px; flex-wrap:wrap;">
-                ${spotRating}${spotReviews}
-              </div>
-            </div>
-            <span style="font-size:0.55rem; padding:2px 5px; background:rgba(${catInfo.rgb},0.12);
-              color:${catInfo.color}; border-radius:4px; font-weight:600; flex-shrink:0; margin-top:1px;">${catInfo.icon} ${catInfo.label}</span>
-          </div>
-          <p class="spot-card-desc" style="margin:0; font-size:0.63rem; color:var(--text-muted); line-height:1.35;
-            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${spot.desc || ''}</p>
-        `;
+        card.innerHTML =
+          '<div style="position:relative;overflow:hidden;">' +
+            '<img class="spot-img-inner" src="' + photoUrl + '" alt="' + spot.name + '" onerror="this.onerror=null;this.src=\'https://images.unsplash.com/photo-1528127269322-539801943592?w=400&q=80\'">' +
+            '<div style="position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(to top,rgba(0,0,0,0.55) 0%,transparent 60%);pointer-events:none;"></div>' +
+            '<span style="position:absolute;top:5px;left:5px;background:rgba(' + catInfo.rgb + ',0.9);color:#fff;font-size:0.55rem;font-weight:700;padding:2px 6px;border-radius:10px;">' + catInfo.icon + ' ' + catInfo.label + '</span>' +
+            '<button class="spot-select-btn" title="Chọn địa điểm này" onclick="event.stopPropagation();window.toggleSpotSelection(this.closest(\'.review-spot-card\'),\'' + safeSpotName + '\',\'' + spot.category + '\',\'' + safeCityName + '\');" style="position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:50%;border:1.5px solid ' + selBorder + ';display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;cursor:pointer;transition:all 0.25s;z-index:2;outline:none;background:' + selBg + ';box-shadow:' + selShadow + ';">' + selIcon + '</button>' +
+            '<button class="spot-map-btn" title="Xem bản đồ" onclick="event.stopPropagation();window.getSpotDirections(\'' + safeSpotName + '\',\'' + safeCityName + '\');" style="position:absolute;bottom:5px;right:5px;padding:2px 7px;border-radius:10px;border:1px solid rgba(255,255,255,0.25);background:rgba(15,23,42,0.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#fff;font-size:0.52rem;font-weight:600;cursor:pointer;transition:all 0.2s;z-index:2;display:flex;align-items:center;gap:2px;">📍 Map</button>' +
+          '</div>' +
+          '<div class="spot-card-info">' +
+            '<div class="spot-card-name">' + spot.name + '</div>' +
+            '<div style="display:flex;gap:0.2rem;align-items:center;margin-bottom:2px;">' + spotRating + spotReviews + '</div>' +
+            '<p class="spot-card-desc">' + (spot.desc || '') + '</p>' +
+          '</div>';
 
         card.addEventListener('click', function(e) {
-          if (!e.target.closest('button')) {
-            openSpotDetail(spot.name, cityName);
-          }
+          if (!e.target.closest('button')) { openSpotDetail(spot.name, cityName); }
         });
 
         listContainer.appendChild(card);
       });
+
 
       // Apply filters after rendering
       setTimeout(() => {
@@ -3876,11 +4158,13 @@
       backToRegionList();
     };
     
-    // Spot Detail Modal Functions
-    let currentSpotData = null;
-    let currentSpotTab = 'info';
-    
-    window.openSpotDetail = function(spotName, cityName) {
+    // NOTE: openSpotDetail, switchSdmTab, closeSpotDetail are defined at the bottom
+    // in the dedicated SPOT DETAIL MODAL <script> block.
+    // The following legacy helpers are kept only:
+
+    window._legacySpotDetailPlaceholder = true; // placeholder to preserve line structure
+
+    window.openSpotDetail_REMOVED_MARKER = function(spotName, cityName) {
       // Find spot data
       const aliasMap = {
         'TP.HCM': 'TP. Hồ Chí Minh',
@@ -4258,21 +4542,28 @@
     function renderReviews(reviews) {
       const container = document.getElementById('v2GoogleReviews');
       if (!container) return;
-      
-      container.innerHTML = reviews.map(review => `
-        <div style="display:flex; gap:0.5rem; padding:0.4rem; background:${review.isUser ? 'rgba(16,185,129,0.1)' : 'var(--bg-elevated)'}; border-radius:0.5rem; border:${review.isUser ? '1px solid rgba(16,185,129,0.3)' : 'none'};">
-          <div style="width:32px; height:32px; border-radius:50%; background:${review.isUser ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #3b82f6, #7c3aed)'}; display:flex; align-items:center; justify-content:center; font-size:0.7rem; font-weight:700; color:#fff; flex-shrink:0;">
-            ${review.name.charAt(0).toUpperCase()}
-          </div>
-          <div style="flex:1; min-width:0;">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:0.5rem;">
-              <span style="font-size:0.75rem; font-weight:700; color:${review.isUser ? '#10b981' : 'var(--text)'};">${review.name}${review.isUser ? ' (Đánh giá của bạn)' : ''}</span>
-              <span style="font-size:0.65rem; color:#fbbf24;">${'⭐'.repeat(review.rating)}</span>
-            </div>
-            <p style="margin:0; font-size:0.7rem; color:var(--text-muted); line-height:1.4; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${review.text}</p>
-          </div>
-        </div>
-      `).join('');
+      container.innerHTML = '';
+      reviews.forEach(function(review) {
+        const div = document.createElement('div');
+        div.className = 'v2-review-item' + (review.isUser ? ' review-user' : '');
+        if (review.isUser) {
+          div.style.cssText = 'background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.25);';
+        }
+        const initial = (review.name || '?').charAt(0).toUpperCase();
+        const avatarBg = review.isUser ? 'linear-gradient(135deg,#10b981,#059669)' : 'linear-gradient(135deg,#3b82f6,#7c3aed)';
+        const stars = '⭐'.repeat(review.rating || 0);
+        const nameColor = review.isUser ? '#10b981' : 'var(--text)';
+        div.innerHTML =
+          '<div class="v2-review-header">' +
+            '<div style="display:flex;align-items:center;gap:0.4rem;">' +
+              '<div style="width:28px;height:28px;border-radius:50%;background:' + avatarBg + ';display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:#fff;flex-shrink:0;">' + initial + '</div>' +
+              '<span class="v2-review-name" style="color:' + nameColor + ';">' + (review.name || '') + (review.isUser ? ' (bạn)' : '') + '</span>' +
+            '</div>' +
+            '<span class="v2-review-stars">' + stars + '</span>' +
+          '</div>' +
+          '<p class="v2-review-text">' + (review.text || '') + '</p>';
+        container.appendChild(div);
+      });
     }
     
     // Alias for onclick handlers
@@ -5031,8 +5322,7 @@
         const actionBox = document.getElementById('itineraryCompareAction');
         if (actionBox) actionBox.innerHTML = '';
       }
-    }
-
+    };
     let selectedTripIds = [];
 
     window.toggleTripSelection = function(el, id) {
@@ -5218,54 +5508,6 @@
     </div>
   </div>
 
-  <!-- SPOT DETAIL MODAL - Chi tiết địa điểm -->
-  <div id="spotDetailModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:99999; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px);">
-    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:95%; max-width:500px; max-height:90vh; background:var(--bg-main, #0f172a); border-radius:1.25rem; overflow:hidden; box-shadow:0 25px 80px rgba(0,0,0,0.5);">
-      
-      <!-- Header với ảnh lớn -->
-      <div id="spotDetailHeader" style="height:200px; position:relative; overflow:hidden;">
-        <img id="spotDetailImg" src="" alt="" style="width:100%; height:100%; object-fit:cover;">
-        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);"></div>
-        <button onclick="closeSpotDetailModal()" style="position:absolute; top:0.75rem; right:0.75rem; width:36px; height:36px; border-radius:50%; border:none; background:rgba(0,0,0,0.5); color:#fff; font-size:1.25rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
-        <div style="position:absolute; bottom:0; left:0; right:0; padding:1rem;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-            <div>
-              <h3 id="spotDetailTitle" style="margin:0; font-size:1.3rem; font-weight:800; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,0.5);"></h3>
-              <div style="display:flex; gap:0.5rem; margin-top:0.4rem;">
-                <span id="spotDetailRating" style="background:#fbbf24; color:#000; padding:2px 8px; border-radius:4px; font-size:0.7rem; font-weight:700;">⭐ 4.9</span>
-                <span id="spotDetailReviews" style="background:rgba(255,255,255,0.15); color:#fff; padding:2px 8px; border-radius:4px; font-size:0.65rem;">234 đánh giá</span>
-              </div>
-            </div>
-            <span id="spotDetailCategory" style="background:rgba(59,130,246,0.9); color:#fff; padding:4px 10px; border-radius:1rem; font-size:0.65rem; font-weight:600;">Điểm chơi</span>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Tabs -->
-      <div style="display:flex; border-bottom:1px solid var(--border, rgba(255,255,255,0.1)); background:rgba(0,0,0,0.2);">
-        <button onclick="switchSpotTab('info')" class="spot-tab-btn active" id="spotTabInfo" style="flex:1; padding:0.75rem; border:none; background:transparent; color:var(--text); font-size:0.8rem; font-weight:600; cursor:pointer; border-bottom:2px solid #3b82f6;">ℹ️ Thông tin</button>
-        <button onclick="switchSpotTab('photos')" class="spot-tab-btn" id="spotTabPhotos" style="flex:1; padding:0.75rem; border:none; background:transparent; color:var(--text-muted); font-size:0.8rem; font-weight:600; cursor:pointer;">📸 Hình ảnh</button>
-        <button onclick="switchSpotTab('reviews')" class="spot-tab-btn" id="spotTabReviews" style="flex:1; padding:0.75rem; border:none; background:transparent; color:var(--text-muted); font-size:0.8rem; font-weight:600; cursor:pointer;">⭐ Đánh giá</button>
-        <button onclick="switchSpotTab('nearby')" class="spot-tab-btn" id="spotTabNearby" style="flex:1; padding:0.75rem; border:none; background:transparent; color:var(--text-muted); font-size:0.8rem; font-weight:600; cursor:pointer;">🍜 Gần đây</button>
-      </div>
-      
-      <!-- Tab Content -->
-      <div id="spotDetailContent" style="height:calc(90vh - 380px); overflow-y:auto; padding:1rem;">
-        <!-- Content will be injected here -->
-      </div>
-      
-      <!-- Footer Actions -->
-      <div style="padding:1rem; border-top:1px solid var(--border, rgba(255,255,255,0.1)); display:flex; gap:0.75rem;">
-        <button onclick="spotDetailSelect()" id="spotDetailSelectBtn" style="flex:1; padding:0.75rem; border-radius:0.75rem; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.1); color:var(--text); font-size:0.85rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.4rem;">
-          ✓ Chọn địa điểm này
-        </button>
-        <button onclick="spotDetailNavigate()" style="padding:0.75rem 1rem; border-radius:0.75rem; border:none; background:linear-gradient(135deg, #10b981, #059669); color:#fff; font-size:0.85rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:0.4rem;">
-          📍 Chỉ đường
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- Collapsible Hero Header Logic -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -5328,6 +5570,365 @@
     });
   </script>
 
+<!-- ============================================================ -->
+<!-- SPOT DETAIL MODAL (Popup xem chi tiết địa điểm) -->
+<!-- ============================================================ -->
+<div id="spotDetailModal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.72); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); overflow-y:auto; padding:1rem; box-sizing:border-box;" onclick="if(event.target===this)closeSpotDetail()">
+  <div style="max-width:520px; margin:2.5rem auto; border-radius:1.25rem; overflow:hidden; box-shadow:0 24px 64px rgba(0,0,0,0.5); position:relative; background:var(--bg-card,#1e293b); border:1px solid var(--border,rgba(255,255,255,0.08));">
+
+    <!-- Hero image -->
+    <div style="position:relative; height:180px; overflow:hidden; background:#0f172a;">
+      <img id="sdmHeroImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;transition:opacity 0.4s;" onerror="this.style.display='none'">
+      <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.2) 60%,transparent 100%);pointer-events:none;"></div>
+
+      <!-- Category badge -->
+      <span id="sdmBadge" style="position:absolute;top:12px;left:12px;padding:3px 10px;border-radius:20px;font-size:0.65rem;font-weight:700;color:#fff;background:rgba(59,130,246,0.9);"></span>
+
+      <!-- Close button -->
+      <button onclick="closeSpotDetail()" style="position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.5);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;">×</button>
+
+      <!-- Title overlay -->
+      <div style="position:absolute;bottom:12px;left:14px;right:14px;">
+        <div id="sdmTitle" style="font-size:1.35rem;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8);margin-bottom:4px;"></div>
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+          <span id="sdmRating" style="background:#fbbf24;color:#000;padding:2px 8px;border-radius:4px;font-size:0.7rem;font-weight:800;"></span>
+          <span id="sdmReviews" style="font-size:0.7rem;color:rgba(255,255,255,0.85);"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab navigation -->
+    <div style="display:flex;border-bottom:1px solid var(--border,rgba(255,255,255,0.08));background:var(--bg-elevated,#0f172a);overflow-x:auto;scrollbar-width:none;">
+      <button class="sdm-tab active" onclick="switchSdmTab('sdm-info')" id="sdm-tab-info" style="flex:1;padding:0.65rem 0.25rem;border:none;background:transparent;color:#60a5fa;font-size:0.75rem;font-weight:700;cursor:pointer;border-bottom:2px solid #3b82f6;white-space:nowrap;min-width:70px;">📋 Thông tin</button>
+      <button class="sdm-tab" onclick="switchSdmTab('sdm-photos')" id="sdm-tab-photos" style="flex:1;padding:0.65rem 0.25rem;border:none;background:transparent;color:var(--text-muted,#64748b);font-size:0.75rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;min-width:70px;">🖼️ Hình ảnh</button>
+      <button class="sdm-tab" onclick="switchSdmTab('sdm-reviews')" id="sdm-tab-reviews" style="flex:1;padding:0.65rem 0.25rem;border:none;background:transparent;color:var(--text-muted,#64748b);font-size:0.75rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;min-width:70px;">⭐ Đánh giá</button>
+      <button class="sdm-tab" onclick="switchSdmTab('sdm-nearby')" id="sdm-tab-nearby" style="flex:1;padding:0.65rem 0.25rem;border:none;background:transparent;color:var(--text-muted,#64748b);font-size:0.75rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;min-width:70px;">📸 Gần đây</button>
+    </div>
+
+    <!-- Tab contents -->
+    <div style="padding:1rem;">
+
+      <!-- INFO tab -->
+      <div id="sdm-info" class="sdm-panel">
+        <div style="margin-bottom:0.9rem;">
+          <div style="font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted,#64748b);margin-bottom:0.35rem;">📝 Mô tả</div>
+          <p id="sdmDesc" style="margin:0;font-size:0.82rem;color:var(--text,#e2e8f0);line-height:1.6;"></p>
+        </div>
+        <div style="margin-bottom:0.9rem;">
+          <div style="font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted,#64748b);margin-bottom:0.35rem;">📊 Thông tin</div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+            <span id="sdmInfoRating" style="font-size:0.78rem;color:var(--text,#e2e8f0);display:flex;align-items:center;gap:4px;"></span>
+            <span id="sdmInfoReviews" style="font-size:0.78rem;color:var(--text,#e2e8f0);display:flex;align-items:center;gap:4px;"></span>
+            <span id="sdmInfoCity" style="font-size:0.78rem;color:var(--text,#e2e8f0);display:flex;align-items:center;gap:4px;"></span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted,#64748b);margin-bottom:0.35rem;">🗺️ Bản đồ</div>
+          <div style="height:160px;border-radius:0.75rem;overflow:hidden;border:1px solid var(--border,rgba(255,255,255,0.08));">
+            <iframe id="sdmMapFrame" width="100%" height="100%" style="border:0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src=""></iframe>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHOTOS tab -->
+      <div id="sdm-photos" class="sdm-panel" style="display:none;">
+        <div id="sdmPhotoGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.5rem;"></div>
+      </div>
+
+      <!-- REVIEWS tab -->
+      <div id="sdm-reviews" class="sdm-panel" style="display:none;">
+        <div id="sdmReviewList" style="display:flex;flex-direction:column;gap:0.6rem;"></div>
+      </div>
+
+      <!-- NEARBY tab -->
+      <div id="sdm-nearby" class="sdm-panel" style="display:none;">
+        <div id="sdmNearbyList" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;"></div>
+      </div>
+
+    </div>
+
+    <!-- Action buttons -->
+    <div style="padding:0 1rem 1rem;">
+      <button id="sdmGpsBtn" onclick="window._sdmGetGPS && window._sdmGetGPS()" style="width:100%;padding:0.6rem;border-radius:0.6rem;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:0.8rem;font-weight:700;cursor:pointer;margin-bottom:0.5rem;display:flex;align-items:center;justify-content:center;gap:0.4rem;">
+        📍 Chỉ đường từ vị trí của bạn
+      </button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <button id="sdmSelectBtn" onclick="window._sdmSelect && window._sdmSelect()" style="padding:0.6rem;border-radius:0.6rem;border:none;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font-size:0.78rem;font-weight:700;cursor:pointer;">
+          ✓ Chọn địa điểm này
+        </button>
+        <button id="sdmDirBtn" onclick="window._sdmDir && window._sdmDir()" style="padding:0.6rem;border-radius:0.6rem;border:none;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;font-size:0.78rem;font-weight:700;cursor:pointer;">
+          🗺️ Chỉ đường
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// SPOT DETAIL MODAL — openSpotDetail / closeSpotDetail
+// ============================================================
+(function() {
+
+  var CATEGORY_META = {
+    attraction:  { label: 'Điểm chơi', icon: '🏛️', color: 'rgba(59,130,246,0.9)' },
+    restaurant:  { label: 'Quán ăn',   icon: '🍜', color: 'rgba(16,185,129,0.9)' },
+    experience:  { label: 'Trải nghiệm', icon: '✨', color: 'rgba(245,158,11,0.9)' },
+    cafe:        { label: 'Cà phê',    icon: '☕', color: 'rgba(168,85,247,0.9)' },
+    food:        { label: 'Ăn uống',   icon: '🍜', color: 'rgba(16,185,129,0.9)' }
+  };
+
+  // Switch tabs inside modal
+  window.switchSdmTab = function(panelId) {
+    document.querySelectorAll('.sdm-panel').forEach(function(p){ p.style.display = 'none'; });
+    var panel = document.getElementById(panelId);
+    if (panel) panel.style.display = 'block';
+
+    document.querySelectorAll('.sdm-tab').forEach(function(btn) {
+      var active = btn.id === 'sdm-tab-' + panelId.replace('sdm-','');
+      btn.style.color     = active ? '#60a5fa' : 'var(--text-muted,#64748b)';
+      btn.style.fontWeight= active ? '700' : '600';
+      btn.style.borderBottom = active ? '2px solid #3b82f6' : '2px solid transparent';
+    });
+  };
+
+  // OPEN modal with spot data
+  window.openSpotDetail = function(spotName, cityName, extraData) {
+    var modal = document.getElementById('spotDetailModal');
+    if (!modal) return;
+
+    // Find spot data from detailsMap (with city alias resolution)
+    var spotData = null;
+    var detailsMap = window.detailsMap || {};
+    var CITY_ALIAS = {
+      'TP.HCM': 'TP. Hồ Chí Minh', 'TP. HCM': 'TP. Hồ Chí Minh',
+      'Hồ Chí Minh': 'TP. Hồ Chí Minh', 'Sài Gòn': 'TP. Hồ Chí Minh',
+      'Ho Chi Minh': 'TP. Hồ Chí Minh', 'HCM': 'TP. Hồ Chí Minh',
+      'Đà Lạc': 'Đà Lạt', 'Da Lat': 'Đà Lạt',
+      'Hoi An': 'Hội An', 'Hue': 'Huế', 'Da Nang': 'Đà Nẵng'
+    };
+    var lookupCity = (cityName || '').trim();
+    if (CITY_ALIAS[lookupCity]) lookupCity = CITY_ALIAS[lookupCity];
+    var cityData = detailsMap[lookupCity] || detailsMap[cityName];
+    if (cityData && cityData.spots) {
+      spotData = cityData.spots.find(function(s){ return s.name === spotName; });
+    }
+
+    // Merge with extraData (for nearby places passed as plain obj)
+    if (!spotData && extraData) spotData = extraData;
+    if (!spotData) spotData = { name: spotName, desc: '', category: 'attraction' };
+
+    var catInfo = CATEGORY_META[spotData.category || 'attraction'] || CATEGORY_META.attraction;
+
+    // Hero image
+    var heroImg = document.getElementById('sdmHeroImg');
+    var photo = '';
+    if (spotData.photos && spotData.photos[0]) photo = spotData.photos[0];
+    else if (spotData.img) photo = spotData.img;
+    else if (typeof window.getVNPhoto === 'function') photo = window.getVNPhoto(cityName, 0) || '';
+    heroImg.src = photo;
+    heroImg.style.display = 'block';
+
+    // Badge
+    var badge = document.getElementById('sdmBadge');
+    badge.textContent = catInfo.icon + ' ' + catInfo.label;
+    badge.style.background = catInfo.color;
+
+    // Title & rating
+    document.getElementById('sdmTitle').textContent = spotData.name || spotName;
+    var ratingEl = document.getElementById('sdmRating');
+    var reviewsEl = document.getElementById('sdmReviews');
+    if (spotData.rating) {
+      ratingEl.textContent = '★ ' + spotData.rating;
+      ratingEl.style.display = '';
+    } else { ratingEl.style.display = 'none'; }
+    if (spotData.reviews) {
+      reviewsEl.textContent = spotData.reviews + ' đánh giá';
+    } else { reviewsEl.textContent = ''; }
+
+    // Info tab
+    document.getElementById('sdmDesc').textContent = spotData.desc || 'Địa điểm du lịch nổi bật tại ' + cityName + '.';
+    document.getElementById('sdmInfoRating').innerHTML  = spotData.rating  ? '⭐ Rating: <strong>' + spotData.rating + '</strong>'  : '';
+    document.getElementById('sdmInfoReviews').innerHTML = spotData.reviews ? '💬 <strong>' + spotData.reviews + '</strong> đánh giá' : '';
+    document.getElementById('sdmInfoCity').innerHTML    = cityName         ? '📍 <strong>' + cityName + '</strong>'                  : '';
+
+    // Map
+    var mapQuery = encodeURIComponent((spotData.name || spotName) + ' ' + cityName + ' Vietnam');
+    document.getElementById('sdmMapFrame').src = 'https://maps.google.com/maps?q=' + mapQuery + '&output=embed';
+
+    // Photos tab
+    var photoGrid = document.getElementById('sdmPhotoGrid');
+    var photos = spotData.photos && spotData.photos.length > 0 ? spotData.photos : (photo ? [photo] : []);
+    // Add more photos via getVNPhoto if available
+    if (typeof window.getVNPhoto === 'function') {
+      for (var pi = 0; pi < 4; pi++) {
+        var p = window.getVNPhoto(cityName, pi);
+        if (p && photos.indexOf(p) === -1) photos.push(p);
+      }
+    }
+    photoGrid.innerHTML = photos.slice(0, 6).map(function(src) {
+      return '<div style="height:100px;border-radius:0.5rem;overflow:hidden;"><img src="' + src + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'"></div>';
+    }).join('') || '<p style="color:var(--text-muted);font-size:0.8rem;text-align:center;padding:1rem;">Chưa có hình ảnh</p>';
+
+    // Reviews tab
+    var reviewList = document.getElementById('sdmReviewList');
+    var reviews = spotData.googleReviews || cityData && cityData.googleReviews || [];
+    if (reviews.length > 0) {
+      reviewList.innerHTML = reviews.slice(0, 5).map(function(r) {
+        var stars = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
+        return '<div style="padding:0.6rem;border-radius:0.6rem;background:var(--bg-elevated,#0f172a);border:1px solid var(--border,rgba(255,255,255,0.08));">' +
+          '<div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">' +
+            '<div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:900;color:#fff;flex-shrink:0;">' + (r.reviewer || 'KH').slice(0,2).toUpperCase() + '</div>' +
+            '<div><strong style="font-size:0.75rem;color:var(--text,#e2e8f0);">' + (r.reviewer || 'Khách hàng') + '</strong><div style="font-size:0.62rem;color:#fbbf24;">' + stars + '</div></div>' +
+          '</div>' +
+          '<p style="margin:0;font-size:0.72rem;color:var(--text-muted,#94a3b8);line-height:1.4;font-style:italic;">"' + (r.comment || r.text || '') + '"</p>' +
+        '</div>';
+      }).join('');
+    } else {
+      reviewList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--text-muted,#64748b);"><div style="font-size:2rem;margin-bottom:0.5rem;">⭐</div><p style="font-size:0.8rem;margin:0;">Chưa có đánh giá nào</p><p style="font-size:0.65rem;margin:0.3rem 0 0;">Hãy là người đầu tiên đánh giá!</p></div>';
+    }
+
+    // Nearby tab — show other spots in same city
+    var nearbyList = document.getElementById('sdmNearbyList');
+    var nearbySpots = (cityData && cityData.spots || []).filter(function(s){ return s.name !== spotName; }).slice(0, 4);
+    nearbyList.innerHTML = nearbySpots.map(function(s, si) {
+      var nPhoto = '';
+      if (s.photos && s.photos[0]) nPhoto = s.photos[0];
+      else if (typeof window.getVNPhoto === 'function') nPhoto = window.getVNPhoto(cityName, si + 1) || '';
+      var nCat = CATEGORY_META[s.category] || CATEGORY_META.attraction;
+      return '<div onclick="openSpotDetail(\'' + s.name.replace(/'/g,"\\'") + '\',\'' + cityName.replace(/'/g,"\\'") + '\')" style="cursor:pointer;border-radius:0.6rem;overflow:hidden;border:1px solid var(--border,rgba(255,255,255,0.08));background:var(--bg-elevated,#0f172a);transition:transform 0.2s;" onmouseover="this.style.transform=\'scale(1.02)\'" onmouseout="this.style.transform=\'scale(1)\'">' +
+        '<div style="height:72px;overflow:hidden;position:relative;">' +
+          (nPhoto ? '<img src="' + nPhoto + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">' : '') +
+          '<span style="position:absolute;top:4px;left:4px;background:' + nCat.color + ';color:#fff;font-size:0.5rem;padding:1px 5px;border-radius:8px;">' + nCat.icon + ' ' + nCat.label + '</span>' +
+        '</div>' +
+        '<div style="padding:0.35rem 0.4rem;"><div style="font-size:0.68rem;font-weight:700;color:var(--text,#e2e8f0);margin-bottom:1px;">' + s.name + '</div>' +
+        (s.rating ? '<div style="font-size:0.58rem;color:#fbbf24;">★ ' + s.rating + '</div>' : '') + '</div>' +
+      '</div>';
+    }).join('') || '<p style="color:var(--text-muted);font-size:0.78rem;text-align:center;padding:1rem;grid-column:1/-1;">Không có địa điểm gần đây</p>';
+
+    // Action button callbacks
+    window._sdmGetGPS = function() {
+      if (typeof window.getGPSDirectionsV2 === 'function') {
+        // Temporarily set current dest name for GPS direction
+        window._sdmSpotOverride = spotData.name || spotName;
+        window.getGPSDirectionsV2();
+        window._sdmSpotOverride = null;
+      } else if (typeof window.getSpotDirections === 'function') {
+        window.getSpotDirections(spotData.name || spotName, cityName);
+      }
+    };
+    window._sdmDir = function() {
+      if (typeof window.getSpotDirections === 'function') {
+        window.getSpotDirections(spotData.name || spotName, cityName);
+      }
+    };
+    window._sdmSelect = function() {
+      // Find the card in reviewPanelSpots and toggle it
+      var cards = document.querySelectorAll('#reviewPanelSpots .review-spot-card');
+      var found = false;
+      cards.forEach(function(card) {
+        if (card.getAttribute('data-spot-name') === (spotData.name || spotName)) {
+          if (typeof window.toggleSpotSelection === 'function') {
+            window.toggleSpotSelection(card, spotData.name || spotName, spotData.category || 'attraction', cityName);
+          }
+          found = true;
+        }
+      });
+      if (!found && typeof window.toggleSpotSelection === 'function') {
+        // Create a dummy card reference for nearby places
+        var dummyCard = document.createElement('div');
+        dummyCard.className = 'review-spot-card';
+        window.toggleSpotSelection(dummyCard, spotData.name || spotName, spotData.category || 'attraction', cityName);
+      }
+      // Update button state
+      updateSdmSelectBtn(spotData.name || spotName);
+      if (typeof showToast === 'function') showToast('✓ Đã thêm ' + (spotData.name || spotName) + ' vào lịch trình!', 'success');
+    };
+
+    // Update select button state
+    updateSdmSelectBtn(spotData.name || spotName);
+
+    // Reset to info tab
+    window.switchSdmTab('sdm-info');
+
+    // Show modal
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(function() {
+      modal.style.opacity = '0';
+      modal.style.transition = 'opacity 0.25s';
+      requestAnimationFrame(function() { modal.style.opacity = '1'; });
+    });
+  };
+
+  function updateSdmSelectBtn(spotName) {
+    var btn = document.getElementById('sdmSelectBtn');
+    if (!btn) return;
+    var isSelected = window.selectedAttractionCards && window.selectedAttractionCards[spotName];
+    btn.textContent = isSelected ? '✓ Đã chọn' : '✓ Chọn địa điểm này';
+    btn.style.background = isSelected
+      ? 'linear-gradient(135deg,#10b981,#059669)'
+      : 'linear-gradient(135deg,#7c3aed,#4f46e5)';
+  }
+
+  // CLOSE modal
+  window.closeSpotDetail = function() {
+    var modal = document.getElementById('spotDetailModal');
+    if (!modal) return;
+    modal.style.opacity = '0';
+    setTimeout(function() {
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+      // Stop map iframe
+      var frame = document.getElementById('sdmMapFrame');
+      if (frame) frame.src = '';
+    }, 250);
+  };
+
+  // Keyboard ESC to close
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var modal = document.getElementById('spotDetailModal');
+      if (modal && modal.style.display !== 'none') closeSpotDetail();
+    }
+  });
+
+  // Patch nearby cards to be clickable (called after render)
+  window.patchNearbyCardsClickable = function(cityName) {
+    var container = document.getElementById('v2NearbyPlaces');
+    if (!container) return;
+    container.querySelectorAll('.v2-nearby-card').forEach(function(card) {
+      if (card.dataset.clickPatched) return;
+      card.dataset.clickPatched = '1';
+      card.style.cursor = 'pointer';
+      card.addEventListener('click', function(e) {
+        if (e.target.closest('button')) return;
+        var nameEl = card.querySelector('.v2-nearby-name');
+        var name = nameEl ? nameEl.textContent.trim() : '';
+        var metaEl = card.querySelector('.v2-nearby-meta');
+        var imgEl = card.querySelector('img');
+        var extraData = {
+          name: name,
+          img: imgEl ? imgEl.src : '',
+          category: 'restaurant',
+          desc: 'Địa điểm ăn uống/cà phê gần đây tại ' + cityName + '.'
+        };
+        // Try to extract rating from meta text
+        if (metaEl) {
+          var match = metaEl.textContent.match(/★\s*([\d.]+)/);
+          if (match) extraData.rating = parseFloat(match[1]);
+          var distMatch = metaEl.textContent.match(/([\d.]+\s*km)/i);
+          if (distMatch) extraData.distance = distMatch[1];
+        }
+        window.openSpotDetail(name, cityName, extraData);
+      });
+    });
+  };
+
+})();
+</script>
+
 </body>
+
 </html>
 

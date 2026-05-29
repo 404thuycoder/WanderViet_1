@@ -19,6 +19,11 @@ window.WANDER_PLACES = [{
   verified: true,
   text: "Đảo ngọc Phú Quốc với dải cát trắng mịn, resort cao cấp trải dài, hệ sinh thái biển đa dạng cùng chợ đêm sầm uất và làng chài truyền thống.",
   image: "/assets/img/phu-quoc.png",
+  images: [
+    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"
+  ],
   lat: 10.2899,
   lng: 103.984,
   transportTips: "Đặt vé bay thẳng đến Phú Quốc. Trong đảo thuê xe máy hoặc xe điện VinBus để dạo quanh.",
@@ -99,6 +104,11 @@ window.WANDER_PLACES = [{
   verified: true,
   text: "Hội An là di sản văn hóa thế giới UNESCO, đặc trưng bởi những nếp nhà cổ kính sơn vàng và sông Hoài lấp lánh hoa đăng về đêm.",
   image: "/assets/img/hoi-an.png",
+  images: [
+    "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?w=800&fit=crop"
+  ],
   lat: 15.8801,
   lng: 108.338,
   transportTips: "Bay đến Đà Nẵng, di chuyển bằng taxi ~45 phút. Trong phố cổ đi bộ hoặc thuê xe đạp.",
@@ -170,7 +180,12 @@ window.WANDER_PLACES = [{
   top: true,
   verified: true,
   text: "Sa Pa chinh phục mọi du khách với đỉnh Fansipan hùng vĩ, ruộng bậc thang uốn lượn và bản sắc văn hóa dân tộc rực rỡ sắc màu Tây Bắc.",
-  image: "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=800&q=80",
+  image: "https://booking.muongthanh.com/upload_images/images/Nhung/review-dia-diem-du-lich-sapa.jpg",
+  images: [
+    "https://booking.muongthanh.com/upload_images/images/Nhung/review-dia-diem-du-lich-sapa.jpg",
+    "https://phetravel.com/uploads/30-06-2023-14-53-09-du-lich-sa-pa-0.jpg.webp",
+    "https://topasecolodge.com/wp-content/uploads/2025/06/best-time-to-visit-sapa-04.jpg"
+  ],
   lat: 22.3364,
   lng: 103.8438,
   transportTips: "Xe giường nằm hoặc tàu đêm từ Hà Nội (6-8h). Sa Pa lạnh quanh năm — luôn mang áo ấm.",
@@ -376,7 +391,12 @@ window.WANDER_PLACES = [{
   meta: "Thành phố ngàn hoa & Khí hậu mát mẻ quanh năm",
   top: true,
   text: "Đà Lạt trên cao nguyên Langbiang nổi tiếng với vườn hoa bát ngát, đồi chè xanh mướt, kiến trúc Pháp cổ điển và cà phê specialty.",
-  image: "https://images.unsplash.com/photo-1586595050178-4673f3a12681?w=800&q=80",
+  image: "https://phetravel.com/uploads/dnt-da-lat.jpg",
+  images: [
+    "https://phetravel.com/uploads/dnt-da-lat.jpg",
+    "https://booking.muongthanh.com/upload_images/images/H%60/thanh-pho-da-lat.jpg",
+    "https://samtenhills.vn/wp-content/uploads/2024/11/kinh-nghiem-du-lich-da-lat-1-minh.jpg"
+  ],
   lat: 11.9404,
   lng: 108.4583,
   transportTips: "Xe giường nằm từ TP.HCM (6-7h) hoặc bay đến sân bay Liên Khương. Đà Lạt dốc — thuê xe máy cần kinh nghiệm.",
@@ -498,6 +518,11 @@ window.WANDER_PLACES = [{
   top: false,
   text: "Nha Trang sở hữu vùng biển trong xanh với hệ thống rạn san hô phong phú, chuỗi đảo hoang sơ và ẩm thực biển cực kỳ đặc sắc.",
   image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"
+  ],
   lat: 12.2388,
   lng: 109.1967,
   transportTips: "Bay đến sân bay Cam Ranh, shuttle/bus vào trung tâm (~45 phút). Chú ý cờ an toàn khi tắm biển.",
@@ -561,6 +586,11 @@ window.WANDER_PLACES = [{
   top: false,
   text: "Cần Thơ là trái tim đồng bằng sông Cửu Long, nơi văn hóa sông nước, chợ nổi tấp nập và vườn cây ăn trái xanh mát tạo nên bức tranh miền Tây đặc sắc.",
   image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?w=800&fit=crop"
+  ],
   lat: 10.0452,
   lng: 105.7469,
   transportTips: "Xe limousine từ TP.HCM ~3-4h. Chợ nổi 5h30-7h — nghỉ gần bến phà để kịp giờ.",
@@ -614,7 +644,12 @@ window.WANDER_PLACES = [{
   meta: "Vịnh Hạ Long trên cạn & Di sản Tràng An UNESCO",
   top: true,
   text: "Ninh Bình là 'Vịnh Hạ Long trên cạn' với hệ thống núi đá vôi, sông nước và hang động tuyệt đẹp. Tràng An được UNESCO công nhận là Di sản Thế giới kép.",
-  image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
+  image: "https://cdn-media.sforum.vn/storage/app/media/ctvseo_16/danh%20lam%20th%E1%BA%AFng%20c%E1%BA%A3nh%20Ninh%20B%C3%ACnh/danh-lam-thang-canh-ninh-binh-thumbnail.jpg",
+  images: [
+    "https://cdn-media.sforum.vn/storage/app/media/ctvseo_16/danh%20lam%20th%E1%BA%AFng%20c%E1%BA%A3nh%20Ninh%20B%C3%ACnh/danh-lam-thang-canh-ninh-binh-thumbnail.jpg",
+    "https://sodulich.ninhbinh.gov.vn/uploads/images/trang-an-bd_1737078235160%20(1).jpg",
+    "https://thanhnienviet.mediacdn.vn/91575133199802368/2025/5/26/photo-1748230467546-17482304703661238448265.jpeg"
+  ],
   lat: 20.2506,
   lng: 105.9745,
   transportTips: "Cách Hà Nội 100km (~2h xe limousine). Xe đạp thuê tại Ninh Bình là cách lý tưởng để khám phá.",
@@ -669,6 +704,11 @@ window.WANDER_PLACES = [{
   top: false,
   text: "Cố đô Huế gắn liền với nhà Nguyễn, ẩn chứa lăng tẩm nguy nga, cung đình hoành tráng và nền ẩm thực cung đình tinh tế độc nhất vô nhị.",
   image: "/assets/img/hue.png",
+  images: [
+    "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1583248369069-9d91f1640fe6?w=800&fit=crop"
+  ],
   lat: 16.4637,
   lng: 107.5909,
   transportTips: "Bay đến sân bay Phú Bài hoặc đi tàu hỏa. Thuê xe máy để tham quan lăng tẩm ngoại ô.",
@@ -722,7 +762,12 @@ window.WANDER_PLACES = [{
   meta: "Cung đường đèo hiểm trở & Hoa tam giác mạch",
   top: true,
   text: "Tỉnh địa đầu Tổ quốc Hà Giang chinh phục phượt thủ bằng đèo Mã Pí Lèng huyền thoại, Đồng Văn Cổ Trấn cổ kính và mùa hoa tam giác mạch tím ngát tháng 10-11.",
-  image: "https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=800&q=80",
+  image: "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:format(webp):quality(75)/20_dia_diem_du_lich_ha_giang_a_b3ae766474.jpg",
+  images: [
+    "https://cdn2.fptshop.com.vn/unsafe/1920x0/filters:format(webp):quality(75)/20_dia_diem_du_lich_ha_giang_a_b3ae766474.jpg",
+    "https://vitracotour.com/wp-content/uploads/2023/12/ha-giang-2.jpg",
+    "https://media.vietravel.com/images/Content/kinh-nghiem-du-lich-ha-giang-1.png"
+  ],
   lat: 23.2241,
   lng: 104.9834,
   transportTips: "Xe khách từ Hà Nội ~7-8h. Thuê moto tại thị xã hoặc đặt off-road tour có guide kinh nghiệm.",
@@ -777,6 +822,11 @@ window.WANDER_PLACES = [{
   top: true,
   text: "Côn Đảo còn nguyên vẻ hoang sơ với bãi biển vắng tuyệt đẹp, vườn quốc gia nguyên sinh và trải nghiệm độc đáo xem rùa biển đẻ trứng đêm hè.",
   image: "https://images.unsplash.com/photo-1559592413-7cec096d7b88?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"
+  ],
   lat: 8.6914,
   lng: 106.6061,
   transportTips: "Bay từ TP.HCM hoặc Cần Thơ ~50 phút. Thuê xe máy trên đảo. Mùa rùa đẻ trứng: tháng 5-10.",
@@ -831,6 +881,11 @@ window.WANDER_PLACES = [{
   top: false,
   text: "Quy Nhơn là viên ngọc ẩn của Việt Nam — biển Kỳ Co trong vắt như ngọc bích, tháp Chăm cổ kính và ẩm thực hải sản siêu tươi giá bình dân.",
   image: "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop"
+  ],
   lat: 13.7765,
   lng: 109.2235,
   transportTips: "Bay đến sân bay Phù Cát. Grab rẻ hơn TP lớn; thuê xe máy đi Kỳ Co, Hòn Khô.",
@@ -998,6 +1053,11 @@ window.WANDER_PLACES = [{
   top: false,
   text: "Buôn Ma Thuột là thủ phủ cà phê nổi tiếng thế giới, nơi đất đỏ bazan nuôi dưỡng cà phê Robusta hảo hạng cùng văn hóa cồng chiêng Tây Nguyên UNESCO.",
   image: "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop"
+  ],
   lat: 12.6797,
   lng: 108.0506,
   transportTips: "Bay thẳng đến sân bay Buôn Ma Thuột hoặc xe khách từ TP.HCM (~8h). Thuê xe máy đi buôn làng.",
@@ -1052,6 +1112,11 @@ window.WANDER_PLACES = [{
   top: false,
   text: "Tam Đảo là ốc đảo xanh mát với thị trấn núi bồng bềnh trong mây, kiến trúc Pháp cổ điển, rừng nguyên sinh và khí hậu mát mẻ quanh năm.",
   image: "https://images.unsplash.com/photo-1540202404-a2f29016b523?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop"
+  ],
   lat: 21.4684,
   lng: 105.6436,
   transportTips: "Ô tô từ Hà Nội ~1.5-2h. Đường núi dốc và trơn khi mưa — cẩn thận khi lái xe.",
@@ -1106,6 +1171,11 @@ window.WANDER_PLACES = [{
   top: false,
   text: "Cổ Thạch là bí mật ít người biết với bãi đá cuội và san hô kỳ lạ lộ ra khi nước ròng, làng chài mộc mạc và bình minh rực rỡ được nhiếp ảnh gia săn tìm.",
   image: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"
+  ],
   lat: 11.1543,
   lng: 108.3522,
   transportTips: "Xe máy từ Phan Thiết ~50km. Tra lịch thuỷ triều trước để bắt được bãi đá lộ.",
@@ -1160,6 +1230,11 @@ window.WANDER_PLACES = [{
   top: true,
   text: "Đỉnh núi cao nhất Việt Nam và bán đảo Đông Dương. Lên bằng cáp treo ngắm biển mây hùng vĩ hoặc trekking chinh phục đỉnh cao.",
   image: "https://images.unsplash.com/photo-1605538032432-a9f0c8d9baac?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&fit=crop"
+  ],
   lat: 22.3045,
   lng: 103.7719,
   transportTips: "Cáp treo Sun World Fansipan Legend lên đỉnh chỉ 15 phút. Xuất phát từ Sa Pa trung tâm.",
@@ -1214,6 +1289,11 @@ window.WANDER_PLACES = [{
   top: false,
   text: "Mộc Châu quyến rũ với đồi chè Trái Tim, rừng thông Bản Áng, thác Dải Yếm và những vườn mận nở trắng muốt khi xuân về.",
   image: "https://images.unsplash.com/photo-1467377791767-c929b5dc9a23?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop"
+  ],
   lat: 20.8542,
   lng: 104.6465,
   transportTips: "Xe limousine từ Hà Nội mất khoảng 4 giờ qua quốc lộ 6. Mùa hoa mận đẹp nhất vào tháng 1-2.",
@@ -1268,6 +1348,11 @@ window.WANDER_PLACES = [{
   top: true,
   text: "Vườn quốc gia với hơn 300 hang động lớn nhỏ, sông ngầm hùng vĩ. Nơi có động Sơn Đoòng — lớn nhất thế giới — và hàng loạt trải nghiệm phiêu lưu đỉnh cao.",
   image: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=800&fit=crop"
+  ],
   lat: 17.5898,
   lng: 106.281,
   transportTips: "Bay đến sân bay Đồng Hới hoặc đi tàu ga Đồng Hới. Thuê xe máy vào thị trấn Phong Nha.",
@@ -1322,6 +1407,11 @@ window.WANDER_PLACES = [{
   top: false,
   text: "Khu bảo tồn thiên nhiên tuyệt đẹp với các resort sinh thái hòa vào ruộng bậc thang bạt ngàn và nhịp sống thanh bình của người Thái.",
   image: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1588666309990-d68f08e3d4a6?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1524230572899-a752b3835840?w=800&fit=crop"
+  ],
   lat: 20.4633,
   lng: 105.2154,
   transportTips: "Cách Hà Nội ~4 tiếng ô tô. Đường có đèo hẹp qua Bản Lác - Mai Châu — hỏi tài xế kinh nghiệm.",
@@ -1376,6 +1466,11 @@ window.WANDER_PLACES = [{
   top: true,
   text: "Phú Yên hút hồn bằng Gành Đá Đĩa kỳ lạ, Mũi Điện — điểm đón bình minh đầu tiên nhất Việt Nam, và những bãi biển xanh ngắt còn nguyên vẹn.",
   image: "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&q=80",
+  images: [
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"
+  ],
   lat: 13.0886,
   lng: 109.3243,
   transportTips: "Sân bay Tuy Hòa cách trung tâm chỉ 5-7km. Thuê xe máy để tự do khám phá dọc biển.",

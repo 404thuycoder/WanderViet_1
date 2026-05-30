@@ -2788,30 +2788,34 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                 code = weatherRes.current.weathercode;
                 // Map weather code to Vietnamese description for fallback recommendation
                 const weatherDescMap = {
-                  0: 'Trời trong lành',
-                  1: 'Trời có sương mù',
-                  2: 'Mây lẻ tấm',
-                  3: 'Nhiều mây che phủ',
-                  45: 'Mưa phùn',
-                  48: 'Mưa đóng băng',
-                  51: 'Mưa nhẹ',
-                  53: 'Mưa vừa',
-                  55: 'Mưa mạnh',
-                  56: 'Mưa đóng băng nhẹ',
-                  57: 'Mưa đóng băng mạnh',
-                  61: 'Mưa mưa bão nhẹ',
-                  63: 'Mưa mưa bão vừa',
-                  65: 'Mưa mưa bão mạnh',
-                  66: 'Mưa mưa bão rất mạnh',
-                  71: 'Băng tuyết nhẹ',
-                  73: 'Băng tuyết vừa',
-                  75: 'Băng tuyết mạnh',
+                  0: 'Trời quang đãng',
+                  1: 'Hầu như không mây',
+                  2: 'Mây rải rác',
+                  3: 'Nhiều mây',
+                  45: 'Sương mù',
+                  48: 'Sương muối/Sương mù băng',
+                  51: 'Mưa phùn nhẹ',
+                  53: 'Mưa phùn vừa',
+                  55: 'Mưa phùn nhiều',
+                  56: 'Mưa phùn buốt nhẹ',
+                  57: 'Mưa phùn buốt nhiều',
+                  61: 'Mưa nhẹ',
+                  63: 'Mưa vừa',
+                  65: 'Mưa to',
+                  66: 'Mưa buốt nhẹ',
+                  67: 'Mưa buốt to',
+                  71: 'Tuyết rơi nhẹ',
+                  73: 'Tuyết rơi vừa',
+                  75: 'Tuyết rơi nhiều',
+                  77: 'Tuyết hạt',
                   80: 'Mưa rào nhẹ',
                   81: 'Mưa rào vừa',
-                  82: 'Mưa rào mạnh',
-                  95: 'Bão mạnh',
-                  96: 'Bão kèm mưa đá',
-                  99: 'Bão cực mạnh'
+                  82: 'Mưa rào to',
+                  85: 'Mưa tuyết rào nhẹ',
+                  86: 'Mưa tuyết rào to',
+                  95: 'Dông bão',
+                  96: 'Dông bão có mưa đá nhẹ',
+                  99: 'Dông bão có mưa đá to'
                 };
                 desc = weatherDescMap[code] || '';
                 if (!areaName) areaName = geoName;
@@ -2864,33 +2868,184 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
               cityEl.textContent = `📍 ${areaName}`;
               cityEl.title = 'Bấm để đổi tỉnh/thành phố khác';
               cityEl.style.cursor = 'pointer';
-              cityEl.style.textDecoration = 'underline dotted';
-              cityEl.onclick = async () => {
-                const inputCity = prompt('Nhập tên Tỉnh/Thành phố của bạn để xem thời tiết chính xác (ví dụ: Hà Nội, Tuyên Quang, Hải Dương, Đà Nẵng...):', areaName);
-                if (inputCity && inputCity.trim()) {
+              cityEl.style.transition = 'opacity 0.2s';
+              cityEl.style.textDecoration = 'none';
+              cityEl.style.borderBottom = 'none';
+              cityEl.onmouseenter = () => { cityEl.style.opacity = '0.7'; };
+              cityEl.onmouseleave = () => { cityEl.style.opacity = '1'; };
+              cityEl.onclick = function(evt) {
+                evt.stopPropagation();
+                // Remove existing modal
+                let old = document.getElementById('weather-loc-modal');
+                if (old) old.remove();
+
+                const dk = document.documentElement.getAttribute('data-theme') === 'dark';
+                const bg = dk ? '#1e293b' : '#ffffff';
+                const tc = dk ? '#f8fafc' : '#0f172a';
+                const sc = dk ? '#94a3b8' : '#64748b';
+                const ib = dk ? 'rgba(0,0,0,0.25)' : '#f1f5f9';
+                const ibr = dk ? 'rgba(255,255,255,0.12)' : '#cbd5e1';
+                const itc = dk ? '#ffffff' : '#0f172a';
+                const cb = dk ? 'rgba(255,255,255,0.06)' : '#f1f5f9';
+                const cbr = dk ? 'rgba(255,255,255,0.12)' : '#e2e8f0';
+                const ctc = dk ? '#e2e8f0' : '#475569';
+
+                const overlay = document.createElement('div');
+                overlay.id = 'weather-loc-modal';
+                Object.assign(overlay.style, {
+                  position: 'fixed', top: '0', left: '0', width: '100%', height: '100%',
+                  background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(8px)',
+                  zIndex: '9999999', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  opacity: '0', transition: 'opacity 0.25s ease'
+                });
+
+                const card = document.createElement('div');
+                Object.assign(card.style, {
+                  background: bg, border: `1px solid ${dk ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                  borderRadius: '16px', padding: '24px', width: '90%', maxWidth: '400px',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.3)', transform: 'scale(0.92)',
+                  transition: 'transform 0.25s ease', color: tc, fontFamily: 'inherit'
+                });
+
+                // Title
+                const h3 = document.createElement('h3');
+                Object.assign(h3.style, { marginTop: '0', marginBottom: '12px', fontSize: '1.1rem', fontWeight: '700', color: tc });
+                h3.textContent = '📍 Thay đổi vị trí thời tiết';
+                card.appendChild(h3);
+
+                // Subtitle
+                const p = document.createElement('p');
+                Object.assign(p.style, { fontSize: '0.8rem', color: sc, marginBottom: '16px', lineHeight: '1.4' });
+                p.textContent = 'Nhập tên Tỉnh/Thành phố hoặc bấm nút định vị tự động.';
+                card.appendChild(p);
+
+                // Input
+                const inputWrap = document.createElement('div');
+                inputWrap.style.marginBottom = '16px';
+                const inp = document.createElement('input');
+                inp.type = 'text';
+                inp.placeholder = 'VD: Hà Nội, Đà Nẵng, Hồ Chí Minh...';
+                inp.value = areaName; // Safe DOM assignment, no HTML injection
+                Object.assign(inp.style, {
+                  width: '100%', padding: '10px 14px', borderRadius: '10px',
+                  border: `1px solid ${ibr}`, background: ib, color: itc,
+                  fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box'
+                });
+                inputWrap.appendChild(inp);
+                card.appendChild(inputWrap);
+
+                // Buttons container
+                const btnsCol = document.createElement('div');
+                Object.assign(btnsCol.style, { display: 'flex', flexDirection: 'column', gap: '10px' });
+
+                // Locate button
+                const locBtn = document.createElement('button');
+                locBtn.type = 'button';
+                locBtn.textContent = '📡 Tự động định vị vị trí hiện tại';
+                Object.assign(locBtn.style, {
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                  width: '100%', padding: '10px', background: 'linear-gradient(135deg,#0284c7,#0369a1)',
+                  color: '#fff', border: 'none', borderRadius: '10px', fontWeight: '600',
+                  fontSize: '0.85rem', cursor: 'pointer'
+                });
+                btnsCol.appendChild(locBtn);
+
+                // Row: Cancel + Save
+                const row = document.createElement('div');
+                Object.assign(row.style, { display: 'flex', gap: '10px', marginTop: '6px' });
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.type = 'button';
+                cancelBtn.textContent = 'Hủy';
+                Object.assign(cancelBtn.style, {
+                  flex: '1', padding: '10px', background: cb, color: ctc,
+                  border: `1px solid ${cbr}`, borderRadius: '10px', fontWeight: '600',
+                  fontSize: '0.85rem', cursor: 'pointer'
+                });
+                row.appendChild(cancelBtn);
+
+                const saveBtn = document.createElement('button');
+                saveBtn.type = 'button';
+                saveBtn.textContent = 'Xác nhận';
+                Object.assign(saveBtn.style, {
+                  flex: '2', padding: '10px', background: '#10b981', color: '#fff',
+                  border: 'none', borderRadius: '10px', fontWeight: '600',
+                  fontSize: '0.85rem', cursor: 'pointer'
+                });
+                row.appendChild(saveBtn);
+                btnsCol.appendChild(row);
+                card.appendChild(btnsCol);
+                overlay.appendChild(card);
+                document.body.appendChild(overlay);
+
+                // Animate in
+                requestAnimationFrame(() => {
+                  overlay.style.opacity = '1';
+                  card.style.transform = 'scale(1)';
+                  inp.focus();
+                  inp.select();
+                });
+
+                function closeModal() {
+                  overlay.style.opacity = '0';
+                  card.style.transform = 'scale(0.92)';
+                  setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 260);
+                }
+
+                // Close on backdrop click
+                overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+
+                cancelBtn.onclick = closeModal;
+
+                saveBtn.onclick = async () => {
+                  const val = inp.value.trim();
+                  if (!val) return;
+                  closeModal();
+                  cityEl.textContent = '📍 Đang định vị...';
                   try {
-                    cityEl.textContent = '📍 Đang định vị...';
-                    const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(inputCity.trim() + ', Vietnam')}&format=json&limit=1`;
-                    const res = await fetch(geocodeUrl);
-                    const data = await res.json();
-                    if (data && data[0]) {
-                      const newLat = parseFloat(data[0].lat);
-                      const newLon = parseFloat(data[0].lon);
-                      let displayName = data[0].display_name.split(',')[0];
-                      displayName = displayName.replace(/^(Thành phố |Tỉnh |TP\.?\s*)/i, '').trim();
-                      
-                      localStorage.setItem('preferred_weather_city', JSON.stringify({ name: displayName, lat: newLat, lon: newLon }));
-                      fetchWeatherData(newLat, newLon, displayName);
+                    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val + ', Vietnam')}&format=json&limit=1`;
+                    const r = await fetch(url);
+                    const d = await r.json();
+                    if (d && d[0]) {
+                      const nLat = parseFloat(d[0].lat), nLon = parseFloat(d[0].lon);
+                      let dn = d[0].display_name.split(',')[0].replace(/^(Thành phố |Tỉnh |TP\.?\s*)/i, '').trim();
+                      localStorage.setItem('preferred_weather_city', JSON.stringify({ name: dn, lat: nLat, lon: nLon }));
+                      fetchWeatherData(nLat, nLon, dn);
                     } else {
-                      alert('Không tìm thấy địa điểm này. Vui lòng nhập lại chính xác tên Tỉnh/Thành phố.');
+                      if (typeof showToast === 'function') showToast('Không tìm thấy địa điểm này.', 'warning');
                       cityEl.textContent = `📍 ${areaName}`;
                     }
                   } catch (err) {
                     console.error('Geocoding failed', err);
-                    alert('Lỗi kết nối khi định vị. Vui lòng thử lại sau.');
+                    if (typeof showToast === 'function') showToast('Lỗi kết nối khi định vị.', 'error');
                     cityEl.textContent = `📍 ${areaName}`;
                   }
-                }
+                };
+
+                locBtn.onclick = () => {
+                  closeModal();
+                  cityEl.textContent = '📍 Đang định vị...';
+                  localStorage.removeItem('preferred_weather_city');
+                  // Directly use geolocation API instead of runWeatherUpdate reference
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      (pos) => fetchWeatherData(pos.coords.latitude, pos.coords.longitude),
+                      async () => {
+                        const coords = await getIPCoordinates();
+                        if (coords) fetchWeatherData(coords.lat, coords.lon);
+                        else fetchWeatherData(null, null);
+                      },
+                      { timeout: 8000 }
+                    );
+                  } else {
+                    getIPCoordinates().then(coords => {
+                      if (coords) fetchWeatherData(coords.lat, coords.lon);
+                      else fetchWeatherData(null, null);
+                    });
+                  }
+                };
+
+                inp.onkeydown = (e) => { if (e.key === 'Enter') saveBtn.click(); };
               };
             }
             if (descEl) descEl.textContent = getTravelRecommendation(temp, code, desc);
@@ -2966,6 +3121,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
       runWeatherUpdate();
     }
+
+    // Khởi chạy cập nhật thời tiết ngay khi chatbot được khởi tạo
+    updateChatbotWeather();
 
     function togglePanel() {
       const isOpen = !panel.hidden;

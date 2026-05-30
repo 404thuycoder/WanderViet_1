@@ -10162,8 +10162,8 @@ html.translated-ltr #translate-curtain, html.translated-rtl #translate-curtain {
 }
 
 .widget-weather__info { display: flex; flex-direction: column; gap: 2px; }
-.widget-weather__city { font-weight: 700; font-size: 0.85rem !important; color: #0f172a !important; }
-[data-theme="dark"] .widget-weather__city { color: #ffffff !important; }
+.widget-weather__city { font-weight: 700; font-size: 0.85rem !important; color: #0f172a !important; text-decoration: none !important; border-bottom: none !important; }
+[data-theme="dark"] .widget-weather__city { color: #ffffff !important; text-decoration: none !important; border-bottom: none !important; }
 .widget-weather__desc { font-size: 0.75rem !important; color: #64748b !important; }
 [data-theme="dark"] .widget-weather__desc { color: #94a3b8 !important; }
 .widget-weather__temp { font-size: 1.45rem !important; font-weight: 800 !important; color: #0284c7 !important; }
@@ -11017,6 +11017,8 @@ html.translated-ltr #translate-curtain, html.translated-rtl #translate-curtain {
 
 [data-theme="light"] .widget-weather__city {
   color: #0f172a !important; /* Strong text color */
+  text-decoration: none !important;
+  border-bottom: none !important;
 }
 
 [data-theme="light"] .widget-weather__desc {

@@ -1750,8 +1750,163 @@
             <span class="an-rank-val" style="color:#10b981;">${(b.score||0).toLocaleString()} XP</span>
           </div>`).join('');
       }
+
+      // ── Industry category breakdown (progress bars) ──
+      const catMap = { 'Lưu trú': 0, 'Ẩm thực': 0, 'Giải trí': 0, 'Vận chuyển': 0, 'General': 0 };
+      const catIdMap = { 'Lưu trú': 'accommodation', 'Ẩm thực': 'dining', 'Giải trí': 'entertainment', 'Vận chuyển': 'transport', 'General': 'general' };
+      bizUsers.forEach(u => {
+        const cat = u.businessCategory || u.category || u.bizCategory || 'General';
+        let mapped = 'General';
+        if (cat.includes('trú') || cat.toLowerCase().includes('hotel') || cat.toLowerCase().includes('accommodation')) mapped = 'Lưu trú';
+        else if (cat.includes('thực') || cat.includes('ăn') || cat.toLowerCase().includes('dining') || cat.toLowerCase().includes('restaurant')) mapped = 'Ẩm thực';
+        else if (cat.includes('trí') || cat.includes('vui') || cat.toLowerCase().includes('entertainment')) mapped = 'Giải trí';
+        else if (cat.includes('chuyển') || cat.includes('xe') || cat.toLowerCase().includes('transport')) mapped = 'Vận chuyển';
+        if (catMap.hasOwnProperty(mapped)) catMap[mapped]++;
+        else catMap['General']++;
+      });
+      const total = bizUsers.length || 1;
+      Object.entries(catMap).forEach(([name, count]) => {
+        const id = catIdMap[name];
+        const pct = Math.round((count / total) * 100);
+        const valEl = document.getElementById(`biz-cat-val-${id}`);
+        const fillEl = document.getElementById(`biz-cat-fill-${id}`);
+        if (valEl) valEl.textContent = `${count} doanh nghiệp (${pct}%)`;
+        if (fillEl) {
+          setTimeout(() => { fillEl.style.width = pct + '%'; }, 100);
+        }
+      });
+
+      // ── Interactive Partner Directory Table ──
+      renderBizDirectoryTable(bizUsers);
+      setupBizDirectoryFilters(bizUsers);
+
     } catch(e) { console.warn('loadBusinessAnalytics error:', e); }
   }
+
+  // ── Partner Directory: render table rows ──
+  function renderBizDirectoryTable(bizUsers, searchQ = '', catFilter = 'all', statusFilter = 'all', page = 1) {
+    const pageSize = 10;
+    let filtered = bizUsers;
+
+    if (searchQ) {
+      const q = searchQ.toLowerCase();
+      filtered = filtered.filter(u =>
+        (u.displayName||u.name||'').toLowerCase().includes(q) ||
+        (u.email||'').toLowerCase().includes(q) ||
+        (u.businessName||u.name||'').toLowerCase().includes(q)
+      );
+    }
+    if (catFilter !== 'all') {
+      filtered = filtered.filter(u => {
+        const cat = (u.businessCategory || u.category || u.bizCategory || 'General').toLowerCase();
+        const fLow = catFilter.toLowerCase();
+        if (fLow === 'lưu trú') return cat.includes('trú') || cat.includes('hotel') || cat.includes('accommodation');
+        if (fLow === 'ẩm thực') return cat.includes('thực') || cat.includes('dining') || cat.includes('restaurant');
+        if (fLow === 'giải trí') return cat.includes('trí') || cat.includes('vui') || cat.includes('entertainment');
+        if (fLow === 'vận chuyển') return cat.includes('chuyển') || cat.includes('transport');
+        return !cat.includes('trú') && !cat.includes('thực') && !cat.includes('trí') && !cat.includes('chuyển');
+      });
+    }
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(u => {
+        if (statusFilter === 'active') return u.status === 'active' || u.bizStatus === 'approved';
+        if (statusFilter === 'pending') return u.status === 'pending' || u.bizStatus === 'pending';
+        if (statusFilter === 'suspended') return u.status === 'suspended';
+        return true;
+      });
+    }
+
+    const totalCount = filtered.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const start = (page - 1) * pageSize;
+    const paginated = filtered.slice(start, start + pageSize);
+
+    const tbody = document.getElementById('biz-dir-tbody');
+    const showing = document.getElementById('biz-dir-showing');
+    const prevBtn = document.getElementById('biz-dir-prev');
+    const nextBtn = document.getElementById('biz-dir-next');
+
+    if (!tbody) return;
+
+    if (!paginated.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--admin-text-muted);">Không tìm thấy đối tác nào phù hợp.</td></tr>`;
+    } else {
+      tbody.innerHTML = paginated.map(biz => {
+        const name = biz.displayName || biz.name || biz.businessName || 'Doanh nghiệp';
+        const email = biz.email || '—';
+        const cat = biz.businessCategory || biz.category || 'General';
+        const region = biz.region || biz.address || '—';
+        const followers = (biz.followersCount || biz.followers || 0).toLocaleString();
+        const xp = (biz.score || biz.xp || 0).toLocaleString();
+        const verified = biz.isVerified || biz.verified;
+        const status = biz.status || 'active';
+        const bizStatus = biz.bizStatus;
+
+        let catClass = 'general';
+        const catLow = cat.toLowerCase();
+        if (catLow.includes('trú') || catLow.includes('hotel') || catLow.includes('accommodation')) catClass = 'accommodation';
+        else if (catLow.includes('thực') || catLow.includes('dining')) catClass = 'dining';
+        else if (catLow.includes('trí') || catLow.includes('entertainment')) catClass = 'entertainment';
+        else if (catLow.includes('chuyển') || catLow.includes('transport')) catClass = 'transport';
+
+        const statusBadge = status === 'active' || bizStatus === 'approved'
+          ? `<span class="status-badge status-badge--active">Hoạt động</span>`
+          : status === 'pending' || bizStatus === 'pending'
+            ? `<span class="status-badge status-badge--pending">Chờ duyệt</span>`
+            : `<span class="status-badge status-badge--suspended">Bị khóa</span>`;
+
+        const verifiedBadge = verified
+          ? `<span title="Đã xác minh" style="color:#10b981; font-size:1.1rem;">✅</span>`
+          : `<span title="Chưa xác minh" style="color:var(--admin-text-muted); font-size:1rem;">—</span>`;
+
+        return `<tr>
+          <td>
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <img src="${biz.avatar||biz.image||''}" style="width:34px;height:34px;border-radius:8px;object-fit:cover;flex-shrink:0;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=34'">
+              <div>
+                <div style="font-weight:600; font-size:0.82rem; color:#f1f5f9;">${name}</div>
+                <div style="font-size:0.7rem; color:var(--admin-text-muted);">${email}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="biz-badge ${catClass}">${cat}</span></td>
+          <td style="font-size:0.78rem; color:var(--admin-text-muted);">${region}</td>
+          <td style="text-align:right; font-size:0.8rem; font-weight:600;">${followers}</td>
+          <td style="text-align:right; font-size:0.8rem; font-weight:600; color:#a78bfa;">${xp}</td>
+          <td style="text-align:center;">${verifiedBadge}</td>
+          <td style="text-align:center;">${statusBadge}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    if (showing) showing.textContent = `Hiển thị ${start + 1} - ${Math.min(start + pageSize, totalCount)} của ${totalCount} đối tác`;
+    if (prevBtn) { prevBtn.disabled = page <= 1; prevBtn.onclick = () => renderBizDirectoryTable(bizUsers, searchQ, catFilter, statusFilter, page - 1); }
+    if (nextBtn) { nextBtn.disabled = page >= totalPages; nextBtn.onclick = () => renderBizDirectoryTable(bizUsers, searchQ, catFilter, statusFilter, page + 1); }
+  }
+
+  function setupBizDirectoryFilters(bizUsers) {
+    let debounceTimer;
+    const searchEl = document.getElementById('biz-dir-search');
+    const catEl = document.getElementById('biz-dir-category-filter');
+    const statusEl = document.getElementById('biz-dir-status-filter');
+
+    const refresh = () => {
+      const q = searchEl?.value?.trim() || '';
+      const cat = catEl?.value || 'all';
+      const status = statusEl?.value || 'all';
+      renderBizDirectoryTable(bizUsers, q, cat, status, 1);
+    };
+
+    if (searchEl) {
+      searchEl.oninput = () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(refresh, 300); };
+    }
+    if (catEl) catEl.onchange = refresh;
+    if (statusEl) statusEl.onchange = refresh;
+
+    // Initial render
+    renderBizDirectoryTable(bizUsers, '', 'all', 'all', 1);
+  }
+
 
   // --- Users ---
   async function loadUsers(silent = false, chartType = 'line', period = 'day') {

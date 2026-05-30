@@ -702,12 +702,66 @@
 
           <!-- ===== ANALYTICS PANEL ===== -->
           <section id="panel-analytics" class="admin-panel" hidden>
+            <style>
+              /* Cohesive, Premium glassmorphic styles for Analytics */
+              .an-kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
+              .an-kpi { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1.25rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(10px); }
+              .an-kpi:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4); border-color: rgba(255, 255, 255, 0.15); }
+              .an-kpi-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+              .an-kpi-content { flex: 1; }
+              .an-kpi-val { font-size: 1.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 2px; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+              .an-kpi-label { font-size: 0.72rem; color: var(--admin-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.75px; }
+              .an-kpi-delta { font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 6px; margin-top: 4px; display: inline-block; }
+              .an-kpi-delta.up { background: rgba(16,185,129,0.15); color: #10b981; }
+              .an-kpi-delta.down { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+              .an-grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+              .an-grid-1-1 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+              .an-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 1.5rem; }
+
+              .an-panel-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 20px; padding: 1.5rem; backdrop-filter: blur(20px); transition: border-color 0.3s; }
+              .an-panel-card:hover { border-color: rgba(255, 255, 255, 0.1); }
+              .an-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+              .an-card-title { font-size: 1.05rem; font-weight: 700; color: #f8fafc; display: flex; align-items: center; gap: 8px; }
+              .an-card-subtitle { font-size: 0.75rem; color: var(--admin-text-muted); margin-top: 4px; }
+
+              .an-select { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #f1f5f9; font-size: 0.78rem; padding: 6px 12px; cursor: pointer; outline: none; transition: all 0.2s; }
+              .an-select:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); }
+
+              /* Progress bars for distributions */
+              .an-progress-row { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+              .an-progress-info { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+              .an-progress-label { font-weight: 500; color: #e2e8f0; display: flex; align-items: center; gap: 6px; }
+              .an-progress-val { font-weight: 700; color: var(--admin-text-muted); }
+              .an-progress-bar-bg { height: 8px; background: rgba(255, 255, 255, 0.04); border-radius: 4px; overflow: hidden; }
+              .an-progress-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease-in-out; }
+
+              /* Leaderboard / Rank list */
+              .an-rank-list { display: flex; flex-direction: column; gap: 0.6rem; }
+              .an-rank-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.75rem; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; }
+              .an-rank-item:hover { background: rgba(255,255,255,0.04); transform: translateX(4px); }
+              .an-rank-num { font-size: 0.75rem; font-weight: 800; color: var(--admin-text-muted); width: 20px; text-align: center; }
+              .an-rank-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+              .an-rank-info { flex: 1; min-width: 0; }
+              .an-rank-name { font-size: 0.82rem; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+              .an-rank-sub { font-size: 0.7rem; color: var(--admin-text-muted); }
+              .an-rank-val { font-size: 0.8rem; font-weight: 700; color: #38bdf8; white-space: nowrap; }
+
+              /* Interactive Directory Table */
+              .biz-dir-table-card { margin-top: 1.5rem; }
+              .biz-badge { font-size: 0.7rem; padding: 3px 8px; border-radius: 6px; font-weight: 700; display: inline-block; text-transform: uppercase; }
+              .biz-badge.accommodation { background: rgba(99,102,241,0.15); color: #818cf8; }
+              .biz-badge.dining { background: rgba(236,72,153,0.15); color: #f472b6; }
+              .biz-badge.entertainment { background: rgba(245,158,11,0.15); color: #fbbf24; }
+              .biz-badge.transport { background: rgba(16,185,129,0.15); color: #34d399; }
+              .biz-badge.general { background: rgba(100,116,139,0.15); color: #94a3b8; }
+            </style>
 
             <div class="panel-header-top">
               <div style="display:flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
                 <div>
                   <h1 class="main-title">Biểu đồ &amp; Thống kê</h1>
-                  <p class="main-subtitle" style="margin-bottom:0">Phân tích chuyên sâu về dữ liệu hệ thống, người dùng và hiệu suất.</p>
+                  <p class="main-subtitle" style="margin-bottom:0">Phân tích chuyên sâu về dữ liệu hệ thống, người dùng và đối tác doanh nghiệp.</p>
                 </div>
               </div>
 
@@ -736,102 +790,116 @@
               </div>
             </div>
 
-
             <div id="sub-panel-analytics-system" class="sub-panel">
-              <!-- Advanced Metric Grid -->
-              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-                <div class="metric-card-pro">
-                  <div class="metric-icon" style="background: rgba(99, 102, 241, 0.1); color: #818cf8;"><i class="fas fa-users"></i></div>
-                  <div class="metric-info">
-                    <span class="metric-label">Người dùng mới</span>
-                    <div class="metric-row">
-                      <span class="metric-value" id="an-stat-new-users">0</span>
-                      <span class="metric-trend" id="an-stat-new-users-trend" style="font-size:0.7rem">Khởi tạo...</span>
-                    </div>
+              <!-- KPI Metric Grid -->
+              <div class="an-kpi-grid">
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background: rgba(99, 102, 241, 0.1); color: #818cf8;"><i class="fas fa-users"></i></div>
+                  <div class="an-kpi-content">
+                    <div class="an-kpi-val" id="stat-total-users">0</div>
+                    <div class="an-kpi-label">Tổng thành viên</div>
                   </div>
                 </div>
-                <div class="metric-card-pro">
-                  <div class="metric-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fas fa-map-marker-alt"></i></div>
-                  <div class="metric-info">
-                    <span class="metric-label">Điểm đến mới</span>
-                    <div class="metric-row">
-                      <span class="metric-value" id="an-stat-new-places">0</span>
-                      <span class="metric-trend" id="an-stat-new-places-trend" style="font-size:0.7rem">Khởi tạo...</span>
-                    </div>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i class="fas fa-building"></i></div>
+                  <div class="an-kpi-content">
+                    <div class="an-kpi-val" id="stat-total-biz">0</div>
+                    <div class="an-kpi-label">Doanh nghiệp đối tác</div>
                   </div>
                 </div>
-                <div class="metric-card-pro">
-                  <div class="metric-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;"><i class="fas fa-star"></i></div>
-                  <div class="metric-info">
-                    <span class="metric-label">Đánh giá 5 sao</span>
-                    <div class="metric-row">
-                      <span class="metric-value" id="an-stat-rating">0%</span>
-                      <span class="metric-trend" id="an-stat-rating-trend" style="font-size:0.7rem">Khởi tạo...</span>
-                    </div>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;"><i class="fas fa-bolt"></i></div>
+                  <div class="an-kpi-content">
+                    <div class="an-kpi-val" id="stat-daily-interactions">0</div>
+                    <div class="an-kpi-label">Lượng tương tác ngày</div>
                   </div>
                 </div>
-                <div class="metric-card-pro">
-                  <div class="metric-icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;"><i class="fas fa-bolt"></i></div>
-                  <div class="metric-info">
-                    <span class="metric-label">Độ trễ trung bình</span>
-                    <div class="metric-row">
-                      <span class="metric-value">124ms</span>
-                      <span class="metric-trend down"><i class="fas fa-caret-down"></i> 8%</span>
-                    </div>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background: rgba(139, 92, 246, 0.1); color: #a78bfa;"><i class="fas fa-map-marked-alt"></i></div>
+                  <div class="an-kpi-content">
+                    <div class="an-kpi-val" id="stat-total-iti">0</div>
+                    <div class="an-kpi-label">Lịch trình đã tạo</div>
                   </div>
                 </div>
               </div>
 
-
-              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem;">
-                <!-- Hero Activity Chart -->
-                <div class="glass-panel chart-box-pro">
-                  <div class="chart-header-pro">
-                    <div style="display:flex; flex-direction:column; gap:0.25rem">
-                      <h3 style="margin:0; font-size:1.1rem; color:#fff">📈 Tương tác & Hoạt động</h3>
-                      <p style="margin:0; font-size:0.75rem; color:var(--admin-text-muted)">Phân tích lưu lượng truy cập theo thời gian thực</p>
-                    </div>
-                    <div class="chart-actions">
-                       <select class="chart-period-select-pro" id="main-activity-period">
-                         <option value="hour">Hôm nay</option>
-                         <option value="week" selected>Tuần này</option>
-                         <option value="day">Tháng này</option>
-                         <option value="month">Năm nay</option>
-                       </select>
-                    </div>
+              <!-- Metrics sub-row -->
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="metric-card-pro" style="padding: 1rem; border-radius:12px;">
+                  <span class="metric-label" style="font-size:0.75rem;">Người dùng mới</span>
+                  <div class="metric-row">
+                    <span class="metric-value" id="an-stat-new-users" style="font-size:1.4rem;">0</span>
+                    <span class="metric-trend" id="an-stat-new-users-trend" style="font-size:0.7rem">Khởi tạo...</span>
                   </div>
-                  <div class="chart-main-container" style="height: 400px; margin-top: 1.5rem;">
+                </div>
+                <div class="metric-card-pro" style="padding: 1rem; border-radius:12px;">
+                  <span class="metric-label" style="font-size:0.75rem;">Điểm đến mới</span>
+                  <div class="metric-row">
+                    <span class="metric-value" id="an-stat-new-places" style="font-size:1.4rem;">0</span>
+                    <span class="metric-trend" id="an-stat-new-places-trend" style="font-size:0.7rem">Khởi tạo...</span>
+                  </div>
+                </div>
+                <div class="metric-card-pro" style="padding: 1rem; border-radius:12px;">
+                  <span class="metric-label" style="font-size:0.75rem;">Đánh giá hài lòng</span>
+                  <div class="metric-row">
+                    <span class="metric-value" id="an-stat-rating" style="font-size:1.4rem;">0%</span>
+                    <span class="metric-trend" id="an-stat-rating-trend" style="font-size:0.7rem">Khởi tạo...</span>
+                  </div>
+                </div>
+                <div class="metric-card-pro" style="padding: 1rem; border-radius:12px;">
+                  <span class="metric-label" style="font-size:0.75rem;">Thời gian phản hồi</span>
+                  <div class="metric-row">
+                    <span class="metric-value" style="font-size:1.4rem;">124ms</span>
+                    <span class="metric-trend down" style="font-size:0.7rem;"><i class="fas fa-caret-down"></i> 8% tốt hơn</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Main Charts Grid -->
+              <div class="an-grid-2-1">
+                <div class="an-panel-card">
+                  <div class="an-card-header">
+                    <div>
+                      <span class="an-card-title">📈 Hoạt động &amp; Tương tác Hệ thống</span>
+                      <p class="an-card-subtitle">Xu hướng người dùng và tương tác theo thời gian thực</p>
+                    </div>
+                    <select class="an-select" id="main-activity-period">
+                      <option value="hour">Hôm nay</option>
+                      <option value="week" selected>Tuần này</option>
+                      <option value="day">Tháng này</option>
+                      <option value="month">Năm nay</option>
+                    </select>
+                  </div>
+                  <div style="height: 380px;">
                     <canvas id="activityChart"></canvas>
                   </div>
                 </div>
 
-                <!-- Side Distribution Column -->
                 <div style="display:flex; flex-direction:column; gap:1.5rem;">
-                  <div class="glass-panel chart-box-pro small">
-                    <h4 class="chart-title-small">📊 Phân bổ Thành viên</h4>
-                    <div style="height: 180px;"><canvas id="distributionChart"></canvas></div>
+                  <div class="an-panel-card" style="padding: 1.25rem;">
+                    <span class="an-card-title" style="font-size: 0.9rem; margin-bottom: 1rem;">📊 Phân bổ Thành phần</span>
+                    <div style="height: 160px;"><canvas id="distributionChart"></canvas></div>
                   </div>
-                  <div class="glass-panel chart-box-pro small">
-                    <h4 class="chart-title-small">📱 Thiết bị truy cập</h4>
-                    <div style="height: 180px;"><canvas id="deviceChart"></canvas></div>
+                  <div class="an-panel-card" style="padding: 1.25rem;">
+                    <span class="an-card-title" style="font-size: 0.9rem; margin-bottom: 1rem;">📱 Thiết bị truy cập</span>
+                    <div style="height: 160px;"><canvas id="deviceChart"></canvas></div>
                   </div>
                 </div>
               </div>
 
-              <!-- Secondary Row -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
-                 <div class="glass-panel chart-box-pro">
-                    <h4 class="chart-title-small">⭐ Đánh giá Phản hồi</h4>
-                    <div style="height: 250px;"><canvas id="sentimentChart"></canvas></div>
-                 </div>
-                 <div class="glass-panel chart-box-pro" style="display:flex; flex-direction:column; justify-content:center; align-items:center; position:relative; overflow:hidden">
-                    <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 70%);"></div>
-                    <div style="z-index:1; text-align:center">
-                      <div class="pulse-ring"></div>
-                      <h2 style="font-size:3rem; margin:0; font-weight:800; color:#fff; text-shadow: 0 0 20px rgba(99,102,241,0.5)">98.2%</h2>
-                      <p style="color:var(--admin-text-muted); text-transform:uppercase; letter-spacing:2px; font-size:0.7rem; font-weight:700">Chỉ số ổn định hệ thống</p>
-                    </div>
-                 </div>
+              <div class="an-grid-2-1">
+                <div class="an-panel-card">
+                  <span class="an-card-title" style="margin-bottom: 1.5rem;">⭐ Mức độ hài lòng &amp; Phản hồi</span>
+                  <div style="height: 230px;"><canvas id="sentimentChart"></canvas></div>
+                </div>
+                <div class="an-panel-card" style="display:flex; flex-direction:column; justify-content:center; align-items:center; position:relative; overflow:hidden">
+                  <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 70%);"></div>
+                  <div style="z-index:1; text-align:center">
+                    <div class="pulse-ring"></div>
+                    <h2 style="font-size:3rem; margin:0; font-weight:800; color:#fff; text-shadow: 0 0 20px rgba(99,102,241,0.5)">98.2%</h2>
+                    <p style="color:var(--admin-text-muted); text-transform:uppercase; letter-spacing:2px; font-size:0.7rem; font-weight:700">Chỉ số ổn định máy chủ</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -912,112 +980,180 @@
                     </select>
                   </div>
                   <div style="height:320px;"><canvas id="userManagerChart"></canvas></div>
-                </div>
-                <div class="an-chart-panel">
-                  <div class="an-chart-header">
-                    <span class="an-chart-title">🏅 Hạng thành viên</span>
-                  </div>
-                  <div style="height:200px;"><canvas id="userRankChart"></canvas></div>
-                  <div id="user-rank-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem;justify-content:center;"></div>
-                </div>
-              </div>
-
-              <!-- Top users list -->
-              <div class="an-chart-panel">
-                <div class="an-chart-header">
-                  <span class="an-chart-title">🏆 Top người dùng hoạt động nhất</span>
-                  <span style="font-size:0.72rem;color:var(--admin-text-muted);">Dựa trên số lượng lịch trình & tương tác</span>
-                </div>
-                <div class="an-rank-list" id="u-top-users-list">
-                  <div style="text-align:center;padding:1.5rem;color:var(--admin-text-muted);">Đang tải...</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- SUB-PANEL: Business Analytics (Doanh nghiệp) -->
+                    <!-- SUB-PANEL: Business Analytics (Doanh nghiệp) -->
             <div id="sub-panel-analytics-businesses" class="sub-panel is-hidden">
-              <style>
-                .biz-kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.25rem; margin-bottom: 2rem; }
-                .biz-kpi { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; transition: transform 0.2s, box-shadow 0.2s; }
-                .biz-kpi:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
-                .biz-kpi-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
-                .biz-kpi-val { font-size: 1.8rem; font-weight: 800; line-height: 1; margin-bottom: 2px; }
-                .biz-kpi-label { font-size: 0.75rem; color: var(--admin-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-                .biz-status-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-bottom: 1.5rem; }
-                .biz-status-card { border-radius: 14px; padding: 1.25rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; border: 1px solid rgba(255,255,255,0.06); }
-                .biz-status-val { font-size: 2rem; font-weight: 800; }
-                .biz-status-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-                .biz-row { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-              </style>
-
-              <!-- KPI Cards -->
-              <div class="biz-kpi-grid">
-                <div class="biz-kpi">
-                  <div class="biz-kpi-icon" style="background:rgba(16,185,129,0.15);">🏢</div>
-                  <div>
-                    <div class="biz-kpi-val" id="b-kpi-total" style="color:#10b981;">—</div>
-                    <div class="biz-kpi-label">Tổng đối tác</div>
+              <div class="an-kpi-grid">
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(16,185,129,0.15); color:#10b981;">🏢</div>
+                  <div class="an-kpi-content">
+                    <div class="an-kpi-val" id="b-kpi-total">—</div>
+                    <div class="an-kpi-label">Tổng doanh nghiệp</div>
                   </div>
                 </div>
-                <div class="biz-kpi">
-                  <div class="biz-kpi-icon" style="background:rgba(56,189,248,0.15);">✅</div>
-                  <div>
-                    <div class="biz-kpi-val" id="b-kpi-approved" style="color:#38bdf8;">—</div>
-                    <div class="biz-kpi-label">Đã phê duyệt</div>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(56,189,248,0.15); color:#38bdf8;">✅</div>
+                  <div class="an-kpi-content">
+                    <div class="an-kpi-val" id="b-kpi-approved">—</div>
+                    <div class="an-kpi-label">Đã phê duyệt</div>
                   </div>
                 </div>
-                <div class="biz-kpi">
-                  <div class="biz-kpi-icon" style="background:rgba(245,158,11,0.15);">⏳</div>
-                  <div>
-                    <div class="biz-kpi-val" id="b-kpi-pending" style="color:#f59e0b;">—</div>
-                    <div class="biz-kpi-label">Chờ duyệt</div>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(245,158,11,0.15); color:#f59e0b;">⏳</div>
+                  <div class="an-kpi-content">
+                    <div class="an-kpi-val" id="b-kpi-pending">—</div>
+                    <div class="an-kpi-label">Yêu cầu chờ duyệt</div>
                   </div>
                 </div>
-                <div class="biz-kpi">
-                  <div class="biz-kpi-icon" style="background:rgba(139,92,246,0.15);">📅</div>
-                  <div>
-                    <div class="biz-kpi-val" id="b-kpi-new" style="color:#a78bfa;">—</div>
-                    <div class="biz-kpi-label">Đăng ký tháng này</div>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(139,92,246,0.15); color:#a78bfa;">📅</div>
+                  <div class="an-kpi-content">
+                    <div class="an-kpi-val" id="b-kpi-new">—</div>
+                    <div class="an-kpi-label">Gia nhập tháng này</div>
                   </div>
                 </div>
               </div>
 
-              <!-- Status breakdown + trend -->
-              <div class="biz-row">
-                <div class="an-chart-panel">
-                  <div class="an-chart-header">
-                    <span class="an-chart-title">📈 Tăng trưởng đối tác doanh nghiệp</span>
-                    <select class="an-select">
-                      <option value="week" selected>Tuần này</option>
-                      <option value="day">Tháng này</option>
-                      <option value="month">Năm nay</option>
-                    </select>
+              <!-- Classified Breakdown Cards -->
+              <div class="an-grid-2-1">
+                <!-- Industry Distribution -->
+                <div class="an-panel-card">
+                  <span class="an-card-title" style="margin-bottom: 1.5rem;"><i class="fas fa-th-large" style="color:var(--admin-primary); margin-right:6px;"></i> Phân loại theo ngành dịch vụ</span>
+                  
+                  <div id="biz-category-progress-container" style="display:flex; flex-direction:column; gap:1.25rem;">
+                    <!-- Accommodations -->
+                    <div class="an-progress-row">
+                      <div class="an-progress-info">
+                        <span class="an-progress-label">🏨 Lưu trú / Khách sạn (Accommodation)</span>
+                        <span class="an-progress-val" id="biz-cat-val-accommodation">0 doanh nghiệp (0%)</span>
+                      </div>
+                      <div class="an-progress-bar-bg">
+                        <div class="an-progress-bar-fill" id="biz-cat-fill-accommodation" style="width: 0%; background: #6366f1;"></div>
+                      </div>
+                    </div>
+                    <!-- Dining -->
+                    <div class="an-progress-row">
+                      <div class="an-progress-info">
+                        <span class="an-progress-label">🍽️ Ẩm thực / Nhà hàng (Dining)</span>
+                        <span class="an-progress-val" id="biz-cat-val-dining">0 doanh nghiệp (0%)</span>
+                      </div>
+                      <div class="an-progress-bar-bg">
+                        <div class="an-progress-bar-fill" id="biz-cat-fill-dining" style="width: 0%; background: #ec4899;"></div>
+                      </div>
+                    </div>
+                    <!-- Entertainment -->
+                    <div class="an-progress-row">
+                      <div class="an-progress-info">
+                        <span class="an-progress-label">🎡 Giải trí / Vui chơi (Entertainment)</span>
+                        <span class="an-progress-val" id="biz-cat-val-entertainment">0 doanh nghiệp (0%)</span>
+                      </div>
+                      <div class="an-progress-bar-bg">
+                        <div class="an-progress-bar-fill" id="biz-cat-fill-entertainment" style="width: 0%; background: #f59e0b;"></div>
+                      </div>
+                    </div>
+                    <!-- Transport -->
+                    <div class="an-progress-row">
+                      <div class="an-progress-info">
+                        <span class="an-progress-label">🚗 Vận chuyển / Di chuyển (Transport)</span>
+                        <span class="an-progress-val" id="biz-cat-val-transport">0 doanh nghiệp (0%)</span>
+                      </div>
+                      <div class="an-progress-bar-bg">
+                        <div class="an-progress-bar-fill" id="biz-cat-fill-transport" style="width: 0%; background: #10b981;"></div>
+                      </div>
+                    </div>
+                    <!-- General / Others -->
+                    <div class="an-progress-row">
+                      <div class="an-progress-info">
+                        <span class="an-progress-label">🏢 Ngành dịch vụ khác (General)</span>
+                        <span class="an-progress-val" id="biz-cat-val-general">0 doanh nghiệp (0%)</span>
+                      </div>
+                      <div class="an-progress-bar-bg">
+                        <div class="an-progress-bar-fill" id="biz-cat-fill-general" style="width: 0%; background: #64748b;"></div>
+                      </div>
+                    </div>
                   </div>
-                  <div style="height:300px;"><canvas id="bizGrowthChart"></canvas></div>
                 </div>
-                <div class="an-chart-panel">
-                  <div class="an-chart-header">
-                    <span class="an-chart-title">🍩 Trạng thái đối tác</span>
-                  </div>
-                  <div style="height:220px;"><canvas id="bizStatusChart"></canvas></div>
+
+                <!-- Verification Status Rate -->
+                <div class="an-panel-card">
+                  <span class="an-card-title" style="margin-bottom: 1.5rem;"><i class="fas fa-check-circle" style="color:#10b981; margin-right:6px;"></i> Trạng thái hoạt động</span>
+                  <div style="height:210px;"><canvas id="bizStatusChart"></canvas></div>
                   <div id="biz-status-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem;justify-content:center;"></div>
                 </div>
               </div>
 
-              <!-- Top businesses -->
-              <div class="an-chart-panel">
-                <div class="an-chart-header">
-                  <span class="an-chart-title">🌟 Top doanh nghiệp nổi bật</span>
-                  <span style="font-size:0.72rem;color:var(--admin-text-muted);">Xếp hạng theo điểm XP &amp; hoạt động</span>
+              <!-- Growth Chart -->
+              <div class="an-grid-2-1">
+                <div class="an-panel-card">
+                  <div class="an-card-header">
+                    <span class="an-card-title">📈 Tăng trưởng Đối tác Doanh nghiệp</span>
+                  </div>
+                  <div style="height:300px;"><canvas id="bizGrowthChart"></canvas></div>
                 </div>
-                <div class="an-rank-list" id="b-top-biz-list">
-                  <div style="text-align:center;padding:1.5rem;color:var(--admin-text-muted);">Đang tải...</div>
+                <div class="an-panel-card">
+                  <span class="an-card-title" style="margin-bottom: 1.25rem;">🌟 Top doanh nghiệp nổi bật</span>
+                  <div class="an-rank-list" id="b-top-biz-list">
+                    <div style="text-align:center;padding:1.5rem;color:var(--admin-text-muted);">Đang tải bảng xếp hạng...</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- INTERACTIVE PARTNER DIRECTORY (Đập đi xây lại - Danh sách chi tiết phân loại và lọc) -->
+              <div class="an-panel-card biz-dir-table-card">
+                <div class="an-card-header" style="flex-wrap: wrap; gap: 1rem;">
+                  <div>
+                    <span class="an-card-title"><i class="fas fa-folder-open" style="color:var(--admin-primary); margin-right:8px;"></i> Thư mục Đối tác Doanh nghiệp</span>
+                    <p class="an-card-subtitle">Xem, tìm kiếm, lọc theo phân loại ngành dịch vụ, xác minh hoặc hoạt động</p>
+                  </div>
+                  <div style="display:flex; gap: 0.5rem; align-items:center; flex-wrap: wrap;">
+                    <div style="position:relative;">
+                      <input type="text" id="biz-dir-search" placeholder="Tìm tên, email..." style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding: 6px 12px 6px 30px; color:#fff; font-size:0.78rem; width:170px; outline:none;">
+                      <i class="fas fa-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:0.75rem; color:var(--admin-text-muted);"></i>
+                    </div>
+                    <select id="biz-dir-category-filter" class="an-select">
+                      <option value="all">Tất cả ngành nghề</option>
+                      <option value="Lưu trú">🏨 Lưu trú / Khách sạn</option>
+                      <option value="Ẩm thực">🍽️ Ẩm thực / Nhà hàng</option>
+                      <option value="Giải trí">🎡 Giải trí / Vui chơi</option>
+                      <option value="Vận chuyển">🚗 Vận chuyển / Di chuyển</option>
+                      <option value="General">🏢 Phân loại khác (General)</option>
+                    </select>
+                    <select id="biz-dir-status-filter" class="an-select">
+                      <option value="all">Tất cả trạng thái</option>
+                      <option value="active">Đang hoạt động</option>
+                      <option value="pending">Chờ phê duyệt</option>
+                      <option value="suspended">Đang bị khóa</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="table-wrap" style="background: transparent; border: none; box-shadow: none;">
+                  <table class="admin-table" style="background: transparent;">
+                    <thead>
+                      <tr>
+                        <th>Đối tác</th>
+                        <th>Phân loại ngành</th>
+                        <th>Liên hệ &amp; Địa điểm</th>
+                        <th style="text-align:right">Followers</th>
+                        <th style="text-align:right">Điểm uy tín (XP)</th>
+                        <th style="text-align:center">Xác minh</th>
+                        <th style="text-align:center">Trạng thái</th>
+                      </tr>
+                    </thead>
+                    <tbody id="biz-dir-tbody">
+                      <tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--admin-text-muted);">Đang tải dữ liệu đối tác...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem; font-size:0.75rem; color:var(--admin-text-muted); padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                  <span id="biz-dir-showing">Hiển thị 0 - 0 của 0 đối tác</span>
+                  <div style="display:flex; gap:0.5rem;">
+                    <button id="biz-dir-prev" class="btn btn--small btn--ghost" disabled><i class="fas fa-chevron-left"></i> Trước</button>
+                    <button id="biz-dir-next" class="btn btn--small btn--ghost" disabled>Sau <i class="fas fa-chevron-right"></i></button>
+                  </div>
                 </div>
               </div>
             </div>
-
-
-
 
             <!-- SUB-PANEL: Place Analytics -->
             <div id="sub-panel-analytics-places" class="sub-panel is-hidden">

@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
   "use strict";
 
   // IMMEDIATE FAIL-SAFE: if anything goes wrong, log it
@@ -993,8 +993,10 @@
                loadDistributionChart().catch(e => {});
             }
             if (hubTab === 'analytics-users') {
-               const p = document.querySelector('.chart-period-select[data-chart="users"]')?.value || 'day';
-               loadUsers(false, 'line', p).catch(e => {});
+               loadUserAnalytics().catch(e => {});
+            }
+            if (hubTab === 'analytics-businesses') {
+               loadBusinessAnalytics().catch(e => {});
             }
             if (hubTab === 'analytics-places') {
                const p = document.querySelector('.chart-period-select[data-chart="places"]')?.value || 'day';
@@ -1618,6 +1620,137 @@
         document.getElementById('health-uptime').textContent = d.uptime;
       }
     } catch (e) {}
+  }
+
+  // --- Separate User Analytics (Người dùng thường) ---
+  let userRankChartInstance = null;
+  async function loadUserAnalytics() {
+    try {
+      const json = await apiFetch('/api/admin/users?t=' + Date.now());
+      if (!json.success) return;
+      const all = json.data || [];
+      const normalUsers = all.filter(u => !u.isBusiness && u.role !== 'business' && !u.isAdmin && !u.isSuperAdmin);
+      const today = new Date().setHours(0,0,0,0);
+      const newToday = normalUsers.filter(u => new Date(u.createdAt).getTime() >= today).length;
+      const online = normalUsers.filter(u => u.lastActive && (Date.now() - new Date(u.lastActive).getTime() < 3*60*1000)).length;
+      const suspended = normalUsers.filter(u => u.status === 'suspended').length;
+
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      set('u-kpi-total', normalUsers.length.toLocaleString());
+      set('u-kpi-new', newToday);
+      set('u-kpi-active', online);
+      set('u-kpi-suspended', suspended);
+
+      // Rank distribution donut
+      const rankCtx = document.getElementById('userRankChart')?.getContext('2d');
+      if (rankCtx) {
+        const rankMap = {};
+        normalUsers.forEach(u => { const r = u.rank || 'Đồng'; rankMap[r] = (rankMap[r] || 0) + 1; });
+        const rLabels = Object.keys(rankMap);
+        const rData = rLabels.map(r => rankMap[r]);
+        const rColors = ['#CD7F32','#C0C0C0','#FFD700','#38bdf8','#6366f1','#10b981'];
+        if (userRankChartInstance) userRankChartInstance.destroy();
+        userRankChartInstance = WanderChartFactory.donut(rankCtx, rLabels, rData, rColors);
+        const legend = document.getElementById('user-rank-legend');
+        if (legend) legend.innerHTML = rLabels.map((l,i) => `<span style="font-size:0.72rem;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:${rColors[i%rColors.length]};display:inline-block;"></span>${l}: ${rankMap[l]}</span>`).join('');
+      }
+
+      // Growth chart
+      const p = document.querySelector('.chart-period-select[data-chart="users"]')?.value || 'hour';
+      loadUsers(false, 'line', p).catch(e => {});
+
+      // Top users list
+      const rankingRes = await apiFetch('/api/admin/stats/rankings?period=alltime&t=' + Date.now());
+      const topList = document.getElementById('u-top-users-list');
+      if (topList && rankingRes.success) {
+        const top = (rankingRes.data?.topItineraries || []).slice(0, 8);
+        if (!top.length) { topList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--admin-text-muted);">Chưa có dữ liệu</div>'; }
+        else topList.innerHTML = top.map((u, i) => `
+          <div class="an-rank-item">
+            <span class="an-rank-num">${i < 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}</span>
+            <img class="an-rank-avatar" src="${u.avatar||''}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(u.displayName||'U')}&background=random&color=fff'">
+            <div class="an-rank-info">
+              <div class="an-rank-name">${u.displayName||u.name||'Người dùng'}</div>
+              <div class="an-rank-sub">${u.email||''}</div>
+            </div>
+            <span class="an-rank-val">${u.count||0} lịch trình</span>
+          </div>`).join('');
+      }
+    } catch(e) { console.warn('loadUserAnalytics error:', e); }
+  }
+
+  // --- Separate Business Analytics (Doanh nghiệp) ---
+  let bizGrowthChartInstance = null;
+  let bizStatusChartInstance = null;
+  async function loadBusinessAnalytics() {
+    try {
+      const json = await apiFetch('/api/admin/users?t=' + Date.now());
+      if (!json.success) return;
+      const all = json.data || [];
+      const bizUsers = all.filter(u => u.isBusiness || u.role === 'business');
+      const thisMonth = new Date(); thisMonth.setDate(1); thisMonth.setHours(0,0,0,0);
+      const newMonth = bizUsers.filter(u => new Date(u.createdAt).getTime() >= thisMonth.getTime()).length;
+      const approved = bizUsers.filter(u => u.status === 'active' || u.bizStatus === 'approved').length;
+      const pending = bizUsers.filter(u => u.status === 'pending' || u.bizStatus === 'pending').length;
+
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      set('b-kpi-total', bizUsers.length);
+      set('b-kpi-approved', approved);
+      set('b-kpi-pending', pending);
+      set('b-kpi-new', newMonth);
+
+      // Status donut
+      const statusCtx = document.getElementById('bizStatusChart')?.getContext('2d');
+      if (statusCtx) {
+        const suspended = bizUsers.filter(u => u.status === 'suspended').length;
+        const other = bizUsers.length - approved - pending - suspended;
+        if (bizStatusChartInstance) bizStatusChartInstance.destroy();
+        bizStatusChartInstance = WanderChartFactory.donut(statusCtx,
+          ['Đã duyệt','Chờ duyệt','Bị khóa','Khác'],
+          [approved, pending, suspended, other < 0 ? 0 : other],
+          ['#10b981','#f59e0b','#ef4444','#64748b']);
+        const legend = document.getElementById('biz-status-legend');
+        const lData = [['Đã duyệt','#10b981',approved],['Chờ duyệt','#f59e0b',pending],['Bị khóa','#ef4444',suspended]];
+        if (legend) legend.innerHTML = lData.map(([l,c,v]) => `<span style="font-size:0.72rem;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:${c};display:inline-block;"></span>${l}: ${v}</span>`).join('');
+      }
+
+      // Growth chart (biz users over time using activityChart API)
+      const growCtx = document.getElementById('bizGrowthChart')?.getContext('2d');
+      if (growCtx) {
+        const trendRes = await apiFetch('/api/admin/stats/trend?period=week');
+        if (trendRes.success && trendRes.data) {
+          const labels = trendRes.data.map(d => { const p = d.label.split('-'); return p.length >= 3 ? `${p[2]}/${p[1]}` : d.label; });
+          const data = trendRes.data.map(d => d.businesses || 0);
+          if (bizGrowthChartInstance) bizGrowthChartInstance.destroy();
+          const grad = growCtx.createLinearGradient(0, 0, 0, 300);
+          grad.addColorStop(0, 'rgba(16,185,129,0.3)');
+          grad.addColorStop(1, 'rgba(16,185,129,0.0)');
+          bizGrowthChartInstance = WanderChartFactory.line(growCtx, labels, [{
+            label: 'Doanh nghiệp mới', data, borderColor: '#10b981',
+            backgroundColor: grad, tension: 0.4, borderWidth: 3,
+            pointRadius: 0, pointHoverRadius: 6, fill: true
+          }]);
+        }
+      }
+
+      // Top businesses
+      const rankRes = await apiFetch('/api/admin/stats/rankings?period=alltime&t=' + Date.now());
+      const topList = document.getElementById('b-top-biz-list');
+      if (topList && rankRes.success) {
+        const top = (rankRes.data?.topBusinesses || []).slice(0, 8);
+        if (!top.length) { topList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--admin-text-muted);">Chưa có dữ liệu</div>'; }
+        else topList.innerHTML = top.map((b, i) => `
+          <div class="an-rank-item">
+            <span class="an-rank-num">${i < 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}</span>
+            <img class="an-rank-avatar" src="${b.avatar||b.image||''}" style="border-radius:8px;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(b.name||'B')}&background=random&color=fff'">
+            <div class="an-rank-info">
+              <div class="an-rank-name">${b.name||b.displayName||'Doanh nghiệp'}</div>
+              <div class="an-rank-sub">${b.email||b.region||''}</div>
+            </div>
+            <span class="an-rank-val" style="color:#10b981;">${(b.score||0).toLocaleString()} XP</span>
+          </div>`).join('');
+      }
+    } catch(e) { console.warn('loadBusinessAnalytics error:', e); }
   }
 
   // --- Users ---

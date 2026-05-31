@@ -920,7 +920,7 @@ router.put('/users/:id', adminTokenAuth, adminAuth, upload.single('avatarFile'),
     if (!target) return res.status(404).json({ success: false, message: 'Không tìm thấy người dùng' });
 
     // Destructure body fields
-    const { name, displayName, email, phone, avatar, notes, isAdmin, isSuperAdmin, status, points } = req.body;
+    const { name, displayName, email, phone, avatar, notes, isAdmin, isSuperAdmin, status, points, isVerified } = req.body;
 
     // ── Bảo vệ Super Admin: không ai được tác động vào Super Admin (kể cả Super Admin khác)
     if (target.role === 'superadmin' && target._id.toString() !== executor.id) {
@@ -949,6 +949,9 @@ router.put('/users/:id', adminTokenAuth, adminAuth, upload.single('avatarFile'),
     if (avatarUrl !== undefined) target.avatar = avatarUrl;
     if (notes !== undefined) target.notes = notes;
     if (status !== undefined) target.status = status;
+    if (isVerified !== undefined && collection === 'BusinessAccount') {
+      target.isVerified = isVerified === true || isVerified === 'true';
+    }
     
     // Xử lý điểm và hạng
     if (points !== undefined) {

@@ -1462,12 +1462,60 @@
         var verifiedBadge = p.verified ? '<div class="verified-badge"><span class="icon">🛡️</span> Verified</div>' : '';
         var wOn = wishIsOn(p.id) ? " is-on" : "";
         var displayImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || "");
-        var fallbackImg = 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80';
-        if (p.kind === 'khach-san') fallbackImg = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80';
-        else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') fallbackImg = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80';
-          else if (p.kind === 'thue-xe' || p.businessCategory === 'rental') fallbackImg = 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&q=80';
-        else if (p.isTour || p.kind === 'trai-nghiem') fallbackImg = 'https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=600&q=80';
-        
+        // ── Smart Fallback: based on name + region + kind ──
+        var fallbackImg = (function(place) {
+          var n = (place.name || '').toLowerCase();
+          var r = (place.region || '').toLowerCase();
+          var k = place.kind || '';
+
+          // Hotel/Resort
+          if (k === 'khach-san' || n.indexOf('khách sạn') !== -1 || n.indexOf('resort') !== -1 || n.indexOf('hotel') !== -1) {
+            if (n.indexOf('phú quốc') !== -1 || r.indexOf('phú quốc') !== -1) return 'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=600&q=80';
+            if (n.indexOf('đà nẵng') !== -1 || r.indexOf('đà nẵng') !== -1) return 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=600&q=80';
+            if (n.indexOf('đà lạt') !== -1 || r.indexOf('đà lạt') !== -1) return 'https://images.unsplash.com/photo-1612969308146-066d55f37ccb?w=600&q=80';
+            if (n.indexOf('hội an') !== -1 || r.indexOf('hội an') !== -1) return 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&q=80';
+            if (n.indexOf('hà nội') !== -1 || r.indexOf('hà nội') !== -1) return 'https://images.unsplash.com/photo-1555639580-b60a97ec2fc3?w=600&q=80';
+            if (n.indexOf('nha trang') !== -1 || r.indexOf('nha trang') !== -1) return 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80';
+            return 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80';
+          }
+          // Restaurant/Food
+          if (k === 'nha-hang' || k === 'giai-tri' || n.indexOf('nhà hàng') !== -1 || n.indexOf('ăn') !== -1 || n.indexOf('ẩm thực') !== -1 || n.indexOf('mi cay') !== -1) {
+            if (n.indexOf('mi cay') !== -1 || n.indexOf('mì') !== -1) return 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&q=80';
+            if (n.indexOf('hải sản') !== -1 || n.indexOf('seafood') !== -1) return 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80';
+            if (n.indexOf('lẩu') !== -1 || n.indexOf('bbq') !== -1 || n.indexOf('nướng') !== -1) return 'https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=600&q=80';
+            return 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80';
+          }
+          // Car/Vehicle Rental
+          if (k === 'thue-xe' || place.businessCategory === 'rental') return 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=600&q=80';
+          // Tours — most important, richest differentiation
+          if (place.isTour || k === 'trai-nghiem' || n.indexOf('tour') !== -1) {
+            if (n.indexOf('sapa') !== -1 || n.indexOf('sa pa') !== -1) return 'https://images.unsplash.com/photo-1517821099606-cef63a9bcda6?w=600&q=80';
+            if (n.indexOf('hạ long') !== -1 || n.indexOf('ha long') !== -1) return 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=600&q=80';
+            if (n.indexOf('phú quốc') !== -1 || r.indexOf('phú quốc') !== -1) return 'https://images.unsplash.com/photo-1540202404-a2f29016b523?w=600&q=80';
+            if (n.indexOf('đà lạt') !== -1 || r.indexOf('đà lạt') !== -1) return 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&q=80';
+            if (n.indexOf('hội an') !== -1 || r.indexOf('hội an') !== -1) return 'https://images.unsplash.com/photo-1568454537842-d933259bb258?w=600&q=80';
+            if (n.indexOf('đà nẵng') !== -1 || r.indexOf('đà nẵng') !== -1) return 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=600&q=80';
+            if (n.indexOf('huế') !== -1 || r.indexOf('huế') !== -1) return 'https://images.unsplash.com/photo-1590054387835-ab72678fef01?w=600&q=80';
+            if (n.indexOf('nha trang') !== -1 || r.indexOf('nha trang') !== -1) return 'https://images.unsplash.com/photo-1506461883276-594a12b11cf3?w=600&q=80';
+            if (n.indexOf('ninh bình') !== -1 || r.indexOf('ninh bình') !== -1) return 'https://images.unsplash.com/photo-1571637539223-27c9cd20e2d5?w=600&q=80';
+            if (n.indexOf('hà giang') !== -1 || r.indexOf('hà giang') !== -1) return 'https://images.unsplash.com/photo-1570829460005-c840387bb1ca?w=600&q=80';
+            if (n.indexOf('phong nha') !== -1 || r.indexOf('quảng bình') !== -1) return 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80';
+            if (n.indexOf('côn đảo') !== -1) return 'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=600&q=80';
+            if (n.indexOf('quy nhơn') !== -1 || r.indexOf('bình định') !== -1) return 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=80';
+            if (n.indexOf('mũi né') !== -1 || n.indexOf('phan thiết') !== -1) return 'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600&q=80';
+            if (n.indexOf('cần thơ') !== -1 || r.indexOf('cần thơ') !== -1) return 'https://images.unsplash.com/photo-1571508601936-6ca847b47ae4?w=600&q=80';
+            if (n.indexOf('trekking') !== -1 || n.indexOf('leo núi') !== -1 || n.indexOf('hiking') !== -1) return 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=80';
+            if (n.indexOf('lặn') !== -1 || n.indexOf('snorkel') !== -1 || n.indexOf('biển') !== -1 || n.indexOf('đảo') !== -1) return 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=80';
+            if (n.indexOf('nghỉ dưỡng') !== -1 || n.indexOf('spa') !== -1 || n.indexOf('luxury') !== -1) return 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=600&q=80';
+            if (n.indexOf('camping') !== -1 || n.indexOf('cắm trại') !== -1) return 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=600&q=80';
+            if (n.indexOf('văn hóa') !== -1 || n.indexOf('lịch sử') !== -1 || n.indexOf('cổ') !== -1) return 'https://images.unsplash.com/photo-1568454537842-d933259bb258?w=600&q=80';
+            // Default tour fallback — generic Vietnam landscape
+            return 'https://images.unsplash.com/photo-1528127269322-539801943592?w=600&q=80';
+          }
+          // Default destination landscape
+          return 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&q=80';
+        })(p);
+
         if (!displayImg || displayImg.length < 5) displayImg = fallbackImg;
         
         var favCount = parseInt(p.favoritesCount) || 0;

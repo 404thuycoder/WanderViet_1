@@ -1598,7 +1598,7 @@
 
     } catch (e) { 
       console.error('Rankings load error:', e); 
-      const errorHTML = `<div class="rank-empty-state"><span>⚠️</span><p>Lỗi tải dữ liệu. Vui lòng thử lại.</p><p style="font-size:0.7rem;color:red;">${e.message}</p></div>`;
+      const errorHTML = `<div class="rank-empty-state"><span>⚠️</span><p>Lỗi tải dữ liệu. Vui lòng thử lại.</p></div>`;
       ['rank-active-list', 'rank-experience-list', 'rank-deposits-list', 'rank-businesses-list', 'rank-places-list'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.innerHTML = errorHTML;
@@ -1606,18 +1606,19 @@
     }
   }
 
-      // Removed loadMockCharts since it is now handled in loadDistributionChart
+  // Removed loadMockCharts since it is now handled in loadDistributionChart
 
   async function loadHealthStatus() {
     try {
       const json = await apiFetch('/api/admin/stats/health?t=' + Date.now());
       if (json.success) {
         const d = json.data;
-        document.getElementById('health-status').textContent = d.status;
-        document.getElementById('health-db').textContent = d.db;
-        document.getElementById('health-latency').textContent = d.latency;
-        document.getElementById('health-memory').textContent = d.memory;
-        document.getElementById('health-uptime').textContent = d.uptime;
+        const setH = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        setH('health-status', d.status);
+        setH('health-db', d.db);
+        setH('health-latency', d.latency);
+        setH('health-memory', d.memory);
+        setH('health-uptime', d.uptime);
       }
     } catch (e) {}
   }
@@ -1632,6 +1633,8 @@
       const normalUsers = all.filter(u => !u.isBusiness && u.role !== 'business' && !u.isAdmin && !u.isSuperAdmin);
       const today = new Date().setHours(0,0,0,0);
       const newToday = normalUsers.filter(u => new Date(u.createdAt).getTime() >= today).length;
+      const thisWeekMs = 7 * 24 * 60 * 60 * 1000;
+      const newWeek = normalUsers.filter(u => Date.now() - new Date(u.createdAt).getTime() < thisWeekMs).length;
       const online = normalUsers.filter(u => u.lastActive && (Date.now() - new Date(u.lastActive).getTime() < 3*60*1000)).length;
       const suspended = normalUsers.filter(u => u.status === 'suspended').length;
 
@@ -1641,6 +1644,9 @@
       set('u-kpi-active', online);
       set('u-kpi-suspended', suspended);
 
+      const tdelta = document.getElementById('u-kpi-total-delta');
+      if (tdelta) tdelta.textContent = `+${newWeek} tuần này`;
+
       // Rank distribution donut
       const rankCtx = document.getElementById('userRankChart')?.getContext('2d');
       if (rankCtx) {
@@ -1648,35 +1654,166 @@
         normalUsers.forEach(u => { const r = u.rank || 'Đồng'; rankMap[r] = (rankMap[r] || 0) + 1; });
         const rLabels = Object.keys(rankMap);
         const rData = rLabels.map(r => rankMap[r]);
-        const rColors = ['#CD7F32','#C0C0C0','#FFD700','#38bdf8','#6366f1','#10b981'];
+        const rColors = ['#CD7F32','#C0C0C0','#FFD700','#818cf8','#6366f1','#10b981'];
         if (userRankChartInstance) userRankChartInstance.destroy();
         userRankChartInstance = WanderChartFactory.donut(rankCtx, rLabels, rData, rColors);
         const legend = document.getElementById('user-rank-legend');
         if (legend) legend.innerHTML = rLabels.map((l,i) => `<span style="font-size:0.72rem;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:${rColors[i%rColors.length]};display:inline-block;"></span>${l}: ${rankMap[l]}</span>`).join('');
       }
 
-      // Growth chart
-      const p = document.querySelector('.chart-period-select[data-chart="users"]')?.value || 'hour';
-      loadUsers(false, 'line', p).catch(e => {});
+      // ── Growth chart: use real trend data ──
+      const p = document.querySelector('.chart-period-select[data-chart="users"]')?.value || 'week';
+      try {
+        const trendRes = await apiFetch(`/api/admin/stats/trend?period=${p}`);
+        if (trendRes.success && trendRes.data) {
+          const ctx = document.getElementById('userManagerChart')?.getContext('2d');
+          if (ctx) {
+            const labels = trendRes.data.map(d => {
+              const parts = d.label.split('-');
+              if (p === 'hour') {
+                const hp = d.label.split(':'); return (hp[1]||hp[0]) + ':00';
+              }
+              return parts.length >= 3 ? `${parts[2]}/${parts[1]}` : d.label;
+            });
+            const userData = trendRes.data.map(d => d.users || 0);
+            if (userManagerChart) userManagerChart.destroy();
+            const grad = ctx.createLinearGradient(0, 0, 0, 260);
+            grad.addColorStop(0, 'rgba(99,102,241,0.35)');
+            grad.addColorStop(1, 'rgba(99,102,241,0.02)');
+            userManagerChart = WanderChartFactory.line(ctx, labels, [{
+              label: 'Người dùng mới',
+              data: userData,
+              borderColor: '#6366f1',
+              backgroundColor: grad,
+              tension: 0.4, borderWidth: 3,
+              pointRadius: 3, pointHoverRadius: 7,
+              pointBackgroundColor: '#6366f1',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              fill: true
+            }]);
+          }
+        }
+      } catch(e) { console.warn('User trend chart error:', e); }
 
-      // Top users list
-      const rankingRes = await apiFetch('/api/admin/stats/rankings?period=alltime&t=' + Date.now());
+      // ── Top users: sort real users by points ──
       const topList = document.getElementById('u-top-users-list');
-      if (topList && rankingRes.success) {
-        const top = (rankingRes.data?.topItineraries || []).slice(0, 8);
-        if (!top.length) { topList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--admin-text-muted);">Chưa có dữ liệu</div>'; }
-        else topList.innerHTML = top.map((u, i) => `
-          <div class="an-rank-item">
-            <span class="an-rank-num">${i < 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}</span>
-            <img class="an-rank-avatar" src="${u.avatar||''}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(u.displayName||'U')}&background=random&color=fff'">
-            <div class="an-rank-info">
-              <div class="an-rank-name">${u.displayName||u.name||'Người dùng'}</div>
-              <div class="an-rank-sub">${u.email||''}</div>
-            </div>
-            <span class="an-rank-val">${u.count||0} lịch trình</span>
-          </div>`).join('');
+      if (topList) {
+        const topUsers = [...normalUsers].sort((a,b) => (b.points||0) - (a.points||0)).slice(0, 8);
+        if (!topUsers.length) {
+          topList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--admin-text-muted);">Chưa có người dùng nào.</div>';
+        } else {
+          topList.innerHTML = topUsers.map((u, i) => {
+            const name = u.displayName || u.name || 'Người dùng';
+            const pts  = (u.points || 0).toLocaleString();
+            const rank = u.rank || 'Đồng';
+            const rankColors = {'Huyền Thoại':'#a855f7','Kim Cương':'#818cf8','Bạch Kim':'#e2e8f0','Vàng':'#FFD700','Bạc':'#C0C0C0','Đồng':'#CD7F32'};
+            const rColor = rankColors[rank] || '#94a3b8';
+            return `
+            <div class="an-rank-item" style="cursor:pointer; transition: background 0.18s;"
+              onclick="window.WanderUI&&window.WanderUI.openUserActivity('${u.email||''}','${name.replace(/'/g,'')}','${u.avatar||''}')"
+              onmouseenter="this.style.background='rgba(255,255,255,0.06)'"
+              onmouseleave="this.style.background=''">
+              <span class="an-rank-num">${i < 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}</span>
+              <img class="an-rank-avatar" src="${u.avatar||''}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6366f1&color=fff'">
+              <div class="an-rank-info">
+                <div class="an-rank-name">${name}</div>
+                <div class="an-rank-sub">${u.email||''}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.75rem;">
+                <div style="text-align:right;">
+                  <div style="font-size:0.78rem;font-weight:700;color:#a5b4fc;">${pts} XP</div>
+                  <div style="font-size:0.65rem;font-weight:700;color:${rColor};">${rank}</div>
+                </div>
+                <span style="font-size:0.68rem;color:var(--admin-text-muted);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:2px 8px;">📋 Xem</span>
+              </div>
+            </div>`;
+          }).join('');
+        }
       }
+
+      // Store and render user directory table
+      window.WanderAdminNormalUsers = normalUsers;
+      renderUserTable(normalUsers);
+      setupUserTableFilters(normalUsers);
+
     } catch(e) { console.warn('loadUserAnalytics error:', e); }
+  }
+
+  // --- User Directory Table ---
+  function renderUserTable(users, searchQ = '', statusFilter = 'all', rankFilter = 'all', page = 1) {
+    const pageSize = 10;
+    let filtered = users;
+    if (searchQ) {
+      const q = searchQ.toLowerCase();
+      filtered = filtered.filter(u => (u.displayName||u.name||'').toLowerCase().includes(q) || (u.email||'').toLowerCase().includes(q));
+    }
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(u => (statusFilter === 'suspended') ? u.status === 'suspended' : u.status !== 'suspended');
+    }
+    if (rankFilter !== 'all') {
+      filtered = filtered.filter(u => (u.rank||'Đồng') === rankFilter);
+    }
+    const totalCount = filtered.length;
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const start = (page - 1) * pageSize;
+    const paginated = filtered.slice(start, start + pageSize);
+    const tbody = document.getElementById('user-dir-tbody');
+    const showing = document.getElementById('user-dir-showing');
+    const prevBtn = document.getElementById('user-dir-prev');
+    const nextBtn = document.getElementById('user-dir-next');
+    if (!tbody) return;
+    if (!paginated.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--admin-text-muted);">Không tìm thấy người dùng phù hợp.</td></tr>`;
+    } else {
+      tbody.innerHTML = paginated.map(u => {
+        const name = u.displayName || u.name || 'Người dùng';
+        const email = u.email || '—';
+        const rank = u.rank || 'Đồng';
+        const status = u.status || 'active';
+        const createdAt = u.createdAt ? new Date(u.createdAt).toLocaleDateString('vi-VN') : '—';
+        const rankColors = {'Huyền Thoại':'#a855f7','Kim Cương':'#818cf8','Bạch Kim':'#e2e8f0','Vàng':'#FFD700','Bạc':'#C0C0C0','Đồng':'#CD7F32'};
+        const rankColor = rankColors[rank] || '#94a3b8';
+        const statusBadge = status === 'suspended'
+          ? `<span class="status-badge status-badge--suspended">Bị khóa</span>`
+          : `<span class="status-badge status-badge--active">Hoạt động</span>`;
+        return `<tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <img src="${u.avatar || ''}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=32'">
+              <div><div style="font-weight:600;font-size:0.82rem;color:#f1f5f9;">${name}</div><div style="font-size:0.7rem;color:var(--admin-text-muted);">${email}</div></div>
+            </div>
+          </td>
+          <td style="text-align:center;"><span style="font-size:0.78rem;font-weight:700;color:${rankColor};">${rank}</span></td>
+          <td style="text-align:center;font-size:0.78rem;color:var(--admin-text-muted);">${createdAt}</td>
+          <td style="text-align:center;">${statusBadge}</td>
+          <td style="text-align:center;">
+            <button class="btn btn--small btn--ghost" style="padding:4px 8px;font-size:0.72rem;min-height:auto;" onclick="window.WanderUI&&window.WanderUI.openUserActivity('${email}','${name.replace(/'/g,'')}','${u.avatar||''}')">
+              📋 Xem
+            </button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+    if (showing) showing.textContent = `Hiển thị ${totalCount ? start+1 : 0} - ${Math.min(start+pageSize, totalCount)} của ${totalCount} người dùng`;
+    if (prevBtn) { prevBtn.disabled = page <= 1; prevBtn.onclick = () => renderUserTable(users, searchQ, statusFilter, rankFilter, page-1); }
+    if (nextBtn) { nextBtn.disabled = page >= totalPages; nextBtn.onclick = () => renderUserTable(users, searchQ, statusFilter, rankFilter, page+1); }
+  }
+
+  function setupUserTableFilters(users) {
+    let timer;
+    const searchEl = document.getElementById('user-dir-search');
+    const statusEl = document.getElementById('user-dir-status-filter');
+    const rankEl = document.getElementById('user-dir-rank-filter');
+    const refresh = () => {
+      const q = searchEl?.value?.trim() || '';
+      const s = statusEl?.value || 'all';
+      const r = rankEl?.value || 'all';
+      renderUserTable(users, q, s, r, 1);
+    };
+    if (searchEl) { searchEl.oninput = () => { clearTimeout(timer); timer = setTimeout(refresh, 280); }; }
+    if (statusEl) statusEl.onchange = refresh;
+    if (rankEl) rankEl.onchange = refresh;
   }
 
   // --- Separate Business Analytics (Doanh nghiệp) ---
@@ -1714,42 +1851,68 @@
         if (legend) legend.innerHTML = lData.map(([l,c,v]) => `<span style="font-size:0.72rem;display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;border-radius:50%;background:${c};display:inline-block;"></span>${l}: ${v}</span>`).join('');
       }
 
-      // Growth chart (biz users over time using activityChart API)
+      // ── Growth chart (biz): use selectable period ──
       const growCtx = document.getElementById('bizGrowthChart')?.getContext('2d');
       if (growCtx) {
-        const trendRes = await apiFetch('/api/admin/stats/trend?period=week');
+        const bizPeriod = document.querySelector('.chart-period-select[data-chart="businesses"]')?.value || 'week';
+        const trendRes = await apiFetch(`/api/admin/stats/trend?period=${bizPeriod}`);
         if (trendRes.success && trendRes.data) {
-          const labels = trendRes.data.map(d => { const p = d.label.split('-'); return p.length >= 3 ? `${p[2]}/${p[1]}` : d.label; });
+          const labels = trendRes.data.map(d => {
+            const parts = d.label.split('-');
+            if (bizPeriod === 'hour') { const hp = d.label.split(':'); return (hp[1]||hp[0]) + ':00'; }
+            return parts.length >= 3 ? `${parts[2]}/${parts[1]}` : d.label;
+          });
           const data = trendRes.data.map(d => d.businesses || 0);
           if (bizGrowthChartInstance) bizGrowthChartInstance.destroy();
           const grad = growCtx.createLinearGradient(0, 0, 0, 300);
-          grad.addColorStop(0, 'rgba(16,185,129,0.3)');
-          grad.addColorStop(1, 'rgba(16,185,129,0.0)');
+          grad.addColorStop(0, 'rgba(16,185,129,0.35)');
+          grad.addColorStop(1, 'rgba(16,185,129,0.02)');
           bizGrowthChartInstance = WanderChartFactory.line(growCtx, labels, [{
             label: 'Doanh nghiệp mới', data, borderColor: '#10b981',
             backgroundColor: grad, tension: 0.4, borderWidth: 3,
-            pointRadius: 0, pointHoverRadius: 6, fill: true
+            pointRadius: 3, pointHoverRadius: 7,
+            pointBackgroundColor: '#10b981',
+            pointBorderColor: '#fff', pointBorderWidth: 2,
+            fill: true
           }]);
         }
       }
 
-      // Top businesses
-      const rankRes = await apiFetch('/api/admin/stats/rankings?period=alltime&t=' + Date.now());
-      const topList = document.getElementById('b-top-biz-list');
-      if (topList && rankRes.success) {
-        const top = (rankRes.data?.topBusinesses || []).slice(0, 8);
-        if (!top.length) { topList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--admin-text-muted);">Chưa có dữ liệu</div>'; }
-        else topList.innerHTML = top.map((b, i) => `
-          <div class="an-rank-item">
-            <span class="an-rank-num">${i < 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}</span>
-            <img class="an-rank-avatar" src="${b.avatar||b.image||''}" style="border-radius:8px;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(b.name||'B')}&background=random&color=fff'">
-            <div class="an-rank-info">
-              <div class="an-rank-name">${b.name||b.displayName||'Doanh nghiệp'}</div>
-              <div class="an-rank-sub">${b.email||b.region||''}</div>
-            </div>
-            <span class="an-rank-val" style="color:#10b981;">${(b.score||0).toLocaleString()} XP</span>
-          </div>`).join('');
+      // ── Top businesses: sort by points from real data ──
+      const topBizList = document.getElementById('b-top-biz-list');
+      if (topBizList) {
+        const topBiz = [...bizUsers].sort((a,b) => (b.points||0) - (a.points||0)).slice(0, 8);
+        if (!topBiz.length) {
+          topBizList.innerHTML = '<div style="text-align:center;padding:1.5rem;color:var(--admin-text-muted);">Chưa có doanh nghiệp nào.</div>';
+        } else {
+          topBizList.innerHTML = topBiz.map((b, i) => {
+            const bname = b.businessName || b.displayName || b.name || 'Doanh nghiệp';
+            const pts = (b.points || 0).toLocaleString();
+            const isVerified = b.isVerified;
+            return `
+            <div class="an-rank-item" style="cursor:pointer; transition: background 0.18s;"
+              onclick="window.WanderAdminBizUsers&&showBizDetail(window.WanderAdminBizUsers.find(x=>x._id==='${b._id}'))"
+              onmouseenter="this.style.background='rgba(255,255,255,0.06)'"
+              onmouseleave="this.style.background=''">
+              <span class="an-rank-num">${i < 3 ? ['🥇','🥈','🥉'][i] : '#'+(i+1)}</span>
+              <img class="an-rank-avatar" src="${b.avatar||b.image||''}" style="border-radius:8px;"
+                onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(bname)}&background=10b981&color=fff'">
+              <div class="an-rank-info">
+                <div class="an-rank-name">${bname} ${isVerified ? '<span style="color:#818cf8;font-size:0.65rem;">✔ Đã XM</span>' : ''}</div>
+                <div class="an-rank-sub">${b.email||b.category||''}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:0.75rem;">
+                <div style="text-align:right;">
+                  <div style="font-size:0.78rem;font-weight:700;color:#6ee7b7;">${pts} XP</div>
+                  <div style="font-size:0.65rem;color:var(--admin-text-muted);">${b.category||'Đối tác'}</div>
+                </div>
+                <span style="font-size:0.68rem;color:var(--admin-text-muted);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:2px 8px;">👁️ Xem</span>
+              </div>
+            </div>`;
+          }).join('');
+        }
       }
+
 
       // ── Industry category breakdown (progress bars) ──
       const catMap = { 'Lưu trú': 0, 'Ẩm thực': 0, 'Giải trí': 0, 'Vận chuyển': 0, 'General': 0 };
@@ -1777,11 +1940,184 @@
       });
 
       // ── Interactive Partner Directory Table ──
+      window.WanderAdminBizUsers = bizUsers;
       renderBizDirectoryTable(bizUsers);
       setupBizDirectoryFilters(bizUsers);
 
     } catch(e) { console.warn('loadBusinessAnalytics error:', e); }
   }
+
+  // --- Show business details drawer ---
+  async function showBizDetail(id) {
+    try {
+      const bizUsers = window.WanderAdminBizUsers || [];
+      let target = bizUsers.find(u => (u._id || u.id) === id);
+      
+      if (!target) {
+        // Fallback: fetch user details
+        const res = await apiFetch(`/api/admin/users/${id}?t=` + Date.now());
+        if (res.success) target = res.data;
+      }
+      
+      if (!target) {
+        return window.WanderToast ? window.WanderToast.error("Không tìm thấy thông tin doanh nghiệp này") : alert("Không tìm thấy thông tin doanh nghiệp");
+      }
+      
+      const name = target.displayName || target.name || target.businessName || 'Doanh nghiệp';
+      const email = target.email || '—';
+      const phone = target.phone || target.phoneNumber || '—';
+      const address = target.region || target.address || '—';
+      const website = target.website || '—';
+      const cat = target.businessCategory || target.category || 'General';
+      const followers = (target.followersCount || target.followers || 0).toLocaleString();
+      const xp = (target.score || target.xp || target.points || 0).toLocaleString();
+      
+      // Update DOM inside Drawer
+      const avatarEl = document.getElementById('bd-avatar');
+      if (avatarEl) avatarEl.src = target.avatar || target.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=80`;
+      
+      const nameEl = document.getElementById('bd-name');
+      if (nameEl) nameEl.textContent = name;
+      
+      const catBadge = document.getElementById('bd-category-badge');
+      if (catBadge) {
+        catBadge.textContent = cat;
+        let catClass = 'general';
+        const catLow = cat.toLowerCase();
+        if (catLow.includes('trú') || catLow.includes('hotel') || catLow.includes('accommodation')) catClass = 'accommodation';
+        else if (catLow.includes('thực') || catLow.includes('dining')) catClass = 'dining';
+        else if (catLow.includes('trí') || catLow.includes('entertainment')) catClass = 'entertainment';
+        else if (catLow.includes('chuyển') || catLow.includes('transport')) catClass = 'transport';
+        catBadge.className = `biz-badge ${catClass}`;
+      }
+      
+      const statusBadgeEl = document.getElementById('bd-status-badge');
+      if (statusBadgeEl) {
+        const isApp = target.status === 'active' || target.bizStatus === 'approved';
+        const isPend = target.status === 'pending' || target.bizStatus === 'pending';
+        if (isApp) statusBadgeEl.innerHTML = `<span class="status-badge status-badge--active">Hoạt động</span>`;
+        else if (isPend) statusBadgeEl.innerHTML = `<span class="status-badge status-badge--pending">Chờ duyệt</span>`;
+        else statusBadgeEl.innerHTML = `<span class="status-badge status-badge--suspended">Bị khóa</span>`;
+      }
+      
+      const verifiedBadgeEl = document.getElementById('bd-verified-badge');
+      if (verifiedBadgeEl) {
+        const isVer = target.isVerified || target.verified;
+        verifiedBadgeEl.innerHTML = isVer
+          ? `<span class="status-badge status-badge--active" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3);">🛡️ Đã xác minh</span>`
+          : `<span class="status-badge" style="background:rgba(255,255,255,0.05); color:var(--admin-text-muted); border:1px solid rgba(255,255,255,0.1);">Chưa xác minh</span>`;
+      }
+      
+      const emailEl = document.getElementById('bd-email');
+      if (emailEl) emailEl.textContent = email;
+      
+      const phoneEl = document.getElementById('bd-phone');
+      if (phoneEl) phoneEl.textContent = phone;
+      
+      const addrEl = document.getElementById('bd-address');
+      if (addrEl) addrEl.textContent = address;
+      
+      const wsEl = document.getElementById('bd-website');
+      if (wsEl) {
+        if (website !== '—') {
+          wsEl.innerHTML = `<a href="${website.startsWith('http') ? website : 'https://' + website}" target="_blank" style="color:var(--admin-primary); text-decoration:none;">${website} <i class="fas fa-external-link-alt" style="font-size:0.75rem; margin-left:4px;"></i></a>`;
+        } else {
+          wsEl.textContent = '—';
+        }
+      }
+      
+      const follEl = document.getElementById('bd-followers');
+      if (follEl) follEl.textContent = followers;
+      
+      const xpEl = document.getElementById('bd-xp');
+      if (xpEl) xpEl.textContent = xp;
+      
+      // Wire up buttons
+      const btnVerify = document.getElementById('btn-toggle-biz-verification');
+      if (btnVerify) {
+        const isVer = target.isVerified || target.verified;
+        btnVerify.innerHTML = isVer ? `<span>❌ HỦY XÁC MINH</span>` : `<span>🛡️ XÁC MINH DOANH NGHIỆP</span>`;
+        btnVerify.className = isVer ? 'btn btn--small btn--ghost' : 'btn btn--small btn--primary';
+        btnVerify.onclick = async () => {
+          try {
+            const res = await apiFetch(`/api/admin/users/${target._id || target.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ isVerified: !isVer })
+            });
+            if (res.success) {
+              if (window.WanderToast) window.WanderToast.success("Cập nhật xác minh thành công");
+              else alert("Cập nhật xác minh thành công");
+              
+              // update local target
+              target.isVerified = !isVer;
+              verifiedBadgeEl.innerHTML = !isVer
+                ? `<span class="status-badge status-badge--active" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3);">🛡️ Đã xác minh</span>`
+                : `<span class="status-badge" style="background:rgba(255,255,255,0.05); color:var(--admin-text-muted); border:1px solid rgba(255,255,255,0.1);">Chưa xác minh</span>`;
+              btnVerify.innerHTML = !isVer ? `<span>❌ HỦY XÁC MINH</span>` : `<span>🛡️ XÁC MINH DOANH NGHIỆP</span>`;
+              btnVerify.className = !isVer ? 'btn btn--small btn--ghost' : 'btn btn--small btn--primary';
+              
+              // reload directories
+              loadBusinessAnalytics();
+            }
+          } catch(e) {
+            console.error(e);
+          }
+        };
+      }
+      
+      const btnStatus = document.getElementById('btn-toggle-biz-status');
+      if (btnStatus) {
+        const isSusp = target.status === 'suspended';
+        btnStatus.innerHTML = isSusp ? `<span>🔓 MỞ KHÓA TÀI KHOẢN</span>` : `<span>🔒 KHÓA TÀI KHOẢN</span>`;
+        btnStatus.className = isSusp ? 'btn btn--small btn--primary' : 'btn btn--small btn--ghost';
+        btnStatus.style.color = isSusp ? '' : '#ef4444';
+        btnStatus.style.borderColor = isSusp ? '' : 'rgba(239,68,68,0.3)';
+        btnStatus.onclick = async () => {
+          try {
+            const nextStatus = isSusp ? 'active' : 'suspended';
+            const res = await apiFetch(`/api/admin/users/${target._id || target.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: nextStatus })
+            });
+            if (res.success) {
+              if (window.WanderToast) window.WanderToast.success(isSusp ? "Mở khóa tài khoản thành công" : "Khóa tài khoản thành công");
+              else alert("Cập nhật trạng thái thành công");
+              
+              // update local target
+              target.status = nextStatus;
+              if (statusBadgeEl) {
+                if (nextStatus === 'active') statusBadgeEl.innerHTML = `<span class="status-badge status-badge--active">Hoạt động</span>`;
+                else statusBadgeEl.innerHTML = `<span class="status-badge status-badge--suspended">Bị khóa</span>`;
+              }
+              const isNowSusp = nextStatus === 'suspended';
+              btnStatus.innerHTML = isNowSusp ? `<span>🔓 MỞ KHÓA TÀI KHOẢN</span>` : `<span>🔒 KHÓA TÀI KHOẢN</span>`;
+              btnStatus.className = isNowSusp ? 'btn btn--small btn--primary' : 'btn btn--small btn--ghost';
+              btnStatus.style.color = isNowSusp ? '' : '#ef4444';
+              btnStatus.style.borderColor = isNowSusp ? '' : 'rgba(239,68,68,0.3)';
+              
+              // reload directories
+              loadBusinessAnalytics();
+            }
+          } catch(e) {
+            console.error(e);
+          }
+        };
+      }
+      
+      if (window.WanderUI && window.WanderUI.openDrawer) {
+        window.WanderUI.openDrawer('biz-detail-drawer');
+      } else {
+        const d = document.getElementById('biz-detail-drawer');
+        if (d) { d.hidden = false; d.classList.add('is-open'); }
+      }
+      
+    } catch(e) {
+      console.warn(e);
+    }
+  }
+  window.showBizDetail = showBizDetail;
 
   // ── Partner Directory: render table rows ──
   function renderBizDirectoryTable(bizUsers, searchQ = '', catFilter = 'all', statusFilter = 'all', page = 1) {
@@ -1829,7 +2165,7 @@
     if (!tbody) return;
 
     if (!paginated.length) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 2rem; color: var(--admin-text-muted);">Không tìm thấy đối tác nào phù hợp.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 2rem; color: var(--admin-text-muted);">Không tìm thấy đối tác nào phù hợp.</td></tr>`;
     } else {
       tbody.innerHTML = paginated.map(biz => {
         const name = biz.displayName || biz.name || biz.businessName || 'Doanh nghiệp';
@@ -1875,6 +2211,11 @@
           <td style="text-align:right; font-size:0.8rem; font-weight:600; color:#a78bfa;">${xp}</td>
           <td style="text-align:center;">${verifiedBadge}</td>
           <td style="text-align:center;">${statusBadge}</td>
+          <td style="text-align:center;">
+            <button class="btn btn--small btn--ghost" style="padding: 4px 8px; font-size:0.72rem; min-height:auto; display:inline-flex; align-items:center; gap:4px;" onclick="showBizDetail('${biz._id || biz.id}')">
+              <span>👁️ Xem</span>
+            </button>
+          </td>
         </tr>`;
       }).join('');
     }
@@ -2002,7 +2343,7 @@
       const tier = u.rankTier || 'I';
       const rankBadge = `<div class="rank-info-cell" style="display:flex; flex-direction:column; gap:2px">
         <div style="font-weight:700; font-size:0.85rem; color:#f1f5f9">${rank} ${tier}</div>
-        <div style="font-size:0.7rem; color:#0ea5e9; font-family:monospace">${xp} XP</div>
+        <div style="font-size:0.7rem; color:#06b6d4; font-family:monospace">${xp} XP</div>
       </div>`;
       
       tr.innerHTML = `
@@ -2030,7 +2371,7 @@
             <button class="btn-detail-toggle" data-toggle-user="${u._id}">Chi tiết</button>
             ${canEdit ? `<button class="btn-icon" data-edit-user="${u._id}" title="Sửa thông tin">✏️</button>` : ''}
             ${(currentAdmin.role === 'superadmin' && u.role === 'admin') ? `
-              <button class="btn-icon" style="background:rgba(14,165,233,0.15); color:#0ea5e9; border:1px solid rgba(14,165,233,0.3);" 
+              <button class="btn-icon" style="background:rgba(99,102,241,0.15); color:#06b6d4; border:1px solid rgba(99,102,241,0.3);" 
                       data-edit-perms="${u._id}" 
                       data-perms="${(u.permissions || []).join(',')}"
                       title="Chỉnh sửa quyền hạn">🔑</button>
@@ -2116,7 +2457,7 @@
                 <button class="btn btn--small" 
                         data-contact-user="${u._id}"
                         data-user-name="${(u.displayName || u.name || '').replace(/"/g, "&quot;")}"
-                        style="margin-top:0.5rem; width:100%; max-width:220px; display:flex; justify-content:center; align-items:center; gap:0.5rem; background:rgba(56,189,248,0.1); color:#38bdf8; border:1px solid rgba(56,189,248,0.2)">
+                        style="margin-top:0.5rem; width:100%; max-width:220px; display:flex; justify-content:center; align-items:center; gap:0.5rem; background:rgba(56,189,248,0.1); color:#818cf8; border:1px solid rgba(56,189,248,0.2)">
                   💬 Liên hệ trực tiếp
                 </button>
                 <button class="btn btn--small" 
@@ -2469,27 +2810,109 @@
   }
 
   let placeManagerChart = null;
-  function updatePlaceManagerDashboard(places, chartType = 'doughnut') {
-    const dashboard = document.getElementById('place-manager-dashboard');
-    if (!dashboard) return;
-    dashboard.style.display = 'block';
+  let placeCategoryChartInstance = null;
+  async function updatePlaceManagerDashboard(places, chartType = 'line') {
+    // ── KPI Cards ──
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    const total   = places.length;
+    const active  = places.filter(p => p.status === 'active'  || p.status === 'approved' || !p.status).length;
+    const pending = places.filter(p => p.status === 'pending').length;
+    const partner = places.filter(p => p.partnerId || p.businessId || p.createdByBusiness).length;
+    set('pm-total-places',   total);
+    set('pm-active-places',  active);
+    set('pm-pending-places', pending);
+    set('pm-partner-places', partner);
+    const deltaEl = document.getElementById('pm-total-delta');
+    if (deltaEl) deltaEl.textContent = `${active} hoạt động · ${pending} chờ duyệt`;
 
-    const placesCount = places.filter(p => p.kind === 'diem-du-lich').length;
-    const servicesCount = places.length - placesCount;
-    const ctx = document.getElementById('placeManagerChart')?.getContext('2d');
-    if (ctx) {
-      const isDonut = chartType === 'doughnut';
-      const isArea = chartType === 'area';
-      const finalChartType = isArea ? 'line' : (isDonut ? 'doughnut' : (chartType || 'bar'));
+    // ── Growth Line Chart (trend API) ──
+    const growCtx = document.getElementById('placeManagerChart')?.getContext('2d');
+    if (growCtx) {
+      try {
+        const period = document.querySelector('.chart-period-select[data-chart="places"]')?.value || 'week';
+        const trendRes = await apiFetch(`/api/admin/stats/trend?period=${period}`);
+        if (trendRes.success && trendRes.data) {
+          const labels = trendRes.data.map(d => {
+            const parts = d.label.split('-');
+            if (period === 'hour') { const hp = d.label.split(':'); return (hp[1]||hp[0]) + ':00'; }
+            return parts.length >= 3 ? `${parts[2]}/${parts[1]}` : d.label;
+          });
+          const pData = trendRes.data.map(d => d.places || 0);
+          if (placeManagerChart) placeManagerChart.destroy();
+          const grad = growCtx.createLinearGradient(0, 0, 0, 250);
+          grad.addColorStop(0, 'rgba(16,185,129,0.35)');
+          grad.addColorStop(1, 'rgba(16,185,129,0.02)');
+          placeManagerChart = WanderChartFactory.line(growCtx, labels, [{
+            label: 'Địa điểm mới', data: pData, borderColor: '#10b981',
+            backgroundColor: grad, tension: 0.4, borderWidth: 3,
+            pointRadius: 3, pointHoverRadius: 7,
+            pointBackgroundColor: '#10b981', pointBorderColor: '#fff', pointBorderWidth: 2,
+            fill: true
+          }]);
+        }
+      } catch(e) { console.warn('Places trend error:', e); }
+    }
 
-      if (placeManagerChart) placeManagerChart.destroy();
-      if (isDonut) {
-        placeManagerChart = WanderChartFactory.donut(ctx, ['Địa điểm', 'Dịch vụ'], [placesCount, servicesCount], ['#6366f1', '#10b981']);
+    // ── Category Donut ──
+    const catCtx = document.getElementById('placeCategoryChart')?.getContext('2d');
+    if (catCtx) {
+      const catMap = {};
+      places.forEach(p => {
+        const cat = p.kind || p.type || p.category || 'Khác';
+        const label = cat === 'diem-du-lich' ? 'Du lịch' :
+                      cat === 'dich-vu'       ? 'Dịch vụ' :
+                      cat === 'restaurant'    ? 'Ẩm thực' :
+                      cat === 'hotel'         ? 'Lưu trú' : 'Khác';
+        catMap[label] = (catMap[label] || 0) + 1;
+      });
+      const catLabels = Object.keys(catMap);
+      const catData   = catLabels.map(l => catMap[l]);
+      const catColors = ['#6366f1','#10b981','#f59e0b','#818cf8','#a855f7'];
+      if (placeCategoryChartInstance) placeCategoryChartInstance.destroy();
+      placeCategoryChartInstance = WanderChartFactory.donut(catCtx, catLabels, catData, catColors);
+      const legend = document.getElementById('place-cat-legend');
+      if (legend) legend.innerHTML = catLabels.map((l, i) =>
+        `<span style="font-size:0.7rem;display:flex;align-items:center;gap:4px;">
+          <span style="width:9px;height:9px;border-radius:50%;background:${catColors[i%catColors.length]};display:inline-block;"></span>${l}: ${catMap[l]}
+        </span>`).join('');
+    }
+
+    // ── Top Places Card Grid ──
+    const topListEl = document.getElementById('place-top-list');
+    if (topListEl) {
+      const sorted = [...places].sort((a, b) => (b.favoritesCount||b.likes||0) - (a.favoritesCount||a.likes||0)).slice(0, 9);
+      if (!sorted.length) {
+        topListEl.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--admin-text-muted);grid-column:1/-1;">Chưa có dữ liệu địa điểm.</div>';
       } else {
-        placeManagerChart = WanderChartFactory.bar(ctx, ['Địa điểm', 'Dịch vụ'], [placesCount, servicesCount], ['#6366f1', '#10b981']);
+        topListEl.innerHTML = sorted.map(p => {
+          const img = p.image || p.thumbnail || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=70';
+          const favs = (p.favoritesCount || p.likes || 0).toLocaleString();
+          const region = p.region || p.province || 'Việt Nam';
+          const status = p.status || 'active';
+          const statusColor = status === 'pending' ? '#f59e0b' : status === 'inactive' ? '#ef4444' : '#10b981';
+          const statusLabel = status === 'pending' ? 'Chờ duyệt' : status === 'inactive' ? 'Tạm ẩn' : 'Hoạt động';
+          return `
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;"
+               onmouseenter="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.3)'"
+               onmouseleave="this.style.transform='';this.style.boxShadow=''">
+            <div style="height:110px;overflow:hidden;position:relative;">
+              <img src="${img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=70'">
+              <div style="position:absolute;top:8px;right:8px;background:${statusColor}22;border:1px solid ${statusColor};color:${statusColor};font-size:0.6rem;font-weight:700;padding:2px 7px;border-radius:20px;">${statusLabel}</div>
+            </div>
+            <div style="padding:0.75rem;">
+              <div style="font-size:0.82rem;font-weight:700;color:#f1f5f9;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name||'Địa điểm'}</div>
+              <div style="font-size:0.68rem;color:var(--admin-text-muted);">📍 ${region}</div>
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem;">
+                <span style="font-size:0.72rem;color:#fbbf24;">❤️ ${favs}</span>
+                ${p.rating ? `<span style="font-size:0.72rem;color:#f59e0b;">⭐ ${p.rating}</span>` : ''}
+              </div>
+            </div>
+          </div>`;
+        }).join('');
       }
     }
   }
+
 
   function renderPlaces(places) {
     placesTbody.innerHTML = '';
@@ -2602,7 +3025,7 @@
       placeForm.elements['overview'].value = place.overview || '';
       placeForm.elements['experience'].value = place.experience || '';
       placeForm.elements['highlights'].value = (place.highlights || []).join(', ');
-      placeForm.elements['themeColor'].value = place.themeColor || '#3b82f6';
+      placeForm.elements['themeColor'].value = place.themeColor || '#6366f1';
       placeForm.elements['priceFrom'].value = place.priceFrom || '';
       placeForm.elements['priceTo'].value = place.priceTo || '';
       placeForm.elements['openTime'].value = place.openTime || '';
@@ -2887,7 +3310,7 @@
         <tr>
           <td>
             <div style="font-family:monospace; color:var(--admin-primary); font-weight:700;">ID: ${truncateId(s._id)}</div>
-            <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">URL: <a href="${s.media?.url}" target="_blank" style="color:#38bdf8">Xem media</a></div>
+            <div style="font-size:0.75rem; color:#64748b; margin-top:2px;">URL: <a href="${s.media?.url}" target="_blank" style="color:#818cf8">Xem media</a></div>
           </td>
           <td>
             <div style="display:flex; align-items:center; gap:8px;">
@@ -2967,7 +3390,7 @@
       const date = new Date(b.createdAt).toLocaleString('vi-VN');
       const statusColors = {
         'pending': { bg: 'rgba(245,158,11,0.1)', text: '#f59e0b' },
-        'confirmed': { bg: 'rgba(56,189,248,0.1)', text: '#38bdf8' },
+        'confirmed': { bg: 'rgba(56,189,248,0.1)', text: '#818cf8' },
         'completed': { bg: 'rgba(16,185,129,0.1)', text: '#10b981' },
         'cancelled': { bg: 'rgba(239,68,68,0.1)', text: '#ef4444' }
       };
@@ -3429,26 +3852,146 @@
   const logsTbody = document.getElementById('logs-tbody');
   const miniLogsContainer = document.getElementById('admin-mini-logs');
   let logsData = [];
+  let logDetailPage = 1;
+  const LOG_PAGE_SIZE = 20;
 
-  async function loadLogs(filter = 'all', chartType = 'line', period = 'day') {
+  // Helper: action → badge color
+  function getLogActionColor(action = '') {
+    if (action.includes('DELETE') || action.includes('BAN') || action.includes('SUSPEND')) return '#ef4444';
+    if (action.includes('CREATE') || action.includes('REGISTER') || action.includes('ADD'))  return '#10b981';
+    if (action.includes('UPDATE') || action.includes('EDIT') || action.includes('VERIFY'))   return '#f59e0b';
+    if (action.includes('LOGIN') || action.includes('ACCESS'))  return '#818cf8';
+    if (action.includes('ADMIN') || action.includes('ROLE'))    return '#a855f7';
+    return '#6366f1';
+  }
+
+  function getLogIcon(action = '') {
+    if (action.includes('DELETE') || action.includes('BAN'))    return '🗑️';
+    if (action.includes('CREATE') || action.includes('REGISTER')) return '✨';
+    if (action.includes('UPDATE') || action.includes('EDIT'))   return '🔄';
+    if (action.includes('LOGIN'))  return '🔑';
+    if (action.includes('VERIFY')) return '✅';
+    if (action.includes('ADMIN'))  return '🛡️';
+    return '📝';
+  }
+
+  function renderLogDetailTable(logs, page = 1, searchQ = '', roleFilter = 'all') {
+    const tbody = document.getElementById('log-detail-tbody');
+    const showEl  = document.getElementById('log-showing');
+    const prevBtn  = document.getElementById('log-prev');
+    const nextBtn  = document.getElementById('log-next');
+    if (!tbody) return;
+
+    // filter
+    let filtered = logs;
+    if (roleFilter !== 'all') filtered = filtered.filter(l => l.userRole === roleFilter);
+    if (searchQ) {
+      const q = searchQ.toLowerCase();
+      filtered = filtered.filter(l =>
+        (l.userName||'').toLowerCase().includes(q) ||
+        (l.action||'').toLowerCase().includes(q) ||
+        (WanderUI.getFriendlyAction(l.action)||'').toLowerCase().includes(q)
+      );
+    }
+
+    const total = filtered.length;
+    const totalPages = Math.ceil(total / LOG_PAGE_SIZE) || 1;
+    const safePage   = Math.min(Math.max(1, page), totalPages);
+    const start = (safePage - 1) * LOG_PAGE_SIZE;
+    const slice = filtered.slice(start, start + LOG_PAGE_SIZE);
+
+    if (showEl) showEl.textContent = total ? `Hiển thị ${start+1} – ${Math.min(start+LOG_PAGE_SIZE, total)} của ${total} nhật ký` : 'Không có nhật ký';
+    if (prevBtn) prevBtn.disabled = safePage <= 1;
+    if (nextBtn) nextBtn.disabled = safePage >= totalPages;
+
+    if (!slice.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--admin-text-muted);">Không tìm thấy nhật ký phù hợp.</td></tr>';
+      return;
+    }
+
+    const frag = document.createDocumentFragment();
+    slice.forEach(l => {
+      const tr = document.createElement('tr');
+      const ts  = new Date(l.timestamp);
+      const dateStr = ts.toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit' });
+      const timeStr = ts.toLocaleTimeString('vi-VN', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+      const color = getLogActionColor(l.action || '');
+      const role  = l.userRole || 'user';
+      const roleColor = role === 'superadmin' ? '#a855f7' : role === 'admin' ? '#f59e0b' : '#6366f1';
+      const details = l.details ? (typeof l.details === 'string' ? l.details : JSON.stringify(l.details).slice(0,80)+'…') : '—';
+
+      tr.innerHTML = `
+        <td style="white-space:nowrap;">
+          <div style="font-size:0.75rem;font-weight:600;color:#f1f5f9;">${timeStr}</div>
+          <div style="font-size:0.65rem;color:var(--admin-text-muted);">${dateStr}</div>
+        </td>
+        <td>
+          <div style="font-size:0.78rem;font-weight:600;color:#e2e8f0;">${l.userName || 'System'}</div>
+          <div style="font-size:0.65rem;color:var(--admin-text-muted);">${l.userId ? l.userId.toString().slice(-6) : '—'}</div>
+        </td>
+        <td>
+          <span style="display:inline-flex;align-items:center;gap:5px;background:${color}18;border:1px solid ${color}44;color:${color};font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:20px;">
+            ${getLogIcon(l.action)} ${WanderUI.getFriendlyAction(l.action)}
+          </span>
+        </td>
+        <td style="text-align:center;">
+          <span style="background:${roleColor}20;color:${roleColor};font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:12px;text-transform:uppercase;">${role}</span>
+        </td>
+        <td style="font-size:0.7rem;color:var(--admin-text-muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${details}">${details}</td>
+      `;
+      frag.appendChild(tr);
+    });
+    tbody.innerHTML = '';
+    tbody.appendChild(frag);
+    logDetailPage = safePage;
+  }
+
+  function renderLogActivityFeed(logs) {
+    const feed = document.getElementById('log-activity-feed');
+    if (!feed) return;
+    const recent = logs.slice(0, 12);
+    if (!recent.length) {
+      feed.innerHTML = '<div style="text-align:center;padding:1rem;color:var(--admin-text-muted);font-size:0.78rem;">Chưa có hoạt động.</div>';
+      return;
+    }
+    feed.innerHTML = recent.map(l => {
+      const ago = Math.floor((Date.now() - new Date(l.timestamp)) / 60000);
+      const timeStr = ago < 1 ? 'Vừa xong' : ago < 60 ? `${ago}p` : `${Math.floor(ago/60)}h`;
+      const color = getLogActionColor(l.action || '');
+      const icon  = getLogIcon(l.action || '');
+      const name  = (l.userName || 'System').split('@')[0];
+      return `
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+        <div style="width:28px;height:28px;border-radius:8px;background:${color}20;display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;">${icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.72rem;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+            <span style="color:${color};">${name}</span> ${WanderUI.getFriendlyAction(l.action)}
+          </div>
+          <div style="font-size:0.62rem;color:var(--admin-text-muted);">${timeStr} trước</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function loadLogs(filter = 'all', chartType = 'bar', period = 'day') {
     try {
       const json = await apiFetch(`/api/admin/logs?period=${period}&t=${Date.now()}`);
       if (json.success) {
         logsData = json.data;
-        if (typeof updateLogManagerDashboard === 'function') updateLogManagerDashboard(logsData, chartType);
+        updateLogManagerDashboard(logsData, chartType, filter);
       }
     } catch (err) {
       console.warn('Failed to load real logs:', err);
     }
-    
-    // 1. Fill main table if present
-    if(logsTbody) {
+
+    // Legacy table (panel-logs page)
+    if (logsTbody) {
       logsTbody.innerHTML = '';
-      const filtered = filter === 'all' ? logsData : logsData.filter(l => l.role === filter);
-      if(filtered.length === 0) {
+      const filtered = filter === 'all' ? logsData : logsData.filter(l => (l.userRole || l.role) === filter);
+      if (!filtered.length) {
         logsTbody.innerHTML = '<tr><td colspan="4" style="text-align:center">Không có lịch sử</td></tr>';
       } else {
-        const fragment = document.createDocumentFragment();
+        const frag = document.createDocumentFragment();
         filtered.forEach(l => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
@@ -3457,98 +4000,110 @@
             <td><span style="color:var(--admin-accent)">${WanderUI.getFriendlyAction(l.action)}</span></td>
             <td><span class="dest-pill" style="font-size:0.7rem">${l.userRole || 'Visitor'}</span></td>
           `;
-          fragment.appendChild(tr);
+          frag.appendChild(tr);
         });
-        logsTbody.appendChild(fragment);
+        logsTbody.appendChild(frag);
       }
     }
 
-    // 2. Fill mini logs in Overview
+    // Mini logs (Overview)
     if (miniLogsContainer) {
       miniLogsContainer.innerHTML = '';
-      const fragment = document.createDocumentFragment();
+      const frag = document.createDocumentFragment();
       logsData.slice(0, 5).forEach(l => {
         const item = document.createElement('div');
         item.className = 'log-item-minimal';
         const ago = Math.floor((Date.now() - new Date(l.timestamp)) / 60000);
         const timeStr = ago < 1 ? 'Vừa xong' : (ago < 60 ? `${ago} phút trước` : `${Math.floor(ago/60)} giờ trước`);
-        
-        // Dynamic icon based on action
-        let icon = '📝';
-        if (l.action.includes('CREATED')) icon = '✨';
-        if (l.action.includes('UPDATED')) icon = '🔄';
-        if (l.action.includes('LOGIN')) icon = '🔑';
-
         item.innerHTML = `
-          <div class="log-icon-min">${icon}</div>
+          <div class="log-icon-min">${getLogIcon(l.action || '')}</div>
           <div class="log-text-min"><strong>${(l.userName || 'Admin').split('@')[0]}</strong> ${WanderUI.getFriendlyAction(l.action)}</div>
           <div class="log-time-min">${timeStr}</div>
         `;
-        fragment.appendChild(item);
+        frag.appendChild(item);
       });
-      miniLogsContainer.appendChild(fragment);
+      miniLogsContainer.appendChild(frag);
     }
   }
 
   let logManagerChart = null;
-  function updateLogManagerDashboard(logs, chartType = 'bar') {
-    const dashboard = document.getElementById('log-manager-dashboard');
-    if (!dashboard) return;
-    dashboard.style.display = 'block';
-
-    const total = logs.length;
+  function updateLogManagerDashboard(logs, chartType = 'bar', activeFilter = 'all') {
+    // ── KPI ──
+    const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
     const todayStr = new Date().toDateString();
-    const todayCount = logs.filter(l => new Date(l.timestamp).toDateString() === todayStr).length;
-    const adminCount = logs.filter(l => l.userRole === 'admin' || l.userRole === 'superadmin').length;
-    const systemCount = logs.filter(l => !l.userId).length;
+    set('lm-total',  logs.length);
+    set('lm-today',  logs.filter(l => new Date(l.timestamp).toDateString() === todayStr).length);
+    set('lm-admin',  logs.filter(l => l.userRole === 'admin' || l.userRole === 'superadmin').length);
+    set('lm-system', logs.filter(l => !l.userId).length);
 
-    const elTotal = document.getElementById('lm-total');
-    const elToday = document.getElementById('lm-today');
-    const elAdmin = document.getElementById('lm-admin');
-    const elSystem = document.getElementById('lm-system');
-
-    if (elTotal) elTotal.textContent = total;
-    if (elToday) elToday.textContent = todayCount;
-    if (elAdmin) elAdmin.textContent = adminCount;
-    if (elSystem) elSystem.textContent = systemCount;
-
+    // ── Action Breakdown Bar Chart ──
     const ctx = document.getElementById('logManagerChart')?.getContext('2d');
     if (ctx) {
-      const counts = [];
-      const labels = [];
       const actionMap = {};
-      logs.slice(0, 100).forEach(l => {
-        actionMap[l.action] = (actionMap[l.action] || 0) + 1;
+      const filterLogs = activeFilter === 'all' ? logs :
+        logs.filter(l => activeFilter === 'admin' ? (l.userRole==='admin'||l.userRole==='superadmin') : l.userRole === 'user');
+      filterLogs.slice(0, 200).forEach(l => {
+        if (!l.action) return;
+        const friendly = WanderUI.getFriendlyAction(l.action);
+        actionMap[friendly] = (actionMap[friendly] || 0) + 1;
       });
-      
-      Object.keys(actionMap).forEach(key => {
-        labels.push(WanderUI.getFriendlyAction(key));
-        counts.push(actionMap[key]);
-      });
+      // top 8 actions
+      const sorted = Object.entries(actionMap).sort((a,b) => b[1]-a[1]).slice(0, 8);
+      const labels = sorted.map(e => e[0]);
+      const counts = sorted.map(e => e[1]);
+      const colors = labels.map((_, i) => ['#6366f1','#10b981','#f59e0b','#818cf8','#a855f7','#ef4444','#06b6d4','#84cc16'][i % 8]);
 
       if (logManagerChart) logManagerChart.destroy();
-      const canvasCtx = ctx.canvas ? ctx : (ctx.getContext ? ctx.getContext('2d') : ctx);
-      logManagerChart = WanderChartFactory.line(ctx, labels, [
-        {
-          label: 'Lượt truy cập',
-          data: counts,
-          borderColor: '#6366f1',
-          backgroundColor: WanderChartFactory.createGradient(canvasCtx, '#6366f1'),
-          tension: 0.4,
-          fill: true,
-          borderWidth: 4,
-          pointRadius: 0,
-          pointHoverRadius: 8
-        }
-      ]);
+      logManagerChart = WanderChartFactory.bar(ctx, labels, counts, colors);
       window.logManagerChart = logManagerChart;
     }
+
+    // ── Activity Feed ──
+    renderLogActivityFeed(logs);
+
+    // ── Detail Table ──
+    const searchQ = document.getElementById('log-search')?.value || '';
+    const roleFilter = document.getElementById('log-role-filter')?.value || 'all';
+    renderLogDetailTable(logs, 1, searchQ, roleFilter);
   }
 
-  document.querySelectorAll('[data-log-filter]').forEach(btn => {
-    btn.addEventListener('click', function() {
-      loadLogs(this.getAttribute('data-log-filter'));
-    });
+  // ── Log filter buttons (inside analytics panel) ──
+  document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.log-filter-btn');
+    if (!btn) return;
+    document.querySelectorAll('.log-filter-btn').forEach(b => b.classList.remove('is-active'));
+    btn.classList.add('is-active');
+    const filter = btn.getAttribute('data-log-filter') || 'all';
+    updateLogManagerDashboard(logsData, 'bar', filter);
+  });
+
+  // ── Log search & role filter ──
+  document.addEventListener('input', function(e) {
+    if (e.target.id === 'log-search' || e.target.id === 'log-role-filter') {
+      const searchQ = document.getElementById('log-search')?.value || '';
+      const roleFilter = document.getElementById('log-role-filter')?.value || 'all';
+      renderLogDetailTable(logsData, 1, searchQ, roleFilter);
+    }
+  });
+  document.addEventListener('change', function(e) {
+    if (e.target.id === 'log-role-filter') {
+      const searchQ = document.getElementById('log-search')?.value || '';
+      renderLogDetailTable(logsData, 1, searchQ, e.target.value);
+    }
+  });
+
+  // ── Log pagination ──
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('#log-prev')) {
+      const searchQ = document.getElementById('log-search')?.value || '';
+      const roleFilter = document.getElementById('log-role-filter')?.value || 'all';
+      renderLogDetailTable(logsData, logDetailPage - 1, searchQ, roleFilter);
+    }
+    if (e.target.closest('#log-next')) {
+      const searchQ = document.getElementById('log-search')?.value || '';
+      const roleFilter = document.getElementById('log-role-filter')?.value || 'all';
+      renderLogDetailTable(logsData, logDetailPage + 1, searchQ, roleFilter);
+    }
   });
 
   const themeToggle = document.getElementById('theme-toggle');
@@ -4004,7 +4559,7 @@
   function initThemeCustomizer() {
     const STORAGE_KEY = 'admin_bg_preset';
     const presets = {
-      default: 'radial-gradient(circle at 0% 0%, rgba(59, 130, 246, 0.05) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.05) 0%, transparent 50%), var(--admin-bg)',
+      default: 'radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.05) 0%, transparent 50%), radial-gradient(circle at 100% 100%, rgba(139, 92, 246, 0.05) 0%, transparent 50%), var(--admin-bg)',
       midnight: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
       forest: 'linear-gradient(135deg, #064e3b 0%, #022c22 100%)',
       slate: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
@@ -4839,7 +5394,7 @@
       spark.style.setProperty('--angle', `${angle}deg`);
       spark.style.setProperty('--dist', `${dist}px`);
       
-      const colors = ['#fcee0a', '#ff003c', '#00f0ff', '#3b82f6'];
+      const colors = ['#fcee0a', '#ff003c', '#00f0ff', '#6366f1'];
       spark.style.background = colors[Math.floor(Math.random() * colors.length)];
       spark.style.boxShadow = `0 0 8px ${spark.style.background}`;
       
@@ -4920,7 +5475,7 @@
   // Default config
     const config = {
       theme: 'default',
-      accentColor: '#3b82f6',
+      accentColor: '#6366f1',
       radius: '16px',
       blur: '24px',
       focusMode: false,
@@ -5270,7 +5825,7 @@
         ramVal.textContent = ram + '%';
         
         // Dynamic colors
-        cpuBar.style.background = cpu > 80 ? '#f43f5e' : (cpu > 50 ? '#f59e0b' : 'linear-gradient(90deg, #38bdf8, #818cf8)');
+        cpuBar.style.background = cpu > 80 ? '#f43f5e' : (cpu > 50 ? '#f59e0b' : 'linear-gradient(90deg, #818cf8, #818cf8)');
     }, 3000);
   }
 
@@ -5729,7 +6284,7 @@
             </div>
             <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem; font-size:0.75rem; color:var(--admin-text-muted);">
               <div>Ngân sách: <span style="color:#fff;">${c.budget}</span></div>
-              <div>Tiếp cận: <span style="color:#38bdf8;">${c.reach}</span></div>
+              <div>Tiếp cận: <span style="color:#818cf8;">${c.reach}</span></div>
               <div>Chuyển đổi: <span style="color:#10b981;">${c.conversion}</span></div>
             </div>
           </div>
@@ -5994,7 +6549,7 @@
         positive: '#10b981',
         toxic: '#ef4444',
         spam: '#f59e0b',
-        question: '#3b82f6',
+        question: '#6366f1',
         other: '#94a3b8'
       };
       
@@ -6036,7 +6591,7 @@
         } else {
           list.innerHTML = comments.map(c => {
             const sIcons = { positive: '😊', toxic: '😠', spam: '🚫', question: '❓', other: '💬' };
-            const sColors = { positive: '#10b981', toxic: '#ef4444', spam: '#f59e0b', question: '#3b82f6', other: '#94a3b8' };
+            const sColors = { positive: '#10b981', toxic: '#ef4444', spam: '#f59e0b', question: '#6366f1', other: '#94a3b8' };
             
             return `
               <div style="padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); display:flex; gap:12px; transition: background 0.2s; cursor:default;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
@@ -6061,3 +6616,4 @@
   }
 
 })();
+

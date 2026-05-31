@@ -362,9 +362,9 @@ tbody tr:hover {
 }
 
 .badge-user-role, [class*="role--user"] {
-  background: rgba(59, 130, 246, 0.12) !important;
+  background: rgba(99, 102, 241, 0.12) !important;
   color: #93c5fd !important;
-  border: 1px solid rgba(59, 130, 246, 0.18) !important;
+  border: 1px solid rgba(99, 102, 241, 0.18) !important;
   border-radius: 999px !important;
   padding: 0.18rem 0.65rem !important;
   font-size: 0.7rem !important;

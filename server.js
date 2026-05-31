@@ -178,6 +178,7 @@ const startPortals = () => {
         });
         pApp.use('/api/', (req, res) => { req.url = '/api/' + req.url.replace(/^\//, ''); proxy(req, res); });
         pApp.use('/uploads/', (req, res) => { req.url = '/uploads/' + req.url.replace(/^\//, ''); proxy(req, res); });
+        pApp.use('/assets', express.static(path.join(__dirname, 'apps/user-web/assets')));
         pApp.use(express.static(path.join(__dirname, config.d)));
         pApp.use((req, res) => res.sendFile(path.join(__dirname, config.d, 'index.html')));
         pApp.listen(config.p).on('error', () => {});

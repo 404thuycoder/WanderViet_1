@@ -72,9 +72,9 @@
         transform: translateY(-1px);
       }
       .btn-period.is-active {
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
         color: #fff;
-        border-color: rgba(59, 130, 246, 0.5);
+        border-color: rgba(99, 102, 241, 0.5);
         box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
       }
     </style>
@@ -97,8 +97,8 @@
   <header class="site-header admin-header">
     <div class="container header-inner">
       <div class="header-left">
-        <a href="/index.html" class="logo">
-          <span class="logo-mark">◈</span>
+        <a href="/index.html" class="logo" style="display: flex; align-items: center; gap: 8px;">
+          <img src="/assets/wanderviet-logo-cropped-rounded.png" style="height: 28px; width: 28px; object-fit: contain; border-radius: 6px;" alt="Logo">
           WanderViet AI <span class="badge-admin">ADMIN</span>
         </a>
       </div>
@@ -154,7 +154,7 @@
     font-family: var(--font-body, 'Be Vietnam Pro', sans-serif);
   ">
     <!-- Decorative orbs -->
-    <div style="position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,0.15),transparent 70%);top:-150px;left:-100px;pointer-events:none;"></div>
+    <div style="position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(129, 140, 248,0.15),transparent 70%);top:-150px;left:-100px;pointer-events:none;"></div>
     <div style="position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,0.12),transparent 70%);bottom:-100px;right:-50px;pointer-events:none;"></div>
 
     <div style="
@@ -173,7 +173,7 @@
       <!-- Logo -->
       <div style="text-align:center; margin-bottom:1.75rem;">
         <div style="font-size:2.5rem; margin-bottom:0.5rem;">🛡️</div>
-        <h1 style="margin:0; font-size:1.5rem; font-family:var(--font-head,'Outfit',sans-serif); font-weight:700; background:linear-gradient(135deg,#38bdf8,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">WanderViet AI Admin</h1>
+        <h1 style="margin:0; font-size:1.5rem; font-family:var(--font-head,'Outfit',sans-serif); font-weight:700; background:linear-gradient(135deg,#818cf8,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;">WanderViet AI Admin</h1>
         <p style="margin:0.4rem 0 0; font-size:0.85rem; color:rgba(148,163,184,0.8);">Truy cập chỉ dành cho Quản trị viên</p>
       </div>
 
@@ -184,7 +184,7 @@
           <input id="admin-login-email" type="email" required autocomplete="email"
             placeholder="admin@wanderviet.com"
             style="width:100%; padding:0.75rem 1rem; border-radius:10px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); color:#f8fafc; font-size:0.95rem; font-family:inherit; box-sizing:border-box; outline:none; transition:border-color 0.2s, box-shadow 0.2s;"
-            onfocus="this.style.borderColor='#38bdf8'; this.style.boxShadow='0 0 0 3px rgba(56,189,248,0.15)'"
+            onfocus="this.style.borderColor='#818cf8'; this.style.boxShadow='0 0 0 3px rgba(129, 140, 248,0.15)'"
             onblur="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.boxShadow='none'"
           />
         </div>
@@ -193,14 +193,14 @@
           <input id="admin-login-password" type="password" required autocomplete="current-password"
             placeholder="••••••••"
             style="width:100%; padding:0.75rem 1rem; border-radius:10px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); color:#f8fafc; font-size:0.95rem; font-family:inherit; box-sizing:border-box; outline:none; transition:border-color 0.2s, box-shadow 0.2s;"
-            onfocus="this.style.borderColor='#38bdf8'; this.style.boxShadow='0 0 0 3px rgba(56,189,248,0.15)'"
+            onfocus="this.style.borderColor='#818cf8'; this.style.boxShadow='0 0 0 3px rgba(129, 140, 248,0.15)'"
             onblur="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.boxShadow='none'"
           />
         </div>
         <button type="submit" id="admin-login-btn"
-          style="margin-top:0.5rem; padding:0.85rem; border-radius:12px; border:none; background:linear-gradient(135deg,#38bdf8,#6366f1); color:#fff; font-size:1rem; font-weight:700; font-family:inherit; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s; box-shadow:0 4px 16px rgba(56,189,248,0.35);"
-          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(56,189,248,0.45)'"
-          onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 16px rgba(56,189,248,0.35)'"
+          style="margin-top:0.5rem; padding:0.85rem; border-radius:12px; border:none; background:linear-gradient(135deg,#818cf8,#6366f1); color:#fff; font-size:1rem; font-weight:700; font-family:inherit; cursor:pointer; transition:transform 0.2s, box-shadow 0.2s; box-shadow:0 4px 16px rgba(129, 140, 248,0.35);"
+          onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(129, 140, 248,0.45)'"
+          onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 16px rgba(129, 140, 248,0.35)'"
         >Đăng nhập Quản trị</button>
         <p id="admin-login-msg" style="margin:0; text-align:center; font-size:0.875rem; min-height:1.25rem; color:#f87171;"></p>
       </form>
@@ -417,7 +417,7 @@
                     <span class="settings-label">Màu chủ đạo (Accent Color)</span>
                   </div>
                   <div class="color-picker-grid" id="settings-accent-colors">
-                    <button class="color-btn is-active" data-color="#3b82f6" style="--c: #3b82f6"></button>
+                    <button class="color-btn is-active" data-color="#6366f1" style="--c: #6366f1"></button>
                     <button class="color-btn" data-color="#10b981" style="--c: #10b981"></button>
                     <button class="color-btn" data-color="#ef4444" style="--c: #ef4444"></button>
                     <button class="color-btn" data-color="#f59e0b" style="--c: #f59e0b"></button>
@@ -593,7 +593,7 @@
                 <div class="glass-panel" style="margin-bottom: 1.5rem;">
                   <div class="chart-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
                     <h3>⏱️ Luồng Nhật ký Hệ thống (Thời gian thực)</h3>
-                    <span class="badge-ai" style="background:rgba(59, 130, 246, 0.1); color:#38bdf8; border:1px solid rgba(59,130,246,0.2); padding:4px 10px; border-radius:20px; font-size:0.65rem; font-weight:800;">LIVE FEED</span>
+                    <span class="badge-ai" style="background:rgba(99, 102, 241, 0.1); color:#818cf8; border:1px solid rgba(99, 102, 241,0.2); padding:4px 10px; border-radius:20px; font-size:0.65rem; font-weight:800;">LIVE FEED</span>
                   </div>
                   <div class="realtime-logs" id="admin-mini-logs" style="max-height: 500px; overflow-y: auto;">
                     <div style="text-align:center;padding:4rem;color:var(--admin-text-muted);">Khởi tạo luồng dữ liệu...</div>
@@ -673,9 +673,9 @@
                   <div style="display: flex; align-items: center; gap: 0.75rem;">
                     <span style="font-size: 0.7rem; color: var(--admin-text-muted); text-transform: uppercase; font-weight: 800;">CPU Load</span>
                     <div style="width: 100px; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden;">
-                      <div id="cpu-bar" style="width: 12%; height: 100%; background: linear-gradient(90deg, #38bdf8, #818cf8); transition: width 0.5s;"></div>
+                      <div id="cpu-bar" style="width: 12%; height: 100%; background: linear-gradient(90deg, #818cf8, #818cf8); transition: width 0.5s;"></div>
                     </div>
-                    <span id="cpu-val" style="font-size: 0.8rem; font-family: monospace; color: #38bdf8; min-width: 30px;">12%</span>
+                    <span id="cpu-val" style="font-size: 0.8rem; font-family: monospace; color: #818cf8; min-width: 30px;">12%</span>
                   </div>
                 </div>
               </div>
@@ -746,7 +746,7 @@
               .an-rank-info { flex: 1; min-width: 0; }
               .an-rank-name { font-size: 0.82rem; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
               .an-rank-sub { font-size: 0.7rem; color: var(--admin-text-muted); }
-              .an-rank-val { font-size: 0.8rem; font-weight: 700; color: #38bdf8; white-space: nowrap; }
+              .an-rank-val { font-size: 0.8rem; font-weight: 700; color: #818cf8; white-space: nowrap; }
 
               /* Interactive Directory Table */
               .biz-dir-table-card { margin-top: 1.5rem; }
@@ -929,7 +929,7 @@
                 .an-rank-info { flex: 1; min-width: 0; }
                 .an-rank-name { font-size: 0.82rem; font-weight: 600; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
                 .an-rank-sub { font-size: 0.7rem; color: var(--admin-text-muted); }
-                .an-rank-val { font-size: 0.8rem; font-weight: 700; color: #38bdf8; white-space: nowrap; }
+                .an-rank-val { font-size: 0.8rem; font-weight: 700; color: #818cf8; white-space: nowrap; }
               </style>
 
               <!-- KPI Cards -->
@@ -951,9 +951,9 @@
                   </div>
                 </div>
                 <div class="an-kpi">
-                  <div class="an-kpi-icon" style="background:rgba(56,189,248,0.15);">⚡</div>
+                  <div class="an-kpi-icon" style="background:rgba(129, 140, 248,0.15);">⚡</div>
                   <div>
-                    <div class="an-kpi-val" id="u-kpi-active" style="color:#38bdf8;">—</div>
+                    <div class="an-kpi-val" id="u-kpi-active" style="color:#818cf8;">—</div>
                     <div class="an-kpi-label">Đang trực tuyến</div>
                     <span class="an-kpi-delta up">Live</span>
                   </div>
@@ -981,7 +981,87 @@
                     </select>
                   </div>
                   <div style="height:320px;"><canvas id="userManagerChart"></canvas></div>
-                    <!-- SUB-PANEL: Business Analytics (Doanh nghiệp) -->
+                </div> <!-- Close .an-chart-panel (User growth) -->
+
+                <!-- User Rank Distribution -->
+                <div class="an-chart-panel">
+                  <div class="an-chart-header">
+                    <span class="an-chart-title">🏅 Hạng thành viên</span>
+                  </div>
+                  <div style="height:200px;"><canvas id="userRankChart"></canvas></div>
+                  <div id="user-rank-legend" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem;justify-content:center;"></div>
+                </div>
+              </div> <!-- Close .an-chart-row -->
+
+              <!-- Top users list -->
+              <div class="an-panel-card" style="margin-bottom: 1.5rem;">
+                <div class="an-chart-header">
+                  <span class="an-chart-title">🏆 Top người dùng hoạt động nhất</span>
+                  <span style="font-size:0.72rem;color:var(--admin-text-muted);">Dựa trên số lượng lịch trình &amp; tương tác</span>
+                </div>
+                <div class="an-rank-list" id="u-top-users-list">
+                  <div style="text-align:center;padding:1.5rem;color:var(--admin-text-muted);">Đang tải...</div>
+                </div>
+              </div>
+
+              <!-- INTERACTIVE USER DIRECTORY (Thư mục Thành viên) -->
+              <div class="an-panel-card">
+                <div class="an-card-header" style="flex-wrap: wrap; gap: 1rem;">
+                  <div>
+                    <span class="an-card-title"><i class="fas fa-users-cog" style="color:var(--admin-primary); margin-right:8px;"></i> Thư mục Thành viên hệ thống</span>
+                    <p class="an-card-subtitle">Quản lý, tìm kiếm và xem chi tiết hoạt động của từng người dùng thường</p>
+                  </div>
+                  <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                    <div style="position:relative;">
+                      <input type="text" id="user-dir-search" placeholder="Tìm tên, email..." class="an-select" style="padding-left:2rem; width:220px;">
+                      <i class="fas fa-search" style="position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); color:var(--admin-text-muted); font-size:0.8rem;"></i>
+                    </div>
+                    <select class="an-select" id="user-dir-status-filter">
+                      <option value="all">Tất cả trạng thái</option>
+                      <option value="active">Hoạt động</option>
+                      <option value="suspended">Bị khóa</option>
+                    </select>
+                    <select class="an-select" id="user-dir-rank-filter">
+                      <option value="all">Tất cả thứ hạng</option>
+                      <option value="Đồng">Đồng</option>
+                      <option value="Bạc">Bạc</option>
+                      <option value="Vàng">Vàng</option>
+                      <option value="Bạch Kim">Bạch Kim</option>
+                      <option value="Kim Cương">Kim Cương</option>
+                      <option value="Huyền Thoại">Huyền Thoại</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="table-responsive" style="margin-top: 1rem; overflow-x: auto;">
+                  <table class="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Thành viên</th>
+                        <th style="text-align:center">Hạng danh vọng</th>
+                        <th style="text-align:center">Ngày tham gia</th>
+                        <th style="text-align:center">Trạng thái</th>
+                        <th style="text-align:center">Hoạt động</th>
+                      </tr>
+                    </thead>
+                    <tbody id="user-dir-tbody">
+                      <tr><td colspan="5" style="text-align:center; padding: 2rem; color: var(--admin-text-muted);">Đang tải danh sách thành viên...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:1.25rem; font-size:0.75rem; color:var(--admin-text-muted); padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
+                  <span id="user-dir-showing">Hiển thị 0 - 0 của 0 thành viên</span>
+                  <div style="display:flex; gap:0.5rem;">
+                    <button id="user-dir-prev" class="btn btn--small btn--ghost" disabled><i class="fas fa-chevron-left"></i> Trước</button>
+                    <button id="user-dir-next" class="btn btn--small btn--ghost" disabled>Sau <i class="fas fa-chevron-right"></i></button>
+                  </div>
+                </div>
+              </div>
+
+            </div> <!-- Close #sub-panel-analytics-users -->
+
+            <!-- SUB-PANEL: Business Analytics (Doanh nghiệp) -->
             <div id="sub-panel-analytics-businesses" class="sub-panel is-hidden">
               <div class="an-kpi-grid">
                 <div class="an-kpi">
@@ -992,7 +1072,7 @@
                   </div>
                 </div>
                 <div class="an-kpi">
-                  <div class="an-kpi-icon" style="background:rgba(56,189,248,0.15); color:#38bdf8;">✅</div>
+                  <div class="an-kpi-icon" style="background:rgba(129, 140, 248,0.15); color:#818cf8;">✅</div>
                   <div class="an-kpi-content">
                     <div class="an-kpi-val" id="b-kpi-approved">—</div>
                     <div class="an-kpi-label">Đã phê duyệt</div>
@@ -1138,6 +1218,7 @@
                         <th style="text-align:right">Điểm uy tín (XP)</th>
                         <th style="text-align:center">Xác minh</th>
                         <th style="text-align:center">Trạng thái</th>
+                        <th style="text-align:center">Chi tiết</th>
                       </tr>
                     </thead>
                     <tbody id="biz-dir-tbody">
@@ -1158,71 +1239,212 @@
 
             <!-- SUB-PANEL: Place Analytics -->
             <div id="sub-panel-analytics-places" class="sub-panel is-hidden">
-               <div id="place-manager-dashboard" class="glass-panel-v2" style="padding: 1.5rem;">
-                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                  <h3 style="margin:0; font-size: 1.1rem; color: var(--admin-primary);">🗺️ Phân tích Kho Địa Điểm</h3>
-                  <div class="chart-controls">
-                      <select class="chart-period-select" data-chart="places">
-                        <option value="hour" selected>Ngày</option>
-                        <option value="week">Tuần</option>
-                        <option value="day">Tháng</option>
-                        <option value="month">Năm</option>
-                      </select>
+
+              <!-- KPI Row -->
+              <div class="an-kpi-grid" style="margin-bottom:1.5rem;">
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(16,185,129,0.15);">🗺️</div>
+                  <div>
+                    <div class="an-kpi-val" id="pm-total-places" style="color:#6ee7b7;">—</div>
+                    <div class="an-kpi-label">Tổng địa điểm</div>
+                    <span class="an-kpi-delta" id="pm-total-delta">Tất cả danh mục</span>
                   </div>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-                  <div style="text-align:center; padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size:1.8rem; font-weight:800; color:#10b981" id="pm-total-places">—</div>
-                    <div style="font-size:0.8rem; color:var(--admin-text-muted); margin-top:0.2rem;">Tổng Địa Điểm</div>
-                  </div>
-                  <div style="text-align:center; padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size:1.8rem; font-weight:800; color:#38bdf8" id="pm-active-places">—</div>
-                    <div style="font-size:0.8rem; color:var(--admin-text-muted); margin-top:0.2rem;">Đang hoạt động</div>
-                  </div>
-                  <div style="text-align:center; padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size:1.8rem; font-weight:800; color:#f59e0b" id="pm-pending-places">—</div>
-                    <div style="font-size:0.8rem; color:var(--admin-text-muted); margin-top:0.2rem;">Chờ duyệt</div>
-                  </div>
-                  <div style="text-align:center; padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size:1.8rem; font-weight:800; color:#6366f1" id="pm-partner-places">—</div>
-                    <div style="font-size:0.8rem; color:var(--admin-text-muted); margin-top:0.2rem;">Từ Đối tác</div>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(129, 140, 248,0.15);">✅</div>
+                  <div>
+                    <div class="an-kpi-val" id="pm-active-places" style="color:#818cf8;">—</div>
+                    <div class="an-kpi-label">Đang hoạt động</div>
+                    <span class="an-kpi-delta" style="color:#34d399;">Đã được duyệt</span>
                   </div>
                 </div>
-                <div style="height: 650px; position: relative;">
-                  <canvas id="placeManagerChart"></canvas>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(245,158,11,0.15);">⏳</div>
+                  <div>
+                    <div class="an-kpi-val" id="pm-pending-places" style="color:#fbbf24;">—</div>
+                    <div class="an-kpi-label">Chờ phê duyệt</div>
+                    <span class="an-kpi-delta" style="color:#f59e0b;">Cần xử lý</span>
+                  </div>
+                </div>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(99,102,241,0.15);">🤝</div>
+                  <div>
+                    <div class="an-kpi-val" id="pm-partner-places" style="color:#a5b4fc;">—</div>
+                    <div class="an-kpi-label">Từ đối tác</div>
+                    <span class="an-kpi-delta" style="color:#818cf8;">Được đề xuất</span>
+                  </div>
                 </div>
               </div>
-            </div>
+
+              <!-- Chart + Top Places Row -->
+              <div class="an-chart-row" style="margin-bottom:1.5rem;">
+                <!-- Growth Chart -->
+                <div class="an-chart-panel" style="flex:2;">
+                  <div class="an-chart-header">
+                    <span class="an-chart-title">📈 Xu hướng thêm địa điểm</span>
+                    <select class="an-select chart-period-select" data-chart="places" style="font-size:0.78rem;padding:4px 10px;">
+                      <option value="hour" selected>Hôm nay</option>
+                      <option value="week">Tuần này</option>
+                      <option value="day">30 ngày</option>
+                      <option value="month">Năm nay</option>
+                    </select>
+                  </div>
+                  <div style="height:280px;position:relative;">
+                    <canvas id="placeManagerChart"></canvas>
+                  </div>
+                </div>
+
+                <!-- Category Donut -->
+                <div class="an-chart-panel" style="flex:1;">
+                  <div class="an-chart-header">
+                    <span class="an-chart-title">🏷️ Phân loại địa điểm</span>
+                  </div>
+                  <div style="height:180px;position:relative;">
+                    <canvas id="placeCategoryChart"></canvas>
+                  </div>
+                  <div id="place-cat-legend" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:0.75rem;justify-content:center;"></div>
+                </div>
+              </div>
+
+              <!-- Top Rated Places -->
+              <div class="an-panel-card">
+                <div class="an-card-header">
+                  <div>
+                    <span class="an-card-title"><i class="fas fa-star" style="color:#fbbf24;margin-right:6px;"></i> Top địa điểm yêu thích nhất</span>
+                    <p class="an-card-subtitle">Xếp hạng dựa trên lượt yêu thích &amp; tương tác của người dùng</p>
+                  </div>
+                  <button class="btn btn--small btn--ghost" onclick="document.querySelector('[data-admin-tab=\'places\']')?.click()" style="font-size:0.75rem;">
+                    <i class="fas fa-external-link-alt"></i> Quản lý địa điểm
+                  </button>
+                </div>
+                <div id="place-top-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem;margin-top:1rem;">
+                  <div style="text-align:center;padding:2rem;color:var(--admin-text-muted);grid-column:1/-1;">
+                    <span class="spinner-small"></span> Đang tải...
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /#sub-panel-analytics-places -->
 
             <!-- SUB-PANEL: Log Analytics -->
             <div id="sub-panel-analytics-logs" class="sub-panel is-hidden">
-               <div id="log-manager-dashboard" class="glass-panel-v2" style="padding: 1.5rem;">
-                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                  <h3 style="margin:0; font-size: 1.1rem; color: var(--admin-primary);">📜 Phân tích Nhật Ký Hệ Thống</h3>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem;">
-                  <div style="text-align:center; padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size:1.8rem; font-weight:800; color:#38bdf8" id="lm-total">—</div>
-                    <div style="font-size:0.8rem; color:var(--admin-text-muted); margin-top:0.2rem;">Tổng Log</div>
-                  </div>
-                  <div style="text-align:center; padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size:1.8rem; font-weight:800; color:#6366f1" id="lm-today">—</div>
-                    <div style="font-size:0.8rem; color:var(--admin-text-muted); margin-top:0.2rem;">Hôm nay</div>
-                  </div>
-                  <div style="text-align:center; padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size:1.8rem; font-weight:800; color:#f59e0b" id="lm-admin">—</div>
-                    <div style="font-size:0.8rem; color:var(--admin-text-muted); margin-top:0.2rem;">Hành động Admin</div>
-                  </div>
-                  <div style="text-align:center; padding:1rem; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid rgba(255,255,255,0.05);">
-                    <div style="font-size:1.8rem; font-weight:800; color:#10b981" id="lm-system">—</div>
-                    <div style="font-size:0.8rem; color:var(--admin-text-muted); margin-top:0.2rem;">Hệ thống</div>
+
+              <!-- KPI Row -->
+              <div class="an-kpi-grid" style="margin-bottom:1.5rem;">
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(129, 140, 248,0.15);">📋</div>
+                  <div>
+                    <div class="an-kpi-val" id="lm-total" style="color:#818cf8;">—</div>
+                    <div class="an-kpi-label">Tổng nhật ký</div>
+                    <span class="an-kpi-delta">Mọi hành động</span>
                   </div>
                 </div>
-                <div style="height: 300px; position: relative;">
-                  <canvas id="logManagerChart"></canvas>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(99,102,241,0.15);">📅</div>
+                  <div>
+                    <div class="an-kpi-val" id="lm-today" style="color:#a5b4fc;">—</div>
+                    <div class="an-kpi-label">Hôm nay</div>
+                    <span class="an-kpi-delta" id="lm-today-delta">So với hôm qua</span>
+                  </div>
+                </div>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(245,158,11,0.15);">🛡️</div>
+                  <div>
+                    <div class="an-kpi-val" id="lm-admin" style="color:#fbbf24;">—</div>
+                    <div class="an-kpi-label">Hành động Admin</div>
+                    <span class="an-kpi-delta" style="color:#f59e0b;">Thao tác quản trị</span>
+                  </div>
+                </div>
+                <div class="an-kpi">
+                  <div class="an-kpi-icon" style="background:rgba(16,185,129,0.15);">⚙️</div>
+                  <div>
+                    <div class="an-kpi-val" id="lm-system" style="color:#6ee7b7;">—</div>
+                    <div class="an-kpi-label">Hệ thống</div>
+                    <span class="an-kpi-delta" style="color:#34d399;">Tự động xử lý</span>
+                  </div>
                 </div>
               </div>
-            </div>
+
+              <!-- Chart Row -->
+              <div class="an-chart-row" style="margin-bottom:1.5rem;">
+                <!-- Action Type Bar Chart -->
+                <div class="an-chart-panel" style="flex:2;">
+                  <div class="an-chart-header">
+                    <span class="an-chart-title">📊 Phân bổ hành động theo loại</span>
+                    <div style="display:flex;gap:6px;">
+                      <button class="btn btn--small btn--ghost log-filter-btn is-active" data-log-filter="all" style="font-size:0.72rem;padding:3px 10px;">Tất cả</button>
+                      <button class="btn btn--small btn--ghost log-filter-btn" data-log-filter="admin" style="font-size:0.72rem;padding:3px 10px;">Admin</button>
+                      <button class="btn btn--small btn--ghost log-filter-btn" data-log-filter="user" style="font-size:0.72rem;padding:3px 10px;">User</button>
+                    </div>
+                  </div>
+                  <div style="height:260px;position:relative;">
+                    <canvas id="logManagerChart"></canvas>
+                  </div>
+                </div>
+
+                <!-- Recent Activity Timeline -->
+                <div class="an-chart-panel" style="flex:1;min-width:0;">
+                  <div class="an-chart-header">
+                    <span class="an-chart-title">⚡ Hoạt động gần đây</span>
+                    <span style="font-size:0.68rem;color:var(--admin-text-muted);">Tự động cập nhật</span>
+                  </div>
+                  <div id="log-activity-feed" style="display:flex;flex-direction:column;gap:0.5rem;max-height:248px;overflow-y:auto;">
+                    <div style="text-align:center;padding:1rem;color:var(--admin-text-muted);font-size:0.8rem;">
+                      <span class="spinner-small"></span> Đang tải...
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Live Log Table -->
+              <div class="an-panel-card">
+                <div class="an-card-header" style="flex-wrap:wrap;gap:0.75rem;">
+                  <div>
+                    <span class="an-card-title"><i class="fas fa-list" style="color:var(--admin-primary);margin-right:6px;"></i> Nhật ký hoạt động chi tiết</span>
+                    <p class="an-card-subtitle">Toàn bộ lịch sử hành động trong hệ thống theo thời gian thực</p>
+                  </div>
+                  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
+                    <div style="position:relative;">
+                      <input type="text" id="log-search" placeholder="Tìm user, hành động..." class="an-select" style="padding-left:1.8rem;width:200px;font-size:0.78rem;">
+                      <i class="fas fa-search" style="position:absolute;left:0.6rem;top:50%;transform:translateY(-50%);color:var(--admin-text-muted);font-size:0.75rem;"></i>
+                    </div>
+                    <select class="an-select" id="log-role-filter" style="font-size:0.78rem;">
+                      <option value="all">Tất cả vai trò</option>
+                      <option value="admin">Admin</option>
+                      <option value="superadmin">Super Admin</option>
+                      <option value="user">User</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="table-responsive" style="margin-top:1rem;overflow-x:auto;">
+                  <table class="admin-table" id="log-detail-table">
+                    <thead>
+                      <tr>
+                        <th style="width:140px;">Thời gian</th>
+                        <th>Người dùng</th>
+                        <th>Hành động</th>
+                        <th style="text-align:center;width:100px;">Vai trò</th>
+                        <th style="width:200px;">Chi tiết</th>
+                      </tr>
+                    </thead>
+                    <tbody id="log-detail-tbody">
+                      <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--admin-text-muted);">Đang tải nhật ký...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem;font-size:0.75rem;color:var(--admin-text-muted);padding-top:1rem;border-top:1px solid rgba(255,255,255,0.05);">
+                  <span id="log-showing">Hiển thị 0 - 0 của 0 nhật ký</span>
+                  <div style="display:flex;gap:0.5rem;">
+                    <button id="log-prev" class="btn btn--small btn--ghost" disabled><i class="fas fa-chevron-left"></i> Trước</button>
+                    <button id="log-next" class="btn btn--small btn--ghost" disabled>Sau <i class="fas fa-chevron-right"></i></button>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /#sub-panel-analytics-logs -->
+
 
             <!-- SUB-PANEL: AI Analytics (MOVED HERE) -->
             <div id="sub-panel-analytics-revenue" class="sub-panel is-hidden">
@@ -1248,7 +1470,7 @@
                 <!-- Revenue Classification -->
                 <div class="glass-panel" style="padding: 1.5rem; display: flex; flex-direction: column;">
                   <div style="display:flex; align-items:center; gap:8px; margin-bottom: 1rem;">
-                    <div style="width:8px; height:8px; border-radius:50%; background:#38bdf8; box-shadow:0 0 10px #38bdf8;"></div>
+                    <div style="width:8px; height:8px; border-radius:50%; background:#818cf8; box-shadow:0 0 10px #818cf8;"></div>
                     <h3 style="margin:0; font-size:0.85rem; font-weight:800; color:#fff; text-transform:uppercase; letter-spacing:0.5px;">📊 Phân bổ doanh thu</h3>
                   </div>
                   <div style="flex:1; position:relative; min-height: 250px; display: flex; align-items: center; justify-content: center;">
@@ -1272,8 +1494,8 @@
                   <div class="stat-val" id="intel-total-itin" style="color:#6366f1">—</div>
                   <div class="stat-label">Tổng lịch trình AI</div>
                 </div>
-                <div class="stat-card-v2" style="background: rgba(56, 189, 248, 0.1);">
-                  <div class="stat-val" id="intel-real-users" style="color:#38bdf8">—</div>
+                <div class="stat-card-v2" style="background: rgba(129, 140, 248, 0.1);">
+                  <div class="stat-val" id="intel-real-users" style="color:#818cf8">—</div>
                   <div class="stat-label">Người dùng hoạt động</div>
                 </div>
                 <div class="stat-card-v2" style="background: rgba(16, 185, 129, 0.1);">
@@ -1986,7 +2208,7 @@
                    <button class="btn btn--ghost btn--small" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); color: #f59e0b;">
                      <i class="fas fa-gift"></i> Phát hành hàng loạt
                    </button>
-                   <button class="btn btn--primary" style="box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);">
+                   <button class="btn btn--primary" style="box-shadow: 0 0 20px rgba(129, 140, 248, 0.4);">
                      <i class="fas fa-plus"></i> Thêm mã mới
                    </button>
                 </div>
@@ -2049,7 +2271,7 @@
                   </div>
                   <div style="display:flex; justify-content:space-between; align-items:center;">
                     <span style="color:var(--admin-text-muted);">Tỷ lệ chuyển đổi</span>
-                    <span style="font-weight:700; color:#38bdf8;">4.5%</span>
+                    <span style="font-weight:700; color:#818cf8;">4.5%</span>
                   </div>
                 </div>
               </div>
@@ -2409,7 +2631,7 @@
                 <label class="field field--full"><span class="field-label">Bản sắc & Câu chuyện (Overview)</span><textarea name="overview" rows="3" placeholder="Giới thiệu sâu sắc về địa điểm..."></textarea></label>
                 <label class="field field--full"><span class="field-label">Gợi ý trải nghiệm (Experience)</span><textarea name="experience" rows="2" placeholder="Khuyên khách hàng nên làm gì..."></textarea></label>
                 <label class="field"><span class="field-label">Điểm nhấn (cách nhau dấu phẩy)</span><input type="text" name="highlights" placeholder="Gần biển, Buffet sáng..." /></label>
-                <label class="field"><span class="field-label">Màu chủ đề (Theme Color)</span><input type="color" name="themeColor" value="#3b82f6" style="height:42px" /></label>
+                <label class="field"><span class="field-label">Màu chủ đề (Theme Color)</span><input type="color" name="themeColor" value="#6366f1" style="height:42px" /></label>
               </div>
             </fieldset>
             
@@ -2479,6 +2701,78 @@
         
         <div style="margin-top: 2rem; text-align: center;">
           <button class="btn btn--ghost btn-popup-close" style="width: 100%;" onclick="WanderUI.closeDrawer('user-activity-drawer')">Đóng cửa sổ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Business Detail Drawer -->
+  <div id="biz-detail-drawer" class="slide-drawer" hidden>
+    <div class="slide-drawer__inner">
+      <div class="slide-drawer__header">
+        <h2 style="display:flex; align-items:center; gap:0.75rem;">🏢 Chi tiết Đối tác Doanh nghiệp</h2>
+        <button class="slide-drawer__close" onclick="WanderUI.closeDrawer('biz-detail-drawer')">&times;</button>
+      </div>
+      <div class="slide-drawer__body" style="padding: 1.5rem;">
+        <div id="biz-detail-info" style="margin-bottom: 1.5rem; padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; text-align: center;">
+          <img id="bd-avatar" src="" style="width:80px; height:80px; border-radius:12px; border:2px solid var(--admin-primary); object-fit:cover; margin-bottom: 1rem;" />
+          <h3 id="bd-name" style="margin:0 0 0.25rem 0; font-size:1.3rem; color:#fff;">...</h3>
+          <span id="bd-category-badge" class="biz-badge general" style="margin-bottom: 0.5rem;">—</span>
+          <div style="display:flex; gap: 0.5rem; margin-top: 0.25rem;">
+            <span id="bd-status-badge"></span>
+            <span id="bd-verified-badge"></span>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr; gap:1rem;">
+          <div class="glass-panel" style="padding: 1rem; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+            <div style="font-size:0.75rem; color:var(--admin-text-muted); margin-bottom:0.25rem;">Email Liên hệ</div>
+            <div id="bd-email" style="font-size:0.9rem; font-weight:600; color:#fff;">—</div>
+          </div>
+          <div class="glass-panel" style="padding: 1rem; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+            <div style="font-size:0.75rem; color:var(--admin-text-muted); margin-bottom:0.25rem;">Số điện thoại / Hotline</div>
+            <div id="bd-phone" style="font-size:0.9rem; font-weight:600; color:#fff;">—</div>
+          </div>
+          <div class="glass-panel" style="padding: 1rem; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+            <div style="font-size:0.75rem; color:var(--admin-text-muted); margin-bottom:0.25rem;">Địa chỉ Trụ sở</div>
+            <div id="bd-address" style="font-size:0.9rem; color:#f1f5f9;">—</div>
+          </div>
+          <div class="glass-panel" style="padding: 1rem; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+            <div style="font-size:0.75rem; color:var(--admin-text-muted); margin-bottom:0.25rem;">Trang web Doanh nghiệp</div>
+            <div id="bd-website" style="font-size:0.9rem; font-weight:600; color:var(--admin-primary);"><a href="#" target="_blank" style="color:inherit; text-decoration:none;">—</a></div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-top:1rem;">
+          <div class="glass-panel" style="padding: 1rem; text-align: center; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+            <div style="font-size:0.72rem; color:var(--admin-text-muted);">Số người theo dõi</div>
+            <div id="bd-followers" style="font-size:1.4rem; font-weight:800; color:#818cf8; margin-top:0.25rem;">0</div>
+          </div>
+          <div class="glass-panel" style="padding: 1rem; text-align: center; border: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);">
+            <div style="font-size:0.72rem; color:var(--admin-text-muted);">Điểm uy tín (XP)</div>
+            <div id="bd-xp" style="font-size:1.4rem; font-weight:800; color:#a78bfa; margin-top:0.25rem;">0</div>
+          </div>
+        </div>
+
+        <!-- Admin Actions section -->
+        <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
+          <h4 style="margin: 0 0 1rem 0; font-size: 0.85rem; color:#fff; text-transform: uppercase; letter-spacing:0.5px;">Thao tác Quản trị viên</h4>
+          
+          <div style="display:flex; flex-direction:column; gap:0.75rem;">
+            <!-- Verification toggle button -->
+            <button id="btn-toggle-biz-verification" class="btn btn--small btn--primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <span>🛡️ XÁC MINH DOANH NGHIỆP</span>
+            </button>
+            
+            <!-- Status toggle button (Lock/Unlock) -->
+            <button id="btn-toggle-biz-status" class="btn btn--small" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <span>🔒 KHÓA TÀI KHOẢN</span>
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center;">
+          <button class="btn btn--ghost btn-popup-close" style="width: 100%;" onclick="WanderUI.closeDrawer('biz-detail-drawer')">Đóng cửa sổ</button>
         </div>
       </div>
     </div>

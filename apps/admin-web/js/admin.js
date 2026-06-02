@@ -4110,11 +4110,16 @@
   if (themeToggle) {
     const savedTheme = localStorage.getItem('admin_theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    // Update button text based on current theme
+    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    
     themeToggle.addEventListener('click', () => {
       const current = document.documentElement.getAttribute('data-theme');
       const nextTheme = current === 'light' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', nextTheme);
       localStorage.setItem('admin_theme', nextTheme);
+      themeToggle.textContent = nextTheme === 'dark' ? '☀️' : '🌙';
     });
   }
 

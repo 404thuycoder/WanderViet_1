@@ -1,6 +1,6 @@
-﻿/* WanderViet AI Admin Global Design Tokens — v2.0 */
+﻿/* WanderViet AI Admin Global Design Tokens — Black & White Version */
 /* ============================================================
-   Elite Dark Theme: Slate 950 + Indigo/Blue/Purple
+   Monochrome Theme: Pure Black & White
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
@@ -23,10 +23,10 @@
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
-  --shadow-glow-primary: 0 0 20px rgba(99, 102, 241, 0.35);
-  --shadow-glow-blue: 0 0 20px rgba(59, 130, 246, 0.35);
-  --shadow-glow-purple: 0 0 20px rgba(139, 92, 246, 0.35);
-  --shadow-glow-green: 0 0 20px rgba(16, 185, 129, 0.35);
+  --shadow-glow-primary: 0 0 20px rgba(255, 255, 255, 0.35);
+  --shadow-glow-blue: 0 0 20px rgba(255, 255, 255, 0.35);
+  --shadow-glow-purple: 0 0 20px rgba(255, 255, 255, 0.35);
+  --shadow-glow-green: 0 0 20px rgba(255, 255, 255, 0.35);
 
   /* ── Glass Effects ── */
   --glass-border: rgba(255, 255, 255, 0.07);
@@ -48,87 +48,87 @@
   --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* ── Default Colors ── */
+/* ── Default Colors (Dark - Black Background) ── */
 :root {
-  --primary: #6366f1;
-  --primary-light: #818cf8;
-  --primary-dark: #4f46e5;
-  --primary-rgb: 99, 102, 241;
+  --primary: #ffffff;
+  --primary-light: #cccccc;
+  --primary-dark: #ffffff;
+  --primary-rgb: 255, 255, 255;
 
-  --secondary: #06b6d4;
-  --secondary-rgb: 6, 182, 212;
+  --secondary: #ffffff;
+  --secondary-rgb: 255, 255, 255;
 
-  --accent: #6366f1;
-  --accent-deep: #4f46e5;
-  --accent-warm: #f472b6;
-  --accent-cyan: #06b6d4;
-  --accent-amber: #fbbf24;
+  --accent: #ffffff;
+  --accent-deep: #ffffff;
+  --accent-warm: #ffffff;
+  --accent-cyan: #ffffff;
+  --accent-amber: #ffffff;
 
-  --success: #86efac;
-  --success-dark: #22c55e;
-  --warning: #fde047;
-  --warning-dark: #eab308;
-  --error: #fca5a5;
-  --error-dark: #ef4444;
-  --info: #93c5fd;
+  --success: #ffffff;
+  --success-dark: #ffffff;
+  --warning: #ffffff;
+  --warning-dark: #ffffff;
+  --error: #ffffff;
+  --error-dark: #ffffff;
+  --info: #ffffff;
 
-  --bg: #F8FAFC;
-  --bg-elevated: #FFFFFF;
-  --bg-card: #f1f5f9;
+  --bg: #000000;
+  --bg-elevated: #111111;
+  --bg-card: #1a1a1a;
 
-  --surface: rgba(255, 255, 255, 0.85);
-  --surface-overlay: rgba(255, 255, 255, 0.95);
+  --surface: rgba(0, 0, 0, 0.8);
+  --surface-overlay: rgba(0, 0, 0, 0.95);
 
-  --text: #1e293b;
-  --text-muted: #64748b;
-  --text-secondary: #94a3b8;
-
-  --border: rgba(15, 23, 42, 0.12);
-  --border-subtle: rgba(15, 23, 42, 0.06);
-  --glass-border: rgba(15, 23, 42, 0.08);
-  --glass-bg: rgba(255, 255, 255, 0.75);
-
-  --gradient-primary: linear-gradient(135deg, #6366f1, #06b6d4);
-  --gradient-cta: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #f472b6 100%);
-}
-
-/* ── Dark Mode ── */
-[data-theme="dark"] {
-  --primary: #818cf8;
-  --primary-light: #a5b4fc;
-  --primary-dark: #6366f1;
-  --primary-rgb: 129, 140, 248;
-
-  --secondary: #22d3ee;
-  --accent: #818cf8;
-  --accent-deep: #6366f1;
-  --accent-warm: #f9a8d4;
-  --accent-cyan: #22d3ee;
-
-  --success: #4ade80;
-  --warning: #fbbf24;
-  --error: #f87171;
-  --info: #60a5fa;
-
-  --bg: #09090b;
-  --bg-elevated: #18181b;
-  --bg-card: #27272a;
-
-  --surface: rgba(9, 9, 11, 0.8);
-  --surface-overlay: rgba(9, 9, 11, 0.95);
-
-  --text: #f1f5f9;
-  --text-muted: #94a3b8;
-  --text-secondary: #64748b;
+  --text: #ffffff;
+  --text-muted: #999999;
+  --text-secondary: #cccccc;
 
   --border: rgba(255, 255, 255, 0.1);
   --border-subtle: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.07);
   --glass-bg: rgba(255, 255, 255, 0.03);
 
-  --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+  --gradient-primary: linear-gradient(135deg, #ffffff, #cccccc);
+  --gradient-cta: linear-gradient(135deg, #ffffff 0%, #ffffff 50%, #cccccc 100%);
+}
+
+/* ── Light Mode (White Background) ── */
+[data-theme="light"] {
+  --primary: #000000;
+  --primary-light: #333333;
+  --primary-dark: #000000;
+  --primary-rgb: 0, 0, 0;
+
+  --secondary: #000000;
+  --accent: #000000;
+  --accent-deep: #000000;
+  --accent-warm: #000000;
+  --accent-cyan: #000000;
+
+  --success: #000000;
+  --warning: #000000;
+  --error: #000000;
+  --info: #000000;
+
+  --bg: #ffffff;
+  --bg-elevated: #f5f5f5;
+  --bg-card: #ffffff;
+
+  --surface: rgba(255, 255, 255, 0.95);
+  --surface-overlay: rgba(255, 255, 255, 0.98);
+
+  --text: #000000;
+  --text-muted: #333333;
+  --text-secondary: #666666;
+
+  --border: rgba(0, 0, 0, 0.1);
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-bg: rgba(0, 0, 0, 0.02);
+
+  --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.25);
 }
 
 /* ── Utility: Loading Button ── */

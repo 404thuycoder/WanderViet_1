@@ -1460,8 +1460,15 @@ const initPlanner = function () {
     const dest = document.getElementById('dest')?.value || '';
     const days = parseInt(document.getElementById('days')?.value) || 1;
     const nights = parseInt(document.getElementById('nights')?.value) || (days - 1);
-    const companion = document.getElementById('companion')?.value || '';
-    const budget = document.getElementById('budget')?.value || '';
+    const rawCompanion = document.getElementById('companion')?.value || '';
+    let budget = document.getElementById('budget')?.value || '';
+    
+    // Đồng bộ ngân sách
+    const calculatedBudget = document.getElementById('totalBudget')?.textContent;
+    if (calculatedBudget && calculatedBudget.trim() !== '' && calculatedBudget !== '0') {
+      budget = calculatedBudget.trim();
+    }
+    
     const additionalInfo = document.getElementById('additionalInfo')?.value || '';
     const tripDate = document.getElementById('tripDate')?.value || '';
     const departureTime = document.getElementById('departureTime')?.value || '08:00';
@@ -1472,6 +1479,17 @@ const initPlanner = function () {
     const toddlers = parseInt(document.getElementById('toddlers')?.value) || 0;
     const seniors = parseInt(document.getElementById('seniors')?.value) || 0;
     const totalMembers = adults + children + toddlers + seniors;
+
+    // Đồng bộ người đi cùng
+    let companion = rawCompanion;
+    if (!companion && totalMembers > 0) {
+      const parts = [];
+      if (adults > 0) parts.push(`${adults} Người lớn`);
+      if (seniors > 0) parts.push(`${seniors} Người cao tuổi`);
+      if (children > 0) parts.push(`${children} Trẻ em`);
+      if (toddlers > 0) parts.push(`${toddlers} Trẻ nhỏ`);
+      companion = parts.join(', ');
+    }
 
     // Get departure location
     const departureLocation = document.getElementById('departureLocation')?.value || '';
@@ -1500,6 +1518,7 @@ const initPlanner = function () {
       tripDate: tripDate,
       departureTime: departureTime,
       styles: selectedStyles.join(', '),
+      vibe: selectedStyles.join(', '),
       sessions: selectedSessions.join(', '),
       // Member data
       adults: adults,
@@ -1549,14 +1568,11 @@ const initPlanner = function () {
         });
 
         // Trigger the original submit flow
-        if (typeof window.doGenerate === 'function') {
-          window.doGenerate(formData);
+        if (typeof doGenerate === 'function') {
+          doGenerate(formData);
         } else {
-          // Try to trigger btnStartSmartWizard click behavior
-          const wizardBtn = document.getElementById('btnStartSmartWizard');
-          if (wizardBtn) {
-            wizardBtn.click();
-          }
+          // Tránh lặp vô tận, nếu không có hàm thì thôi
+          console.error("Không tìm thấy hàm tạo lịch trình.");
         }
       }
     }
@@ -1576,7 +1592,7 @@ const initPlanner = function () {
     discoveryMessages.scrollTop = discoveryMessages.scrollHeight;
   }
 
-  if (btnModeForm && btnModeDiscovery) {
+  if (btnModeForm) {
     const btnModeCompare = document.getElementById('btnModeCompare');
     const stepDiscovery = document.getElementById('stepDiscovery');
     const stepCompare = document.getElementById('stepCompare');
@@ -1638,9 +1654,6 @@ const initPlanner = function () {
       switchPath(btnModeForm, 'stepBasic');
     });
 
-    btnModeDiscovery.addEventListener('click', () => {
-      switchPath(btnModeDiscovery, 'stepDiscovery');
-    });
 
     if (btnModeCompare) {
       btnModeCompare.addEventListener('click', () => {
@@ -1794,16 +1807,15 @@ const initPlanner = function () {
       });
       this.dom.btnFinal?.addEventListener('click', () => this.generateItinerary());
 
-      // Use both click and submit for maximum reliability
-      this.dom.btnStartWizard?.addEventListener('click', () => {
-        console.log("🔘 [SmartWizard] Start button clicked");
-        this.startSmartWizardFromForm();
-      });
-
+      // Bỏ event listener của Smart Wizard để form gọi trực tiếp vào hàm sinh kết quả
+      // this.dom.btnStartWizard?.addEventListener('click', ...);
+      
       this.dom.basicForm?.addEventListener('submit', (e) => {
         e.preventDefault();
-        console.log("📝 [SmartWizard] Form submitted via Enter");
-        this.startSmartWizardFromForm();
+        console.log("📝 Form submitted via Enter");
+        if (typeof window.submitFormToWizard === 'function') {
+          window.submitFormToWizard();
+        }
       });
 
       // --- AI Suggest Question ---
@@ -2160,6 +2172,14 @@ const initPlanner = function () {
         currentPlanIndex = 0;
         renderVersionTabs();
 
+        // Đảm bảo chi phí hiển thị khớp với ngân sách đã tính toán ở form
+        if (data.budget && planHistory.length > 0) {
+          planHistory.forEach(p => { 
+            p.estimatedCost = data.budget;
+            p.totalEstimatedCost = data.budget;
+          });
+        }
+
         if (data.optionCount === "2" && planHistory.length >= 2) {
           renderDualItinerary(planHistory[0], planHistory[1], data.destination, data.days, json.weather);
           // Tự động kích hoạt view So sánh/Phân tích sau khi render xong
@@ -2232,7 +2252,8 @@ const initPlanner = function () {
       container.classList.remove('dual-plan-view');
 
       // Inject Back Button at the top
-      const backBtnHtml = `
+      const isViewModeLocal = new URLSearchParams(window.location.search).get('view') === 'true';
+      const backBtnHtml = isViewModeLocal ? '' : `
         <div class="back-to-form-wrap" style="margin-bottom: 1.5rem;">
           <button type="button" class="btn btn--ghost" style="color: var(--accent); border-color: var(--accent); gap: 0.5rem;" onclick="document.querySelector('.planner-container').classList.remove('show-result')">
             <span>⬅️ Quay lại sửa thông tin</span>
@@ -2250,8 +2271,9 @@ const initPlanner = function () {
       container.classList.add('dual-plan-view');
 
       // Inject Back Button
-      const backBtnHtml = `
-        <div class="back-to-form-wrap" style="grid-column: span 2; margin-bottom: 1.5rem;">
+      const isViewModeLocal = new URLSearchParams(window.location.search).get('view') === 'true';
+      const backBtnHtml = isViewModeLocal ? '' : `
+        <div class="back-to-form-wrap" style="margin-bottom: 1.5rem;">
           <button type="button" class="btn btn--ghost" style="color: var(--accent); border-color: var(--accent); gap: 0.5rem;" onclick="document.querySelector('.planner-container').classList.remove('show-result')">
             <span>⬅️ Quay lại sửa thông tin</span>
           </button>
@@ -3537,10 +3559,10 @@ const initPlanner = function () {
       const itinId = urlParams.get('itinId');
 
       const processPlan = (plan, destination, days) => {
-        // Kích hoạt show-result để CSS hiển thị timelineResult và ẩn formCard
+        // Kích hoạt show-result để CSS hiển thị timelineResult và tự động ẩn formCard
         document.querySelector('.planner-container')?.classList.add('show-result');
         const plannerFormCard = document.getElementById('plannerFormCard');
-        if (plannerFormCard) plannerFormCard.style.display = 'none';
+        // Đã xóa inline style vì CSS show-result quản lý
         const btnSaveTrip = document.getElementById('btnSaveTrip');
         if (btnSaveTrip) btnSaveTrip.style.display = 'none';
 

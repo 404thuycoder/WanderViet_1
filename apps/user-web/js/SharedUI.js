@@ -760,17 +760,66 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       }
     }
 
-    // 4. If we are on planner.html and Form Step 2 is active, switch to Step 1
+    // 4. Ưu tiên 1: Nếu đang ở màn hình Kết Quả (show-result đang active) -> Quay lại form / danh sách trước đó
+    const plannerContainer = document.querySelector('.planner-container');
+    if (plannerContainer && plannerContainer.classList.contains('show-result')) {
+      const isViewModeLocal = new URLSearchParams(window.location.search).get('view') === 'true';
+      if (isViewModeLocal) {
+        window.location.href = 'my-trips.html';
+      } else {
+        plannerContainer.classList.remove('show-result');
+        const plannerFormCard = document.getElementById('plannerFormCard');
+        if (plannerFormCard) plannerFormCard.style.display = ''; // Xóa inline style để CSS quản lý
+        
+        // Ẩn vùng kết quả, hiện placeholder
+        const timelineResult = document.getElementById('timelineResult');
+        if (timelineResult) timelineResult.style.display = 'none';
+        const resultPlaceholder = document.getElementById('resultPlaceholder');
+        if (resultPlaceholder) resultPlaceholder.style.display = '';
+        
+        // Reset container comparison mode
+        const timelineContent = document.getElementById('timelineContent');
+        if (timelineContent) timelineContent.classList.remove('comparison-mode-active');
+      }
+      return;
+    }
+
+    // 5. Ưu tiên 2: Nếu đang ở tab So Sánh (nhưng không ở kết quả) -> Quay lại tab Lập Lịch
+    const stepCompareEl = document.getElementById('stepCompare');
+    if (stepCompareEl && stepCompareEl.style.display !== 'none' && stepCompareEl.style.display !== '') {
+      const btnModeForm = document.getElementById('btnModeForm');
+      if (btnModeForm) {
+        btnModeForm.click();
+      } else {
+        stepCompareEl.style.display = 'none';
+        const formStep1 = document.getElementById('formStep1');
+        if (formStep1) {
+          formStep1.style.display = 'block';
+          formStep1.style.display = ''; // Fallback
+        }
+        const formStepNav = document.getElementById('formStepNav');
+        if (formStepNav) formStepNav.style.display = 'flex';
+        if (typeof window.switchFormStep === 'function') window.switchFormStep(1);
+      }
+      return;
+    }
+
+    // 6. Ưu tiên 3: Nếu đang ở tab Lập Lịch Bước 2 -> Quay lại Bước 1
     const formStep2 = document.getElementById('formStep2');
-    if (formStep2 && (formStep2.style.display === 'block' || formStep2.style.display === 'flex' || !formStep2.hasAttribute('hidden') && window.getComputedStyle(formStep2).display !== 'none')) {
+    if (formStep2 && (formStep2.style.display === 'block' || formStep2.style.display === 'flex' || (!formStep2.hasAttribute('hidden') && window.getComputedStyle(formStep2).display !== 'none'))) {
       if (typeof window.switchFormStep === 'function') {
         window.switchFormStep(1);
         return;
       }
     }
 
-    // 5. Navigate to home page (clean, no hash to avoid triggering auth modal)
-    window.location.href = 'index.html';
+
+    // 7. Navigate back in history, or fallback to home page
+    if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+      window.history.back();
+    } else {
+      window.location.href = 'index.html';
+    }
   };
 
   function injectHeader() {

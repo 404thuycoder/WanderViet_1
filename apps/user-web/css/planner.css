@@ -2281,10 +2281,9 @@ a {
 
 /* Dual Plan View - Split Screen */
 .dual-plan-view {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 1.5rem !important;
-  align-items: start !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2rem !important;
 }
 
 .dual-plan-view .planner-itinerary-header {
@@ -2301,12 +2300,6 @@ a {
 
 .dual-plan-view .itinerary-card-title {
   font-size: 0.95rem;
-}
-
-@media (max-width: 1100px) {
-  .dual-plan-view {
-    grid-template-columns: 1fr !important;
-  }
 }
 
 /* Comparison Summary Card Styles */
@@ -3074,6 +3067,20 @@ a {
     flex: 1 1 100%;
     overflow-y: auto;
     padding-bottom: 50px;
+}
+
+/* Khi đang hiển thị kết quả: ẩn 2 sidebar, cho nội dung chiếm full width */
+.planner-container.show-result .planner-sidebar {
+    display: none !important;
+}
+.planner-container.show-result .planner-3col-layout {
+    grid-template-columns: 1fr !important;
+}
+.planner-container.show-result .planner-result {
+    border-radius: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
 }
 
 /* =============================================================

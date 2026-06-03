@@ -1526,9 +1526,7 @@
             <button type="button" id="btnModeForm" class="mode-toggle-btn active">
               <span>📋</span> Lập lịch
             </button>
-            <button type="button" id="btnModeDiscovery" class="mode-toggle-btn">
-              <span>🔍</span> Gợi ý
-            </button>
+
             <button type="button" id="btnModeCompare" class="mode-toggle-btn">
               <span>⚖️</span> So sánh
             </button>
@@ -1757,6 +1755,13 @@
                       <p style="font-size:0.72rem; margin:0;">Chưa chọn địa điểm nào</p>
                       <p style="font-size:0.65rem; margin:0.2rem 0 0; opacity:0.7;">Chọn từ danh sách địa điểm nổi bật bên trên</p>
                     </div>
+                  </div>
+                  
+                  <!-- Nút chuyển sang Bước 2 -->
+                  <div style="margin-top: 1rem; text-align: center;">
+                    <button type="button" onclick="switchFormStep(2)" style="width: 100%; padding: 0.85rem; background: linear-gradient(135deg, #3b82f6, #6366f1); color: #fff; font-weight: 700; border: none; border-radius: 0.75rem; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(59,130,246,0.35); transition: all 0.3s ease;">
+                      Tiếp theo: Nhập chi tiết ➔
+                    </button>
                   </div>
                 </div>
 
@@ -4947,7 +4952,7 @@
         const borderColor = idx % 2 === 0 ? '#e2e8f0' : '#fef3c7';
         
         return `
-          <div class="compare-card" style="background: ${bgColor}; border: 1px solid ${borderColor}; padding: 1.5rem; border-radius: 1.25rem; flex: 1; min-width: 300px;">
+          <div class="compare-card" style="background: ${bgColor}; border: 1px solid ${borderColor}; padding: 1.25rem; border-radius: 1.25rem; min-width: 0;">
               <div class="analysis-label" style="color:${accentColor}; font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; border-bottom: 1px solid ${borderColor}; padding-bottom: 0.5rem;">${name}</div>
               <div class="criteria-item" style="margin-bottom: 1rem;">
                 <strong style="color: #475569; display: block; font-size: 0.8rem; text-transform: uppercase;">${isTour ? '✨ Đặc điểm Tour' : '🌟 Điểm nhấn'}</strong>
@@ -4983,7 +4988,7 @@
         <div class="comparison-summary-card" style="grid-column: 1 / -1; margin-bottom: 2rem; background: #ffffff; color: #1e293b;">
           <div class="compare-card-title" style="color: #0f172a; border-bottom: 2px solid #f1f5f9; padding-bottom: 1rem;">⚖️ Bảng So Sánh & Đánh Giá Tổng Hợp (${isTour ? 'Tour' : 'Lịch trình'})</div>
           
-          <div class="comparison-container" style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 1.5rem;">
+          <div class="comparison-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 1.5rem;">
             ${comparisonCardsHtml}
           </div>
 
@@ -5231,15 +5236,27 @@
         
         showComparisonView(plans, names, 'tour');
 
-        // Hiện vùng kết quả
+        // Hiện vùng kết quả toàn màn hình
+        document.querySelector('.planner-container')?.classList.add('show-result');
+
+        // Ẩn nút Lưu vì đây là so sánh tour, không phải lịch trình tự tạo
+        const saveBtn = document.getElementById('btnSaveTrip');
+        if (saveBtn) saveBtn.style.display = 'none';
+        const saveTripStatus = document.getElementById('saveTripStatus');
+        if (saveTripStatus) saveTripStatus.style.display = 'none';
+        const postSave = document.getElementById('postSaveActions');
+        if (postSave) postSave.style.display = 'none';
+
         const resultContainer = document.getElementById('timelineResult');
         const placeholder = document.getElementById('resultPlaceholder');
         if (placeholder) placeholder.style.display = 'none';
-        if (resultContainer) resultContainer.style.display = 'block';
-
-        resultContainer.scrollIntoView({ behavior: 'smooth' });
+        if (resultContainer) {
+          resultContainer.style.display = 'block';
+          setTimeout(() => resultContainer.scrollIntoView({ behavior: 'smooth' }), 100);
+        }
       } catch (e) {
         console.error("Tour comparison error:", e);
+        if (window.WanderToast) WanderToast.error("Có lỗi xảy ra khi so sánh tour.");
       } finally {
         if (loader) loader.style.display = 'none';
       }
@@ -5405,7 +5422,7 @@
        // Switch to result view — THIS IS THE KEY MISSING LINE
        document.querySelector('.planner-container')?.classList.add('show-result');
        const plannerFormCard = document.getElementById('plannerFormCard');
-       if (plannerFormCard) plannerFormCard.style.display = 'none';
+       // Đã xóa inline style vì CSS show-result tự động quản lý ẩn/hiện
        if (placeholder) placeholder.style.display = 'none';
        if (resultContainer) resultContainer.style.display = 'block';
 
@@ -5454,11 +5471,14 @@
          const container = document.getElementById('timelineContent');
          if (container) container.classList.add('comparison-mode-active');
          
-         // Hiện vùng kết quả
+         // Hiện vùng kết quả toàn màn hình
+         document.querySelector('.planner-container')?.classList.add('show-result');
+         
          if (placeholder) placeholder.style.display = 'none';
-         if (resultContainer) resultContainer.style.display = 'block';
-
-         resultContainer.scrollIntoView({ behavior: 'smooth' });
+         if (resultContainer) {
+           resultContainer.style.display = 'block';
+           setTimeout(() => resultContainer.scrollIntoView({ behavior: 'smooth' }), 100);
+         }
          
        } catch (e) {
          console.error("Multi-Compare Error:", e);

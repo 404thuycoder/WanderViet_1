@@ -2698,7 +2698,7 @@
 
         card.innerHTML = `
           <div class="dest-card-image">
-            <img id="outerCardImg_${cardIdx}" src="${imgSrc}" alt="${dest.name}" style="transition: opacity 0.5s ease;" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop';">
+            <img id="outerCardImg_${cardIdx}" src="${imgSrc}" alt="${dest.name}" style="transition: opacity 0.5s ease;" onerror="(window._failedImgUrls=window._failedImgUrls||new Set()).add(this.src);this.onerror=null;this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop';">
             <div class="dest-card-badge">⭐ ${rating}</div>
           </div>
           <div class="dest-card-info">
@@ -2723,17 +2723,28 @@
           // Staggered interval: randomized between 3.0s and 5.0s
           const slideInterval = 3000 + Math.random() * 2000;
           let currentPhotoIdx = 0;
-          
           const timer = setInterval(() => {
             const el = document.getElementById(`outerCardImg_${cardIdx}`);
             if (!el) {
               clearInterval(timer);
               return;
             }
-            currentPhotoIdx = (currentPhotoIdx + 1) % photos.length;
+            const failedUrls = window._failedImgUrls || new Set();
+            let attempts = 0;
+            do {
+              currentPhotoIdx = (currentPhotoIdx + 1) % photos.length;
+              attempts++;
+            } while (failedUrls.has(photos[currentPhotoIdx]) && attempts < photos.length);
+
+            if (attempts >= photos.length) {
+              clearInterval(timer);
+              return;
+            }
+
             el.style.opacity = '0';
+            const nextUrl = photos[currentPhotoIdx];
             setTimeout(() => {
-              el.src = photos[currentPhotoIdx];
+              el.src = nextUrl;
               el.style.opacity = '1';
             }, 300);
           }, slideInterval);
@@ -5290,7 +5301,7 @@
           if (trip.isDeleted) statusBadge = '<span class="trip-badge-mini deleted">Đã xóa</span>';
 
           return `
-            <div class="saved-trip-item-v2" onclick="toggleTripSelection(this, '${trip._id}')">
+            <div class="saved-trip-item-v2" data-trip-id="${trip._id}">
               <div class="trip-selection-check">
                 <input type="checkbox" id="check_${trip._id}" class="trip-checkbox" ${selectedTripIds.includes(trip._id) ? 'checked' : ''}>
               </div>
@@ -5326,16 +5337,38 @@
     };
     let selectedTripIds = [];
 
+    // Use change event delegation for checkbox toggle
+    document.getElementById('savedTripsList')?.addEventListener('change', e => {
+      const checkbox = e.target.closest('.trip-checkbox');
+      if (!checkbox) return;
+      const item = checkbox.closest('.saved-trip-item-v2');
+      if (!item) return;
+      const tripId = item.dataset.tripId;
+      if (!tripId) return;
+      toggleTripSelection(item, tripId);
+    });
+
+    // Click anywhere on the row toggles the checkbox
+    document.getElementById('savedTripsList')?.addEventListener('click', e => {
+      const item = e.target.closest('.saved-trip-item-v2');
+      if (!item) return;
+      const checkbox = item.querySelector('.trip-checkbox');
+      if (!checkbox) return;
+      // Only trigger if NOT already clicking on the checkbox itself (avoids double-fire)
+      if (e.target !== checkbox) {
+        checkbox.click();
+      }
+    });
     window.toggleTripSelection = function(el, id) {
       const checkbox = el.querySelector('.trip-checkbox');
-      if (selectedTripIds.includes(id)) {
+      // Use actual checkbox state (browser already toggled it before 'change' fires)
+      const isNowChecked = checkbox ? checkbox.checked : false;
+      if (isNowChecked) {
+        if (!selectedTripIds.includes(id)) selectedTripIds.push(id);
+        el.classList.add('selected-for-compare');
+      } else {
         selectedTripIds = selectedTripIds.filter(i => i !== id);
         el.classList.remove('selected-for-compare');
-        if (checkbox) checkbox.checked = false;
-      } else {
-        selectedTripIds.push(id);
-        el.classList.add('selected-for-compare');
-        if (checkbox) checkbox.checked = true;
       }
       
       // Cập nhật trạng thái nút và counter
@@ -5348,8 +5381,7 @@
         btn.disabled = selectedTripIds.length < 2;
         btn.style.background = selectedTripIds.length < 2 ? 'rgba(255,255,255,0.05)' : 'linear-gradient(135deg, #3b82f6, #2563eb)';
         btn.style.boxShadow = selectedTripIds.length < 2 ? 'none' : '0 8px 20px rgba(37, 99, 235, 0.4)';
-        
-        // Cập nhật hint text
+
         let hint = btn.nextElementSibling;
         if (selectedTripIds.length < 2) {
           if (!hint || hint.tagName !== 'P') {
@@ -5363,14 +5395,21 @@
 
     async function startMultiCompare() {
        if (selectedTripIds.length === 0) return;
-       
+
        const loader = document.getElementById('aiLoader');
        const resultContainer = document.getElementById('timelineResult');
        const placeholder = document.getElementById('resultPlaceholder');
-       
+
        if (loader) loader.style.display = 'flex';
-       
-        try {
+
+       // Switch to result view — THIS IS THE KEY MISSING LINE
+       document.querySelector('.planner-container')?.classList.add('show-result');
+       const plannerFormCard = document.getElementById('plannerFormCard');
+       if (plannerFormCard) plannerFormCard.style.display = 'none';
+       if (placeholder) placeholder.style.display = 'none';
+       if (resultContainer) resultContainer.style.display = 'block';
+
+       try {
          const token = localStorage.getItem('wander_token');
          const history = window.WanderPlanner.getPlanHistory() || [];
          const currentIndex = window.WanderPlanner.getCurrentPlanIndex();

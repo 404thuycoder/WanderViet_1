@@ -2995,6 +2995,29 @@
     openPlaceModal();
   });
 
+  // Nút dọn ảnh lỗi
+  document.getElementById('btn-cleanup-place-images')?.addEventListener('click', async () => {
+    if (!confirm('Hành động này sẽ xóa các ảnh lỗi (/uploads/undefined) trong tất cả địa điểm. Tiếp tục?')) return;
+    const btn = document.getElementById('btn-cleanup-place-images');
+    btn.disabled = true;
+    btn.textContent = '⏳ Đang dọn...';
+    try {
+      const res = await fetch('/api/admin/places/cleanup-images', {
+        method: 'POST',
+        headers: { 'x-auth-token': token }
+      });
+      const json = await res.json();
+      if (json.success) {
+        alert(json.message);
+        await loadPlaces();
+      } else {
+        alert('Lỗi: ' + (json.message || 'Không rõ'));
+      }
+    } catch (e) { alert('Lỗi kết nối'); }
+    btn.disabled = false;
+    btn.textContent = '🧹 Dọn ảnh lỗi';
+  });
+
   function openPlaceModal(place = null) {
     placeForm.reset();
     placeFormStatus.textContent = '';
@@ -3042,8 +3065,9 @@
       document.getElementById('chk-is-tour').checked = !!place.isTour;
       document.getElementById('chk-is-utility').checked = !!place.isUtility;
 
-      // Handle displaying images
-      let imagesArr = place.images && place.images.length > 0 ? place.images : (place.image ? [place.image] : []);
+      // Handle displaying images — lọc bỏ URL lỗi /uploads/undefined
+      let imagesArr = (place.images && place.images.length > 0 ? place.images : (place.image ? [place.image] : []))
+        .filter(url => url && url.trim() && !url.includes('uploads/undefined') && url !== 'undefined');
       renderDropzonePreview(imagesArr.map(url => ({ url })));
     } else {
       placeForm.elements['id'].value = '';
@@ -3493,30 +3517,88 @@
   const placeDropzone = document.getElementById('place-dropzone');
   const placeDropzonePreview = document.getElementById('place-dropzone-preview');
   const placeImageInput = document.getElementById('place-image-input');
-  
+
   function renderDropzonePreview(files) {
     currentDropzoneFiles = files || [];
     if (!placeDropzonePreview) return;
     placeDropzonePreview.innerHTML = '';
     currentDropzoneFiles.forEach((f, idx) => {
       const wrapper = document.createElement('div');
-      wrapper.style.cssText = 'position:relative; width:80px; height:80px; border-radius:var(--radius-sm); overflow:hidden; border:1px solid var(--border);';
+      wrapper.style.cssText = 'position:relative; width:80px; height:80px; border-radius:var(--radius-sm); overflow:hidden; border:1px solid var(--border); flex-shrink:0;';
       const img = document.createElement('img');
       img.src = f.preview || f.url || '';
       img.style.cssText = 'width:100%; height:100%; object-fit:cover;';
+      img.onerror = () => { wrapper.style.display = 'none'; };
+      const typeBadge = document.createElement('span');
+      typeBadge.style.cssText = 'position:absolute; bottom:4px; left:4px; background:rgba(0,0,0,0.5); color:#fff; border-radius:4px; font-size:10px; padding:1px 4px; pointer-events:none;';
+      typeBadge.textContent = f.file ? '📷' : '🔗';
       const btn = document.createElement('button');
       btn.innerHTML = '&times;';
-      btn.style.cssText = 'position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.5); color:#fff; border:none; border-radius:50%; width:20px; height:20px; line-height:1; cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center;';
+      btn.style.cssText = 'position:absolute; top:4px; right:4px; background:rgba(0,0,0,0.5); color:#fff; border:none; border-radius:50%; width:20px; height:20px; line-height:1; cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center; z-index:1;';
       btn.onclick = (e) => {
         e.preventDefault();
+        e.stopPropagation();
         currentDropzoneFiles.splice(idx, 1);
         renderDropzonePreview(currentDropzoneFiles);
       };
       wrapper.appendChild(img);
+      wrapper.appendChild(typeBadge);
       wrapper.appendChild(btn);
       placeDropzonePreview.appendChild(wrapper);
     });
   }
+
+  // --- Place Dropzone Event Listeners ---
+  function handlePlaceFile(file) {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      currentDropzoneFiles.push({ file, preview: e.target.result });
+      renderDropzonePreview(currentDropzoneFiles);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  if (placeDropzone) {
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(n => {
+      placeDropzone.addEventListener(n, e => { e.preventDefault(); e.stopPropagation(); });
+    });
+    placeDropzone.addEventListener('dragover', () => placeDropzone.style.borderColor = 'var(--admin-primary)');
+    placeDropzone.addEventListener('dragleave', () => placeDropzone.style.borderColor = '');
+    placeDropzone.addEventListener('drop', e => {
+      placeDropzone.style.borderColor = '';
+      const file = e.dataTransfer.files[0];
+      if (file) handlePlaceFile(file);
+    });
+    placeDropzone.addEventListener('click', () => placeImageInput && placeImageInput.click());
+  }
+
+  if (placeImageInput) {
+    placeImageInput.addEventListener('change', e => {
+      Array.from(e.target.files).forEach(file => handlePlaceFile(file));
+      e.target.value = '';
+    });
+  }
+
+  // Add image via URL text input
+  function addImageUrl() {
+    const urlInput = document.getElementById('place-image-url');
+    const url = urlInput?.value.trim();
+    if (!url) return;
+    if (!url.match(/^https?:\/\//i)) {
+      alert('Vui lòng nhập đường link bắt đầu bằng http:// hoặc https://');
+      return;
+    }
+    currentDropzoneFiles.push({ url, preview: url });
+    renderDropzonePreview(currentDropzoneFiles);
+    if (urlInput) urlInput.value = '';
+  }
+  window.__addImageUrl = addImageUrl;
+
+  document.getElementById('btn-add-image-url')?.addEventListener('click', addImageUrl);
+  document.getElementById('place-image-url')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); addImageUrl(); }
+  });
 
   let currentSupportTab = 'user'; // 'user' or 'business'
   let currentSupportChatId = null;

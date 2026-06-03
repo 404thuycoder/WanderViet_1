@@ -1170,11 +1170,15 @@ router.post('/places', adminTokenAuth, superAdminAuth, upload.array('imageFile',
   try {
     let imagesArr = [];
     
-    // 1. Files uploaded
+    // 1. Files uploaded via uploadFile() -> MongoDB base64
     if (req.files && req.files.length > 0) {
-      req.files.forEach(file => {
-        imagesArr.push('/uploads/' + file.filename);
-      });
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      for (const file of req.files) {
+        const uploaded = await uploadFile(file, `place_${Date.now()}_${file.originalname}`, {
+          type: 'place_image'
+        });
+        imagesArr.push(`${baseUrl}/api/files/${uploaded.id}`);
+      }
     }
     
     // 2. URLs passed as text
@@ -1246,11 +1250,15 @@ router.put('/places/:id', adminTokenAuth, adminAuth, upload.array('imageFile', 1
 
     let imagesArr = place.images && place.images.length > 0 ? [...place.images] : (place.image ? [place.image] : []);
 
-    // Handling new file uploads
+    // Handling new file uploads via uploadFile() -> MongoDB base64
     if (req.files && req.files.length > 0) {
-      req.files.forEach(file => {
-        imagesArr.push('/uploads/' + file.filename);
-      });
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      for (const file of req.files) {
+        const uploaded = await uploadFile(file, `place_${Date.now()}_${file.originalname}`, {
+          type: 'place_image'
+        });
+        imagesArr.push(`${baseUrl}/api/files/${uploaded.id}`);
+      }
     } 
     
     // If the frontend sends an explicit list of images to retain (for sorting/deleting)
@@ -1264,7 +1272,13 @@ router.put('/places/:id', adminTokenAuth, adminAuth, upload.array('imageFile', 1
         // Assume this is the new absolute state of images array + new files
         imagesArr = parsedImages;
         if (req.files && req.files.length > 0) {
-           req.files.forEach(file => imagesArr.push('/uploads/' + file.filename));
+          const baseUrl = `${req.protocol}://${req.get('host')}`;
+          for (const file of req.files) {
+            const uploaded = await uploadFile(file, `place_${Date.now()}_${file.originalname}`, {
+              type: 'place_image'
+            });
+            imagesArr.push(`${baseUrl}/api/files/${uploaded.id}`);
+          }
         }
       }
     } else if (req.body.image !== undefined && !req.files) {
@@ -1331,6 +1345,32 @@ router.delete('/places/:id', adminTokenAuth, superAdminAuth, async (req, res) =>
     await logAction(req.user?.email || 'admin', req.user?.role || 'admin', 'PLACE_DELETED', { placeId: req.params.id, name: place.name }, req.ip, req.headers['user-agent']);
     broadcastGlobal('data_sync', { entity: 'place', action: 'deleted' });
     res.json({ success: true, message: 'Đã xóa thành công' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Dọn dẹp ảnh lỗi /uploads/undefined trong tất cả place
+router.post('/places/cleanup-images', adminTokenAuth, superAdminAuth, async (req, res) => {
+  try {
+    const badPatterns = ['uploads/undefined', '/uploads/undefined', 'undefined', null, ''];
+    let fixed = 0;
+    const places = await Place.find();
+    for (const place of places) {
+      let changed = false;
+      const cleanImages = (place.images || []).filter(img => {
+        if (!img || img === 'undefined' || img.includes('uploads/undefined')) { changed = true; return false; }
+        return true;
+      });
+      const cleanImage = place.image && place.image !== 'undefined' && !place.image.includes('uploads/undefined') ? place.image : (cleanImages[0] || '');
+      if (changed) {
+        place.images = cleanImages;
+        place.image = cleanImage;
+        await place.save();
+        fixed++;
+      }
+    }
+    res.json({ success: true, message: `Đã dọn dẹp ${fixed} địa điểm có ảnh lỗi.` });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

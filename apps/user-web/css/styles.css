@@ -5962,13 +5962,13 @@ section[id] {
 .hero-v2 {
   position: relative;
   padding: 10rem 0 8rem;
-  background-color: var(--bg);
+  background-color: #0f172a; /* Fallback dark */
   background-image: url('https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=2000');
   background-size: cover;
   background-position: center;
   overflow: visible;
   /* Cho phép dropdown hiện ra ngoài */
-  color: var(--text);
+  color: #ffffff; /* Always white text on dark background image */
 }
 
 @media (max-width: 600px) {
@@ -6085,7 +6085,7 @@ section[id] {
 .hero-v2__eyebrow {
   font-family: var(--font-head);
   font-weight: 700;
-  color: var(--primary);
+  color: #38bdf8; /* Always visible bright blue */
   letter-spacing: 0.1em;
   text-transform: uppercase;
   font-size: 0.85rem;
@@ -6098,11 +6098,12 @@ section[id] {
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: 1.5rem;
+  color: #ffffff; /* Always white */
 }
 
 .hero-v2__lead {
   font-size: 1.15rem;
-  color: var(--text-muted);
+  color: rgba(255, 255, 255, 0.85); /* Always light text */
   line-height: 1.6;
   max-width: 600px;
   margin-bottom: 2.5rem;
@@ -6119,6 +6120,7 @@ section[id] {
   max-width: 650px;
   margin-bottom: 2.5rem;
   position: relative;
+  z-index: 100; /* Force this stacking context above the tags */
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -6138,7 +6140,7 @@ section[id] {
 
 .search-icon {
   font-size: 1.2rem;
-  opacity: 0.5;
+  opacity: 0.8;
 }
 
 .search-box input {
@@ -6148,8 +6150,12 @@ section[id] {
   padding: 1rem 0;
   font-family: inherit;
   font-size: 1rem;
-  color: var(--text);
+  color: #ffffff; /* Always white so it's readable on dark background */
   outline: none;
+}
+
+.search-box input::placeholder {
+  color: rgba(255, 255, 255, 0.65); /* High contrast placeholder */
 }
 
 .hero-v2__btn {

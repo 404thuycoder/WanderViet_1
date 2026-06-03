@@ -1758,6 +1758,7 @@
                 </select>
                 <input type="text" id="place-search" class="admin-search-input" placeholder="🔍 Tìm điểm đến..." />
                 <button class="btn btn--primary btn--small" id="btn-add-place">+ Thêm mới</button>
+                <button class="btn btn--small" id="btn-cleanup-place-images" style="background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3);" title="Xóa ảnh lỗi /uploads/undefined trong database">🧹 Dọn ảnh lỗi</button>
               </div>
             </div>
 
@@ -2587,6 +2588,11 @@
               <span class="field-label">Hình ảnh điểm đến (*)</span>
               <!-- Hidden input to hold absolute array of URL images if we modify order -->
               <input type="hidden" name="images" id="hidden-place-images" />
+              <!-- URL image input -->
+              <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
+                <input type="text" id="place-image-url" placeholder="Dán link ảnh (Unsplash, Google Images...)" style="flex:1; padding:0.5rem 0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#fff; font-size:0.875rem;" />
+                <button type="button" id="btn-add-image-url" onclick="window.__addImageUrl && window.__addImageUrl()" style="padding:0.5rem 1rem; border-radius:8px; border:none; background:rgba(99,102,241,0.3); color:#a5b4fc; cursor:pointer; font-size:0.875rem; white-space:nowrap;">+ Thêm URL</button>
+              </div>
               <div class="upload-dropzone" id="place-dropzone">
                 <input type="file" id="place-image-input" name="imageFile" accept="image/jpeg, image/png, image/webp" multiple class="visually-hidden" />
                 <label for="place-image-input" class="upload-dropzone__label">

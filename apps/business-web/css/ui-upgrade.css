@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    WanderViet AI Business Web — UI Upgrade v2.0
    Additive stylesheet — import AFTER styles.css & business.css
    ============================================================ */
@@ -320,6 +320,11 @@ select {
   border-radius: 10px !important;
   color: #f1f5f9 !important;
   transition: all 0.2s ease !important;
+}
+
+select option {
+  background-color: #111827 !important;
+  color: #f1f5f9 !important;
 }
 
 input:focus,

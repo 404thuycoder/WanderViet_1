@@ -11191,3 +11191,8 @@ body.disable-neon .crt-overlay {
   }
 }
 
+select option {
+  background-color: #111827 !important;
+  color: #ffffff !important;
+}
+

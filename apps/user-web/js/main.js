@@ -1315,7 +1315,7 @@
 
       // Keyword based high-res specific overrides to make the UI look absolutely stunning!
       var lowName = (p.name || '').toLowerCase();
-      if (lowName.indexOf('anh thùy') !== -1) {
+      if (lowName.indexOf('anh thùy') !== -1 || lowName.indexOf('anh thủy') !== -1) {
         fallbackImg = 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80';
       } else if (lowName.indexOf('phi cơ') !== -1 || lowName.indexOf('ngắm vịnh') !== -1) {
         fallbackImg = 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=600&q=80';
@@ -1323,6 +1323,10 @@
         fallbackImg = 'https://images.unsplash.com/photo-1533038590840-1cde6b5697df?w=600&q=80';
       } else if (lowName.indexOf('bữa tối lãng mạn') !== -1 || lowName.indexOf('luxury dinner') !== -1) {
         fallbackImg = 'https://images.unsplash.com/photo-1515263487990-61b07816b324?w=600&q=80';
+      } else if (lowName.indexOf('spa') !== -1 || lowName.indexOf('massage') !== -1) {
+        fallbackImg = 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80';
+      } else if (lowName.indexOf('câu mực') !== -1) {
+        fallbackImg = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80';
       }
 
       var displayImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || fallbackImg);
@@ -1339,7 +1343,7 @@
 
       // Add high-quality slides dynamically if it's one of the seeded items to maximize aesthetics!
       if (imagesList.length === 1) {
-        if (lowName.indexOf('anh thùy') !== -1) {
+        if (lowName.indexOf('anh thùy') !== -1 || lowName.indexOf('anh thủy') !== -1) {
           imagesList = [
             'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=600&q=80',
             'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80',
@@ -1357,11 +1361,22 @@
             'https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?w=600&q=80',
             'https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600&q=80'
           ];
-        } else if (lowName.indexOf('bữa tối lãng mạn') !== -1) {
+        } else if (lowName.indexOf('bữa tối lãng mạn') !== -1 || lowName.indexOf('luxury dinner') !== -1) {
           imagesList = [
             'https://images.unsplash.com/photo-1515263487990-61b07816b324?w=600&q=80',
             'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80',
             'https://images.unsplash.com/photo-1509722747041-074f18d68246?w=600&q=80'
+          ];
+        } else if (lowName.indexOf('spa') !== -1 || lowName.indexOf('massage') !== -1) {
+          imagesList = [
+            'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=600&q=80',
+            'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=600&q=80',
+            'https://images.unsplash.com/photo-1498496294664-d9372eb521f3?w=600&q=80'
+          ];
+        } else if (lowName.indexOf('câu mực') !== -1) {
+          imagesList = [
+            'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=80',
+            'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80'
           ];
         }
       }

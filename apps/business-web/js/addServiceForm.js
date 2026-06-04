@@ -108,6 +108,10 @@
     }
     .svc-form-input:focus { outline: none; border-color: #6366f1; background: rgba(255,255,255,0.06); box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
     .svc-form-input::placeholder { color: #4b5563; }
+    .svc-form-input option {
+      background-color: #111827;
+      color: #fff;
+    }
     
     .svc-form-row { 
       display: grid; 
@@ -770,61 +774,115 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   }
 
   function setupLeafletMap() {
+    if (window.L) {
+      // Fix leaflet marker icon path issue
+      delete L.Icon.Default.prototype._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      });
+    }
+
+    const latEl = document.getElementById('svc-lat');
+    const lngEl = document.getElementById('svc-lng');
+    const hasCoordinates = latEl && latEl.value && parseFloat(latEl.value) !== 0 && !isNaN(parseFloat(latEl.value));
+    
+    let lat = hasCoordinates ? parseFloat(latEl.value) : 21.0285;
+    let lng = hasCoordinates ? parseFloat(lngEl.value) : 105.8542;
+
     if (mapInstance) {
       mapInstance.invalidateSize();
-      return;
+      mapInstance.setView([lat, lng], 13);
+      if (marker) {
+        marker.setLatLng([lat, lng]);
+      }
+      setTimeout(() => { mapInstance.invalidateSize(); }, 300);
+    } else {
+      const mapEl = document.getElementById('svc-map');
+      if (mapEl) {
+        mapInstance = L.map('svc-map').setView([lat, lng], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(mapInstance);
+        
+        marker = L.marker([lat, lng], {draggable: true}).addTo(mapInstance);
+        
+        marker.on('dragend', function(e) {
+          const pos = marker.getLatLng();
+          document.getElementById('svc-lat').value = pos.lat.toFixed(6);
+          document.getElementById('svc-lng').value = pos.lng.toFixed(6);
+        });
+
+        mapInstance.on('click', function(e) {
+          marker.setLatLng(e.latlng);
+          document.getElementById('svc-lat').value = e.latlng.lat.toFixed(6);
+          document.getElementById('svc-lng').value = e.latlng.lng.toFixed(6);
+        });
+
+        // Handle address search via Nominatim
+        const addressInput = document.getElementById('svc-address');
+        let typingTimer;
+        addressInput.addEventListener('input', () => {
+          clearTimeout(typingTimer);
+          typingTimer = setTimeout(() => {
+            const query = addressInput.value.trim();
+            if (query.length > 5) {
+              fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                  if (data && data.length > 0) {
+                    const newLat = parseFloat(data[0].lat);
+                    const newLon = parseFloat(data[0].lon);
+                    mapInstance.setView([newLat, newLon], 14);
+                    marker.setLatLng([newLat, newLon]);
+                    document.getElementById('svc-lat').value = newLat.toFixed(6);
+                    document.getElementById('svc-lng').value = newLon.toFixed(6);
+                  }
+                }).catch(err => console.error('Geocoding error', err));
+            }
+          }, 1000);
+        });
+        
+        setTimeout(() => { mapInstance.invalidateSize(); }, 300);
+      }
     }
-    const mapEl = document.getElementById('svc-map');
-    if (!mapEl) return;
-    
-    const initialLat = 21.0285;
-    const initialLng = 105.8542;
-    mapInstance = L.map('svc-map').setView([initialLat, initialLng], 13);
-    
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(mapInstance);
-    
-    marker = L.marker([initialLat, initialLng], {draggable: true}).addTo(mapInstance);
-    
-    marker.on('dragend', function(e) {
-      const pos = marker.getLatLng();
-      document.getElementById('svc-lat').value = pos.lat.toFixed(6);
-      document.getElementById('svc-lng').value = pos.lng.toFixed(6);
-    });
 
-    mapInstance.on('click', function(e) {
-      marker.setLatLng(e.latlng);
-      document.getElementById('svc-lat').value = e.latlng.lat.toFixed(6);
-      document.getElementById('svc-lng').value = e.latlng.lng.toFixed(6);
-    });
-
-    // Handle address search via Nominatim
-    const addressInput = document.getElementById('svc-address');
-    let typingTimer;
-    addressInput.addEventListener('input', () => {
-      clearTimeout(typingTimer);
-      typingTimer = setTimeout(() => {
-        const query = addressInput.value.trim();
-        if (query.length > 5) {
-          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
-            .then(res => res.json())
-            .then(data => {
-              if (data && data.length > 0) {
-                const lat = parseFloat(data[0].lat);
-                const lon = parseFloat(data[0].lon);
-                mapInstance.setView([lat, lon], 14);
-                marker.setLatLng([lat, lon]);
-                document.getElementById('svc-lat').value = lat.toFixed(6);
-                document.getElementById('svc-lng').value = lon.toFixed(6);
+    // Geocode address if coordinates are missing
+    if (!hasCoordinates) {
+      const addressVal = document.getElementById('svc-address') ? document.getElementById('svc-address').value.trim() : '';
+      const regionVal = document.getElementById('svc-region') ? document.getElementById('svc-region').value.trim() : '';
+      const cityVal = document.getElementById('svc-city') ? document.getElementById('svc-city').value.trim() : '';
+      
+      let searchQuery = addressVal;
+      if (regionVal && !searchQuery.includes(regionVal)) {
+        searchQuery += (searchQuery ? ', ' : '') + regionVal;
+      }
+      if (cityVal && !searchQuery.includes(cityVal)) {
+        searchQuery += (searchQuery ? ', ' : '') + cityVal;
+      }
+      
+      if (searchQuery) {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.length > 0) {
+              const newLat = parseFloat(data[0].lat);
+              const newLon = parseFloat(data[0].lon);
+              if (mapInstance) {
+                mapInstance.setView([newLat, newLon], 14);
+                if (marker) {
+                  marker.setLatLng([newLat, newLon]);
+                }
               }
-            }).catch(err => console.error('Geocoding error', err));
-        }
-      }, 1000);
-    });
-    
-    // Fix leaflet map display bug inside modals
-    setTimeout(() => { mapInstance.invalidateSize(); }, 300);
+              if (document.getElementById('svc-lat')) document.getElementById('svc-lat').value = newLat.toFixed(6);
+              if (document.getElementById('svc-lng')) document.getElementById('svc-lng').value = newLon.toFixed(6);
+            }
+          })
+          .catch(err => console.error('Geocoding error on init', err));
+      }
+    }
   }
 
   // --- LOGIC: BUILDER HÀNH TRÌNH ---

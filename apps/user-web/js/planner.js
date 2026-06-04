@@ -9,7 +9,7 @@ const VN_DESTINATION_PHOTOS = {
   "hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://upload.wikimedia.org/wikipedia/commons/4/42/Ha_Long_2019_taken_by_DJI_FC220.jpg"],
   "vịnh hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
   "sapa": ["https://booking.muongthanh.com/upload_images/images/Nhung/review-dia-diem-du-lich-sapa.jpg", "https://phetravel.com/uploads/30-06-2023-14-53-09-du-lich-sa-pa-0.jpg.webp", "https://topasecolodge.com/wp-content/uploads/2025/06/best-time-to-visit-sapa-04.jpg"],
-  "fansipan": ["https://booking.muongthanh.com/upload_images/images/Nhung/review-dia-diem-du-lich-sapa.jpg"],
+  "fansipan": ["https://booking.muongthanh.com/upload_images/images/H%60/dinh-nui-fansipan.jpg"],
   "cát cát": ["https://phetravel.com/uploads/30-06-2023-14-53-09-du-lich-sa-pa-0.jpg.webp"],
   "ninh bình": ["https://cdn-media.sforum.vn/storage/app/media/ctvseo_16/danh%20lam%20th%E1%BA%AFng%20c%E1%BA%A3nh%20Ninh%20B%C3%ACnh/danh-lam-thang-canh-ninh-binh-thumbnail.jpg", "https://sodulich.ninhbinh.gov.vn/uploads/images/trang-an-bd_1737078235160%20(1).jpg", "https://thanhnienviet.mediacdn.vn/91575133199802368/2025/5/26/photo-1748230467546-17482304703661238448265.jpeg"],
   "tràng an": ["https://cdn-media.sforum.vn/storage/app/media/ctvseo_16/danh%20lam%20th%E1%BA%AFng%20c%E1%BA%A3nh%20Ninh%20B%C3%ACnh/danh-lam-thang-canh-ninh-binh-thumbnail.jpg"],
@@ -33,11 +33,11 @@ const VN_DESTINATION_PHOTOS = {
 
   // --- MIỀN TRUNG ---
   "đà nẵng": ["https://cdn-media.sforum.vn/storage/app/media/ctvseo_MH/%E1%BA%A3nh%20%C4%91%E1%BA%B9p%20%C4%91%C3%A0%20n%E1%BA%B5ng/anh-dep-da-nang-thumb.jpg", "https://cdn-media.sforum.vn/storage/app/media/wp-content/uploads/2024/01/dia-diem-du-lich-da-nang-thumb.jpg", "https://statics.vinwonders.com/du-lich-da-nang-3-ngay-2-dem-anh-1.jpg"],
-  "hội an": ["https://bcp.cdnchinhphu.vn/334894974524682240/2025/9/18/cdhoian5-17581621538711341831070.jpeg", "https://danangfantasticity.com/wp-content/uploads/2025/09/hoi-an-ve-dem-flycam-1024x576.jpg", "https://www.victoriahotels.asia/wp-content/uploads/2025/06/Top-historical-landmarks-to-visit.jpg"],
+  "hội an": ["https://bcp.cdnchinhphu.vn/334894974524682240/2025/9/18/cdhoian5-17581621538711341831070.jpeg", "https://danangfantasticity.com/wp-content/uploads/2025/09/hoi-an-ve-dem-flycam-1024x576.jpg", "https://cdnmedia.vneconomycdn.com/2025/09/anh-pho-co-hoi-an-ve-dem-5-17581624032221291969754.jpg"],
   "huế": ["https://cdn-media.sforum.vn/storage/app/media/wp-content/uploads/2024/01/cac-dia-diem-du-lich-o-hue-thumb.jpg", "https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2024/10/30/1-1730286328125213276220.jpg", "https://tapchidongnama.vn/wp-content/uploads/2024/10/z5960127075782_b80d031bfd905d559fd387ad7b77d14f.jpg"],
   "nha trang": ["https://letsflytravel.vn/wp-content/uploads/2024/08/nha-trang-2.webp", "https://baokhanhhoa.vn/file/e7837c02857c8ca30185a8c39b582c03/052026/copilot_20260526_213230_20260526213249.png", "https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/adgahjd-1755152740753.jpg"],
-  "đà lạt": ["https://phetravel.com/uploads/dnt-da-lat.jpg", "https://booking.muongthanh.com/upload_images/images/H%60/thanh-pho-da-lat.jpg", "https://samtenhills.vn/wp-content/uploads/2024/11/kinh-nghiem-du-lich-da-lat-1-minh.jpg"],
-  "đà lạc": ["https://phetravel.com/uploads/dnt-da-lat.jpg", "https://booking.muongthanh.com/upload_images/images/H%60/thanh-pho-da-lat.jpg"],
+  "đà lạt": ["https://booking.muongthanh.com/upload_images/images/H%60/thanh-pho-da-lat.jpg", "https://phetravel.com/uploads/dnt-da-lat.jpg", "https://samtenhills.vn/wp-content/uploads/2024/11/kinh-nghiem-du-lich-da-lat-1-minh.jpg"],
+  "đà lạc": ["https://booking.muongthanh.com/upload_images/images/H%60/thanh-pho-da-lat.jpg", "https://phetravel.com/uploads/dnt-da-lat.jpg"],
   "quy nhơn": ["https://vcdn1-dulich.vnecdn.net/2022/04/02/dulichQuyNhon-1648878861-3106-1648880222.jpg?w=0&h=0&q=100&dpr=2&fit=crop&s=wFYxIbRCAt_Yy6OCMqXkOg", "https://ik.imagekit.io/tvlk/blog/2024/08/thoi-tiet-quy-nhon-1.jpg?tr=q-70,c-at_max,w-1000,h-600", "https://statics.vinwonders.com/quy-nhon-thuoc-mien-nao-1_1711465470.jpg"],
   "phú yên": ["https://pystravel.vn/_next/image?url=https%3A%2F%2Fbooking.pystravel.vn%2Fuploads%2Fposts%2Falbums%2F17773%2F3a8d3766296cf2d88980c7641cece7c2.png&w=1920&q=75", "https://images2.thanhnien.vn/528068263637045248/2024/6/18/song-cau-1-1718686277229613062622.jpg", "https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/depositphotos595528698xl-1736473488122.jpg"],
   "tuy hòa": ["https://vj-prod-website-cms.s3.ap-southeast-1.amazonaws.com/abcss-1645419251625.png", "https://statics.vinwonders.com/ve-dep-bai-bien-tuy-hoa-phu-yen_1761366703.jpg", "https://upload.wikimedia.org/wikipedia/commons/d/de/TuyHoaCT.jpg"],
@@ -63,7 +63,7 @@ const VN_DESTINATION_PHOTOS = {
   "vũng tàu": ["https://cdn-media.sforum.vn/storage/app/media/ctv_seo4/le-hoi-vung-tau-thumb.jpg", "https://homepage.momocdn.net/blogscontents/momo-upload-api-221013140622-638012667825895595.jpeg", "https://owa.bestprice.vn/images/destinations/uploads/vung-tau-56440d55ca575.jpg"],
   "phú quốc": ["https://luhanhtour.com/wp-content/uploads/2025/02/PQ-WEB-sao-che%CC%81p.jpg", "https://phetravel.com/uploads/173062315558phu-quoc-da-xinh-dep-roi-gio-can-quyet-liet-1730950394161-1730950394301377124644-1.jpg.webp", "https://cdn.daidoanket.vn/w3840/uploaded/images/2025/10/13/2786714c-4930-4dc5-a5a9-9cf243b61b81.jpg"],
   "cần thơ": ["https://ik.imagekit.io/tvlk/blog/2021/11/dia-diem-du-lich-can-tho-cover.jpg", "https://tinviettravel.com/uploads/tours/images/can_tho/tour-can-tho-2-ngay-1-dem.jpg", "https://tinviettravel.com.vn/uploads/cam-nang-du-lich/2025_12/du-lich-can-thocover.png"],
-  "côn đảo": ["https://pystravel.vn/_next/image?url=https%3A%2F%2Fbooking.pystravel.vn%2Fuploads%2Fposts%2Favatar%2F1760513565.jpg&w=3840&q=75", "https://www.condaopark.com.vn/vnt_upload/weblink/ben-dam-paner.jpg", "https://datviettour.com.vn/uploads/images/tin-tuc-SEO/mien-nam/Con-Dao/danh-thang/cac-diem-den-noi-bat-trong-tour-du-lich-con-dao.jpg"],
+  "côn đảo": ["https://images.hcmcpv.org.vn/res/news/2025/10/19-10-2025-vuon-quoc-gia-con-dao-trung-tam-da-dang-sinh-hoc-giau-gia-tri-A6109B0E.jpg", "https://nld.mediacdn.vn/291774122806476800/2026/3/2/1jikakr3c4rni81-17724304662011736096926.jpeg", "https://cdn2.tuoitre.vn/thumb_w/1200/471584752817336320/2023/11/24/a1-toan-canh-con-dao-print-1700809218436426528680-99-262-755-1514-crop-1700810459369661580857.jpg"],
   "an giang": ["https://cdn2.tuoitre.vn/471584752817336320/2023/4/9/hinh-3-16810338473161395787464.jpg", "https://cdn2.tuoitre.vn/471584752817336320/2023/4/9/hinh-8-16810338473552060873789.jpg", "https://r2.nucuoimekong.com/wp-content/uploads/diem-den-noi-bat-an-giang-nu-cuoi-me-kong.webp"],
   "tây ninh": ["https://tinviettravel.com/uploads/tours/2022_11/du-lich-tay-ninh-nui-ba-den.jpg", "https://sun-ecommerce-cdn.azureedge.net/ecommerce/service-sites/asset/SunWorldBaDen/swold/kinh-nghiem-du-lich-tay-ninh/1-tong-hop-du-lich-tay-ninh.png", "https://ik.imagekit.io/tvlk/blog/2022/02/dia-diem-du-lich-tay-ninh-cover.jpeg"],
   "bến tre": ["https://bizweb.dktcdn.net/100/514/927/files/khu-du-lich-sinh-thai-ben-tre-phan-van-travel-1.webp?v=1763371309470", "https://vntravel.org.vn/uploads/images/blog/lethytheu/2025/04/11/giai-ba-nhon-nhip-cho-dem-va-cau-ben-tre-tg-nguyen-minh-tan-tp-hcm-1744350816.jpg", "https://zoomtravel.vn/upload/images/TOUR%20TI%E1%BB%80N%20GIANG%20-%20B%E1%BA%BEN%20TRE.jpg"],
@@ -1462,13 +1462,13 @@ const initPlanner = function () {
     const nights = parseInt(document.getElementById('nights')?.value) || (days - 1);
     const rawCompanion = document.getElementById('companion')?.value || '';
     let budget = document.getElementById('budget')?.value || '';
-    
+
     // Đồng bộ ngân sách
     const calculatedBudget = document.getElementById('totalBudget')?.textContent;
     if (calculatedBudget && calculatedBudget.trim() !== '' && calculatedBudget !== '0') {
       budget = calculatedBudget.trim();
     }
-    
+
     const additionalInfo = document.getElementById('additionalInfo')?.value || '';
     const tripDate = document.getElementById('tripDate')?.value || '';
     const departureTime = document.getElementById('departureTime')?.value || '08:00';
@@ -1809,7 +1809,7 @@ const initPlanner = function () {
 
       // Bỏ event listener của Smart Wizard để form gọi trực tiếp vào hàm sinh kết quả
       // this.dom.btnStartWizard?.addEventListener('click', ...);
-      
+
       this.dom.basicForm?.addEventListener('submit', (e) => {
         e.preventDefault();
         console.log("📝 Form submitted via Enter");
@@ -2174,7 +2174,7 @@ const initPlanner = function () {
 
         // Đảm bảo chi phí hiển thị khớp với ngân sách đã tính toán ở form
         if (data.budget && planHistory.length > 0) {
-          planHistory.forEach(p => { 
+          planHistory.forEach(p => {
             p.estimatedCost = data.budget;
             p.totalEstimatedCost = data.budget;
           });
@@ -3022,14 +3022,14 @@ const initPlanner = function () {
                    <h3 style="color: #fff; font-size: 1.2rem; font-weight: 800; margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">🗺️ Lịch trình bao quát</h3>
                    <div style="display: flex; flex-direction: column; gap: 1rem;">
                       ${itinerary.map((day, idx) => {
-                         const dayNum = day.day || (idx + 1);
-                         const dayStr = dayNum.toString();
-                         const dayDigitMatch = dayStr.match(/\d+/);
-                         const dNum = dayDigitMatch ? dayDigitMatch[0] : (idx + 1);
-                         let dTitle = dayStr.replace(/^\d+\s*-\s*/, '').replace(/Ngày /g, '');
-                         if (dTitle === dNum.toString()) dTitle = 'Khám phá điểm đến';
-                         const acts = (day.activities || []).map(a => a.task || a.activity || a.name || '').filter(Boolean).join(' ➔ ');
-                         return `
+      const dayNum = day.day || (idx + 1);
+      const dayStr = dayNum.toString();
+      const dayDigitMatch = dayStr.match(/\d+/);
+      const dNum = dayDigitMatch ? dayDigitMatch[0] : (idx + 1);
+      let dTitle = dayStr.replace(/^\d+\s*-\s*/, '').replace(/Ngày /g, '');
+      if (dTitle === dNum.toString()) dTitle = 'Khám phá điểm đến';
+      const acts = (day.activities || []).map(a => a.task || a.activity || a.name || '').filter(Boolean).join(' ➔ ');
+      return `
                             <div style="display: flex; gap: 1rem; align-items: flex-start; padding-bottom: 1rem; border-bottom: 1px dashed rgba(255,255,255,0.1);">
                                <div style="min-width: 65px; font-weight: 800; color: #10b981; font-size: 0.95rem; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 8px; text-align: center;">Ngày ${dNum}</div>
                                <div style="flex: 1;">
@@ -3038,7 +3038,7 @@ const initPlanner = function () {
                                </div>
                             </div>
                          `;
-                      }).join('')}
+    }).join('')}
                    </div>
                 </div>
               </div>
@@ -3723,7 +3723,7 @@ document.addEventListener('keydown', function (e) {
 });
 
 // Define tab switching globally
-window.switchItineraryTab = function(panelId, btnEl) {
+window.switchItineraryTab = function (panelId, btnEl) {
   // Find all panels in the workspace
   const container = btnEl.closest('.travel-console-container');
   if (!container) return;

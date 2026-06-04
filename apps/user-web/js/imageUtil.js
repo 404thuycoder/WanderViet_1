@@ -3,7 +3,9 @@
  * Returns a safe image URL – if `src` is falsy, fallback is used.
  */
 export function getSafeImage(src, fallback) {
-  if (!src) return fallback;
+  if (!src || src === 'undefined' || src === 'null' || (typeof src === 'string' && src.indexOf('uploads/undefined') !== -1)) {
+    return fallback;
+  }
   return src;
 }
 

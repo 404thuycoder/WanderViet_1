@@ -14,7 +14,10 @@
   // otherwise uses a simple inline implementation so load order doesn't matter.
   function getSafeImage(src, fallback) {
     if (typeof window.getSafeImage === 'function') return window.getSafeImage(src, fallback);
-    return src || fallback;
+    if (!src || src === 'undefined' || src === 'null' || (typeof src === 'string' && src.indexOf('uploads/undefined') !== -1)) {
+      return fallback || '';
+    }
+    return src;
   }
   var userPos = null; // Tọa độ GPS người dùng
   var routeLayer = null; // Layer vẽ đường đi OSRM
@@ -35,14 +38,20 @@
     // Cache PLACES in session storage to speed up page transitions
     const cached = sessionStorage.getItem('wv_cached_places');
     if (cached) {
-      try {
-        const data = JSON.parse(cached);
-        if (data && data.length > 0) {
-          PLACES = data;
-          renderDestCards();
-          return Promise.resolve(true);
+      if (cached.indexOf('uploads/undefined') !== -1 || cached.indexOf('"undefined"') !== -1 || cached.indexOf('null') !== -1) {
+        sessionStorage.removeItem('wv_cached_places');
+      } else {
+        try {
+          const data = JSON.parse(cached);
+          if (data && data.length > 0) {
+            PLACES = data;
+            renderDestCards();
+            return Promise.resolve(true);
+          }
+        } catch (e) {
+          sessionStorage.removeItem('wv_cached_places');
         }
-      } catch (e) {}
+      }
     }
 
     renderSkeletons();
@@ -1461,7 +1470,10 @@
         var topBadge = p.top ? '<span class="dest-badge">Top</span>' : "";
         var verifiedBadge = p.verified ? '<div class="verified-badge"><span class="icon">🛡️</span> Verified</div>' : '';
         var wOn = wishIsOn(p.id) ? " is-on" : "";
-        var displayImg = (p.images && p.images.length > 0) ? p.images[0] : (p.image || "");
+        var validImages = (p.images || []).filter(function(img) {
+          return img && img !== 'undefined' && img !== 'null' && img.indexOf('uploads/undefined') === -1;
+        });
+        var displayImg = (validImages.length > 0) ? validImages[0] : (p.image && p.image !== 'undefined' && p.image !== 'null' && p.image.indexOf('uploads/undefined') === -1 ? p.image : "");
         // ── Smart Fallback: based on name + region + kind ──
         var fallbackImg = (function(place) {
           var n = (place.name || '').toLowerCase();
@@ -1524,7 +1536,9 @@
         // Build slideshow image tags
         var imagesList = [];
         if (p.images && p.images.length > 0) {
-          imagesList = p.images.filter(function(img) { return img && img.length > 5; }).slice(0, 3);
+          imagesList = p.images.filter(function(img) { 
+            return img && img.length > 5 && img !== 'undefined' && img !== 'null' && img.indexOf('uploads/undefined') === -1; 
+          }).slice(0, 3);
         }
         if (imagesList.length === 0) {
           imagesList = [displayImg];
@@ -3280,15 +3294,21 @@
     if (typeof PLACES !== 'undefined' && PLACES.length > 0) {
       var topPlaces = PLACES.filter(p => p.top).slice(0, 10);
       if (topPlaces.length < 5) topPlaces = PLACES.slice(0, 10);
-      slides = topPlaces.map(p => ({
-        url: (p.images && p.images.length > 0) ? p.images[0] : (p.image || 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200'),
-        id: p.id || p._id,
-        name: p.name,
-        region: p.region || p.province || 'Việt Nam',
-        verified: p.verified,
-        rating: p.rating || (4.5 + Math.random() * 0.5).toFixed(1),
-        reviewCount: p.reviewCount || Math.floor(Math.random() * 300 + 50)
-      }));
+      slides = topPlaces.map(p => {
+        var validImages = (p.images || []).filter(function(img) {
+          return img && img !== 'undefined' && img !== 'null' && img.indexOf('uploads/undefined') === -1;
+        });
+        var url = (validImages.length > 0) ? validImages[0] : (p.image && p.image !== 'undefined' && p.image !== 'null' && p.image.indexOf('uploads/undefined') === -1 ? p.image : 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200');
+        return {
+          url: url,
+          id: p.id || p._id,
+          name: p.name,
+          region: p.region || p.province || 'Việt Nam',
+          verified: p.verified,
+          rating: p.rating || (4.5 + Math.random() * 0.5).toFixed(1),
+          reviewCount: p.reviewCount || Math.floor(Math.random() * 300 + 50)
+        };
+      });
     } 
     
     // Fallback slides with extra metadata

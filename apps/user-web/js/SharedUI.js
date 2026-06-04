@@ -16,7 +16,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
   // Global image helper fallback
   window.getSafeImage = function(src, fallback) {
-    if (!src) return fallback;
+    if (!src || src === 'undefined' || src === 'null' || (typeof src === 'string' && src.indexOf('uploads/undefined') !== -1)) {
+      return fallback;
+    }
     return src;
   };
 

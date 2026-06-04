@@ -391,10 +391,10 @@ window.WANDER_PLACES = [{
   meta: "Thành phố ngàn hoa & Khí hậu mát mẻ quanh năm",
   top: true,
   text: "Đà Lạt trên cao nguyên Langbiang nổi tiếng với vườn hoa bát ngát, đồi chè xanh mướt, kiến trúc Pháp cổ điển và cà phê specialty.",
-  image: "https://phetravel.com/uploads/dnt-da-lat.jpg",
+  image: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80",
   images: [
+    "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80",
     "https://phetravel.com/uploads/dnt-da-lat.jpg",
-    "https://booking.muongthanh.com/upload_images/images/H%60/thanh-pho-da-lat.jpg",
     "https://samtenhills.vn/wp-content/uploads/2024/11/kinh-nghiem-du-lich-da-lat-1-minh.jpg"
   ],
   lat: 11.9404,
@@ -821,9 +821,9 @@ window.WANDER_PLACES = [{
   meta: "Thiên đường biển hoang nguyên sơ & Di tích lịch sử",
   top: true,
   text: "Côn Đảo còn nguyên vẻ hoang sơ với bãi biển vắng tuyệt đẹp, vườn quốc gia nguyên sinh và trải nghiệm độc đáo xem rùa biển đẻ trứng đêm hè.",
-  image: "https://images.unsplash.com/photo-1559592413-7cec096d7b88?w=800&q=80",
+  image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
   images: [
-    "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&fit=crop",
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
     "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&fit=crop",
     "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&fit=crop"
   ],

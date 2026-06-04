@@ -4,7 +4,7 @@
  */
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Place = require('./models/Place');
+const Place = require('../../server/models/Place');
 
 const placesData = [
   {
@@ -478,7 +478,7 @@ const placesData = [
     interests: ["hoa", "cà phê", "thiên nhiên", "check-in"],
     meta: "Thành phố ngàn hoa & Khí hậu mát mẻ quanh năm",
     text: "Thành phố Đà Lạt nằm trên cao nguyên Langbiang mát mẻ, nổi tiếng với những vườn hoa bát ngát, đồi chè xanh mướt, kiến trúc Pháp cổ điển và nền cà phê specialty nức tiếng.",
-    image: "https://images.unsplash.com/photo-1539367628448-4bc5c9d171c8?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1528181304800-259b08848526?w=800&q=80",
     lat: 11.9404, lng: 108.4583, top: true,
     transportTips: "Xe khách giường nằm từ TP.HCM (6-7 tiếng) hoặc bay đến sân bay Liên Khương. Đà Lạt dốc — thuê xe máy cần kinh nghiệm lái núi.",
     activities: [
@@ -891,7 +891,7 @@ const placesData = [
     interests: ["biển hoang", "rùa biển", "lịch sử", "lặn biển"],
     meta: "Thiên đường biển hoang nguyên sơ & Di tích lịch sử",
     text: "Côn Đảo còn lưu giữ vẻ nguyên sơ hiếm có với những bãi biển hoang vắng tuyệt đẹp, vườn quốc gia với rừng nguyên sinh và trải nghiệm xem rùa biển đẻ trứng độc đáo.",
-    image: "https://images.unsplash.com/photo-1415399153348-c05e9599f298?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
     lat: 8.6914, lng: 106.6061, top: true,
     transportTips: "Bay từ TP.HCM hoặc Cần Thơ khoảng 50 phút. Thuê xe máy trên đảo để tham quan. Mùa rùa đẻ trứng: tháng 5-10.",
     activities: [

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
@@ -2682,10 +2682,14 @@
             // ELITE: Merge legacy images and new gallery system & DEDUPLICATE URLS
             const uniqueMap = new Map();
             (place.gallery || []).forEach(item => {
-                if (item && item.url) uniqueMap.set(item.url, item);
+                if (item && item.url && item.url !== 'undefined' && item.url !== 'null' && item.url.indexOf('uploads/undefined') === -1) {
+                    uniqueMap.set(item.url, item);
+                }
             });
             (place.images || []).forEach(url => {
-                if(url && !uniqueMap.has(url)) uniqueMap.set(url, { url: url, category: 'general', type: 'image' });
+                if (url && url !== 'undefined' && url !== 'null' && url.indexOf('uploads/undefined') === -1 && !uniqueMap.has(url)) {
+                    uniqueMap.set(url, { url: url, category: 'general', type: 'image' });
+                }
             });
             allGalleryItems = Array.from(uniqueMap.values());
             
@@ -3166,7 +3170,10 @@
                 document.getElementById('p-cat').innerText = catText;
 
                 // Hero image
-                const heroImg = p.image || p.coverImage || 'https://images.unsplash.com/photo-1528127269322-539801943592?w=1200&q=80';
+                var rawHeroImg = p.image || p.coverImage;
+                var heroImg = (rawHeroImg && rawHeroImg !== 'undefined' && rawHeroImg !== 'null' && rawHeroImg.indexOf('uploads/undefined') === -1) 
+                    ? rawHeroImg 
+                    : 'https://images.unsplash.com/photo-1528127269322-539801943592?w=1200&q=80';
                 document.getElementById('hero-img').src = heroImg;
                 document.getElementById('hero-img').onerror = function() { this.src = 'https://images.unsplash.com/photo-1528127269322-539801943592?w=1200&q=80'; };
 

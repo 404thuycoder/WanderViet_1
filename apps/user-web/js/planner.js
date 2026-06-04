@@ -3,9 +3,70 @@ window.WanderPlanner = window.WanderPlanner || {};
 
 const VN_DESTINATION_PHOTOS = {
   // --- MIỀN BẮC ---
-  "hà nội": ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop", "https://ktmt.vnmediacdn.com/images/2023/01/23/51-1674468322-mot-goc-ha-noi-nhin-tu-tren-cao.jpg", "https://nads.1cdn.vn/2024/07/10/W_z5620227067098_17422a1d9f705e524396421d93fb68c1_1.jpg"],
-  "hoàn kiếm": ["https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&fit=crop"],
-  "phố cổ": ["https://ktmt.vnmediacdn.com/images/2023/01/23/51-1674468322-mot-goc-ha-noi-nhin-tu-tren-cao.jpg"],
+  "hà nội": [
+    "https://images.pexels.com/photos/189349/pexels-photo-189349.jpeg",
+    "https://images.pexels.com/photos/3733102/pexels-photo-3733102.jpeg",
+    "https://images.unsplash.com/photo-1526483364030-5f22f1f281f6?auto=format&fit=crop&w=1170&q=80",
+    "https://images.unsplash.com/photo-1488747279002-c8523379faaa?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "hồ hoàn kiếm": [
+    "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1170&q=80",
+    "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
+  ],
+  "lăng chủ tịch hồ chí minh": [
+    "https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=1170&q=80",
+    "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "chùa một cột": [
+    "https://images.unsplash.com/photo-1602026534794-1f987675a313?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "đền ngọc sơn": [
+    "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "nhà tù hỏa lò": [
+    "https://images.pexels.com/photos/292261/pexels-photo-292261.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  ],
+  "nhà thờ lớn": [
+    "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "phố cổ hà nội": [
+    "https://images.unsplash.com/photo-1488747279002-c8523379faaa?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "phố cổ": [
+    "https://images.unsplash.com/photo-1488747279002-c8523379faaa?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "chả cá lã vọng": [
+    "https://images.pexels.com/photos/103546/pexels-photo-103546.jpeg",
+    "https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "phở thìn lò đúc": [
+    "https://images.unsplash.com/photo-1526483364030-5f22f1f281f6?auto=format&fit=crop&w=1170&q=80",
+    "https://images.unsplash.com/photo-1488747279002-c8523379faaa?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "cà phê trứng giảng": [
+    "https://images.pexels.com/photos/551667/pexels-photo-551667.jpeg?auto=compress&cs=tinysrgb&w=600",
+    "https://images.pexels.com/photos/597077/pexels-photo-597077.jpeg?auto=compress&cs=tinysrgb&w=600"
+  ],
+  "bún chả hương liên": [
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1170&q=80",
+    "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "bún đậu mắm tôm": [
+    "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+    "https://images.pexels.com/photos/292261/pexels-photo-292261.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  ],
+  "cà phê đường tàu": [
+    "https://images.unsplash.com/photo-1548544481-7f7a417c2f1f?auto=format&fit=crop&w=1170&q=80",
+    "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "khách sạn aira boutique": [
+    "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1170&q=80",
+    "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1170&q=80"
+  ],
+  "la sin kong hotel": [
+    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1170&q=80",
+    "https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  ],
   "hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://upload.wikimedia.org/wikipedia/commons/4/42/Ha_Long_2019_taken_by_DJI_FC220.jpg"],
   "vịnh hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
   "sapa": ["https://booking.muongthanh.com/upload_images/images/Nhung/review-dia-diem-du-lich-sapa.jpg", "https://phetravel.com/uploads/30-06-2023-14-53-09-du-lich-sa-pa-0.jpg.webp", "https://topasecolodge.com/wp-content/uploads/2025/06/best-time-to-visit-sapa-04.jpg"],
@@ -137,10 +198,19 @@ function getVNPhoto(query, idx = 0) {
   if (!query) return GENERIC_VN_PHOTOS[idx % GENERIC_VN_PHOTOS.length];
   const qLower = query.toLowerCase().trim();
 
-  // Kiểm tra điểm đến cụ thể trước
+  // Nếu có bộ ảnh spot cụ thể từ planner.html, dùng trước
+  const customSpotPhotos = window.SPOT_PHOTOS_DB || {};
+  for (const [key, photos] of Object.entries(customSpotPhotos)) {
+    const keyLower = key.toLowerCase().trim();
+    if (qLower.includes(keyLower) || keyLower.includes(qLower)) {
+      const photoIdx = (Math.abs(idx) + qLower.length) % photos.length;
+      return photos[photoIdx];
+    }
+  }
+
+  // Kiểm tra điểm đến cụ thể chung trong planner.js
   for (const [key, photos] of Object.entries(VN_DESTINATION_PHOTOS)) {
     if (qLower.includes(key) || key.includes(qLower)) {
-      // Dùng hàm băm đơn giản hoặc random theo idx để chọn ảnh trong tập ảnh của địa điểm đó
       const photoIdx = (Math.abs(idx) + qLower.length) % photos.length;
       return photos[photoIdx];
     }
@@ -168,6 +238,58 @@ function getVNVideoId(query) {
     }
   }
   return '1dodeGKcr1A';
+}
+
+function inferActivityCategory(act) {
+  const raw = ((act.type || act.category || act.task || act.activity || act.name) || '').toLowerCase();
+  const normalized = raw.normalize('NFC');
+  const foodKeywords = [
+    'phở', 'bún chả', 'bún thang', 'bún', 'cơm', 'ăn', 'nhà hàng', 'quán', 'cà phê', 'cafe', 'trà', 'hải sản', 'ẩm thực', 'bánh mì', 'gỏi', 'hủ tiếu', 'lẩu', 'ăn uống', 'street food', 'ăn sáng'
+  ];
+  const restKeywords = [
+    'khách sạn', 'resort', 'homestay', 'nghỉ', 'spa', 'massage', 'chill', 'relax', 'nghỉ ngơi', 'villa', 'resort', 'hotel', 'resort nghỉ dưỡng', 'sảnh', 'lounge'
+  ];
+  const funKeywords = [
+    'công viên', 'tour', 'vịnh', 'hang', 'chùa', 'lăng', 'đền', 'phố cổ', 'tháp', 'cầu', 'bảo tàng', 'xích lô', 'đạp xe', 'chợ', 'show', 'shopping', 'mua sắm', 'vui chơi', 'trò chơi', 'trải nghiệm', 'night market', 'đi bộ', 'check-in', 'bar'
+  ];
+
+  if (/(restaurant|food|cafe|coffee|phở|bún|cơm|hải sản|bánh mì|cơm tấm|bún chả|hủ tiếu|lẩu|ẩm thực|ăn uống|trà)/i.test(normalized)) {
+    return 'Ăn uống';
+  }
+  if (/(hotel|home ?stay|resort|villa|nghỉ|spa|massage|chill|relax|khách sạn|nghỉ ngơi)/i.test(normalized)) {
+    return 'Nghỉ ngơi';
+  }
+  if (/(công viên|tour|vịnh|hang|chùa|lăng|đền|phố cổ|tháp|cầu|bảo tàng|xích lô|đạp xe|chợ|show|shopping|mua sắm|vui chơi|trải nghiệm|check-in|đi bộ|thăm quan)/i.test(normalized)) {
+    return 'Vui chơi';
+  }
+  if (foodKeywords.some(k => normalized.includes(k))) return 'Ăn uống';
+  if (restKeywords.some(k => normalized.includes(k))) return 'Nghỉ ngơi';
+  if (funKeywords.some(k => normalized.includes(k))) return 'Vui chơi';
+  return 'Khám phá';
+}
+
+function getActivityCategoryMeta(category) {
+  const map = {
+    'Ăn uống': { icon: '🍜', label: 'Ăn Uống', color: '#fb923c', bg: 'rgba(251, 146, 60, 0.12)', border: 'rgba(251, 146, 60, 0.25)' },
+    'Vui chơi': { icon: '🎉', label: 'Vui Chơi', color: '#38bdf8', bg: 'rgba(56, 189, 248, 0.12)', border: 'rgba(56, 189, 248, 0.25)' },
+    'Nghỉ ngơi': { icon: '🛌', label: 'Nghỉ Ngơi', color: '#34d399', bg: 'rgba(52, 211, 153, 0.12)', border: 'rgba(52, 211, 153, 0.25)' },
+    'Khám phá': { icon: '🗺️', label: 'Khám Phá', color: '#a855f7', bg: 'rgba(168, 85, 247, 0.12)', border: 'rgba(168, 85, 247, 0.25)' }
+  };
+  return map[category] || map['Khám phá'];
+}
+
+function getCategoryDescription(act, category) {
+  const name = act.task || act.activity || act.name || 'điểm đến';
+  switch (category) {
+    case 'Ăn uống':
+      return `Trải nghiệm ẩm thực tại ${name}, nơi bạn có thể thưởng thức các món đặc sản địa phương và tận hưởng không gian ăn uống sôi động.`;
+    case 'Nghỉ ngơi':
+      return `Khoảng thời gian thư giãn tại ${name}, giúp bạn phục hồi năng lượng và chuẩn bị cho phần tiếp theo của chuyến đi.`;
+    case 'Vui chơi':
+      return `Hoạt động khám phá ${name} với nhiều trải nghiệm hấp dẫn, tạo nên phần vui chơi đáng nhớ trong ngày.`;
+    default:
+      return `Khám phá ${name} theo cách riêng của bạn và tận hưởng từng khoảnh khắc trong lịch trình.`;
+  }
 }
 
 window.getGPSDirections = function (destinationName, event) {
@@ -667,12 +789,13 @@ const initPlanner = function () {
   // ================================================
   const SPOT_COSTS = {
     // ===== HÀ NỘI =====
-    "Lăng Bác & Chùa Một Cột": { ticket: 0, food: 0, type: "attraction" },
-    "Hồ Hoàn Kiếm & Đền Ngọc Sơn": { ticket: 0, food: 0, type: "attraction" },
-    "Phở Thìn Bờ Hồ": { ticket: 0, food: 70000, type: "restaurant" },
-    "Bún Chả Đắc Kim": { ticket: 0, food: 60000, type: "restaurant" },
-    "Xem Múa Rối Nước Bông Sen": { ticket: 150000, food: 0, type: "experience" },
-    "Tour Đêm Nhà Tù Hỏa Lò": { ticket: 200000, food: 0, type: "experience" },
+    "Lăng Chủ tịch Hồ Chí Minh": { ticket: 0, food: 0, type: "attraction" },
+    "Chùa Một Cột": { ticket: 0, food: 0, type: "attraction" },
+    "Hồ Hoàn Kiếm": { ticket: 0, food: 0, type: "attraction" },
+    "Đền Ngọc Sơn": { ticket: 0, food: 0, type: "attraction" },
+    // Removed some specific local eateries/experiences from default spot costs (managed in UI lists now)
+    "Nhà tù Hỏa Lò": { ticket: 200000, food: 0, type: "experience" },
+    "Nhà Thờ Lớn": { ticket: 0, food: 0, type: "attraction" },
     "Chả cá Lã Vọng": { ticket: 0, food: 200000, type: "restaurant" },
     "Trà Hạt Long An": { ticket: 0, food: 80000, type: "cafe" },
     "Phủ Tây Hồ": { ticket: 0, food: 0, type: "attraction" },
@@ -2328,22 +2451,33 @@ const initPlanner = function () {
     window.currentDestName = typeof dest === 'object' ? (dest.name || dest.destination) : dest;
     const rawItinerary = plan.itinerary || [];
 
-    // Elite Enrichment: Deep cultural and travel insights
     const itinerary = rawItinerary.map(day => ({
       ...day,
       activities: (day.activities || []).map(act => {
-        const descriptions = [
-          `Chào mừng bạn đến với ${act.task || act.activity || act.name}. Trải nghiệm khoảnh khắc bình minh tuyệt đẹp trên mặt biển tĩnh lặng tại đây. Bạn sẽ được chiêm ngưỡng sự chuyển mình của vạn vật khi ánh mặt trời đầu tiên len lỏi qua các hang động đá vôi kỳ vĩ. Đây là thời điểm lý tưởng để cảm nhận sự thư thái và ghi lại những thước phim nghệ thuật về di sản thiên nhiên thế giới.`,
-          `Khám phá tinh hoa ẩm thực địa phương tại ${act.task || act.activity || act.name} - không gian ẩm thực sang trọng bậc nhất. Mỗi món ăn là một câu chuyện về văn hóa và lòng hiếu khách của người dân bản địa, được chế biến bởi những đầu bếp tài hoa nhất.`,
-          `Hành trình chinh phục ${act.task || act.activity || act.name}, nơi bạn có thể bao quát toàn bộ vẻ đẹp ngoạn mục của vùng vịnh. Đường đi uốn lượn qua những cánh rừng xanh mướt, mang đến cơ hội tiếp cận gần hơn với hệ sinh thái đa dạng.`,
-          `Đắm mình vào không gian văn hóa lịch sử lâu đời tại ${act.task || act.activity || act.name} với những công trình kiến trúc mang đậm dấu ấn thời gian. Từng viên gạch, từng họa tiết chạm khắc đều kể về một thời kỳ vàng son của dân tộc.`
-        ];
+        const category = inferActivityCategory(act);
+        const meta = getActivityCategoryMeta(category);
+        const description = act.description || getCategoryDescription(act, category);
         return {
           ...act,
-          description: act.description || descriptions[Math.floor(Math.random() * descriptions.length)]
+          category,
+          categoryMeta: meta,
+          description
         };
       })
     }));
+
+    const activityTotals = itinerary.reduce((totals, day) => {
+      (day.activities || []).forEach(act => {
+        const cat = act.category || 'Khám phá';
+        totals[cat] = (totals[cat] || 0) + 1;
+      });
+      return totals;
+    }, { 'Ăn uống': 0, 'Vui chơi': 0, 'Nghỉ ngơi': 0, 'Khám phá': 0 });
+
+    const categorySummaryText = Object.entries(activityTotals)
+      .filter(([_, value]) => value > 0)
+      .map(([category, value]) => `${category}: ${value} lần`)
+      .join(' • ');
 
     let wTemp = weather ? Number(weather.temp) : 28;
     let wCond = weather ? weather.condition : 'Nắng ấm / Mát mẻ';
@@ -2377,6 +2511,8 @@ const initPlanner = function () {
         const actAddress = act.address || act.location || '';
         const sessionColor = actSession === 'Sáng' ? '#10b981' : actSession === 'Chiều' ? '#f59e0b' : '#818cf8';
         const sessionEmoji = actSession === 'Sáng' ? '☀️' : actSession === 'Chiều' ? '⛅' : '🌙';
+        const categoryMeta = act.categoryMeta || getActivityCategoryMeta(inferActivityCategory(act));
+        const categoryBadge = `<div style="display:inline-flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:800; color:${categoryMeta.color}; background:${categoryMeta.bg}; border:1px solid ${categoryMeta.border}; border-radius:999px; padding:6px 12px; margin-bottom:0.85rem;">${categoryMeta.icon} ${categoryMeta.label}</div>`;
 
         let starHtml = '';
         if (actRating > 0) {
@@ -2427,30 +2563,35 @@ const initPlanner = function () {
             </div>
 
             <div class="activity-content-card-v3">
-              <div class="activity-image-wrap-v3">
-                <img 
-                  class="activity-image-v3"
-                  src="${getVNPhoto(actName, aIdx)}" 
-                  alt="${actName}"
-                  loading="lazy"
-                  onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=600&fit=crop';"
-                >
-                <div class="activity-image-overlay-v3"></div>
-                ${locationBadge}
-                ${costBadge}
-                <div style="position:absolute; top:12px; left:12px; font-size:0.6rem; color:rgba(255,255,255,0.5); background:rgba(0,0,0,0.4); padding:2px 6px; border-radius:4px; font-weight:700;">📸 WANDERVIỆT</div>
-              </div>
-
-              <div style="padding:1.5rem 1.75rem 1.5rem;">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; margin-bottom:0.6rem;">
-                  <h4 style="font-size:1.25rem; color:#fff; margin:0; font-weight:800; line-height:1.3; flex:1;">${actName}</h4>
-                  ${ratingBadge}
+              <div class="activity-row-v3">
+                <div class="activity-image-wrap-v3">
+                  <img 
+                    class="activity-image-v3"
+                    src="${getVNPhoto(actName, aIdx)}" 
+                    alt="${actName}"
+                    loading="lazy"
+                    onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=600&fit=crop';"
+                  >
+                  <div class="activity-image-overlay-v3"></div>
+                  ${locationBadge}
+                  ${costBadge}
+                  <div style="position:absolute; top:12px; left:12px; font-size:0.6rem; color:rgba(255,255,255,0.5); background:rgba(0,0,0,0.4); padding:2px 6px; border-radius:4px; font-weight:700;">📸 WANDERVIỆT</div>
                 </div>
 
-                ${transportBadge}
-                ${descParagraph}
+                <div class="activity-body-v3">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.75rem; margin-bottom:0.85rem;">
+                    <div style="flex:1; min-width:0;">
+                      <h4 style="font-size:1.25rem; color:#fff; margin:0; font-weight:800; line-height:1.3;">${actName}</h4>
+                      ${categoryBadge}
+                      ${transportBadge}
+                    </div>
+                    ${ratingBadge}
+                  </div>
 
-                <div style="display:flex; gap:10px; flex-wrap:wrap; padding-top:0.9rem; border-top:1px solid rgba(255,255,255,0.08);">
+                  ${descParagraph}
+                </div>
+
+                <div class="activity-actions-v3">
                   <button type="button" class="act-btn-v3 act-btn-details"
                     onclick='showActivityDetails(${actData})'>
                     🔍 Xem Chi Tiết & Review
@@ -2833,8 +2974,8 @@ const initPlanner = function () {
           /* Rebuilt Glassmorphic Content Card */
           .activity-content-card-v3 {
             flex: 1 !important;
-            background: rgba(30, 41, 59, 0.45) !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            background: rgba(30, 41, 59, 0.55) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
             border-radius: 1.75rem !important;
             overflow: hidden !important;
             transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -2844,15 +2985,77 @@ const initPlanner = function () {
           .activity-content-card-v3:hover {
             border-color: rgba(16, 185, 129, 0.35) !important;
             transform: translateY(-6px) scale(1.01) !important;
-            background: rgba(30, 41, 59, 0.6) !important;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35), 0 0 25px rgba(16, 185, 129, 0.15) !important;
+            background: rgba(30, 41, 59, 0.68) !important;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32), 0 0 25px rgba(16, 185, 129, 0.12) !important;
           }
 
-          /* Fixed squished images - elegant 16:9 look */
+          .activity-row-v3 {
+            display: flex !important;
+            align-items: stretch !important;
+            gap: 1rem !important;
+            padding: 1.5rem !important;
+            flex-wrap: wrap !important;
+          }
+
           .activity-image-wrap-v3 {
-            height: 220px !important; /* Elegant cinema height */
+            flex: 0 0 min(320px, 40%) !important;
+            width: min(320px, 40%) !important;
+            min-width: 260px !important;
+            height: 260px !important;
             position: relative !important;
             overflow: hidden !important;
+            border-radius: 1.75rem !important;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18) !important;
+          }
+
+          .activity-image-v3 {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            transition: transform 0.7s ease !important;
+          }
+
+          .activity-body-v3 {
+            flex: 1 1 1px !important;
+            min-width: 260px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+          }
+
+          .activity-body-v3 h4 {
+            word-break: break-word !important;
+          }
+
+          .activity-actions-v3 {
+            flex: 0 0 200px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            gap: 0.85rem !important;
+            min-width: 180px !important;
+            padding: 1rem !important;
+            border-radius: 1.5rem !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            backdrop-filter: blur(18px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+          }
+
+          .activity-actions-v3 .act-btn-v3 {
+            width: 100% !important;
+            padding: 0.95rem 1rem !important;
+            border-radius: 18px !important;
+            font-size: 0.82rem !important;
+            letter-spacing: 0.4px !important;
+          }
+
+          .activity-actions-v3 .act-btn-v3:hover {
+            transform: translateY(-1px) !important;
+          }
+
+          .activity-content-card-v3 {
+            min-width: 0 !important;
           }
           .activity-image-v3 {
             width: 100% !important;
@@ -2954,6 +3157,7 @@ const initPlanner = function () {
                   </div>
                   <h2 class="main-itinerary-title-v2" style="font-size: 1.8rem; margin-top: 1.25rem; margin-bottom: 0.75rem; font-weight: 800; background: linear-gradient(135deg, #ffffff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Outfit', sans-serif;">${plan.title || ('Hành trình ' + days + ' ngày')}</h2>
                   <p class="timeline-summary-v2" style="font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.75); margin: 0; font-weight: 400;">${plan.tripSummary || plan.summary || 'Kế hoạch du lịch được WanderAI thiết kế riêng cho bạn.'}</p>
+                  <p class="timeline-summary-v2" style="font-size: 0.88rem; line-height: 1.75; color: rgba(255,255,255,0.7); margin: 0.75rem 0 0; font-weight: 500;">${categorySummaryText ? categorySummaryText + ' • Đầy đủ ăn uống, vui chơi và nghỉ ngơi.' : 'Lịch trình được tối ưu cho trải nghiệm cân bằng, bao gồm ăn uống, vui chơi và nghỉ ngơi.'}</p>
                 </div>
                 
                 <div style="margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 1.5rem;">

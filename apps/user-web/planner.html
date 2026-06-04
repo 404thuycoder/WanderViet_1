@@ -385,6 +385,97 @@
     .spot-select-btn:hover { transform: scale(1.15) !important; }
     .spot-map-btn:hover { background: rgba(16,185,129,0.85) !important; }
 
+    /* SELECTED ATTRACTIONS GRID */
+    #selectedAttractionsDisplay {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 0.6rem;
+    }
+    .selected-attraction-card {
+      border-radius: 0.75rem;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1.5px solid #e2e8f0;
+      background: #fff;
+      transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      position: relative;
+    }
+    .selected-attraction-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      border-color: #3b82f6;
+    }
+    .selected-attraction-card img {
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+    .selected-attraction-card:hover img {
+      transform: scale(1.05);
+    }
+    .selected-attraction-info {
+      padding: 0.4rem;
+      background: #fff;
+    }
+    .selected-attraction-name {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 2px;
+    }
+    .selected-attraction-desc {
+      font-size: 0.55rem;
+      color: #64748b;
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .selected-attraction-remove {
+      position: absolute;
+      top: 3px;
+      right: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.95);
+      border: 1px solid rgba(0,0,0,0.1);
+      color: #ef4444;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      z-index: 10;
+    }
+    .selected-attraction-remove:hover {
+      background: #ef4444;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(239,68,68,0.3);
+    }
+    [data-theme="dark"] .selected-attraction-card {
+      background: #1e293b;
+      border-color: #334155;
+    }
+    [data-theme="dark"] .selected-attraction-info {
+      background: #1e293b;
+    }
+    [data-theme="dark"] .selected-attraction-name {
+      color: #f8fafc;
+    }
+    [data-theme="dark"] .selected-attraction-desc {
+      color: #94a3b8;
+    }
+
     /* NEARBY PLACE CARDS */
     .v2-nearby-card {
       border-radius: 0.75rem;
@@ -672,7 +763,7 @@
       box-shadow: 0 6px 15px rgba(124, 58, 237, 0.3);
       filter: brightness(1.08);
     }
-    .spot-action-btn, .spot-select-btn {
+    .spot-action-btn {
       border: 1px solid rgba(255,255,255,0.12);
       background: rgba(255,255,255,0.06);
       color: #f8fafc;
@@ -682,10 +773,13 @@
       min-width: 110px;
       transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
     }
-    .spot-action-btn:hover, .spot-select-btn:hover {
+    .spot-action-btn:hover {
       background: rgba(255,255,255,0.12);
       transform: translateY(-1px);
       box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    }
+    .spot-select-btn {
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease !important;
     }
     .spot-detail-panel {
       background: rgba(8, 15, 30, 0.96);
@@ -1750,7 +1844,7 @@
                     <span style="font-size:0.72rem; font-weight:700; color:#10b981;">✓ Địa điểm đã chọn</span>
                   </div>
                   <div id="selectedAttractionsDisplay" style="min-height:48px;">
-                    <div style="text-align:center; padding:0.75rem; color:var(--text-muted);">
+                    <div id="selectedAttractionsEmpty" style="text-align:center; padding:0.75rem; color:var(--text-muted);">
                       <div style="font-size:1.3rem; margin-bottom:0.25rem;">📍</div>
                       <p style="font-size:0.72rem; margin:0;">Chưa chọn địa điểm nào</p>
                       <p style="font-size:0.65rem; margin:0.2rem 0 0; opacity:0.7;">Chọn từ danh sách địa điểm nổi bật bên trên</p>
@@ -1821,17 +1915,17 @@
                 <div class="planner-field-group" style="margin-bottom:0">
                   <label class="planner-field-label">☀️ Số ngày</label>
                   <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <button type="button" onclick="adjustDays(-1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1.2rem; cursor: pointer;">−</button>
+                    <button type="button" onclick="adjustDays(-1)" class="btn-circle">−</button>
                     <input type="number" id="days" class="planner-input" value="3" min="1" max="14" required style="text-align: center; width: 70px;">
-                    <button type="button" onclick="adjustDays(1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1.2rem; cursor: pointer;">+</button>
+                    <button type="button" onclick="adjustDays(1)" class="btn-circle">+</button>
                   </div>
                 </div>
                 <div class="planner-field-group" style="margin-bottom:0">
                   <label class="planner-field-label">🌙 Số đêm</label>
                   <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <button type="button" onclick="adjustNights(-1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1.2rem; cursor: pointer;">−</button>
+                    <button type="button" onclick="adjustNights(-1)" class="btn-circle">−</button>
                     <input type="number" id="nights" class="planner-input" value="2" min="0" max="13" style="text-align: center; width: 70px;" readonly>
-                    <button type="button" onclick="adjustNights(1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1.2rem; cursor: pointer;">+</button>
+                    <button type="button" onclick="adjustNights(1)" class="btn-circle">+</button>
                   </div>
                 </div>
               </div>
@@ -1887,72 +1981,52 @@
               <div class="planner-field-group" style="margin-top: 1rem;">
                 <label class="planner-field-label">👥 Thành viên tham gia</label>
                 
-                <div class="members-age-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
-                  <!-- Người lớn -->
+                <div class="members-age-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem;">
+                  <!-- Người trưởng thành -->
                   <div class="member-age-card" style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 12px; padding: 0.75rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                       <div>
                         <span style="font-size: 1.1rem;">👨‍👩‍👧</span>
-                        <span style="font-weight: 700; font-size: 0.85rem; color: var(--text);"> Người lớn</span>
-                        <span style="font-size: 0.6rem; color: var(--text-muted);"> (18+ tuổi)</span>
+                        <span style="font-weight: 700; font-size: 0.85rem; color: var(--text);"> Người trưởng thành</span>
                       </div>
                       <span style="font-size: 0.7rem; color: var(--accent);" id="adultsPrice">Giá đầy đủ</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                      <button type="button" onclick="adjustMember('adults', -1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1rem; cursor: pointer;">−</button>
+                      <button type="button" onclick="adjustMember('adults', -1)" class="btn-circle btn-circle--sm">−</button>
                       <input type="number" id="adults" class="planner-input" value="2" min="1" max="10" style="text-align: center; width: 50px; padding: 0.5rem;">
-                      <button type="button" onclick="adjustMember('adults', 1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1rem; cursor: pointer;">+</button>
+                      <button type="button" onclick="adjustMember('adults', 1)" class="btn-circle btn-circle--sm">+</button>
                     </div>
                   </div>
                   
-                  <!-- Trẻ em (6-11 tuổi) -->
+                  <!-- Trẻ nhỏ -->
                   <div class="member-age-card" style="background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); border-radius: 12px; padding: 0.75rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                       <div>
                         <span style="font-size: 1.1rem;">👶</span>
-                        <span style="font-weight: 700; font-size: 0.85rem; color: var(--text);"> Trẻ em</span>
-                        <span style="font-size: 0.6rem; color: var(--text-muted);"> (6-11 tuổi)</span>
+                        <span style="font-weight: 700; font-size: 0.85rem; color: var(--text);"> Trẻ nhỏ</span>
                       </div>
                       <span style="font-size: 0.7rem; color: #fbbf24;" id="childrenPrice">Giảm 30%</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                      <button type="button" onclick="adjustMember('children', -1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1rem; cursor: pointer;">−</button>
+                      <button type="button" onclick="adjustMember('children', -1)" class="btn-circle btn-circle--sm">−</button>
                       <input type="number" id="children" class="planner-input" value="0" min="0" max="10" style="text-align: center; width: 50px; padding: 0.5rem;">
-                      <button type="button" onclick="adjustMember('children', 1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1rem; cursor: pointer;">+</button>
+                      <button type="button" onclick="adjustMember('children', 1)" class="btn-circle btn-circle--sm">+</button>
                     </div>
                   </div>
                   
-                  <!-- Trẻ nhỏ (0-5 tuổi) - MIỄN PHÍ -->
-                  <div class="member-age-card" style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 0.75rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                      <div>
-                        <span style="font-size: 1.1rem;">🧒</span>
-                        <span style="font-weight: 700; font-size: 0.85rem; color: var(--text);"> Trẻ nhỏ</span>
-                        <span style="font-size: 0.6rem; color: var(--text-muted);"> (0-5 tuổi)</span>
-                      </div>
-                      <span style="font-size: 0.7rem; color: #10b981;" id="toddlersPrice">MIỄN PHÍ</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                      <button type="button" onclick="adjustMember('toddlers', -1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1rem; cursor: pointer;">−</button>
-                      <input type="number" id="toddlers" class="planner-input" value="0" min="0" max="10" style="text-align: center; width: 50px; padding: 0.5rem;">
-                      <button type="button" onclick="adjustMember('toddlers', 1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1rem; cursor: pointer;">+</button>
-                    </div>
-                  </div>
-                  
-                  <!-- Người cao tuổi (60+) -->
+                  <!-- Người già -->
                   <div class="member-age-card" style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; padding: 0.75rem;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                       <div>
                         <span style="font-size: 1.1rem;">👴</span>
-                        <span style="font-weight: 700; font-size: 0.85rem; color: var(--text);"> Người cao tuổi</span>
-                        <span style="font-size: 0.6rem; color: var(--text-muted);"> (60+ tuổi)</span>
+                        <span style="font-weight: 700; font-size: 0.85rem; color: var(--text);"> Người già</span>
                       </div>
                       <span style="font-size: 0.7rem; color: #f87171;" id="seniorsPrice">Giảm 20%</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
-                      <button type="button" onclick="adjustMember('seniors', -1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1rem; cursor: pointer;">−</button>
+                      <button type="button" onclick="adjustMember('seniors', -1)" class="btn-circle btn-circle--sm">−</button>
                       <input type="number" id="seniors" class="planner-input" value="0" min="0" max="10" style="text-align: center; width: 50px; padding: 0.5rem;">
-                      <button type="button" onclick="adjustMember('seniors', 1)" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text); font-size: 1rem; cursor: pointer;">+</button>
+                      <button type="button" onclick="adjustMember('seniors', 1)" class="btn-circle btn-circle--sm">+</button>
                     </div>
                   </div>
                 </div>
@@ -2460,7 +2534,7 @@
 
     const REGION_DESTINATIONS = {
       'Miền Bắc': [
-        { name: 'Hà Nội', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200&h=150&fit=crop', spots: ['Hồ Hoàn Kiếm', 'Lăng Bác', 'Phố Cổ'] },
+        { name: 'Hà Nội', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200&h=150&fit=crop', spots: ['Hồ Hoàn Kiếm', 'Lăng Chủ tịch Hồ Chí Minh', 'Chùa Một Cột'] },
         { name: 'Hạ Long', img: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=200&h=150&fit=crop', spots: ['Vịnh Hạ Long', 'Đảo Ti Tốp', 'Hang Sửng Sốt'] },
         { name: 'Sapa', img: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=150&fit=crop', spots: ['Fansipan', 'Cát Cát', 'Đèo Ô Quy Hồ'] },
         { name: 'Ninh Bình', img: 'https://images.unsplash.com/photo-1571637539223-27c9cd20e2d5?w=200&h=150&fit=crop', spots: ['Tràng An', 'Bái Đính', 'Hang Múa'] },
@@ -2799,18 +2873,17 @@
           "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop"
         ],
         nearbyPlaces: [
-          { name: "Phở Thìn Bờ Hồ", type: "restaurant", rating: "4.7", distance: "0.5km", img: "https://images.unsplash.com/photo-1583224964978-2257b960c3d3?w=200&h=150&fit=crop" },
           { name: "Bún Chả Hương Liên", type: "restaurant", rating: "4.8", distance: "1.2km", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=200&h=150&fit=crop" },
           { name: "Kem Bạch Đằng", type: "restaurant", rating: "4.5", distance: "0.8km", img: "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=200&h=150&fit=crop" },
           { name: "Cà Phê Trứng Đắng", type: "cafe", rating: "4.6", distance: "1.5km", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=150&fit=crop" }
         ],
         spots: [
-          { name: "Lăng Bác & Chùa Một Cột", category: "attraction", desc: "Khu di tích lịch sử văn hóa thiêng liêng quốc gia.", reviews: 234, rating: 4.9, photos: ["https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?w=400&h=250&fit=crop"] },
-          { name: "Hồ Hoàn Kiếm & Đền Ngọc Sơn", category: "attraction", desc: "Biểu tượng lịch sử, trái tim của thủ đô Hà Nội.", reviews: 567, rating: 4.8, photos: ["https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=400&h=250&fit=crop"] },
-          { name: "Phở Thìn Bờ Hồ", category: "restaurant", desc: "Hương vị phở bò gia truyền thơm ngon đậm vị.", reviews: 189, rating: 4.7, photos: ["https://images.unsplash.com/photo-1583224964978-2257b960c3d3?w=400&h=250&fit=crop"] },
-          { name: "Bún Chả Đắc Kim", category: "restaurant", desc: "Bún chả gia truyền nổi tiếng phố Hàng Mành.", reviews: 312, rating: 4.8, photos: ["https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&h=250&fit=crop"] },
-          { name: "Xem Múa Rối Nước Bông Sen", category: "experience", desc: "Nghệ thuật sân khấu dân gian độc đáo của Việt Nam.", reviews: 456, rating: 4.9, photos: ["https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=250&fit=crop"] },
-          { name: "Tour Đêm Nhà Tù Hỏa Lò", category: "experience", desc: "Trải nghiệm nhập vai lịch sử đầy cảm xúc và ý nghĩa.", reviews: 278, rating: 4.6, photos: ["https://images.unsplash.com/photo-1590054387835-ab72678fef01?w=400&h=250&fit=crop"] }
+          { name: "Lăng Chủ tịch Hồ Chí Minh", category: "attraction", desc: "Khu di tích lịch sử văn hóa thiêng liêng quốc gia.", reviews: 234, rating: 4.9, photos: ["https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg?tr=q-70,c-at_max,w-1000,h-600"] },
+          { name: "Chùa Một Cột", category: "attraction", desc: "Ngôi chùa độc đáo với kiến trúc trên một cột giữa hồ nhỏ.", reviews: 198, rating: 4.8, photos: ["https://kimlientravel.com.vn/upload/image/Chua-Mot-Cot-1.jpg"] },
+          { name: "Hồ Hoàn Kiếm", category: "attraction", desc: "Biểu tượng lịch sử, trái tim của thủ đô Hà Nội.", reviews: 567, rating: 4.8, photos: ["https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg"] },
+          { name: "Đền Ngọc Sơn", category: "attraction", desc: "Di tích văn hóa nằm trên đảo trong Hồ Hoàn Kiếm.", reviews: 412, rating: 4.7, photos: ["https://vov2.vov.vn/sites/default/files/styles/large/public/2025-10/den-ngoc-son-ben-ho-hoan-kiem-anh-pham-hung-1.jpg"] },
+          { name: "Nhà tù Hỏa Lò", category: "experience", desc: "Di tích lịch sử với nhiều câu chuyện về thời kỳ đấu tranh.", reviews: 278, rating: 4.6, photos: ["https://tuotz.com/wp-content/uploads/2025/07/nha-tu-hoa-lo-1-1.png"] },
+          { name: "Nhà Thờ Lớn", category: "attraction", desc: "Nhà thờ Công giáo lớn và điểm check-in nổi tiếng ở trung tâm Hà Nội.", reviews: 321, rating: 4.7, photos: ["https://sohanews.sohacdn.com/zoom/700_438/160588918557773824/2022/5/18/photo1652870952340-165287095249466913169.jpg"] }
         ]
       },
       "TP. Hồ Chí Minh": {
@@ -3709,7 +3782,7 @@
     window.detailsMap = detailsMap;
 
     // Selected attractions with full info
-    window.selectedAttractionData = []; // Array of { name, category, cityName }
+    window.selectedAttractionData = []; // Array of { name, category, cityName, image, description }
     window.selectedAttractionCards = {}; // Map by spot name
     
     window.toggleSpotSelection = function(cardEl, name, category, cityName) {
@@ -3720,7 +3793,14 @@
         window.selectedAttractionData.splice(existingIdx, 1);
         delete window.selectedAttractionCards[name];
       } else {
-        window.selectedAttractionData.push({ name, category, cityName });
+        let image = '', description = '';
+        if (cardEl) {
+          const imgEl = cardEl.querySelector('.spot-img-inner');
+          const descEl = cardEl.querySelector('.spot-card-desc');
+          if (imgEl) image = imgEl.src;
+          if (descEl) description = descEl.textContent.trim();
+        }
+        window.selectedAttractionData.push({ name, category, cityName, image, description });
         window.selectedAttractionCards[name] = true;
       }
 
@@ -3748,68 +3828,34 @@
       
       if (window.selectedAttractionData.length === 0) {
         container.innerHTML = `
-          <div style="text-align:center; padding:1.5rem; color:var(--text-muted);">
-            <div style="font-size:2rem; margin-bottom:0.5rem;">📍</div>
-            <p style="font-size:0.8rem; margin:0;">Chưa chọn địa điểm nào</p>
-            <p style="font-size:0.7rem; margin:0.3rem 0 0; opacity:0.7;">Chọn từ danh sách địa điểm nổi bật bên dưới</p>
+          <div id="selectedAttractionsEmpty" style="text-align:center; padding:0.75rem; color:var(--text-muted);">
+            <div style="font-size:1.3rem; margin-bottom:0.25rem;">📍</div>
+            <p style="font-size:0.72rem; margin:0;">Chưa chọn địa điểm nào</p>
+            <p style="font-size:0.65rem; margin:0.2rem 0 0; opacity:0.7;">Chọn từ danh sách địa điểm nổi bật bên trên</p>
           </div>
         `;
         container.style.display = 'block';
         return;
       }
       
-      const categories = {
-        attraction: { label: 'Điểm chơi', icon: '🏛️' },
-        restaurant: { label: 'Quán ăn', icon: '🍜' },
-        experience: { label: 'Trải nghiệm', icon: '✨' }
-      };
+      let html = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:0.6rem;">`;
       
-      let html = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-          <span style="font-size:0.75rem; font-weight:700; color:var(--text);">
-            📍 Đã chọn ${window.selectedAttractionData.length} địa điểm
-          </span>
-          <button onclick="clearAllSelections()" style="
-            padding:4px 10px; border-radius:0.5rem; border:1px solid rgba(239,68,68,0.3); 
-            background:rgba(239,68,68,0.1); color:#ef4444; font-size:0.65rem; cursor:pointer;
-          ">🗑️ Xóa tất cả</button>
-        </div>
-      `;
-      
-      ['attraction', 'restaurant', 'experience'].forEach(catKey => {
-        const cat = categories[catKey];
-        const items = window.selectedAttractionData.filter(a => a.category === catKey);
-        if (items.length > 0) {
-          html += `
-            <div style="margin-bottom:0.75rem;">
-              <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.4rem;">
-                <span style="font-size:0.7rem;">${cat.icon}</span>
-                <span style="font-size:0.7rem; font-weight:700; color:${catKey === 'attraction' ? '#3b82f6' : catKey === 'restaurant' ? '#10b981' : '#f59e0b'};">${cat.label}</span>
-                <span style="font-size:0.6rem; color:var(--text-muted);">(${items.length})</span>
-              </div>
-              <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
-                ${items.map(item => `
-                  <div style="
-                    display:inline-flex; align-items:center; gap:0.3rem; padding:4px 8px; 
-                    border-radius:1rem; font-size:0.7rem;
-                    background:${catKey === 'attraction' ? 'rgba(59,130,246,0.1)' : catKey === 'restaurant' ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)'}; 
-                    border:1px solid ${catKey === 'attraction' ? 'rgba(59,130,246,0.3)' : catKey === 'restaurant' ? 'rgba(16,185,129,0.3)' : 'rgba(245,158,11,0.3)'};
-                    color:var(--text);
-                  ">
-                    ${item.cityName ? `<span style="font-size:0.6rem; opacity:0.7;">${item.cityName}:</span>` : ''}
-                    <span>${item.name}</span>
-                    <button onclick="event.stopPropagation(); removeAttraction('${item.name.replace(/'/g, "\\'")}')" style="
-                      background:none; border:none; color:inherit; cursor:pointer; font-size:0.8rem; 
-                      opacity:0.7; padding:0; line-height:1; margin-left:2px;
-                    ">×</button>
-                  </div>
-                `).join('')}
-              </div>
+      window.selectedAttractionData.forEach((item, idx) => {
+        const imgUrl = item.image || 'https://images.unsplash.com/photo-1528127269322-539801943592?w=400&q=80';
+        const safeName = item.name.replace(/'/g, "\\'");
+        html += `
+          <div class="selected-attraction-card">
+            <img src="${imgUrl}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=400&q=80'" />
+            <div class="selected-attraction-info">
+              <div class="selected-attraction-name">${item.name}</div>
+              <div class="selected-attraction-desc">${item.description || item.cityName || ''}</div>
             </div>
-          `;
-        }
+            <button class="selected-attraction-remove" onclick="event.stopPropagation(); removeAttraction('${safeName}')" title="Xóa">×</button>
+          </div>
+        `;
       });
       
+      html += `</div>`;
       container.innerHTML = html;
       container.style.display = 'block';
     };
@@ -4590,9 +4636,9 @@
     };
         
     window.applyReviewFilters = function() {
-      const showAttraction = document.getElementById('prefCategoryAttraction').checked;
-      const showRestaurant = document.getElementById('prefCategoryRestaurant').checked;
-      const showExperience = document.getElementById('prefCategoryExperience').checked;
+      const showAttraction = document.getElementById('prefCategoryAttraction') ? document.getElementById('prefCategoryAttraction').checked : true;
+      const showRestaurant = document.getElementById('prefCategoryRestaurant') ? document.getElementById('prefCategoryRestaurant').checked : true;
+      const showExperience = document.getElementById('prefCategoryExperience') ? document.getElementById('prefCategoryExperience').checked : true;
       
       const cards = document.querySelectorAll('#reviewPanelSpots .review-spot-card');
       cards.forEach(card => {
@@ -4617,17 +4663,26 @@
 
     
     // Bộ từ điển ảnh thực tế Unsplash chất lượng cao cho các địa điểm nổi tiếng Việt Nam (Thẩm mỹ đỉnh cao)
-    const SPOT_PHOTOS_DB = {
+    window.SPOT_PHOTOS_DB = {
       // Hà Nội
-      "Lăng Bác & Chùa Một Cột": [
-        "https://images.unsplash.com/photo-1599707367072-cd6ada2bc375?w=640&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=640&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=640&auto=format&fit=crop&q=80"
+      "Lăng Chủ tịch Hồ Chí Minh": [
+        "https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg?tr=q-70,c-at_max,w-1000,h-600",
+        "https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg?tr=q-70,c-at_max,w=800,h=500"
       ],
-      "Hồ Hoàn Kiếm & Đền Ngọc Sơn": [
-        "https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?w=640&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=640&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=640&auto=format&fit=crop&q=80"
+      "Chùa Một Cột": [
+        "https://kimlientravel.com.vn/upload/image/Chua-Mot-Cot-1.jpg"
+      ],
+      "Hồ Hoàn Kiếm": [
+        "https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg"
+      ],
+      "Đền Ngọc Sơn": [
+        "https://vov2.vov.vn/sites/default/files/styles/large/public/2025-10/den-ngoc-son-ben-ho-hoan-kiem-anh-pham-hung-1.jpg"
+      ],
+      "Nhà tù Hỏa Lò": [
+        "https://tuotz.com/wp-content/uploads/2025/07/nha-tu-hoa-lo-1-1.png"
+      ],
+      "Nhà Thờ Lớn": [
+        "https://sohanews.sohacdn.com/zoom/700_438/160588918557773824/2022/5/18/photo1652870952340-165287095249466913169.jpg"
       ],
       "Phố Cổ Hà Nội": [
         "https://images.unsplash.com/photo-1528127269322-539801943592?w=640&auto=format&fit=crop&q=80",
@@ -5087,8 +5142,13 @@
       
       const oldCard = document.querySelector('.comparison-summary-card');
       if (oldCard) oldCard.remove();
-      
-      resultsContainer.insertAdjacentHTML('afterbegin', analysisHtml);
+
+      if (isTour) {
+        // Clear any previous itinerary render before showing tour compare summary.
+        resultsContainer.innerHTML = analysisHtml;
+      } else {
+        resultsContainer.insertAdjacentHTML('afterbegin', analysisHtml);
+      }
       resultsContainer.scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -5234,6 +5294,8 @@
         }));
         const names = tourData.map(t => t.name || 'Tour chưa rõ tên');
         
+        const timelineContainer = document.getElementById('timelineContent');
+        if (timelineContainer) timelineContainer.innerHTML = '';
         showComparisonView(plans, names, 'tour');
 
         // Hiện vùng kết quả toàn màn hình
@@ -5247,12 +5309,12 @@
         const postSave = document.getElementById('postSaveActions');
         if (postSave) postSave.style.display = 'none';
 
-        const resultContainer = document.getElementById('timelineResult');
+        const timelineResult = document.getElementById('timelineResult');
         const placeholder = document.getElementById('resultPlaceholder');
         if (placeholder) placeholder.style.display = 'none';
-        if (resultContainer) {
-          resultContainer.style.display = 'block';
-          setTimeout(() => resultContainer.scrollIntoView({ behavior: 'smooth' }), 100);
+        if (timelineResult) {
+          timelineResult.style.display = 'block';
+          setTimeout(() => timelineResult.scrollIntoView({ behavior: 'smooth' }), 100);
         }
       } catch (e) {
         console.error("Tour comparison error:", e);

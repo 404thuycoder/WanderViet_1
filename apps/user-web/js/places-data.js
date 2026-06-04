@@ -372,7 +372,7 @@ window.WANDER_PLACES = [{
   }],
   checkInSpots: [{
     name: "Nhà Thờ Lớn Hà Nội",
-    image: "https://images.unsplash.com/photo-1603566114828-9842a2202685?w=400&q=80",
+    image: "https://sohanews.sohacdn.com/zoom/700_438/160588918557773824/2022/5/18/photo1652870952340-165287095249466913169.jpg",
     rating: 4.7,
     description: "Kiến trúc Gothic cổ điển trung tâm.",
     address: "40 Nhà Chung, Hà Nội"

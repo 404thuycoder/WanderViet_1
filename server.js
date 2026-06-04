@@ -76,6 +76,40 @@ app.use('/api', (req, res, next) => {
 
 // API Routes
 app.use('/api/public', require('./server/routes/public'));
+
+// Fallback weather proxy routes (ensure /api/public/weather/* works on localhost 3000)
+app.get('/api/public/weather/open-meteo', async (req, res) => {
+    try {
+        const { lat, lng } = req.query;
+        if (!lat || !lng) {
+            return res.status(400).json({ error: 'lat and lng parameters required' });
+        }
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weathercode`;
+        const response = await fetch(url);
+        const data = await response.json();
+        res.json(data);
+    } catch (err) {
+        console.error('[Weather/Open-Meteo Error]', err);
+        res.status(500).json({ error: 'Failed to fetch weather data', details: err.message });
+    }
+});
+
+app.get('/api/public/weather/wttr', async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q) {
+            return res.status(400).json({ error: 'q parameter required' });
+        }
+        const url = `https://wttr.in/${encodeURIComponent(q)}?format=j1&lang=vi`;
+        const response = await fetch(url);
+        const data = await response.json();
+        res.json(data);
+    } catch (err) {
+        console.error('[Weather/wttr.in Error]', err);
+        res.status(500).json({ error: 'Failed to fetch weather data', details: err.message });
+    }
+});
+
 app.use('/api/chat', require('./server/routes/chat'));
 app.use('/api/places', require('./server/routes/places'));
 app.use('/api/auth', require('./server/routes/auth').router);

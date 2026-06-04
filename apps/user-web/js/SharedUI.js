@@ -2007,6 +2007,30 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         <div class="am-view-content" style="display:none;"></div>
       `;
 
+      // Insert rounded hero add button overlay (top-right) for quick add
+      try {
+        const heroEl = wrap.querySelector('.place-detail__hero');
+        if (heroEl && !heroEl.querySelector('.place-hero-add-btn')) {
+          const addBtn = document.createElement('button');
+          addBtn.type = 'button';
+          addBtn.className = 'place-hero-add-btn';
+          addBtn.title = 'Thêm vào lịch';
+          addBtn.innerText = '+';
+          addBtn.onclick = function (ev) {
+            ev.stopPropagation();
+            if (typeof window.addStopById === 'function') {
+              try { window.addStopById(placeId); }
+              catch (e) { if (window.showToast) showToast('Lỗi khi thêm điểm', 'error'); }
+            } else {
+              if (window.showToast) showToast('Chức năng chưa khả dụng', 'info');
+            }
+          };
+          heroEl.appendChild(addBtn);
+        }
+      } catch (err) {
+        console.warn('Could not insert hero add button', err);
+      }
+
       // Interactivity
       wrap.querySelectorAll('.gallery-thumb').forEach(thumb => {
         thumb.onclick = () => {
@@ -2828,7 +2852,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           if (lat != null && lon != null) {
             try {
               // Ưu tiên dùng Open-Meteo vì độ chính xác thời gian thực cực cao và cập nhật liên tục
-              const openMeteoUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode`;
+              const openMeteoUrl = `/api/public/weather/open-meteo?lat=${lat}&lng=${lon}`;
               const [weatherRes, geoName] = await Promise.all([
                 fetch(openMeteoUrl).then(r => r.json()),
                 geoPromise
@@ -2880,8 +2904,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           if (temp === null) {
             const weatherQuery = (lat != null && lon != null) ? `${lat},${lon}` : '';
             const weatherUrl = weatherQuery
-              ? `https://wttr.in/${encodeURIComponent(weatherQuery)}?format=j1&lang=vi`
-              : `https://wttr.in/?format=j1&lang=vi`;
+              ? `/api/public/weather/wttr?q=${encodeURIComponent(weatherQuery)}`
+              : `/api/public/weather/wttr?q=Viet Nam`;
 
             const [weatherRes, geoName] = await Promise.all([
               fetch(weatherUrl).then(r => r.json()),
@@ -3107,25 +3131,9 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       };
 
       // Hàm lấy tọa độ dựa trên IP (fallback khi trình duyệt chặn GPS)
+      // NOTE: Disabled external IP geo-location calls to avoid CORS/429/403 errors
+      // Geo-location is optional; weather will fall back to null if unavailable
       async function getIPCoordinates() {
-        try {
-          const res = await fetch('https://freeipapi.com/api/json');
-          const data = await res.json();
-          if (data && data.latitude != null && data.longitude != null) {
-            return { lat: data.latitude, lon: data.longitude };
-          }
-        } catch (e) {
-          console.warn('IP-based geo fallback 1 failed', e);
-        }
-        try {
-          const res = await fetch('https://ipapi.co/json/');
-          const data = await res.json();
-          if (data && data.latitude != null && data.longitude != null) {
-            return { lat: data.latitude, lon: data.longitude };
-          }
-        } catch (e) {
-          console.warn('IP-based geo fallback 2 failed', e);
-        }
         return null;
       }
 

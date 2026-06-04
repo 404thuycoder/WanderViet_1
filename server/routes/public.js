@@ -34,6 +34,44 @@ function buildIdQuery(id) {
   return { $or: conditions };
 }
 
+// GET /api/public/weather/open-meteo - Proxy for Open-Meteo weather API
+router.get('/weather/open-meteo', async (req, res) => {
+  try {
+    const { lat, lng } = req.query;
+    if (!lat || !lng) {
+      return res.status(400).json({ error: 'lat and lng parameters required' });
+    }
+
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weathercode`;
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    res.json(data);
+  } catch (err) {
+    console.error('[Weather/Open-Meteo Error]', err);
+    res.status(500).json({ error: 'Failed to fetch weather data', details: err.message });
+  }
+});
+
+// GET /api/public/weather/wttr - Proxy for wttr.in weather API
+router.get('/weather/wttr', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({ error: 'q parameter required' });
+    }
+
+    const url = `https://wttr.in/${encodeURIComponent(q)}?format=j1&lang=vi`;
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    res.json(data);
+  } catch (err) {
+    console.error('[Weather/wttr.in Error]', err);
+    res.status(500).json({ error: 'Failed to fetch weather data', details: err.message });
+  }
+});
+
 // GET /api/public/place-photo - Proxy to get real Google Maps thumbnails or DB images
 router.get('/place-photo', async (req, res) => {
   const { name, address } = req.query;

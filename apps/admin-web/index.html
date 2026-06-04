@@ -1750,11 +1750,12 @@
                 <button class="btn btn--ghost btn--small" onclick="WanderUI.exportToCSV('places')">📥 Xuất CSV</button>
                 <select id="place-category-filter" class="admin-search-input" style="max-width: 150px; height: 36px; padding: 0 0.75rem; font-size: 0.85rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff;">
                   <option value="all">Loại: Tất cả</option>
-                  <option value="cultural">Văn hóa</option>
-                  <option value="nature">Thiên nhiên</option>
-                  <option value="culinary">Ẩm thực</option>
-                  <option value="activity">Hoạt động</option>
-                  <option value="accommodation">Lưu trú</option>
+                  <option value="diem-du-lich">Điểm du lịch</option>
+                  <option value="khach-san">Lưu trú</option>
+                  <option value="nha-hang">Ẩm thực</option>
+                  <option value="tour">Tour du lịch</option>
+                  <option value="dich-vu">Dịch vụ</option>
+                  <option value="trai-nghiem">Trải nghiệm</option>
                 </select>
                 <input type="text" id="place-search" class="admin-search-input" placeholder="🔍 Tìm điểm đến..." />
                 <button class="btn btn--primary btn--small" id="btn-add-place">+ Thêm mới</button>
@@ -2540,140 +2541,224 @@
   </div>
 
   <!-- Place Edit Drawer (Off-canvas) -->
-  <div class="slide-drawer" id="modal-place-form" hidden>
+  <div class="slide-drawer place-form-modal" id="modal-place-form" hidden>
     <div class="slide-drawer__inner slide-drawer__inner--wide">
       <div class="slide-drawer__header">
-        <h2 class="slide-drawer__title" id="place-modal-title">Thêm / Sửa Điểm Đến</h2>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div style="width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">📍</div>
+          <h2 class="slide-drawer__title" id="place-modal-title">Thêm / Sửa Điểm Đến</h2>
+        </div>
         <button type="button" class="slide-drawer__close" data-close-modal aria-label="Đóng">×</button>
       </div>
+
+      <!-- Tab Nav -->
+      <div class="pf-tabs">
+        <button type="button" class="pf-tab is-active" data-tab="basic">📋 Cơ bản</button>
+        <button type="button" class="pf-tab" data-tab="images">🖼️ Hình ảnh</button>
+        <button type="button" class="pf-tab" data-tab="content">📝 Nội dung</button>
+        <button type="button" class="pf-tab" data-tab="details">⚙️ Chi tiết</button>
+        <button type="button" class="pf-tab" data-tab="jsondata">🔗 Dữ liệu JSON</button>
+      </div>
+
       <div class="slide-drawer__body">
         <form id="place-form">
           <input type="hidden" name="id" id="place-edit-id" />
-          <div class="admin-form-grid">
-            <label class="field"><span class="field-label">Tên địa điểm (*)</span><input type="text" name="name"
-                required /></label>
-            <label class="field"><span class="field-label">Loại (Kind)</span>
-              <select name="kind">
-                <option value="diem-du-lich" selected>Điểm tham quan</option>
-                <option value="trai-nghiem">Trải nghiệm / Tour</option>
-                <option value="khach-san">Khách sạn / Nghỉ dưỡng</option>
-                <option value="nha-hang">Nhà hàng / Ẩm thực</option>
-                <option value="giai-tri">Giải trí / Vui chơi</option>
-                <option value="tien-ich">Tiện ích khác</option>
-              </select>
-            </label>
 
-            <div class="field field--full" style="display:flex; gap:2rem; padding:0.5rem; background:rgba(255,255,255,0.03); border-radius:8px; border:1px solid rgba(255,255,255,0.05);">
-              <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-                <input type="checkbox" id="chk-is-tour" style="width:18px;height:18px" />
-                <span class="field-label" style="margin:0">Là Tour du lịch</span>
+          <!-- TAB: Cơ bản -->
+          <div class="pf-panel is-active" data-panel="basic">
+            <div class="admin-form-grid">
+              <label class="field field--full">
+                <span class="field-label">Tên địa điểm (*)</span>
+                <input type="text" name="name" required placeholder="Nhập tên địa điểm..." />
               </label>
-              <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-                <input type="checkbox" id="chk-is-utility" style="width:18px;height:18px" />
-                <span class="field-label" style="margin:0">Là Tiện ích (Essentials)</span>
+              <label class="field">
+                <span class="field-label">Loại (Kind)</span>
+                <select name="kind">
+                  <option value="diem-du-lich" selected>📍 Điểm tham quan</option>
+                  <option value="trai-nghiem">🎯 Trải nghiệm / Tour</option>
+                  <option value="khach-san">🏨 Khách sạn / Nghỉ dưỡng</option>
+                  <option value="nha-hang">🍽️ Nhà hàng / Ẩm thực</option>
+                  <option value="giai-tri">🎪 Giải trí / Vui chơi</option>
+                  <option value="tien-ich">🔧 Tiện ích khác</option>
+                </select>
               </label>
-              <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-                <input type="checkbox" id="chk-top" style="width:18px;height:18px" />
-                <span class="field-label" style="margin:0">Nổi bật (Top)</span>
+              <label class="field">
+                <span class="field-label">Vùng miền</span>
+                <input type="text" name="region" placeholder="ví dụ: Miền Nam, Tây Nguyên..." />
               </label>
-              <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
-                <input type="checkbox" id="chk-verified" style="width:18px;height:18px" />
-                <span class="field-label" style="margin:0">Đã xác minh</span>
+              <label class="field">
+                <span class="field-label">Phân loại (Category)</span>
+                <input type="text" name="category" placeholder="ví dụ: Di sản, Ẩm thực..." />
               </label>
-            </div>
-            <label class="field"><span class="field-label">Vùng miền</span><input type="text" name="region" /></label>
-            <label class="field"><span class="field-label">Phân loại (Category)</span><input type="text" name="category" placeholder="ví dụ: Di sản, Ẩm thực..." /></label>
-            <label class="field field--full"><span class="field-label">Đối tác sở hữu (Owner ID)</span><input type="text" name="ownerId" readonly style="opacity:0.7; cursor:not-allowed; background:rgba(255,255,255,0.05)" placeholder="Dữ liệu hệ thống hoặc ID doanh nghiệp" /></label>
-            <div class="field field--full">
-              <span class="field-label">Hình ảnh điểm đến (*)</span>
-              <!-- Hidden input to hold absolute array of URL images if we modify order -->
-              <input type="hidden" name="images" id="hidden-place-images" />
-              <!-- URL image input -->
-              <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
-                <input type="text" id="place-image-url" placeholder="Dán link ảnh (Unsplash, Google Images...)" style="flex:1; padding:0.5rem 0.75rem; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); color:#fff; font-size:0.875rem;" />
-                <button type="button" id="btn-add-image-url" onclick="window.__addImageUrl && window.__addImageUrl()" style="padding:0.5rem 1rem; border-radius:8px; border:none; background:rgba(99,102,241,0.3); color:#a5b4fc; cursor:pointer; font-size:0.875rem; white-space:nowrap;">+ Thêm URL</button>
+              <label class="field field--full">
+                <span class="field-label">Tags (cách nhau bằng dấu phẩy)</span>
+                <input type="text" name="tags" placeholder="ví dụ: biển, ẩm thực, lịch sử..." />
+              </label>
+              <label class="field field--full">
+                <span class="field-label">Đối tác sở hữu (Owner ID)</span>
+                <input type="text" name="ownerId" readonly style="opacity:0.6;cursor:not-allowed;" placeholder="Dữ liệu hệ thống hoặc ID doanh nghiệp" />
+              </label>
+              <div class="field field--full">
+                <span class="field-label" style="display:block;margin-bottom:0.6rem;">Trạng thái &amp; Phân loại</span>
+                <div class="pf-checks">
+                  <label class="pf-check"><input type="checkbox" id="chk-top" /><span>⭐ Nổi bật (Top)</span></label>
+                  <label class="pf-check"><input type="checkbox" id="chk-verified" /><span>✅ Đã xác minh</span></label>
+                  <label class="pf-check"><input type="checkbox" id="chk-is-tour" /><span>🗺️ Là Tour</span></label>
+                  <label class="pf-check"><input type="checkbox" id="chk-is-utility" /><span>🔧 Là Tiện ích</span></label>
+                </div>
               </div>
+            </div>
+          </div>
+
+          <!-- TAB: Hình ảnh -->
+          <div class="pf-panel" data-panel="images">
+            <div class="field field--full" style="margin-bottom:1.25rem;">
+              <span class="field-label" style="display:block;margin-bottom:0.6rem;">🔗 Thêm ảnh qua URL</span>
+              <div class="pf-url-row">
+                <input type="text" id="place-image-url" placeholder="Dán link ảnh (https://images.unsplash.com/...)" />
+                <button type="button" id="btn-add-image-url" class="pf-url-btn">➕ Thêm URL</button>
+              </div>
+              <p class="pf-hint">Hỗ trợ mọi URL ảnh hợp lệ (http/https). Nhấn Enter để thêm nhanh.</p>
+            </div>
+            <div class="field field--full" style="margin-bottom:1.25rem;">
+              <span class="field-label" style="display:block;margin-bottom:0.6rem;">📁 Tải ảnh từ máy tính</span>
               <div class="upload-dropzone" id="place-dropzone">
-                <input type="file" id="place-image-input" name="imageFile" accept="image/jpeg, image/png, image/webp" multiple class="visually-hidden" />
+                <input type="file" id="place-image-input" name="imageFile" accept="image/jpeg,image/png,image/webp" multiple class="visually-hidden" />
                 <label for="place-image-input" class="upload-dropzone__label">
-                  <span style="font-size: 2rem; display:block; margin-bottom:0.5rem;">📸</span>
-                  <p style="margin:0 0 0.25rem 0;">Kéo thả ảnh vào đây hoặc <strong>nhấp để chọn</strong></p>
-                  <p style="margin:0; font-size: 0.8rem; color: var(--text-muted);">(Tối đa 5MB/ảnh, hỗ trợ JPG, PNG, WEBP)</p>
+                  <span style="font-size:2rem;display:block;margin-bottom:0.5rem;">📸</span>
+                  <p style="margin:0 0 0.25rem;">Kéo thả hoặc <strong>nhấp để chọn ảnh</strong></p>
+                  <p style="margin:0;font-size:0.8rem;color:var(--admin-text-dim);">Tối đa 5MB/ảnh — JPG, PNG, WEBP</p>
                 </label>
-                <div class="upload-preview-list" id="place-dropzone-preview" style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1rem;"></div>
               </div>
             </div>
-            <label class="field"><span class="field-label">Ngân sách</span>
-              <select name="budget">
-                <option value="1">1 - Tiết kiệm</option>
-                <option value="2" selected>2 - Vừa phải</option>
-                <option value="3">3 - Cao cấp</option>
-              </select>
-            </label>
-            <label class="field"><span class="field-label">Nhịp chuyến</span>
-              <select name="pace">
-                <option value="cham">Thong thả</option>
-                <option value="vua" selected>Cân bằng</option>
-                <option value="nhanh">Năng động</option>
-              </select>
-            </label>
-            <label class="field"><span class="field-label">Vĩ độ (lat)</span><input type="number" name="lat" step="any"
-                placeholder="ví dụ: 10.2899" /></label>
-            <label class="field"><span class="field-label">Kinh độ (lng)</span><input type="number" name="lng"
-                step="any" placeholder="ví dụ: 103.984" /></label>
-            <label class="field field--full"><span class="field-label">Tags (cách nhau bằng dấu phẩy)</span><input
-                type="text" name="tags" placeholder="ví dụ: biển, ẩm thực" /></label>
-            <label class="field"><span class="field-label">Mô tả ngắn (1-2 câu)</span><textarea name="description"
-                rows="2"></textarea></label>
-            <label class="field field--full"><span class="field-label">Nội dung chi tiết (Legacy Text)</span><textarea name="text"
-                rows="2"></textarea></label>
-            <label class="field field--full"><span class="field-label">Gợi ý di chuyển</span><textarea name="transportTips"
-                rows="2"></textarea></label>
-
-            <!-- Rich Narrative Content -->
-            <fieldset class="field field--full" style="border:1px solid var(--border); padding:1rem; border-radius:var(--radius-sm); margin-top:0.5rem;">
-              <legend class="field-label" style="padding:0 0.5rem;">✨ Nội dung cao cấp (Business Content)</legend>
-              <div class="admin-form-grid">
-                <label class="field field--full"><span class="field-label">Bản sắc & Câu chuyện (Overview)</span><textarea name="overview" rows="3" placeholder="Giới thiệu sâu sắc về địa điểm..."></textarea></label>
-                <label class="field field--full"><span class="field-label">Gợi ý trải nghiệm (Experience)</span><textarea name="experience" rows="2" placeholder="Khuyên khách hàng nên làm gì..."></textarea></label>
-                <label class="field"><span class="field-label">Điểm nhấn (cách nhau dấu phẩy)</span><input type="text" name="highlights" placeholder="Gần biển, Buffet sáng..." /></label>
-                <label class="field"><span class="field-label">Màu chủ đề (Theme Color)</span><input type="color" name="themeColor" value="#6366f1" style="height:42px" /></label>
+            <div class="field field--full">
+              <span class="field-label" style="display:block;margin-bottom:0.5rem;">Xem trước (<span id="pf-img-count">0</span> ảnh)</span>
+              <div class="pf-preview-wrap">
+                <div class="upload-preview-list" id="place-dropzone-preview" style="display:flex;flex-wrap:wrap;gap:0.5rem;"></div>
               </div>
-            </fieldset>
-            
-            <!-- Nested Data Fields -->
-            <fieldset class="field field--full" style="border:1px solid var(--border); padding:1rem; border-radius:var(--radius-sm); margin-top:0.5rem;">
-              <legend class="field-label" style="padding:0 0.5rem;">📌 Dữ liệu liên kết (JSON Array)</legend>
-              <div class="admin-form-grid">
-                <label class="field field--full"><span class="field-label">Địa điểm vui chơi (amusementPlaces)</span><textarea name="amusementPlaces" rows="2" placeholder='[{"name":"...","image":"...","ticketPrice":"..."}]' style="font-family:monospace"></textarea></label>
-                <label class="field field--full"><span class="field-label">Nơi lưu trú (accommodations)</span><textarea name="accommodations" rows="2" placeholder='[{"name":"...","image":"...","priceRange":"..."}]' style="font-family:monospace"></textarea></label>
-                <label class="field field--full"><span class="field-label">Nhà hàng / Quán ăn (diningPlaces)</span><textarea name="diningPlaces" rows="2" placeholder='[{"name":"...","image":"...","priceRange":"..."}]' style="font-family:monospace"></textarea></label>
-                <label class="field field--full"><span class="field-label">Điểm Check-in (checkInSpots)</span><textarea name="checkInSpots" rows="2" placeholder='[{"name":"...","image":"...","address":"..."}]' style="font-family:monospace"></textarea></label>
-              </div>
-            </fieldset>
-
-            <!-- Pricing & Hours -->
-            <fieldset class="field field--full" style="border:1px solid var(--border); padding:1rem; border-radius:var(--radius-sm); margin-top:0.5rem;">
-              <legend class="field-label" style="padding:0 0.5rem;">💰 Giá & Thời gian</legend>
-              <div class="admin-form-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
-                <label class="field"><span class="field-label">Giá từ</span><input type="number" name="priceFrom" /></label>
-                <label class="field"><span class="field-label">Giá đến</span><input type="number" name="priceTo" /></label>
-                <label class="field"><span class="field-label">Giờ mở cửa</span><input type="time" name="openTime" /></label>
-                <label class="field"><span class="field-label">Giờ đóng cửa</span><input type="time" name="closeTime" /></label>
-              </div>
-            </fieldset>
-            
-            <div style="display:flex; gap:1rem; width:100%; margin-top: 1rem;">
-              <label class="field" style="flex:1"><span class="field-label">Tên Nguồn/Tổ chức</span><input type="text" name="sourceName" placeholder="Ví dụ: VQG Côn Đảo" /></label>
-              <label class="field" style="flex:1"><span class="field-label">Link Tham chiếu</span><input type="url" name="sourceUrl" placeholder="https://..." /></label>
             </div>
           </div>
-          <div style="display:flex;gap:0.75rem;margin-top:1rem">
-            <button type="submit" class="btn btn--primary" style="flex:1">💾 Lưu Thông Tin</button>
-            <button type="button" class="btn btn--ghost" id="btn-delete-place" hidden
-              style="color:#f87171;border-color:rgba(248,113,113,0.4)">🗑️ Xóa điểm đến</button>
+
+          <!-- TAB: Nội dung -->
+          <div class="pf-panel" data-panel="content">
+            <div class="admin-form-grid">
+              <label class="field field--full">
+                <span class="field-label">Mô tả ngắn (1-2 câu)</span>
+                <textarea name="description" rows="2" placeholder="Mô tả súc tích về địa điểm..."></textarea>
+              </label>
+              <label class="field field--full">
+                <span class="field-label">Bản sắc &amp; Câu chuyện (Overview)</span>
+                <textarea name="overview" rows="3" placeholder="Giới thiệu sâu sắc về địa điểm..."></textarea>
+              </label>
+              <label class="field field--full">
+                <span class="field-label">Gợi ý trải nghiệm (Experience)</span>
+                <textarea name="experience" rows="2" placeholder="Khuyên khách nên trải nghiệm gì..."></textarea>
+              </label>
+              <label class="field">
+                <span class="field-label">Điểm nhấn (dấu phẩy)</span>
+                <input type="text" name="highlights" placeholder="Gần biển, Buffet sáng..." />
+              </label>
+              <label class="field">
+                <span class="field-label">Màu chủ đề</span>
+                <input type="color" name="themeColor" value="#6366f1" style="height:42px;width:100%;border-radius:8px;cursor:pointer;border:1px solid var(--admin-border);padding:3px;" />
+              </label>
+              <label class="field field--full">
+                <span class="field-label">Nội dung chi tiết (Legacy)</span>
+                <textarea name="text" rows="2" placeholder="Nội dung mô tả chi tiết..."></textarea>
+              </label>
+              <label class="field field--full">
+                <span class="field-label">Gợi ý di chuyển</span>
+                <textarea name="transportTips" rows="2" placeholder="Cách di chuyển đến địa điểm..."></textarea>
+              </label>
+            </div>
           </div>
-          <p id="place-form-status" style="margin-top:0.75rem;font-size:0.9rem;min-height:1.25rem"></p>
+
+          <!-- TAB: Chi tiết -->
+          <div class="pf-panel" data-panel="details">
+            <div class="admin-form-grid">
+              <label class="field">
+                <span class="field-label">Ngân sách</span>
+                <select name="budget">
+                  <option value="1">💚 Tiết kiệm</option>
+                  <option value="2" selected>💛 Vừa phải</option>
+                  <option value="3">💎 Cao cấp</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field-label">Nhịp chuyến</span>
+                <select name="pace">
+                  <option value="cham">🐢 Thong thả</option>
+                  <option value="vua" selected>⚖️ Cân bằng</option>
+                  <option value="nhanh">🚀 Năng động</option>
+                </select>
+              </label>
+              <label class="field">
+                <span class="field-label">Vĩ độ (lat)</span>
+                <input type="number" name="lat" step="any" placeholder="10.2899" />
+              </label>
+              <label class="field">
+                <span class="field-label">Kinh độ (lng)</span>
+                <input type="number" name="lng" step="any" placeholder="103.984" />
+              </label>
+              <label class="field">
+                <span class="field-label">Giá từ (VNĐ)</span>
+                <input type="number" name="priceFrom" placeholder="0" />
+              </label>
+              <label class="field">
+                <span class="field-label">Giá đến (VNĐ)</span>
+                <input type="number" name="priceTo" placeholder="0" />
+              </label>
+              <label class="field">
+                <span class="field-label">Giờ mở cửa</span>
+                <input type="time" name="openTime" />
+              </label>
+              <label class="field">
+                <span class="field-label">Giờ đóng cửa</span>
+                <input type="time" name="closeTime" />
+              </label>
+              <label class="field">
+                <span class="field-label">Tên Nguồn/Tổ chức</span>
+                <input type="text" name="sourceName" placeholder="Ví dụ: VQG Côn Đảo" />
+              </label>
+              <label class="field">
+                <span class="field-label">Link Tham chiếu</span>
+                <input type="url" name="sourceUrl" placeholder="https://..." />
+              </label>
+            </div>
+          </div>
+
+          <!-- TAB: Dữ liệu JSON -->
+          <div class="pf-panel" data-panel="jsondata">
+            <div class="pf-json-notice">
+              <span>ℹ️</span>
+              <p>Nhập dữ liệu JSON Array hợp lệ. Hệ thống sẽ kiểm tra khi lưu.</p>
+            </div>
+            <div class="admin-form-grid">
+              <label class="field field--full">
+                <span class="field-label">🎡 Địa điểm vui chơi (amusementPlaces)</span>
+                <textarea name="amusementPlaces" rows="3" placeholder='[{"name":"...","image":"...","ticketPrice":"..."}]' style="font-family:monospace;font-size:0.8rem;"></textarea>
+              </label>
+              <label class="field field--full">
+                <span class="field-label">🏨 Nơi lưu trú (accommodations)</span>
+                <textarea name="accommodations" rows="3" placeholder='[{"name":"...","image":"...","priceRange":"..."}]' style="font-family:monospace;font-size:0.8rem;"></textarea>
+              </label>
+              <label class="field field--full">
+                <span class="field-label">🍽️ Nhà hàng / Quán ăn (diningPlaces)</span>
+                <textarea name="diningPlaces" rows="3" placeholder='[{"name":"...","image":"...","priceRange":"..."}]' style="font-family:monospace;font-size:0.8rem;"></textarea>
+              </label>
+              <label class="field field--full">
+                <span class="field-label">📸 Điểm Check-in (checkInSpots)</span>
+                <textarea name="checkInSpots" rows="3" placeholder='[{"name":"...","image":"...","address":"..."}]' style="font-family:monospace;font-size:0.8rem;"></textarea>
+              </label>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="pf-actions">
+            <button type="submit" class="btn btn--primary" style="flex:1;padding:0.75rem 1.5rem;">💾 Lưu Thông Tin</button>
+            <button type="button" class="btn" id="btn-delete-place" hidden style="color:#f87171;border-color:rgba(248,113,113,0.4);padding:0.75rem 1.25rem;">🗑️ Xóa điểm đến</button>
+          </div>
+          <p id="place-form-status" style="margin-top:0.75rem;font-size:0.9rem;min-height:1.25rem;text-align:center;"></p>
         </form>
       </div>
     </div>

@@ -4,8 +4,8 @@ const placeSchema = new mongoose.Schema({
   id:            { type: String, unique: true, sparse: true },
   name:          { type: String, required: true },
   slug:          { type: String, unique: true, sparse: true }, // SEO-friendly URL
-  kind:          { type: String, enum: ['diem-du-lich', 'trai-nghiem', 'khach-san', 'nha-hang', 'giai-tri', 'tien-ich', 'thue-xe'], default: 'diem-du-lich' },
-  businessCategory: { type: String, enum: ['dining', 'stay', 'tour', 'facility', 'rental', 'other'], default: 'other' },
+  kind:          { type: String, enum: ['diem-du-lich', 'trai-nghiem', 'khach-san', 'nha-hang', 'giai-tri', 'tien-ich', 'thue-xe', 'tour', 'dich-vu'], default: 'diem-du-lich' },
+  businessCategory: { type: String, enum: ['dining', 'stay', 'tour', 'facility', 'rental', 'other', 'hotel', 'restaurant', 'spa', 'transport', 'activity', 'meeting'], default: 'other' },
   // Tour-specific fields
   isTour:        { type: Boolean, default: false },
   isUtility:     { type: Boolean, default: false },

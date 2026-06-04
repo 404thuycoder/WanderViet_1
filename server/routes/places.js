@@ -384,7 +384,7 @@ router.get('/', async (req, res) => {
     }
 
     const places = await Place.find(query)
-           .select('id name region address meta text budget pace image images verified top favoritesCount ownerId lat lng transportTips priceFrom priceTo ratingAvg reviewCount kind description isTour')
+           .select('id name region city address meta text budget pace image images verified top favoritesCount ownerId lat lng transportTips priceFrom priceTo ratingAvg reviewCount kind description isTour source businessCategory')
            .limit(req.query.limit ? parseInt(req.query.limit) : 100)
            .lean();
 

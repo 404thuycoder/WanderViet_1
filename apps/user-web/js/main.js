@@ -3868,10 +3868,11 @@
         // Apply filtering
         if (filter !== 'all') {
             bizPlaces = bizPlaces.filter(p => {
-                if (filter === 'tour') return p.isTour || p.kind === 'trai-nghiem';
+                if (filter === 'tour') return p.isTour || p.kind === 'tour' || p.kind === 'trai-nghiem';
                 if (filter === 'khach-san') return p.kind === 'khach-san';
                 if (filter === 'nha-hang') return p.kind === 'nha-hang';
-                if (filter === 'thue-xe') return p.kind === 'thue-xe' || p.businessCategory === 'rental';
+                if (filter === 'dich-vu') return p.kind === 'dich-vu' || p.businessCategory === 'spa' || p.businessCategory === 'meeting';
+                if (filter === 'thue-xe') return p.kind === 'thue-xe' || p.businessCategory === 'rental' || p.businessCategory === 'transport';
                 return true;
             });
         }
@@ -3899,7 +3900,7 @@
           if (p.kind === 'khach-san') catLabel = 'Lưu trú Elite';
           else if (p.isTour || p.kind === 'trai-nghiem') catLabel = 'Trải nghiệm Tour';
           else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') catLabel = 'Ẩm thực & Giải trí';
-          else if (p.kind === 'thue-xe' || p.businessCategory === 'rental') catLabel = 'Thuê xe Dịch vụ';
+          else if (p.kind === 'thue-xe' || p.businessCategory === 'rental' || p.businessCategory === 'transport') catLabel = 'Thuê xe Dịch vụ';
 
           // Build slideshow image tags for partner services
           var imagesList = [];

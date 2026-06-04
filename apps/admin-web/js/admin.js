@@ -2859,10 +2859,12 @@
       const catMap = {};
       places.forEach(p => {
         const cat = p.kind || p.type || p.category || 'Khác';
-        const label = cat === 'diem-du-lich' ? 'Du lịch' :
+        const label = cat === 'diem-du-lich' ? 'Điểm du lịch' :
+                      cat === 'khach-san'     ? 'Lưu trú' :
+                      cat === 'nha-hang'      ? 'Ẩm thực' :
+                      cat === 'tour'          ? 'Tour du lịch' :
                       cat === 'dich-vu'       ? 'Dịch vụ' :
-                      cat === 'restaurant'    ? 'Ẩm thực' :
-                      cat === 'hotel'         ? 'Lưu trú' : 'Khác';
+                      cat === 'trai-nghiem'   ? 'Trải nghiệm' : 'Khác';
         catMap[label] = (catMap[label] || 0) + 1;
       });
       const catLabels = Object.keys(catMap);
@@ -2975,7 +2977,10 @@
             (p.name && p.name.toLowerCase().includes(q)) ||
             (p.region && p.region.toLowerCase().includes(q)) ||
             (p.tags && p.tags.join(' ').toLowerCase().includes(q));
-        const matchCat = cat === 'all' || (p.category && p.category.toLowerCase() === cat.toLowerCase());
+        const matchCat = cat === 'all' || 
+            (p.kind && p.kind.toLowerCase() === cat.toLowerCase()) || 
+            (p.category && p.category.toLowerCase() === cat.toLowerCase()) ||
+            (p.businessCategory && p.businessCategory.toLowerCase() === cat.toLowerCase());
         return matchSearch && matchCat;
     });
     renderPlaces(filtered);
@@ -3076,6 +3081,15 @@
 
     document.getElementById('admin-modal-backdrop').hidden = false;
     placeModal.hidden = false;
+    // Reset tabs to first tab
+    placeModal.querySelectorAll('.pf-tab').forEach(t => t.classList.remove('is-active'));
+    placeModal.querySelectorAll('.pf-panel').forEach(p => p.classList.remove('is-active'));
+    const firstTab = placeModal.querySelector('.pf-tab');
+    if (firstTab) {
+      firstTab.classList.add('is-active');
+      const panel = placeModal.querySelector('.pf-panel[data-panel="' + firstTab.dataset.tab + '"]');
+      if (panel) panel.classList.add('is-active');
+    }
     requestAnimationFrame(() => {
       placeModal.classList.add('is-open');
     });
@@ -3520,6 +3534,8 @@
 
   function renderDropzonePreview(files) {
     currentDropzoneFiles = files || [];
+    const countEl = document.getElementById('pf-img-count');
+    if (countEl) countEl.textContent = currentDropzoneFiles.length;
     if (!placeDropzonePreview) return;
     placeDropzonePreview.innerHTML = '';
     currentDropzoneFiles.forEach((f, idx) => {
@@ -3598,6 +3614,18 @@
   document.getElementById('btn-add-image-url')?.addEventListener('click', addImageUrl);
   document.getElementById('place-image-url')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') { e.preventDefault(); addImageUrl(); }
+  });
+
+  // Place form tab switching
+  document.getElementById('modal-place-form')?.querySelectorAll('.pf-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const modal = document.getElementById('modal-place-form');
+      modal.querySelectorAll('.pf-tab').forEach(t => t.classList.remove('is-active'));
+      modal.querySelectorAll('.pf-panel').forEach(p => p.classList.remove('is-active'));
+      tab.classList.add('is-active');
+      const panel = modal.querySelector('.pf-panel[data-panel="' + tab.dataset.tab + '"]');
+      if (panel) panel.classList.add('is-active');
+    });
   });
 
   let currentSupportTab = 'user'; // 'user' or 'business'
@@ -4307,6 +4335,8 @@
         'diem-du-lich': 'Điểm du lịch',
         'khach-san': 'Khách sạn',
         'nha-hang': 'Nhà hàng',
+        'tour': 'Tour du lịch',
+        'dich-vu': 'Dịch vụ',
         'giai-tri': 'Giải trí',
         'trai-nghiem': 'Trải nghiệm',
         'tien-ich': 'Tiện ích'

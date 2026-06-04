@@ -1307,15 +1307,27 @@ router.put('/places/:id', adminTokenAuth, adminAuth, upload.array('imageFile', 1
       tags: typeof req.body.tags === 'string' ? req.body.tags.split(',').map(t => t.trim()) : req.body.tags
     };
     
+    // 🔒 BẢOVỆ: Không cho ghi đè các trường quan trọng bằng undefined/empty
+    // Giữ nguyên status nếu form không gửi hoặc gửi giá trị trống
+    if (!updates.status || !['pending', 'approved', 'rejected'].includes(updates.status)) {
+      updates.status = place.status; // giữ nguyên trạng thái hiện tại
+    }
+    // Giữ nguyên source (system/partner) - admin không nên thay đổi source
+    if (!updates.source || !['system', 'partner'].includes(updates.source)) {
+      updates.source = place.source;
+    }
+    // Giữ nguyên ownerId nếu field bị trống/empty
+    const rawOwnerId = updates.ownerId;
+    if (!rawOwnerId || rawOwnerId === 'Hệ thống (System)' || rawOwnerId === '') {
+      updates.ownerId = place.ownerId; // giữ nguyên ownerId gốc
+    }
+
     const amusementPlaces = parseJsonArray('amusementPlaces');
     if (amusementPlaces !== undefined) updates.amusementPlaces = amusementPlaces;
-    
     const accommodations = parseJsonArray('accommodations');
     if (accommodations !== undefined) updates.accommodations = accommodations;
-    
     const diningPlaces = parseJsonArray('diningPlaces');
     if (diningPlaces !== undefined) updates.diningPlaces = diningPlaces;
-    
     const checkInSpots = parseJsonArray('checkInSpots');
     if (checkInSpots !== undefined) updates.checkInSpots = checkInSpots;
 

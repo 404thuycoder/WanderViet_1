@@ -41,9 +41,299 @@
     href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css?v=4" />
-  <link rel="stylesheet" href="css/planner.css?v=20260527_v1" />
+  <link rel="stylesheet" href="css/planner.css?v=20260605_v1" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="/planner_spot_detail_css_helper.css?v=1" />
+  <style>
+    /* Premium AI Loader Redesign */
+    .ai-premium-loader {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 99999;
+      padding: 3rem;
+      background: linear-gradient(135deg, rgba(13,20,36,0.98), rgba(8,15,30,0.99));
+      border: none;
+      overflow: hidden;
+    }
+    
+    .ai-bg-particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    
+    .ai-bg-particles .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #38bdf8;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #38bdf8;
+      opacity: 0;
+      animation: floatUp 4s infinite linear;
+    }
+    
+    .ai-bg-particles .p1 { left: 20%; animation-delay: 0s; }
+    .ai-bg-particles .p2 { left: 40%; animation-delay: 1.2s; width: 6px; height: 6px; background: #10b981; box-shadow: 0 0 12px #10b981; }
+    .ai-bg-particles .p3 { left: 60%; animation-delay: 2.5s; }
+    .ai-bg-particles .p4 { left: 80%; animation-delay: 0.8s; width: 3px; height: 3px; background: #8b5cf6; box-shadow: 0 0 10px #8b5cf6; }
+    .ai-bg-particles .p5 { left: 50%; animation-delay: 3s; }
+    
+    @keyframes floatUp {
+      0% { transform: translateY(100px) scale(0); opacity: 0; }
+      20% { opacity: 0.8; }
+      80% { opacity: 0.5; }
+      100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+    }
+    
+    .ai-glow-orb {
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      animation: pulseOrb 6s infinite alternate;
+      pointer-events: none;
+    }
+    .orb-left { top: -50px; left: -50px; background: #38bdf8; }
+    .orb-right { bottom: -50px; right: -50px; background: #10b981; animation-delay: -3s; }
+    
+    @keyframes pulseOrb {
+      0% { transform: scale(1); opacity: 0.3; }
+      100% { transform: scale(1.2); opacity: 0.6; }
+    }
+
+    .ai-core-wrapper {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      z-index: 2;
+    }
+
+    .ai-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      animation: spinRing linear infinite;
+    }
+
+    .ring-outer {
+      width: 140px; height: 140px;
+      border-top-color: #38bdf8;
+      border-bottom-color: rgba(56, 189, 248, 0.2);
+      animation-duration: 3s;
+    }
+
+    .ring-middle {
+      width: 100px; height: 100px;
+      border-left-color: #10b981;
+      border-right-color: rgba(16, 185, 129, 0.2);
+      animation-duration: 2s;
+      animation-direction: reverse;
+    }
+
+    .ring-inner {
+      width: 70px; height: 70px;
+      border-top-color: #8b5cf6;
+      border-bottom-color: rgba(139, 92, 246, 0.2);
+      animation-duration: 1.5s;
+    }
+
+    .ai-core-sphere {
+      width: 40px;
+      height: 40px;
+      background: radial-gradient(circle at 30% 30%, #fff, #38bdf8 40%, #0369a1 80%);
+      border-radius: 50%;
+      box-shadow: 0 0 30px #38bdf8, inset 0 0 10px #fff;
+      animation: corePulse 2s infinite alternate;
+    }
+
+    @keyframes spinRing { 100% { transform: rotate(360deg); } }
+    @keyframes corePulse { 0% { transform: scale(0.9); box-shadow: 0 0 20px #38bdf8; } 100% { transform: scale(1.1); box-shadow: 0 0 40px #38bdf8, 0 0 80px rgba(56,189,248,0.4); } }
+
+    .ai-status-panel {
+      text-align: center;
+      z-index: 2;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .ai-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #10b981;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .ai-status-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 0.5rem;
+      background: linear-gradient(to right, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .ai-status-text-carousel {
+      height: 24px;
+      width: 100%;
+      min-width: 300px;
+      margin-bottom: 1.5rem;
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .ai-status-msg {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      font-weight: 500;
+      transition: all 0.4s ease;
+      position: absolute;
+      width: 100%;
+      left: 0;
+      right: 0;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .ai-progress-wrapper {
+      width: 100%;
+      background: rgba(10, 15, 30, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 100px;
+      padding: 1.5rem 2.5rem;
+      box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.6), 0 10px 30px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ai-progress-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+      animation: aiSweep 3s infinite linear;
+    }
+
+    @keyframes aiSweep {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(400%); }
+    }
+
+    .ai-progress-track-container {
+      position: relative;
+      height: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .ai-progress-track {
+      position: absolute;
+      left: 0; right: 0;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 10px;
+      box-shadow: inset 0 2px 5px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.05);
+      overflow: hidden;
+      margin-bottom: 0; /* Override any previous inline margin */
+    }
+
+    .ai-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #3b82f6, #0ea5e9, #10b981);
+      background-size: 200% 100%;
+      animation: gradientShift 2s linear infinite;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+      transition: width 0.3s ease-out;
+      position: relative;
+    }
+
+    .ai-progress-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+      animation: shine 1.5s infinite linear;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    @keyframes gradientShift { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+    .ai-progress-steps {
+      position: absolute;
+      left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0;
+      z-index: 2;
+    }
+
+    .ai-step {
+      width: 20px;
+      height: 20px;
+      background: #1e293b;
+      border: 3px solid rgba(255,255,255,0.15);
+      border-radius: 50%;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    .ai-step.active {
+      background: #10b981;
+      border-color: #00e5ff;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.9), inset 0 0 6px rgba(255,255,255,0.8);
+      transform: scale(1.3);
+    }
+
+    .ai-step.active::before {
+      content: '';
+      position: absolute;
+      top: -10px; left: -10px; right: -10px; bottom: -10px;
+      border-radius: 50%;
+      background: rgba(0, 229, 255, 0.25);
+      animation: stepPulse 1.5s infinite ease-out;
+      z-index: -1;
+    }
+
+    @keyframes stepPulse {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(1.8); opacity: 0; }
+    }
+  </style>
   <style id="hotfix-cache-buster">
     /* FORCE remove old map image from ALL potential places in hero */
     .planner-hero-header::before,
@@ -435,6 +725,7 @@
       line-height: 1.2;
       display: -webkit-box;
       -webkit-line-clamp: 1;
+      line-clamp: 1;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
@@ -1933,21 +2224,21 @@
               <!-- PHONG CÁCH DU LỊCH -->
               <div class="planner-field-group" style="margin-top: 1rem;">
                 <label class="planner-field-label">🎯 Bạn thích du lịch theo phong cách nào?</label>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
-                  <div class="style-chip active" onclick="toggleTravelStyle(this)" data-style="Khám phá" style="padding: 0.5rem 0.85rem; border-radius: 20px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">
-                    <span>🧭</span> Khám phá
+                <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.6rem;">
+                  <div class="style-chip active" onclick="toggleTravelStyle(this)" data-style="Khám phá">
+                    <span class="style-icon">🧭</span> Khám phá
                   </div>
-                  <div class="style-chip" onclick="toggleTravelStyle(this)" data-style="Nghỉ dưỡng" style="padding: 0.5rem 0.85rem; border-radius: 20px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">
-                    <span>🏖️</span> Nghỉ dưỡng
+                  <div class="style-chip" onclick="toggleTravelStyle(this)" data-style="Nghỉ dưỡng">
+                    <span class="style-icon">🏖️</span> Nghỉ dưỡng
                   </div>
-                  <div class="style-chip" onclick="toggleTravelStyle(this)" data-style="Phiêu lưu" style="padding: 0.5rem 0.85rem; border-radius: 20px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">
-                    <span>🏔️</span> Phiêu lưu
+                  <div class="style-chip" onclick="toggleTravelStyle(this)" data-style="Phiêu lưu">
+                    <span class="style-icon">🏔️</span> Phiêu lưu
                   </div>
-                  <div class="style-chip" onclick="toggleTravelStyle(this)" data-style="Ẩm thực" style="padding: 0.5rem 0.85rem; border-radius: 20px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">
-                    <span>🍜</span> Ẩm thực
+                  <div class="style-chip" onclick="toggleTravelStyle(this)" data-style="Ẩm thực">
+                    <span class="style-icon">🍜</span> Ẩm thực
                   </div>
-                  <div class="style-chip" onclick="toggleTravelStyle(this)" data-style="Văn hóa" style="padding: 0.5rem 0.85rem; border-radius: 20px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); font-size: 0.8rem; cursor: pointer; transition: all 0.2s;">
-                    <span>🏛️</span> Văn hóa
+                  <div class="style-chip" onclick="toggleTravelStyle(this)" data-style="Văn hóa">
+                    <span class="style-icon">🏛️</span> Văn hóa
                   </div>
                 </div>
               </div>
@@ -1955,24 +2246,24 @@
               <!-- NỔI BẬT -->
               <div class="planner-field-group" style="margin-top: 1rem;">
                 <label class="planner-field-label">⭐ Bạn muốn điểm nào nổi bật?</label>
-                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
-                  <div class="highlight-chip" onclick="toggleHighlight(this)" data-highlight="Biển" style="padding: 0.4rem 0.75rem; border-radius: 20px; border: 1px solid rgba(59,130,246,0.3); background: rgba(59,130,246,0.08); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;">
-                    🏖️ Biển
+                <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.6rem;">
+                  <div class="highlight-chip hc-blue" onclick="toggleHighlight(this)" data-highlight="Biển">
+                    <span>🏖️</span> Biển
                   </div>
-                  <div class="highlight-chip" onclick="toggleHighlight(this)" data-highlight="Núi" style="padding: 0.4rem 0.75rem; border-radius: 20px; border: 1px solid rgba(34,197,94,0.3); background: rgba(34,197,94,0.08); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;">
-                    🏔️ Núi
+                  <div class="highlight-chip hc-green" onclick="toggleHighlight(this)" data-highlight="Núi">
+                    <span>🏔️</span> Núi
                   </div>
-                  <div class="highlight-chip" onclick="toggleHighlight(this)" data-highlight="Di sản" style="padding: 0.4rem 0.75rem; border-radius: 20px; border: 1px solid rgba(168,85,247,0.3); background: rgba(168,85,247,0.08); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;">
-                    🏛️ Di sản
+                  <div class="highlight-chip hc-purple" onclick="toggleHighlight(this)" data-highlight="Di sản">
+                    <span>🏛️</span> Di sản
                   </div>
-                  <div class="highlight-chip" onclick="toggleHighlight(this)" data-highlight="Món ngon" style="padding: 0.4rem 0.75rem; border-radius: 20px; border: 1px solid rgba(249,115,22,0.3); background: rgba(249,115,22,0.08); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;">
-                    🍜 Món ngon
+                  <div class="highlight-chip hc-orange" onclick="toggleHighlight(this)" data-highlight="Món ngon">
+                    <span>🍜</span> Món ngon
                   </div>
-                  <div class="highlight-chip" onclick="toggleHighlight(this)" data-highlight="Check-in" style="padding: 0.4rem 0.75rem; border-radius: 20px; border: 1px solid rgba(236,72,153,0.3); background: rgba(236,72,153,0.08); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;">
-                    📸 Check-in
+                  <div class="highlight-chip hc-pink" onclick="toggleHighlight(this)" data-highlight="Check-in">
+                    <span>📸</span> Check-in
                   </div>
-                  <div class="highlight-chip" onclick="toggleHighlight(this)" data-highlight="Lên mây" style="padding: 0.4rem 0.75rem; border-radius: 20px; border: 1px solid rgba(14,165,233,0.3); background: rgba(14,165,233,0.08); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;">
-                    ☁️ Lên mây
+                  <div class="highlight-chip hc-sky" onclick="toggleHighlight(this)" data-highlight="Lên mây">
+                    <span>☁️</span> Lên mây
                   </div>
                 </div>
               </div>
@@ -1981,78 +2272,78 @@
               <div class="planner-field-group" style="margin-top: 1rem;">
                 <label class="planner-field-label">👥 Thành viên tham gia</label>
                 
-                <div class="members-age-grid" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.75rem;">
+                <div class="members-age-grid">
                   <!-- Người trưởng thành -->
-                  <div class="member-age-card" style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); border-radius: 12px; padding: 0.75rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <div class="member-age-card mac-blue">
+                    <div class="mac-header">
                       <div>
-                        <span style="font-size: 1.1rem;">👨‍👩‍👧</span>
-                        <span style="font-weight: 700; font-size: 0.85rem; color: var(--text);"> Người trưởng thành</span>
+                        <span class="mac-icon">👨‍👩‍👧</span>
+                        <span class="mac-title"> Người trưởng thành</span>
                       </div>
-                      <span style="font-size: 0.7rem; color: var(--accent);" id="adultsPrice">Giá đầy đủ</span>
+                      <span class="mac-price" id="adultsPrice">Giá đầy đủ</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div class="mac-controls">
                       <button type="button" onclick="adjustMember('adults', -1)" class="btn-circle btn-circle--sm">−</button>
-                      <input type="number" id="adults" class="planner-input" value="2" min="1" max="10" style="text-align: center; width: 50px; padding: 0.5rem;">
+                      <input type="number" id="adults" class="planner-input" value="2" min="1" max="10">
                       <button type="button" onclick="adjustMember('adults', 1)" class="btn-circle btn-circle--sm">+</button>
                     </div>
                   </div>
                   
                   <!-- Trẻ nhỏ -->
-                  <div class="member-age-card" style="background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); border-radius: 12px; padding: 0.75rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <div class="member-age-card mac-yellow">
+                    <div class="mac-header">
                       <div>
-                        <span style="font-size: 1.1rem;">👶</span>
-                        <span style="font-weight: 700; font-size: 0.85rem; color: var(--text);"> Trẻ nhỏ</span>
+                        <span class="mac-icon">👶</span>
+                        <span class="mac-title"> Trẻ nhỏ</span>
                       </div>
-                      <span style="font-size: 0.7rem; color: #fbbf24;" id="childrenPrice">Giảm 30%</span>
+                      <span class="mac-price" id="childrenPrice">Giảm 30%</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div class="mac-controls">
                       <button type="button" onclick="adjustMember('children', -1)" class="btn-circle btn-circle--sm">−</button>
-                      <input type="number" id="children" class="planner-input" value="0" min="0" max="10" style="text-align: center; width: 50px; padding: 0.5rem;">
+                      <input type="number" id="children" class="planner-input" value="0" min="0" max="10">
                       <button type="button" onclick="adjustMember('children', 1)" class="btn-circle btn-circle--sm">+</button>
                     </div>
                   </div>
                   
                   <!-- Người già -->
-                  <div class="member-age-card" style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; padding: 0.75rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <div class="member-age-card mac-red">
+                    <div class="mac-header">
                       <div>
-                        <span style="font-size: 1.1rem;">👴</span>
-                        <span style="font-weight: 700; font-size: 0.85rem; color: var(--text);"> Người già</span>
+                        <span class="mac-icon">👴</span>
+                        <span class="mac-title"> Người già</span>
                       </div>
-                      <span style="font-size: 0.7rem; color: #f87171;" id="seniorsPrice">Giảm 20%</span>
+                      <span class="mac-price" id="seniorsPrice">Giảm 20%</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div class="mac-controls">
                       <button type="button" onclick="adjustMember('seniors', -1)" class="btn-circle btn-circle--sm">−</button>
-                      <input type="number" id="seniors" class="planner-input" value="0" min="0" max="10" style="text-align: center; width: 50px; padding: 0.5rem;">
+                      <input type="number" id="seniors" class="planner-input" value="0" min="0" max="10">
                       <button type="button" onclick="adjustMember('seniors', 1)" class="btn-circle btn-circle--sm">+</button>
                     </div>
                   </div>
                 </div>
                 
                 <!-- Tổng số người -->
-                <div style="margin-top: 0.75rem; padding: 0.6rem; background: rgba(59,130,246,0.1); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-size: 0.8rem; color: var(--text);">👥 Tổng cộng:</span>
-                  <span id="totalMembers" style="font-weight: 700; color: #60a5fa;">2 người</span>
+                <div class="member-total-box">
+                  <span>👥 Tổng cộng:</span>
+                  <span id="totalMembers">2 người</span>
                 </div>
               </div>
 
               <!-- TỔNG GIÁ ƯỚC TÍNH - CHI TIẾT THEO TỪNG KHOẢN -->
-              <div class="budget-estimate-section" id="budgetEstimateSection" style="margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(16,185,129,0.05)); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <div class="budget-estimate-section" id="budgetEstimateSection">
+                <div class="budget-header">
                   <label class="planner-field-label" style="margin-bottom: 0;">💰 Ước tính chi phí</label>
-                  <span id="tripDurationLabel" style="font-size: 0.7rem; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 0.25rem 0.5rem; border-radius: 4px;"></span>
+                  <span id="tripDurationLabel" class="budget-duration-label"></span>
                 </div>
                 
-                <div class="travel-tier-selector" style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
-                  <button type="button" class="travel-tier-btn" data-tier="budget" onclick="selectTravelTier('budget')" style="flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.75rem; cursor: pointer;">
+                <div class="travel-tier-selector">
+                  <button type="button" class="travel-tier-btn" data-tier="budget" onclick="selectTravelTier('budget')">
                     🎒 Tiết kiệm
                   </button>
-                  <button type="button" class="travel-tier-btn active" data-tier="normal" onclick="selectTravelTier('normal')" style="flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid #10b981; background: rgba(16,185,129,0.15); color: #10b981; font-size: 0.75rem; cursor: pointer;">
+                  <button type="button" class="travel-tier-btn active" data-tier="normal" onclick="selectTravelTier('normal')">
                     ✨ Tiêu chuẩn
                   </button>
-                  <button type="button" class="travel-tier-btn" data-tier="luxury" onclick="selectTravelTier('luxury')" style="flex: 1; padding: 0.5rem; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.75rem; cursor: pointer;">
+                  <button type="button" class="travel-tier-btn" data-tier="luxury" onclick="selectTravelTier('luxury')">
                     💎 Cao cấp
                   </button>
                 </div>
@@ -2060,88 +2351,76 @@
                 <!-- CHI TIẾT CÁC KHOẢN CHI -->
                 <div class="budget-breakdown" id="budgetBreakdown">
                   <!-- 🏨 Tiền phòng khách sạn -->
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding: 0.5rem; background: rgba(139,92,246,0.08); border-radius: 8px;">
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
-                      <span style="font-size: 0.9rem;">🏨</span>
-                      <span style="font-size: 0.75rem; color: var(--text);">Tiền phòng</span>
+                  <div class="bb-item">
+                    <div class="bb-header">
+                      <div class="bb-title"><span class="bb-icon">🏨</span> Tiền phòng</div>
+                      <span class="bb-total" id="hotelTotal">0 VNĐ</span>
                     </div>
-                    <span style="font-size: 0.75rem; color: var(--text);" id="hotelTotal">0 VNĐ</span>
+                    <div id="hotelDetail" class="bb-detail"></div>
                   </div>
-                  <div id="hotelDetail" style="font-size: 0.65rem; color: var(--text-muted); margin-left: 1.4rem; margin-top: -0.25rem; margin-bottom: 0.5rem;"></div>
                   
                   <!-- 🍜 Tiền ăn uống -->
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding: 0.5rem; background: rgba(251,191,36,0.08); border-radius: 8px;">
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
-                      <span style="font-size: 0.9rem;">🍜</span>
-                      <span style="font-size: 0.75rem; color: var(--text);">Ăn uống</span>
+                  <div class="bb-item">
+                    <div class="bb-header">
+                      <div class="bb-title"><span class="bb-icon">🍜</span> Ăn uống</div>
+                      <span class="bb-total" id="foodTotal">0 VNĐ</span>
                     </div>
-                    <span style="font-size: 0.75rem; color: var(--text);" id="foodTotal">0 VNĐ</span>
+                    <div id="foodDetail" class="bb-detail"></div>
                   </div>
-                  <div id="foodDetail" style="font-size: 0.65rem; color: var(--text-muted); margin-left: 1.4rem; margin-top: -0.25rem; margin-bottom: 0.5rem;"></div>
                   
                   <!-- 🚌 Tiền di chuyển -->
-                  <div style="margin-bottom: 0.5rem; padding: 0.75rem; background: rgba(59,130,246,0.1); border-radius: 12px; border: 1px solid rgba(59,130,246,0.2);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-                      <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 1.1rem;" id="transportIcon">🛵</span>
-                        <span style="font-size: 0.85rem; color: var(--text); font-weight: 600;">Di chuyển</span>
-                      </div>
-                      <span style="font-size: 1rem; color: #60a5fa; font-weight: 700;" id="transportTotal">0 VNĐ</span>
+                  <div class="bb-item bb-item-highlight">
+                    <div class="bb-header">
+                      <div class="bb-title"><span class="bb-icon" id="transportIcon">🛵</span> Di chuyển</div>
+                      <span class="bb-total-high" id="transportTotal">0 VNĐ</span>
                     </div>
-                    <div id="transportRoute" style="font-size: 0.7rem; color: #60a5fa; margin-bottom: 0.25rem;"></div>
-                    <div id="transportDetail" style="font-size: 0.7rem; color: var(--text-muted);"></div>
+                    <div id="transportRoute" class="bb-route"></div>
+                    <div id="transportDetail" class="bb-detail"></div>
                   </div>
                   
                   <!-- 🎫 Tiền vé tham quan -->
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding: 0.5rem; background: rgba(16,185,129,0.08); border-radius: 8px;">
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
-                      <span style="font-size: 0.9rem;">🎫</span>
-                      <span style="font-size: 0.75rem; color: var(--text);">Vé tham quan</span>
+                  <div class="bb-item">
+                    <div class="bb-header">
+                      <div class="bb-title"><span class="bb-icon">🎫</span> Vé tham quan</div>
+                      <span class="bb-total" id="ticketTotal">0 VNĐ</span>
                     </div>
-                    <span style="font-size: 0.75rem; color: var(--text);" id="ticketTotal">0 VNĐ</span>
+                    <div id="ticketDetail" class="bb-detail"></div>
                   </div>
-                  <div id="ticketDetail" style="font-size: 0.65rem; color: var(--text-muted); margin-left: 1.4rem; margin-top: -0.25rem; margin-bottom: 0.5rem;"></div>
                   
                   <!-- 📍 Chi phí địa điểm đã chọn -->
-                  <div id="selectedSpotsCostSection" style="display: none; margin-bottom: 0.5rem; padding: 0.6rem; background: rgba(168,85,247,0.1); border-radius: 10px; border: 1px solid rgba(168,85,247,0.25);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
-                      <div style="display: flex; align-items: center; gap: 0.4rem;">
-                        <span style="font-size: 0.9rem;">🎯</span>
-                        <span style="font-size: 0.75rem; color: var(--text); font-weight: 600;">Địa điểm đã chọn</span>
-                      </div>
-                      <span style="font-size: 0.85rem; color: #a855f7; font-weight: 700;" id="spotsTotal">0 VNĐ</span>
+                  <div id="selectedSpotsCostSection" class="bb-item bb-item-purple" style="display: none;">
+                    <div class="bb-header">
+                      <div class="bb-title"><span class="bb-icon">🎯</span> Địa điểm đã chọn</div>
+                      <span class="bb-total-purple" id="spotsTotal">0 VNĐ</span>
                     </div>
-                    <div id="spotsDetail" style="font-size: 0.65rem; color: var(--text-muted); margin-bottom: 0.25rem;"></div>
-                    <div id="spotsList" style="font-size: 0.6rem; color: #a855f7; max-height: 60px; overflow-y: auto;"></div>
+                    <div id="spotsDetail" class="bb-detail"></div>
+                    <div id="spotsList" class="bb-list"></div>
                   </div>
                   
                   <!-- ☕ Tiền giải trí & đồ uống -->
-                  <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding: 0.5rem; background: rgba(236,72,153,0.08); border-radius: 8px;">
-                    <div style="display: flex; align-items: center; gap: 0.4rem;">
-                      <span style="font-size: 0.9rem;">☕</span>
-                      <span style="font-size: 0.75rem; color: var(--text);">Giải trí & Đồ uống</span>
+                  <div class="bb-item">
+                    <div class="bb-header">
+                      <div class="bb-title"><span class="bb-icon">☕</span> Giải trí & Đồ uống</div>
+                      <span class="bb-total" id="entertainTotal">0 VNĐ</span>
                     </div>
-                    <span style="font-size: 0.75rem; color: var(--text);" id="entertainTotal">0 VNĐ</span>
+                    <div id="entertainDetail" class="bb-detail"></div>
                   </div>
-                  <div id="entertainDetail" style="font-size: 0.65rem; color: var(--text-muted); margin-left: 1.4rem; margin-top: -0.25rem; margin-bottom: 0.5rem;"></div>
                 </div>
                 
                 <!-- TỔNG CỘNG -->
-                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 2px solid rgba(16,185,129,0.3); display: flex; justify-content: space-between; align-items: center;">
+                <div class="budget-total-section">
                   <div>
-                    <span style="font-size: 0.85rem; color: var(--text); font-weight: 600;">💵 Tổng cộng:</span>
-                    <div id="membersSummary" style="font-size: 0.65rem; color: var(--text-muted); margin-top: 0.15rem;"></div>
+                    <span class="budget-total-label">💵 Tổng cộng:</span>
+                    <div id="membersSummary" class="budget-members-summary"></div>
                   </div>
                   <div style="text-align: right;">
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">Trung bình </span>
-                    <span id="perPersonBudget" style="font-size: 0.85rem; color: #10b981; font-weight: 700;">0 VNĐ</span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">/người</span><br>
-                    <span id="totalBudget" style="font-size: 1.15rem; color: #10b981; font-weight: 800;">0 VNĐ</span>
+                    <span class="budget-avg-text">Trung bình <span id="perPersonBudget" class="budget-avg-val">0 VNĐ</span> /người</span><br>
+                    <span id="totalBudget" class="budget-grand-total">0 VNĐ</span>
                   </div>
                 </div>
                 
                 <!-- GHI CHÚ GIÁ -->
-                <div style="margin-top: 0.6rem; padding: 0.5rem; background: rgba(59,130,246,0.06); border-radius: 6px; font-size: 0.6rem; color: var(--text-muted); line-height: 1.4;">
+                <div class="budget-note">
                   💡 <strong>Chú thích:</strong> Trẻ dưới 5 tuổi miễn phí vé & ăn. Trẻ 6-11 tuổi giảm 30% tiền ăn & vé. Giá đã bao gồm thuế VAT.
                 </div>
               </div>
@@ -2351,7 +2630,7 @@
 
 
       <!-- KẾT QUẢ RENDER -->
-      <section class="planner-result">
+      <section class="planner-result" style="position: relative; min-height: 600px; display: flex; flex-direction: column;">
         
         <!-- Trạng thái trống -->
         <div id="resultPlaceholder" class="result-placeholder">
@@ -2360,14 +2639,164 @@
           <p>Hãy trả lời các câu hỏi bên trái để AI hiểu nhu cầu của bạn và thiết kế một hành trình hoàn hảo nhất!</p>
         </div>
 
-        <!-- Trạng thái loading -->
-        <div id="aiLoader" class="ai-loader">
-          <div class="ai-loader-visual">
-            <div class="ai-loader-spinner"></div>
-            <div class="ai-loader-pulse"></div>
+        <!-- Trạng thái loading: AI Processing Premium Redesign -->
+        <div id="aiLoader" class="ai-premium-loader">
+          <!-- Background Effects -->
+          <div class="ai-bg-particles">
+            <div class="particle p1"></div>
+            <div class="particle p2"></div>
+            <div class="particle p3"></div>
+            <div class="particle p4"></div>
+            <div class="particle p5"></div>
           </div>
-          <h3 style="color: var(--accent); margin-bottom: 0.5rem; font-size: 1.5rem;">AI Đang Suy Nghĩ...</h3>
-          <p style="color: var(--text-muted); text-align: center; font-size: 1rem;">Đang tìm kiếm điểm đến, kiểm tra thời tiết và tối ưu lộ trình cho bạn.<br>Vui lòng đợi trong giây lát.</p>
+          <div class="ai-glow-orb orb-left"></div>
+          <div class="ai-glow-orb orb-right"></div>
+          
+          <!-- Data flow lines -->
+          <div class="ai-data-flow">
+            <div class="data-line line1"></div>
+            <div class="data-line line2"></div>
+            <div class="data-line line3"></div>
+          </div>
+
+          <!-- Main AI Brain/Core -->
+          <div class="ai-core-wrapper">
+            <div class="ai-ring ring-outer"></div>
+            <div class="ai-ring ring-middle"></div>
+            <div class="ai-ring ring-inner"></div>
+            <div class="ai-core-sphere"></div>
+          </div>
+          
+          <!-- Text and Progress -->
+          <div class="ai-status-panel">
+            <div class="ai-status-badge"><span>✦</span> WANDERVIET AI</div>
+            <h3 class="ai-status-title">AI Đang Suy Nghĩ...</h3>
+            
+            <div class="ai-status-text-carousel">
+              <div id="aiStatusText" class="ai-status-msg">Khởi tạo nhân AI...</div>
+            </div>
+            
+            <!-- Timeline / Progress -->
+            <div class="ai-progress-wrapper">
+              <div class="ai-progress-track-container">
+                <div class="ai-progress-track">
+                  <div id="aiProgressBar" class="ai-progress-fill"></div>
+                </div>
+                <div class="ai-progress-steps">
+                  <div class="ai-step active"></div>
+                  <div class="ai-step"></div>
+                  <div class="ai-step"></div>
+                  <div class="ai-step"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <script>
+            // Premium AI Loader Logic
+            (function() {
+               const loader = document.getElementById('aiLoader');
+               const statusText = document.getElementById('aiStatusText');
+               const progressBar = document.getElementById('aiProgressBar');
+               const steps = document.querySelectorAll('.ai-step');
+               
+               let audioCtx = null;
+               function playTick() {
+                 try {
+                   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                   if (audioCtx.state === 'suspended') audioCtx.resume();
+                   const osc = audioCtx.createOscillator();
+                   const gain = audioCtx.createGain();
+                   osc.type = 'sine';
+                   osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                   osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.1);
+                   gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                   gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                   osc.connect(gain);
+                   gain.connect(audioCtx.destination);
+                   osc.start();
+                   osc.stop(audioCtx.currentTime + 0.1);
+                 } catch(e) {}
+               }
+
+               const messages = [
+                 "Đang phân tích sở thích du lịch...",
+                 "Đang tìm kiếm địa điểm phù hợp...",
+                 "Đang tối ưu lịch trình di chuyển...",
+                 "Đang đề xuất trải nghiệm cá nhân hóa..."
+               ];
+               
+               let intervalId = null;
+               let progressId = null;
+               
+               function startAnimation() {
+                 let msgIndex = 0;
+                 let progress = 0;
+                 
+                 statusText.style.opacity = 0;
+                 setTimeout(() => {
+                   statusText.textContent = messages[0];
+                   statusText.style.opacity = 1;
+                   playTick();
+                 }, 300);
+                 
+                 steps.forEach(s => s.classList.remove('active'));
+                 if(steps.length > 0) steps[0].classList.add('active');
+                 if(progressBar) progressBar.style.width = '0%';
+                 
+                 intervalId = setInterval(() => {
+                   msgIndex++;
+                   if (msgIndex >= messages.length) msgIndex = messages.length - 1;
+                   
+                   statusText.style.opacity = 0;
+                   statusText.style.transform = 'translateY(10px)';
+                   
+                   setTimeout(() => {
+                     statusText.textContent = messages[msgIndex];
+                     statusText.style.opacity = 1;
+                     statusText.style.transform = 'translateY(0)';
+                     playTick();
+                     
+                     steps.forEach((s, i) => {
+                       if (i <= msgIndex) s.classList.add('active');
+                     });
+                   }, 400);
+                 }, 2000);
+                 
+                 progressId = setInterval(() => {
+                   progress += 1;
+                   if (progress <= 95 && progressBar) {
+                     progressBar.style.width = progress + '%';
+                   }
+                 }, 80);
+               }
+               
+               function stopAnimation() {
+                 if (intervalId) clearInterval(intervalId);
+                 if (progressId) clearInterval(progressId);
+               }
+               
+               const observer = new MutationObserver((mutations) => {
+                 mutations.forEach((mutation) => {
+                   if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                     const display = window.getComputedStyle(loader).display;
+                     if (display !== 'none') {
+                       startAnimation();
+                     } else {
+                       stopAnimation();
+                     }
+                   }
+                 });
+               });
+               
+               if (loader) {
+                 observer.observe(loader, { attributes: true });
+                 if (window.getComputedStyle(loader).display !== 'none') {
+                   startAnimation();
+                 }
+               }
+            })();
+          </script>
         </div>
 
         <!-- Trạng thái có kết quả -->
@@ -2394,16 +2823,13 @@
           <!-- Nội dung bản thân Timeline (Render vào đây) -->
           <div id="timelineContent"></div>
 
-          <!-- Tương tác với KQ (Lưu Nháp) -->
-          <div style="text-align: center; margin-top: 3rem; margin-bottom: 1rem;">
-            <button type="button" id="btnSaveTrip" class="planner-btn" style="background: linear-gradient(135deg, #f43f5e, #e11d48); max-width: 300px; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 1.2rem;">
+          <!-- Nút Lưu Lịch Trình -->
+          <div style="text-align: center; margin-top: 2rem; padding-bottom: 1rem;">
+            <button id="btnSaveTrip" class="planner-btn" style="display: none; align-items: center; justify-content: center; gap: 8px; padding: 0.85rem 2rem; font-size: 1.1rem; border-radius: 100px; color: #fff; font-weight: 800; border: none; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 25px rgba(244, 63, 94, 0.4); margin: 0 auto; min-width: 250px;">
               ♥️ Lưu Lịch Trình Này
             </button>
-            <p id="saveTripStatus" style="color: var(--text-muted); font-size: 0.9rem; margin-top: 0.75rem; display: none;"></p>
-            <div id="postSaveActions" style="display: none; justify-content: center; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
-              <a href="my-trips.html" class="btn btn--outline" style="border-radius: 12px; padding: 0.75rem 1.5rem; text-decoration: none; color: #fff;">🎒 Xem danh sách chuyến đi</a>
-              <button type="button" onclick="window.resetAIPlanner()" class="btn btn--primary" style="border-radius: 12px; padding: 0.75rem 1.5rem; font-weight: 700;">🔄 Tạo lịch trình mới</button>
-            </div>
+            <div id="saveTripStatus" style="display:none; color: #10b981; margin-top: 10px; font-weight: 700;"></div>
+            <div id="postSaveActions" style="display:none; margin-top: 15px;"></div>
           </div>
         </div>
 
@@ -2867,23 +3293,29 @@
           { name: "Hoàng Nam", rating: 4, text: "Cà phê trứng nổi tiếng thế giới không phải khen chứ. Văn hóa cà phê ở đây rất đặc biệt." }
         ],
         photos: [
-          "https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=400&h=250&fit=crop",
-          "https://images.unsplash.com/photo-1559297434-fae8a1916a79?w=400&h=250&fit=crop",
-          "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=400&h=250&fit=crop",
-          "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop"
+          "https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg",
+          "https://thoitiet24h.vn/images/pho-co-ha-noi-xua.jpg",
+          "https://statics.vinpearl.com/cau-long-bien-6_1678872759.jpg",
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Hanoi_Temple_of_Literature_%28cropped%29.jpg/1280px-Hanoi_Temple_of_Literature_%28cropped%29.jpg"
         ],
         nearbyPlaces: [
-          { name: "Bún Chả Hương Liên", type: "restaurant", rating: "4.8", distance: "1.2km", img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=200&h=150&fit=crop" },
-          { name: "Kem Bạch Đằng", type: "restaurant", rating: "4.5", distance: "0.8km", img: "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=200&h=150&fit=crop" },
-          { name: "Cà Phê Trứng Đắng", type: "cafe", rating: "4.6", distance: "1.5km", img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=150&fit=crop" }
+          { name: "Bún Chả Hương Liên", type: "restaurant", rating: "4.8", distance: "1.2km", img: "https://mms.img.susercontent.com/vn-11134513-7r98o-lstxf7m02f2c77@resize_ss1242x600!@crop_w1242_h600_cT" },
+          { name: "Kem Tràng Tiền", type: "restaurant", rating: "4.5", distance: "0.8km", img: "https://nhn.1cdn.vn/2021/09/27/nhipsonghanoi-hanoimoi-com-vn-kem-ttien.jpg" },
+          { name: "Cà Phê Giảng", type: "cafe", rating: "4.7", distance: "1.5km", img: "https://coffee.org.vn/wp-content/uploads/2022/04/ca-phe-trung-16.jpg" }
         ],
         spots: [
-          { name: "Lăng Chủ tịch Hồ Chí Minh", category: "attraction", desc: "Khu di tích lịch sử văn hóa thiêng liêng quốc gia.", reviews: 234, rating: 4.9, photos: ["https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg?tr=q-70,c-at_max,w-1000,h-600"] },
-          { name: "Chùa Một Cột", category: "attraction", desc: "Ngôi chùa độc đáo với kiến trúc trên một cột giữa hồ nhỏ.", reviews: 198, rating: 4.8, photos: ["https://kimlientravel.com.vn/upload/image/Chua-Mot-Cot-1.jpg"] },
+          { name: "Lăng Chủ tịch Hồ Chí Minh", category: "attraction", desc: "Khu di tích lịch sử văn hóa thiêng liêng quốc gia.", reviews: 234, rating: 4.9, photos: ["https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg"] },
+          { name: "Chùa Một Cột", category: "attraction", desc: "Ngôi chùa độc đáo với kiến trúc trên một cột giữa hồ nhỏ.", reviews: 198, rating: 4.8, photos: ["https://hoidisanvanhoa.vn/wp-content/uploads/2024/12/39.jpg"] },
           { name: "Hồ Hoàn Kiếm", category: "attraction", desc: "Biểu tượng lịch sử, trái tim của thủ đô Hà Nội.", reviews: 567, rating: 4.8, photos: ["https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg"] },
           { name: "Đền Ngọc Sơn", category: "attraction", desc: "Di tích văn hóa nằm trên đảo trong Hồ Hoàn Kiếm.", reviews: 412, rating: 4.7, photos: ["https://vov2.vov.vn/sites/default/files/styles/large/public/2025-10/den-ngoc-son-ben-ho-hoan-kiem-anh-pham-hung-1.jpg"] },
           { name: "Nhà tù Hỏa Lò", category: "experience", desc: "Di tích lịch sử với nhiều câu chuyện về thời kỳ đấu tranh.", reviews: 278, rating: 4.6, photos: ["https://tuotz.com/wp-content/uploads/2025/07/nha-tu-hoa-lo-1-1.png"] },
-          { name: "Nhà Thờ Lớn", category: "attraction", desc: "Nhà thờ Công giáo lớn và điểm check-in nổi tiếng ở trung tâm Hà Nội.", reviews: 321, rating: 4.7, photos: ["https://sohanews.sohacdn.com/zoom/700_438/160588918557773824/2022/5/18/photo1652870952340-165287095249466913169.jpg"] }
+          { name: "Nhà Thờ Lớn", category: "attraction", desc: "Nhà thờ Công giáo lớn và điểm check-in nổi tiếng ở trung tâm Hà Nội.", reviews: 321, rating: 4.7, photos: ["https://hnm.1cdn.vn/2020/12/18/nhipsonghanoi.hanoimoi.com.vn-uploads-images-phananh-2020-12-17-_nha-tho-lon.jpg"] },
+          { name: "Văn Miếu - Quốc Tử Giám", category: "attraction", desc: "Trường đại học đầu tiên của Việt Nam, di sản văn hóa ngàn năm.", reviews: 389, rating: 4.8, photos: ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Hanoi_Temple_of_Literature_%28cropped%29.jpg/1280px-Hanoi_Temple_of_Literature_%28cropped%29.jpg"] },
+          { name: "Hoàng Thành Thăng Long", category: "attraction", desc: "Di sản thế giới UNESCO, trung tâm quyền lực nghìn năm.", reviews: 298, rating: 4.7, photos: ["https://media.baocaobang.vn/upload/image/201307/thumbnail/16974_Hoangthanh01.jpg"] },
+          { name: "Chùa Trấn Quốc", category: "attraction", desc: "Ngôi chùa cổ nhất Hà Nội tọa lạc trên bán đảo Hồ Tây.", reviews: 345, rating: 4.8, photos: ["https://nhn.1cdn.vn/thumbs/1200x630/2023/09/13/chua-tran-quoc-th.jpg"] },
+          { name: "Hồ Tây", category: "attraction", desc: "Hồ nước ngọt lớn nhất Hà Nội, thơ mộng và yên bình.", reviews: 412, rating: 4.7, photos: ["https://phuotvivu.com/blog/wp-content/uploads/2021/06/H%E1%BB%93-T%C3%A2y-1024x597.jpg"] },
+          { name: "Phố Cổ Hà Nội", category: "attraction", desc: "36 phố phường cổ kính, linh hồn của Hà Nội nghìn năm.", reviews: 512, rating: 4.8, photos: ["https://thoitiet24h.vn/images/pho-co-ha-noi-xua.jpg"] },
+          { name: "Cầu Long Biên", category: "attraction", desc: "Cây cầu thép biểu tượng, nhân chứng lịch sử của Hà Nội.", reviews: 267, rating: 4.6, photos: ["https://statics.vinpearl.com/cau-long-bien-6_1678872759.jpg"] }
         ]
       },
       "TP. Hồ Chí Minh": {
@@ -4662,34 +5094,86 @@
     };
 
     
-    // Bộ từ điển ảnh thực tế Unsplash chất lượng cao cho các địa điểm nổi tiếng Việt Nam (Thẩm mỹ đỉnh cao)
+    // Bộ từ điển ảnh thực tế cho các địa điểm nổi tiếng Việt Nam — ưu tiên SPOT_PHOTOS_DB trước VN_DESTINATION_PHOTOS
     window.SPOT_PHOTOS_DB = {
-      // Hà Nội
-      "Lăng Chủ tịch Hồ Chí Minh": [
-        "https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg?tr=q-70,c-at_max,w-1000,h-600",
-        "https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg?tr=q-70,c-at_max,w=800,h=500"
-      ],
-      "Chùa Một Cột": [
-        "https://kimlientravel.com.vn/upload/image/Chua-Mot-Cot-1.jpg"
-      ],
-      "Hồ Hoàn Kiếm": [
-        "https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg"
-      ],
-      "Đền Ngọc Sơn": [
-        "https://vov2.vov.vn/sites/default/files/styles/large/public/2025-10/den-ngoc-son-ben-ho-hoan-kiem-anh-pham-hung-1.jpg"
-      ],
-      "Nhà tù Hỏa Lò": [
-        "https://tuotz.com/wp-content/uploads/2025/07/nha-tu-hoa-lo-1-1.png"
-      ],
-      "Nhà Thờ Lớn": [
-        "https://sohanews.sohacdn.com/zoom/700_438/160588918557773824/2022/5/18/photo1652870952340-165287095249466913169.jpg"
-      ],
-      "Phố Cổ Hà Nội": [
-        "https://images.unsplash.com/photo-1528127269322-539801943592?w=640&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=640&auto=format&fit=crop&q=80",
-        "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=640&auto=format&fit=crop&q=80"
-      ],
-      // Đà Nẵng
+      // ===================== HÀ NỘI — ĐIỂM THAM QUAN =====================
+      "Hồ Hoàn Kiếm": ["https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg"],
+      "Chùa Một Cột": ["https://hoidisanvanhoa.vn/wp-content/uploads/2024/12/39.jpg"],
+      "Lăng Bác": ["https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg"],
+      "Lăng Chủ tịch Hồ Chí Minh": ["https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg"],
+      "Đền Ngọc Sơn": ["https://vov2.vov.vn/sites/default/files/styles/large/public/2025-10/den-ngoc-son-ben-ho-hoan-kiem-anh-pham-hung-1.jpg"],
+      "Văn Miếu - Quốc Tử Giám": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Hanoi_Temple_of_Literature_%28cropped%29.jpg/1280px-Hanoi_Temple_of_Literature_%28cropped%29.jpg"],
+      "Văn Miếu": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Hanoi_Temple_of_Literature_%28cropped%29.jpg/1280px-Hanoi_Temple_of_Literature_%28cropped%29.jpg"],
+      "Hoàng Thành Thăng Long": ["https://media.baocaobang.vn/upload/image/201307/thumbnail/16974_Hoangthanh01.jpg"],
+      "Nhà Tù Hỏa Lò": ["https://tuotz.com/wp-content/uploads/2025/07/nha-tu-hoa-lo-1-1.png"],
+      "Nhà tù Hỏa Lò": ["https://tuotz.com/wp-content/uploads/2025/07/nha-tu-hoa-lo-1-1.png"],
+      "Chùa Trấn Quốc": ["https://nhn.1cdn.vn/thumbs/1200x630/2023/09/13/chua-tran-quoc-th.jpg"],
+      "Hồ Tây": ["https://phuotvivu.com/blog/wp-content/uploads/2021/06/H%E1%BB%93-T%C3%A2y-1024x597.jpg"],
+      "Cầu Long Biên": ["https://statics.vinpearl.com/cau-long-bien-6_1678872759.jpg"],
+      "Phố Cổ Hà Nội": ["https://thoitiet24h.vn/images/pho-co-ha-noi-xua.jpg"],
+      "Phố Đi Bộ Hoàn Kiếm": ["https://tl.cdnchinhphu.vn/344445545208135680/2024/10/2/pho-di-bo-2-17278682397801779053327.jpg"],
+      "Bảo Tàng Dân Tộc Học Việt Nam": ["https://static.vinwonders.com/production/bao-tang-dan-toc-hoc-1.jpg"],
+      "Bảo Tàng Hồ Chí Minh": ["https://bennharong.vn/upload/filemanage/6d31-5960-46bc-a194-60204a31f1b5.jpg"],
+      "Nhà Hát Lớn Hà Nội": ["https://statics.vinpearl.com/nha-hat-lon-ha-noi-5_1676040733.JPG"],
+      "Chợ Đồng Xuân": ["https://bieudienthuccanh.com/userfiles/image/ha-noi/2021/cho-dong-xuan/1-hinh-anh-cong-cho-dong-xuan.jpg"],
+      "Khu Phố Phùng Hưng": ["https://cdn.xanhsm.com/2024/11/00a75849-pho-phung-hung-1.jpg"],
+      "Cột Cờ Hà Nội": ["https://ticotravel.com.vn/wp-content/uploads/2023/04/cot-co-ha-noi-5.jpg"],
+      "Nhà Thờ Lớn": ["https://hnm.1cdn.vn/2020/12/18/nhipsonghanoi.hanoimoi.com.vn-uploads-images-phananh-2020-12-17-_nha-tho-lon.jpg"],
+
+      // ===================== HÀ NỘI — ẨM THỰC =====================
+      "Bún Chả Hương Liên": ["https://mms.img.susercontent.com/vn-11134513-7r98o-lstxf7m02f2c77@resize_ss1242x600!@crop_w1242_h600_cT"],
+      "Phở Thìn Bờ Hồ": ["https://cafebiz.cafebizcdn.vn/zoom/700_438/162123310254002176/2023/2/23/avatar1677154808691-1677154809528736470105.jpg"],
+      "Phở Bát Đàn": ["https://mms.img.susercontent.com/vn-11134513-7r98o-lsu7jkcdbfkpd3@resize_ss1242x600!@crop_w1242_h600_cT"],
+      "Phở 10 Lý Quốc Sư": ["https://danielfooddiary.com/wp-content/uploads/2025/12/pho101.JPG"],
+      "Chả Cá Lã Vọng": ["https://statics.vinpearl.com/cha-ca-la-vong-ha-noi-0_1681057662.jpg"],
+      "Bún Thang Giảng": ["https://luxuo.vn/wp-content/uploads/2024/11/cover-bun-thang.jpg"],
+      "Bún Ốc Hình Lăng": ["https://cdn.tgdd.vn/2021/10/CookDish/tong-hop-8-cach-nau-bun-oc-ngon-hap-dan-chuan-vi-tai-nha-avt-1200x676.jpg"],
+      "Bún Đậu Mắm Tôm Cầu Gỗ": ["https://lofita.vn/wp-content/uploads/2026/04/bun-dau-mam-tom-go-vap-9f18ca.webp"],
+      "Bánh Mì 25": ["https://www.vibrantlyvietnam.com/wp-content/uploads/2019/08/banh-mi-25-hanoi-vietnam-restaurant-review.jpg"],
+      "Bánh Cuốn Gia An": ["https://meetup.vn/wp-content/uploads/2025/06/351520-banh-cuon-gia-an-body-2.jpg"],
+      "Cơm Gà Hàng Bè": ["https://cdn-i.vtcnews.vn/resize/th/upload/2024/04/23/comgathuonghaingonnhuthongxuong-1-23434087.png"],
+      "Kem Tràng Tiền": ["https://nhn.1cdn.vn/2021/09/27/nhipsonghanoi-hanoimoi-com-vn-kem-ttien.jpg"],
+      "Bún Chả Sinh Từ": ["https://bunchasinhtu.vn/wp-content/uploads/2021/02/z2075448516274_851172a37aae05f0a587a5265293f007.jpg"],
+      "Cháo Sườn Hàng Bồ": ["https://dulich3mien.vn/wp-content/uploads/2022/01/chao-suon-ha-noi.jpg"],
+      "Nhà Hàng Ngon": ["https://mia.vn/media/uploads/blog-du-lich/nha-hang-quan-an-ngon-ha-noi-noi-gin-giu-gia-tri-am-thuc-viet-13-1640631736.jpg"],
+      "Lẩu Cá Kèo / Lẩu Gà Lá É": ["https://emdoi.vn/wp-content/uploads/2025/03/lau-ga-la-e-sai-gon-10.webp"],
+
+      // ===================== HÀ NỘI — CÀ PHÊ & GIẢI KHÁT =====================
+      "Cà Phê Giảng": ["https://coffee.org.vn/wp-content/uploads/2022/04/ca-phe-trung-16.jpg"],
+      "Cà Phê Đường Tàu": ["https://cdn.cand.vn/images/6295294336b43409ef7c00e9eb4350a94f3ddb88ffb7afcf0284/Ca_phe_duong_tau-1741410653170.jpg.avif"],
+      "Trà Chanh Tạ Hiện": ["https://1phutsaigon.vn/wp-content/uploads/2023/11/dia-chi-tra-chanh-gia-tay-o-sai-gon-2.jpg"],
+      "Quán Bia Tạ Hiện": ["https://greenfuture.tech/_next/image?url=https%3A%2F%2Fupload-static.fgf.vn%2Fcms%2Fpho-ta-hien-4.jpg&w=3840&q=100"],
+
+      // ===================== HÀ NỘI — KHÁCH SẠN =====================
+      "Sofitel Legend Metropole Hanoi": ["https://sofitel.com.vn/wp-content/uploads/2022/06/Sofitel-Metropole-Hanoi.jpg"],
+      "InterContinental Hanoi Westlake": ["https://hanoitourist.com.vn/images/fields/2019/01/25/large/banner4_1548393019_1.jpg"],
+      "Pan Pacific Hanoi": ["https://images.trvl-media.com/lodging/1000000/120000/114500/114496/a4df4368.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill"],
+      "Hilton Hanoi Opera": ["https://mekongasean.vn/stores/news_dataimages/mekongaseanvn/102022/18/14/hilton-opera-hanoi-attivo-6516.jpg"],
+      "Hotel de l'Opera Hanoi": ["https://hanoitourist.com.vn/upload_images/images/2019/01/25/anh-bai(1).jpg"],
+      "Apricot Hotel": ["https://apricothotels.com/wp-content/uploads/2018/09/Apricot-Hotel_Masterpiece_low-700x400.jpg"],
+      "La Siesta Premium Hang Be": ["https://lasiestahotels.com/hangbe/wp-content/uploads/2019/01/No-Window-Superior-c1500x1000.jpg"],
+      "Essence Hanoi Hotel & Spa": ["https://www.hotels-of-hanoi.com/data/Pics/OriginalPhoto/7417/741724/741724951/pic-la-mejor-hotel-sky-bar-hanoi-92.JPEG"],
+      "Hanoi La Siesta Hotel & Spa": ["https://pix10.agoda.net/hotelImages/2552472/-1/0e6eb9160a3beec17666b00eb09eb0e3.jpg?ca=10&ce=1&s=414x232"],
+      "O'Gallery Premier Hotel & Spa": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/e5/3c/68/hotel-lobby.jpg?w=900&h=500&s=1"],
+      "Silk Path Hotel Hanoi": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0e/ee/a4/ee/lobby.jpg?w=900&h=500&s=1"],
+      "Hanoi Pearl Hotel": ["https://cf.bstatic.com/xdata/images/hotel/max1024x768/82045526bcdb6471af8f163790324b4c329118f8b79cf71f13fdf140c63647&o="],
+      "Jupiter Legend Hotel": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/ec/e4/1a/caption.jpg?w=900&h=500&s=1"],
+      "Maison d'Orient Hotel": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/fe/77/42/maison-d-orient.jpg?w=900&h=500&s=1"],
+      "The Oriental Jade Hotel": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/2b/1d/1f/swimming-pool.jpg?w=900&h=500&s=1"],
+      "Meliá Hanoi": ["https://cdn2.vietnambooking.com/wp-content/uploads/hotel_pro/hotel_343476/ff30dfd6b244d3357f6c8392a8d1b033.jpg"],
+
+      // ===================== HÀ NỘI — TRẢI NGHIỆM ĐẶC SẮC =====================
+      "Xem Múa Rối Nước Thăng Long": ["https://luhanhvietnam.com.vn/du-lich-land-tour/vnt_upload/tour/08_2019/thumbs/780_crop_72f718faa37747e6a5f724eb2481cc2f.png"],
+      "Múa Rối Nước Thăng Long": ["https://luhanhvietnam.com.vn/du-lich-land-tour/vnt_upload/tour/08_2019/thumbs/780_crop_72f718faa37747e6a5f724eb2481cc2f.png"],
+      "Đi Xích Lô Quanh Phố Cổ": ["https://statics.vinpearl.com/gia-xich-lo-ha-noi-banner_1682253976.jpg"],
+      "Dạo Chợ Đêm Phố Cổ": ["https://static.vinwonders.com/production/cho-dem-pho-co-ha-noi-1.jpg"],
+      "Thuê Xe Đạp / Chạy Bộ Quanh Hồ Tây": ["https://cdnphoto.dantri.com.vn/fZAnyQDTNSmcjWgAxzwf3l6y-bw=/2024/04/06/2-1712371163261.jpg?watermark=true"],
+      "Ăn Tối Rooftop Westlake": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/00/98/32/majestic-lake-view.jpg"],
+      "Café Sách & Góc Chill Phố Cổ": ["https://hotelroyalhoian.vn/wp-content/uploads/2025/05/dac-san-hoi-an-1-2-4.jpg"],
+      "Nhà Hàng Rooftop Ở West Lake": ["https://topgo.vn/wp-content/uploads/2017/07/rooftop-bar-12-1.jpg"],
+      "Nhà Hàng Buffet Lẩu / Nướng Nổi Tiếng": ["https://melamine.vn/wp-content/uploads/2023/07/Seoul-Garden-Chuoi-nha-hang-buffet-lau-nuong-TPHCM.jpg"],
+
+      // ===================== ĐÀ NẴNG =====================
       "Cầu Vàng Bà Nà Hills": [
         "https://images.unsplash.com/photo-1524230572899-a752b3835840?w=640&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1555244162-803834f70033?w=640&auto=format&fit=crop&q=80",
@@ -4705,7 +5189,7 @@
         "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=640&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=640&auto=format&fit=crop&q=80"
       ],
-      // Sài Gòn
+      // ===================== SÀI GÒN =====================
       "Nhà Thờ Đức Bà & Bưu Điện TP": [
         "https://images.unsplash.com/photo-1583244532610-2a234e7c3eca?w=640&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=640&auto=format&fit=crop&q=80",
@@ -4716,7 +5200,7 @@
         "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=640&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=640&auto=format&fit=crop&q=80"
       ],
-      // Đà Lạt
+      // ===================== ĐÀ LẠT =====================
       "Thung Lũng Tình Yêu": [
         "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=640&auto=format&fit=crop&q=80",
         "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=640&auto=format&fit=crop&q=80",
@@ -5560,6 +6044,7 @@
       }
     });
 
+    window.WanderPlanner = window.WanderPlanner || {};
     window.WanderPlanner.triggerComparison = async function(savedTripId) {
        const loader = document.getElementById('aiLoader');
        if (loader) loader.style.display = 'flex';

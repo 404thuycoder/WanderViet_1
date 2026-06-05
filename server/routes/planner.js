@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const { auth, JWT_SECRET } = require('./auth');
@@ -117,6 +117,85 @@ router.post('/generate', optionalAuth, async (req, res) => {
       console.error('Weather fetch error:', e.message);
     }
 
+    // === DANH SÁCH ĐỊA ĐIỂM THEO ĐIỂM ĐẾN ===
+    const destLower = String(destination || '').toLowerCase();
+    let destinationLocationContext = '';
+
+    if (destLower.includes('hà nội') || destLower.includes('ha noi') || destLower.includes('hanoi')) {
+      destinationLocationContext = `
+=== CƠ SỞ DỮ LIỆU ĐỊA ĐIỂM HÀ NỘI (BẮT BUỘC ƯU TIÊN) ===
+QUAN TRỌNG: Khi lập lịch cho Hà Nội, BẮT BUỘC sử dụng ĐÚNG TÊN địa điểm từ danh sách dưới đây trong trường "location". Hệ thống sẽ dùng tên này để hiển thị hình ảnh chính xác. KHÔNG được đặt tên địa điểm khác nếu danh sách đã có.
+
+🏛️ ĐIỂM THAM QUAN (dùng đúng tên này):
+- Hồ Hoàn Kiếm
+- Đền Ngọc Sơn
+- Chùa Một Cột
+- Lăng Bác
+- Văn Miếu - Quốc Tử Giám
+- Hoàng Thành Thăng Long
+- Nhà Tù Hỏa Lò
+- Chùa Trấn Quốc
+- Hồ Tây
+- Cầu Long Biên
+- Phố Cổ Hà Nội
+- Phố Đi Bộ Hoàn Kiếm
+- Bảo Tàng Dân Tộc Học Việt Nam
+- Bảo Tàng Hồ Chí Minh
+- Nhà Hát Lớn Hà Nội
+- Chợ Đồng Xuân
+- Khu Phố Phùng Hưng
+- Cột Cờ Hà Nội
+- Nhà Thờ Lớn
+
+🍜 ẨM THỰC NỔI TIẾNG (dùng đúng tên này):
+- Bún Chả Hương Liên
+- Phở Thìn Bờ Hồ
+- Phở Bát Đàn
+- Phở 10 Lý Quốc Sư
+- Chả Cá Lã Vọng
+- Bún Thang Giảng
+- Bún Ốc Hình Lăng
+- Bún Đậu Mắm Tôm Cầu Gỗ
+- Bánh Mì 25
+- Bánh Cuốn Gia An
+- Cơm Gà Hàng Bè
+- Kem Tràng Tiền
+- Bún Chả Sinh Từ
+- Cháo Sườn Hàng Bồ
+- Nhà Hàng Ngon
+
+☕ CÀ PHÊ & GIẢI KHÁT (dùng đúng tên này):
+- Cà Phê Giảng
+- Cà Phê Đường Tàu
+- Trà Chanh Tạ Hiện
+- Quán Bia Tạ Hiện
+
+🏨 KHÁCH SẠN GỢI Ý (dùng đúng tên này):
+- Sofitel Legend Metropole Hanoi (5 sao, sang trọng bậc nhất)
+- InterContinental Hanoi Westlake (5 sao, view Hồ Tây)
+- Pan Pacific Hanoi (5 sao)
+- Hilton Hanoi Opera (4-5 sao)
+- Hotel de l'Opera Hanoi (4 sao, bên cạnh Nhà Hát Lớn)
+- Apricot Hotel (4 sao, view Hồ Hoàn Kiếm)
+- La Siesta Premium Hang Be (boutique, phố cổ)
+- Essence Hanoi Hotel & Spa (boutique)
+- Hanoi La Siesta Hotel & Spa (boutique)
+- O'Gallery Premier Hotel & Spa (boutique)
+- Silk Path Hotel Hanoi (3-4 sao)
+- Meliá Hanoi (5 sao)
+
+🎭 TRẢI NGHIỆM ĐẶC SẮC (dùng đúng tên này):
+- Xem Múa Rối Nước Thăng Long
+- Đi Xích Lô Quanh Phố Cổ
+- Dạo Chợ Đêm Phố Cổ
+- Thuê Xe Đạp / Chạy Bộ Quanh Hồ Tây
+- Ăn Tối Rooftop Westlake
+- Café Sách & Góc Chill Phố Cổ
+- Nhà Hàng Rooftop Ở West Lake
+- Nhà Hàng Buffet Lẩu / Nướng Nổi Tiếng
+`;
+    }
+
     const prompt = `Bạn là SIÊU KIẾN TRÚC SƯ LỊCH TRÌNH của WanderViet AI. Nhiệm vụ của bạn là biến một chuyến đi thành một TÁC PHẨM NGHỆ THUẬT.
 
 === THÔNG TIN CHUYẾN ĐI ===
@@ -132,6 +211,7 @@ ${weatherInfo ? `- THỜI TIẾT THỰC TẾ NGAY LÚC NÀY: ${weatherInfo} (HÃ
 - Nhịp độ: ${pace || 'Vừa phải'}
 - Không khí/Vibe mong muốn: ${vibe || 'Tự do/Khám phá'}
 - Yêu cầu đặc biệt: "${interestsStr || 'Không có'}"
+${destinationLocationContext}
 
 === QUY TẮC "THẾ HỆ 2.0" (PHẢI TUÂN THỦ TỐI THƯỢNG) ===
 1. MẬT ĐỘ HOẠT ĐỘNG (DENSITY): Mỗi ngày BẮT BUỘC phải có ít nhất 5-6 hoạt động bao gồm: Ăn sáng, Tham quan sáng, Ăn trưa, Nghỉ ngơi/Cafe chiều, Tham quan chiều, và Ăn tối/Chơi tối. TUYỆT ĐỐI không được để trống buổi chiều hoặc tối.
@@ -942,6 +1022,36 @@ router.get('/reviews', async (req, res) => {
   } catch (error) {
     console.error('❌ Get Reviews Error:', error);
     res.status(500).json({ success: false, message: 'Lỗi server khi tải đánh giá.' });
+  }
+});
+
+// Proxy image để tránh lỗi 403 Forbidden do hotlink protection
+router.get('/proxy-image', async (req, res) => {
+  try {
+    const imageUrl = req.query.url;
+    if (!imageUrl) return res.status(400).send('URL is required');
+
+    const response = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': new URL(imageUrl).origin,
+        'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+      }
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).send('Failed to fetch image');
+    }
+
+    const contentType = response.headers.get('content-type');
+    res.set('Content-Type', contentType);
+    
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    res.send(buffer);
+  } catch (error) {
+    console.error('Image Proxy Error:', error);
+    res.status(500).send('Internal Server Error');
   }
 });
 

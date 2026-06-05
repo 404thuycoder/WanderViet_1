@@ -9,64 +9,77 @@ const VN_DESTINATION_PHOTOS = {
     "https://images.unsplash.com/photo-1526483364030-5f22f1f281f6?auto=format&fit=crop&w=1170&q=80",
     "https://images.unsplash.com/photo-1488747279002-c8523379faaa?auto=format&fit=crop&w=1170&q=80"
   ],
-  "hồ hoàn kiếm": [
-    "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1170&q=80",
-    "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80"
-  ],
-  "lăng chủ tịch hồ chí minh": [
-    "https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=1170&q=80",
-    "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1170&q=80"
-  ],
-  "chùa một cột": [
-    "https://images.unsplash.com/photo-1602026534794-1f987675a313?auto=format&fit=crop&w=1170&q=80"
-  ],
-  "đền ngọc sơn": [
-    "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1170&q=80"
-  ],
-  "nhà tù hỏa lò": [
-    "https://images.pexels.com/photos/292261/pexels-photo-292261.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-  ],
-  "nhà thờ lớn": [
-    "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1170&q=80"
-  ],
-  "phố cổ hà nội": [
-    "https://images.unsplash.com/photo-1488747279002-c8523379faaa?auto=format&fit=crop&w=1170&q=80"
-  ],
-  "phố cổ": [
-    "https://images.unsplash.com/photo-1488747279002-c8523379faaa?auto=format&fit=crop&w=1170&q=80"
-  ],
-  "chả cá lã vọng": [
-    "https://images.pexels.com/photos/103546/pexels-photo-103546.jpeg",
-    "https://images.unsplash.com/photo-1544986581-efac024faf62?auto=format&fit=crop&w=1170&q=80"
-  ],
-  "phở thìn lò đúc": [
-    "https://images.unsplash.com/photo-1526483364030-5f22f1f281f6?auto=format&fit=crop&w=1170&q=80",
-    "https://images.unsplash.com/photo-1488747279002-c8523379faaa?auto=format&fit=crop&w=1170&q=80"
-  ],
-  "cà phê trứng giảng": [
-    "https://images.pexels.com/photos/551667/pexels-photo-551667.jpeg?auto=compress&cs=tinysrgb&w=600",
-    "https://images.pexels.com/photos/597077/pexels-photo-597077.jpeg?auto=compress&cs=tinysrgb&w=600"
-  ],
-  "bún chả hương liên": [
-    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1170&q=80",
-    "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1170&q=80"
-  ],
-  "bún đậu mắm tôm": [
-    "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
-    "https://images.pexels.com/photos/292261/pexels-photo-292261.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-  ],
-  "cà phê đường tàu": [
-    "https://images.unsplash.com/photo-1548544481-7f7a417c2f1f?auto=format&fit=crop&w=1170&q=80",
-    "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1170&q=80"
-  ],
-  "khách sạn aira boutique": [
-    "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=1170&q=80",
-    "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1170&q=80"
-  ],
-  "la sin kong hotel": [
-    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1170&q=80",
-    "https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-  ],
+  "hồ hoàn kiếm": ["https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg"],
+  "chùa một cột": ["https://hoidisanvanhoa.vn/wp-content/uploads/2024/12/39.jpg"],
+  "lăng bác": ["https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg"],
+  "lăng chủ tịch hồ chí minh": ["https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg"],
+  "đền ngọc sơn": ["https://vov2.vov.vn/sites/default/files/styles/large/public/2025-10/den-ngoc-son-ben-ho-hoan-kiem-anh-pham-hung-1.jpg"],
+  "văn miếu - quốc tử giám": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Hanoi_Temple_of_Literature_%28cropped%29.jpg/1280px-Hanoi_Temple_of_Literature_%28cropped%29.jpg"],
+  "văn miếu": ["https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Hanoi_Temple_of_Literature_%28cropped%29.jpg/1280px-Hanoi_Temple_of_Literature_%28cropped%29.jpg"],
+  "hoàng thành thăng long": ["https://media.baocaobang.vn/upload/image/201307/thumbnail/16974_Hoangthanh01.jpg"],
+  "nhà tù hỏa lò": ["https://tuotz.com/wp-content/uploads/2025/07/nha-tu-hoa-lo-1-1.png"],
+  "chùa trấn quốc": ["https://nhn.1cdn.vn/thumbs/1200x630/2023/09/13/chua-tran-quoc-th.jpg"],
+  "hồ tây": ["https://phuotvivu.com/blog/wp-content/uploads/2021/06/H%E1%BB%93-T%C3%A2y-1024x597.jpg"],
+  "cầu long biên": ["https://statics.vinpearl.com/cau-long-bien-6_1678872759.jpg"],
+  "phố cổ hà nội": ["https://thoitiet24h.vn/images/pho-co-ha-noi-xua.jpg"],
+  "phố cổ": ["https://thoitiet24h.vn/images/pho-co-ha-noi-xua.jpg"],
+  "phố đi bộ hoàn kiếm": ["https://tl.cdnchinhphu.vn/344445545208135680/2024/10/2/pho-di-bo-2-17278682397801779053327.jpg"],
+  "bảo tàng dân tộc học việt nam": ["https://static.vinwonders.com/production/bao-tang-dan-toc-hoc-1.jpg"],
+  "bảo tàng hồ chí minh": ["https://bennharong.vn/upload/filemanage/6d31-5960-46bc-a194-60204a31f1b5.jpg"],
+  "nhà hát lớn hà nội": ["https://statics.vinpearl.com/nha-hat-lon-ha-noi-5_1676040733.JPG"],
+  "chợ đồng xuân": ["https://bieudienthuccanh.com/userfiles/image/ha-noi/2021/cho-dong-xuan/1-hinh-anh-cong-cho-dong-xuan.jpg"],
+  "khu phố phùng hưng": ["https://cdn.xanhsm.com/2024/11/00a75849-pho-phung-hung-1.jpg"],
+  "cột cờ hà nội": ["https://ticotravel.com.vn/wp-content/uploads/2023/04/cot-co-ha-noi-5.jpg"],
+  "nhà thờ lớn": ["https://hnm.1cdn.vn/2020/12/18/nhipsonghanoi.hanoimoi.com.vn-uploads-images-phananh-2020-12-17-_nha-tho-lon.jpg"],
+  "bún chả hương liên": ["https://mms.img.susercontent.com/vn-11134513-7r98o-lstxf7m02f2c77@resize_ss1242x600!@crop_w1242_h600_cT"],
+  "phở thìn bờ hồ": ["https://cafebiz.cafebizcdn.vn/zoom/700_438/162123310254002176/2023/2/23/avatar1677154808691-1677154809528736470105.jpg"],
+  "phở bát đàn": ["https://mms.img.susercontent.com/vn-11134513-7r98o-lsu7jkcdbfkpd3@resize_ss1242x600!@crop_w1242_h600_cT"],
+  "phở 10 lý quốc sư": ["https://danielfooddiary.com/wp-content/uploads/2025/12/pho101.JPG"],
+  "chả cá lã vọng": ["https://statics.vinpearl.com/cha-ca-la-vong-ha-noi-0_1681057662.jpg"],
+  "bún thang giảng": ["https://luxuo.vn/wp-content/uploads/2024/11/cover-bun-thang.jpg"],
+  "bún ốc hình lăng": ["https://cdn.tgdd.vn/2021/10/CookDish/tong-hop-8-cach-nau-bun-oc-ngon-hap-dan-chuan-vi-tai-nha-avt-1200x676.jpg"],
+  "bún đậu mắm tôm cầu gỗ": ["https://lofita.vn/wp-content/uploads/2026/04/bun-dau-mam-tom-go-vap-9f18ca.webp"],
+  "bánh mì 25": ["https://www.vibrantlyvietnam.com/wp-content/uploads/2019/08/banh-mi-25-hanoi-vietnam-restaurant-review.jpg"],
+  "bánh cuốn gia an": ["https://meetup.vn/wp-content/uploads/2025/06/351520-banh-cuon-gia-an-body-2.jpg"],
+  "cơm gà hàng bè": ["https://cdn-i.vtcnews.vn/resize/th/upload/2024/04/23/comgathuonghaingonnhuthongxuong-1-23434087.png"],
+  "kem tràng tiền": ["https://nhn.1cdn.vn/2021/09/27/nhipsonghanoi-hanoimoi-com-vn-kem-ttien.jpg"],
+  "cà phê giảng": ["https://coffee.org.vn/wp-content/uploads/2022/04/ca-phe-trung-16.jpg"],
+  "cà phê đường tàu": ["https://cdn.cand.vn/images/6295294336b43409ef7c00e9eb4350a94f3ddb88ffb7afcf0284/Ca_phe_duong_tau-1741410653170.jpg.avif"],
+  "trà chanh tạ hiện": ["https://1phutsaigon.vn/wp-content/uploads/2023/11/dia-chi-tra-chanh-gia-tay-o-sai-gon-2.jpg"],
+  "quán bia tạ hiện": ["https://greenfuture.tech/_next/image?url=https%3A%2F%2Fupload-static.fgf.vn%2Fcms%2Fpho-ta-hien-4.jpg&w=3840&q=100"],
+  "nhà hàng ngon": ["https://mia.vn/media/uploads/blog-du-lich/nha-hang-quan-an-ngon-ha-noi-noi-gin-giu-gia-tri-am-thuc-viet-13-1640631736.jpg"],
+  "bún chả sinh từ": ["https://bunchasinhtu.vn/wp-content/uploads/2021/02/z2075448516274_851172a37aae05f0a587a5265293f007.jpg"],
+  "cháo sườn hàng bồ": ["https://dulich3mien.vn/wp-content/uploads/2022/01/chao-suon-ha-noi.jpg"],
+  "lẩu cá kèo / lẩu gà lá é": ["https://emdoi.vn/wp-content/uploads/2025/03/lau-ga-la-e-sai-gon-10.webp"],
+  "lẩu gà lá é": ["https://emdoi.vn/wp-content/uploads/2025/03/lau-ga-la-e-sai-gon-10.webp"],
+  "sofitel legend metropole hanoi": ["https://sofitel.com.vn/wp-content/uploads/2022/06/Sofitel-Metropole-Hanoi.jpg"],
+  "intercontinental hanoi westlake": ["https://hanoitourist.com.vn/images/fields/2019/01/25/large/banner4_1548393019_1.jpg"],
+  "pan pacific hanoi": ["https://images.trvl-media.com/lodging/1000000/120000/114500/114496/a4df4368.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill"],
+  "hilton hanoi opera": ["https://mekongasean.vn/stores/news_dataimages/mekongaseanvn/102022/18/14/hilton-opera-hanoi-attivo-6516.jpg"],
+  "hotel de l'opera hanoi": ["https://hanoitourist.com.vn/upload_images/images/2019/01/25/anh-bai(1).jpg"],
+  "apricot hotel": ["https://apricothotels.com/wp-content/uploads/2018/09/Apricot-Hotel_Masterpiece_low-700x400.jpg"],
+  "la siesta premium hang be": ["https://lasiestahotels.com/hangbe/wp-content/uploads/2019/01/No-Window-Superior-c1500x1000.jpg"],
+  "essence hanoi hotel & spa": ["https://www.hotels-of-hanoi.com/data/Pics/OriginalPhoto/7417/741724/741724951/pic-la-mejor-hotel-sky-bar-hanoi-92.JPEG"],
+  "hanoi la siesta hotel & spa": ["https://pix10.agoda.net/hotelImages/2552472/-1/0e6eb9160a3beec17666b00eb09eb0e3.jpg?ca=10&ce=1&s=414x232"],
+  "o'gallery premier hotel & spa": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/e5/3c/68/hotel-lobby.jpg?w=900&h=500&s=1"],
+  "silk path hotel hanoi": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0e/ee/a4/ee/lobby.jpg?w=900&h=500&s=1"],
+  "hanoi pearl hotel": ["https://cf.bstatic.com/xdata/images/hotel/max1024x768/82045526bcdb6471af8f163790324b4c329118f8b79cf71f13fdf140c63647&o="],
+  "jupiter legend hotel": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/ec/e4/1a/caption.jpg?w=900&h=500&s=1"],
+  "maison d'orient hotel": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/fe/77/42/maison-d-orient.jpg?w=900&h=500&s=1"],
+  "the oriental jade hotel": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/2b/1d/1f/swimming-pool.jpg?w=900&h=500&s=1"],
+  "meliá hanoi": ["https://cdn2.vietnambooking.com/wp-content/uploads/hotel_pro/hotel_343476/ff30dfd6b244d3357f6c8392a8d1b033.jpg"],
+  "xem múa rối nước thăng long": ["https://luhanhvietnam.com.vn/du-lich-land-tour/vnt_upload/tour/08_2019/thumbs/780_crop_72f718faa37747e6a5f724eb2481cc2f.png"],
+  "múa rối nước thăng long": ["https://luhanhvietnam.com.vn/du-lich-land-tour/vnt_upload/tour/08_2019/thumbs/780_crop_72f718faa37747e6a5f724eb2481cc2f.png"],
+  "đi xích lô quanh phố cổ": ["https://statics.vinpearl.com/gia-xich-lo-ha-noi-banner_1682253976.jpg"],
+  "xích lô phố cổ": ["https://statics.vinpearl.com/gia-xich-lo-ha-noi-banner_1682253976.jpg"],
+  "dạo chợ đêm phố cổ": ["https://static.vinwonders.com/production/cho-dem-pho-co-ha-noi-1.jpg"],
+  "chợ đêm phố cổ": ["https://static.vinwonders.com/production/cho-dem-pho-co-ha-noi-1.jpg"],
+  "thuê xe đạp / chạy bộ quanh hồ tây": ["https://cdnphoto.dantri.com.vn/fZAnyQDTNSmcjWgAxzwf3l6y-bw=/2024/04/06/2-1712371163261.jpg?watermark=true"],
+  "chạy bộ quanh hồ tây": ["https://cdnphoto.dantri.com.vn/fZAnyQDTNSmcjWgAxzwf3l6y-bw=/2024/04/06/2-1712371163261.jpg?watermark=true"],
+  "ăn tối rooftop westlake": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/00/98/32/majestic-lake-view.jpg"],
+  "café sách & góc chill phố cổ": ["https://hotelroyalhoian.vn/wp-content/uploads/2025/05/dac-san-hoi-an-1-2-4.jpg"],
+  "nhà hàng rooftop ở west lake": ["https://topgo.vn/wp-content/uploads/2017/07/rooftop-bar-12-1.jpg"],
+  "nhà hàng buffet lẩu / nướng nổi tiếng": ["https://melamine.vn/wp-content/uploads/2023/07/Seoul-Garden-Chuoi-nha-hang-buffet-lau-nuong-TPHCM.jpg"],
   "hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://upload.wikimedia.org/wikipedia/commons/4/42/Ha_Long_2019_taken_by_DJI_FC220.jpg"],
   "vịnh hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
   "sapa": ["https://booking.muongthanh.com/upload_images/images/Nhung/review-dia-diem-du-lich-sapa.jpg", "https://phetravel.com/uploads/30-06-2023-14-53-09-du-lich-sa-pa-0.jpg.webp", "https://topasecolodge.com/wp-content/uploads/2025/06/best-time-to-visit-sapa-04.jpg"],
@@ -196,26 +209,45 @@ const VN_PLACES_VIDEOS = {
 
 function getVNPhoto(query, idx = 0) {
   if (!query) return GENERIC_VN_PHOTOS[idx % GENERIC_VN_PHOTOS.length];
-  const qLower = query.toLowerCase().trim();
+  // Normalize Unicode NFC + lowercase để đồng nhất so sánh dấu tiếng Việt
+  const qLower = query.normalize('NFC').toLowerCase().trim();
 
-  // Nếu có bộ ảnh spot cụ thể từ planner.html, dùng trước
+  // 1. Ưu tiên bộ ảnh spot cụ thể từ planner.html (SPOT_PHOTOS_DB) — dùng bestMatch
+  let bestMatch = null;
+  let bestKeyLen = 0;
   const customSpotPhotos = window.SPOT_PHOTOS_DB || {};
   for (const [key, photos] of Object.entries(customSpotPhotos)) {
-    const keyLower = key.toLowerCase().trim();
+    const keyLower = key.normalize('NFC').toLowerCase().trim();
     if (qLower.includes(keyLower) || keyLower.includes(qLower)) {
-      const photoIdx = (Math.abs(idx) + qLower.length) % photos.length;
-      return photos[photoIdx];
+      if (keyLower.length > bestKeyLen) {
+        bestKeyLen = keyLower.length;
+        bestMatch = photos;
+      }
     }
   }
+  if (bestMatch && bestMatch.length > 0) {
+    const photoIdx = (Math.abs(idx) + qLower.length) % bestMatch.length;
+    return bestMatch[photoIdx];
+  }
 
-  // Kiểm tra điểm đến cụ thể chung trong planner.js
+  // 2. Kiểm tra VN_DESTINATION_PHOTOS (planner.js) — bestMatch theo key dài nhất
+  bestMatch = null;
+  bestKeyLen = 0;
   for (const [key, photos] of Object.entries(VN_DESTINATION_PHOTOS)) {
-    if (qLower.includes(key) || key.includes(qLower)) {
-      const photoIdx = (Math.abs(idx) + qLower.length) % photos.length;
-      return photos[photoIdx];
+    const keyNorm = key.normalize('NFC');
+    if (qLower.includes(keyNorm) || keyNorm.includes(qLower)) {
+      if (keyNorm.length > bestKeyLen) {
+        bestKeyLen = keyNorm.length;
+        bestMatch = photos;
+      }
     }
   }
+  if (bestMatch && bestMatch.length > 0) {
+    const photoIdx = (Math.abs(idx) + qLower.length) % bestMatch.length;
+    return bestMatch[photoIdx];
+  }
 
+  // 3. Fallback ảnh generic Việt Nam
   return GENERIC_VN_PHOTOS[(Math.abs(idx) + qLower.length) % GENERIC_VN_PHOTOS.length];
 }
 window.getVNPhoto = getVNPhoto;
@@ -2256,11 +2288,14 @@ const initPlanner = function () {
     resultContainer.style.display = 'none';
     loader.style.display = 'flex';
 
-    // Clear comparison mode
+    // Clear comparison mode and old content
     const container = document.getElementById('timelineContent');
-    if (container) container.classList.remove('comparison-mode-active');
+    if (container) {
+      container.classList.remove('comparison-mode-active');
+      container.innerHTML = ''; // Xóa nội dung cũ để không hiển thị trong lúc đang loading
+    }
     const saveBtn = document.getElementById('btnSaveTrip');
-    if (saveBtn) saveBtn.style.display = 'inline-flex';
+    if (saveBtn) saveBtn.style.display = 'none';
 
     try {
       const token = localStorage.getItem('wander_token');
@@ -2315,6 +2350,9 @@ const initPlanner = function () {
 
         resultContainer.style.display = 'block';
         refineBox.style.display = 'block';
+        
+        const btnSaveTrip = document.getElementById('btnSaveTrip');
+        if (btnSaveTrip) btnSaveTrip.style.display = 'inline-flex';
 
         // Ensure scroll to top of results
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2457,12 +2495,7 @@ const initPlanner = function () {
         const category = inferActivityCategory(act);
         const meta = getActivityCategoryMeta(category);
         const description = act.description || getCategoryDescription(act, category);
-        return {
-          ...act,
-          category,
-          categoryMeta: meta,
-          description
-        };
+        return { ...act, category, categoryMeta: meta, description };
       })
     }));
 
@@ -2483,7 +2516,7 @@ const initPlanner = function () {
     let wCond = weather ? weather.condition : 'Nắng ấm / Mát mẻ';
     const cleanD = String(dest || "").split(',')[0].trim();
     if (weather && wTemp < 18 && !cleanD.toLowerCase().includes('sapa') && !cleanD.toLowerCase().includes('đà lạt')) {
-      wTemp = Math.floor(Math.random() * 5) + 27; // 27°C - 31°C cho khu vực đồng bằng/biển
+      wTemp = Math.floor(Math.random() * 5) + 27;
     }
 
     const aiHotelRaw = plan.accommodationSuggestion ? plan.accommodationSuggestion.nameAndCost : '';
@@ -2512,7 +2545,7 @@ const initPlanner = function () {
         const sessionColor = actSession === 'Sáng' ? '#10b981' : actSession === 'Chiều' ? '#f59e0b' : '#818cf8';
         const sessionEmoji = actSession === 'Sáng' ? '☀️' : actSession === 'Chiều' ? '⛅' : '🌙';
         const categoryMeta = act.categoryMeta || getActivityCategoryMeta(inferActivityCategory(act));
-        const categoryBadge = `<div style="display:inline-flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:800; color:${categoryMeta.color}; background:${categoryMeta.bg}; border:1px solid ${categoryMeta.border}; border-radius:999px; padding:6px 12px; margin-bottom:0.85rem;">${categoryMeta.icon} ${categoryMeta.label}</div>`;
+        const categoryBadge = `<div style="display:inline-flex; align-items:center; gap:5px; font-size:0.72rem; font-weight:700; color:${categoryMeta.color}; background:${categoryMeta.bg}; border:1px solid ${categoryMeta.border}; border-radius:999px; padding:4px 10px;">${categoryMeta.icon} ${categoryMeta.label}</div>`;
 
         let starHtml = '';
         if (actRating > 0) {
@@ -2527,32 +2560,33 @@ const initPlanner = function () {
           actMapQuery += ', ' + window.currentDestName;
         }
 
+        // --- Redesigned Badges ---
         const costBadge = actCost
-          ? '<div style="position:absolute; top:12px; right:12px; background:rgba(251,191,36,0.95); color:#000; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:12px; backdrop-filter:blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.25);">💰 ' + actCost + '</div>'
-          : '<div style="position:absolute; top:12px; right:12px; background:rgba(16,185,129,0.9); color:#fff; font-size:0.75rem; font-weight:900; padding:4px 12px; border-radius:12px; backdrop-filter:blur(4px); box-shadow: 0 4px 10px rgba(0,0,0,0.25);">Miễn phí</div>';
+          ? `<div class="act-cost-badge">💰 ${actCost}</div>`
+          : `<div class="act-cost-badge act-cost-free">✓ Miễn phí</div>`;
 
         const sessionBadge = actSession
-          ? '<span style="font-size:0.65rem; font-weight:800; color:' + sessionColor + '; background:' + sessionColor + '20; border: 1px solid ' + sessionColor + '35; padding:3px 8px; border-radius:8px; white-space:nowrap; text-transform:uppercase;">' + sessionEmoji + ' ' + actSession + '</span>'
+          ? `<span class="act-session-badge" style="--sc:${sessionColor};">${sessionEmoji} ${actSession}</span>`
           : '';
 
         const locationBadge = actLocation
-          ? '<div style="position:absolute; bottom:12px; left:12px; display:flex; align-items:center; gap:4px; font-size:0.72rem; color:#fff; font-weight:700; background:rgba(15,23,42,0.65); backdrop-filter:blur(8px); padding:4px 10px; border-radius:12px; max-width:80%; border: 1px solid rgba(255,255,255,0.08); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">📍 ' + actLocation + '</div>'
+          ? `<div class="act-location-badge">📍 ${actLocation}</div>`
           : '';
 
         const ratingBadge = actRating > 0
-          ? '<div style="display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex-shrink:0;"><span style="color:#fbbf24; font-size:0.72rem; letter-spacing:1px;">' + starHtml + '</span><span style="color:#fbbf24; font-size:0.72rem; font-weight:900;">' + actRating + '/5</span></div>'
+          ? `<div class="act-rating-badge"><span class="act-stars">${starHtml}</span><span class="act-rating-num">${actRating}/5</span></div>`
           : '';
 
         const transportBadge = actTransport
-          ? '<div style="display:inline-flex; align-items:center; gap:5px; font-size:0.75rem; color:#38bdf8; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.2); padding:4px 12px; border-radius:20px; margin-bottom:0.75rem; font-weight:700;">🚗 ' + actTransport + '</div>'
+          ? `<div class="act-meta-chip">🚗 ${actTransport}</div>`
           : '';
 
         const descParagraph = actDesc
-          ? '<p style="font-size:0.88rem; line-height:1.6; color:rgba(255,255,255,0.75); margin:0 0 1rem; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">' + actDesc + '</p>'
+          ? `<p class="act-desc">${actDesc}</p>`
           : '';
 
         const transitHtml = act.transitToNext
-          ? '<div class="transit-step-v3"><span style="font-size:1rem;">⚡</span><span>' + act.transitToNext + '</span></div>'
+          ? `<div class="transit-step-v3"><span>⚡</span><span>${act.transitToNext}</span></div>`
           : '';
 
         return `
@@ -2563,44 +2597,49 @@ const initPlanner = function () {
             </div>
 
             <div class="activity-content-card-v3">
-              <div class="activity-row-v3">
-                <div class="activity-image-wrap-v3">
-                  <img 
-                    class="activity-image-v3"
-                    src="${getVNPhoto(actName, aIdx)}" 
-                    alt="${actName}"
-                    loading="lazy"
-                    onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=600&fit=crop';"
-                  >
-                  <div class="activity-image-overlay-v3"></div>
-                  ${locationBadge}
-                  ${costBadge}
-                  <div style="position:absolute; top:12px; left:12px; font-size:0.6rem; color:rgba(255,255,255,0.5); background:rgba(0,0,0,0.4); padding:2px 6px; border-radius:4px; font-weight:700;">📸 WANDERVIỆT</div>
-                </div>
+              <div class="activity-image-wrap-v3">
+                <img 
+                  class="activity-image-v3"
+                  src="${getVNPhoto(actLocation || actName, aIdx) || getVNPhoto(actName, aIdx)}" 
+                  alt="${actName}"
+                  loading="lazy"
+                  onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1528127269322-539801943592?w=600&fit=crop';"
+                >
+                <div class="activity-image-overlay-v3"></div>
+                ${costBadge}
+                ${locationBadge}
+                <div style="position:absolute; top:12px; left:12px; font-size:0.6rem; color:rgba(255,255,255,0.7); background:rgba(0,0,0,0.5); padding:3px 7px; border-radius:6px; font-weight:700; backdrop-filter:blur(4px);">📸 WANDERVIỆT</div>
+              </div>
 
-                <div class="activity-body-v3">
-                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.75rem; margin-bottom:0.85rem;">
-                    <div style="flex:1; min-width:0;">
-                      <h4 style="font-size:1.25rem; color:#fff; margin:0; font-weight:800; line-height:1.3;">${actName}</h4>
+              <div class="activity-body-v3">
+                <div class="act-main-row">
+                  <div class="act-info-col">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem; gap:1rem;">
+                      <h4 class="act-title-text">${actName}</h4>
+                      ${ratingBadge}
+                    </div>
+                    <div class="act-tags-row">
                       ${categoryBadge}
                       ${transportBadge}
                     </div>
-                    ${ratingBadge}
                   </div>
+                  
+                  <div class="act-actions-col">
+                    <button type="button" class="act-btn-v3 act-btn-details"
+                      onclick='showActivityDetails(${actData})'>
+                      <span style="font-size:0.9rem;">🔍</span> Chi Tiết & Review
+                    </button>
+                    <a href="#" class="act-btn-v3 act-btn-gps"
+                      onclick="window.getGPSDirections('${actMapQuery.replace(/'/g, "\\'")}', event)">
+                      <span style="font-size:0.9rem;">📍</span> Bản đồ (GPS)
+                    </a>
+                  </div>
+                </div>
 
+                ${actDesc ? `
+                <div class="act-desc-row">
                   ${descParagraph}
-                </div>
-
-                <div class="activity-actions-v3">
-                  <button type="button" class="act-btn-v3 act-btn-details"
-                    onclick='showActivityDetails(${actData})'>
-                    🔍 Xem Chi Tiết & Review
-                  </button>
-                  <a href="#" class="act-btn-v3 act-btn-gps"
-                    onclick="window.getGPSDirections('${actMapQuery.replace(/'/g, "\\'")}', event)">
-                    📍 Bản đồ (GPS)
-                  </a>
-                </div>
+                </div>` : ''}
               </div>
             </div>
           </div>
@@ -2711,425 +2750,521 @@ const initPlanner = function () {
     return `
       <div class="itinerary-column-wrapper">
         <style>
-          /* Full Modern Rebuild Style Section */
+          /* ============================================================
+           * WANDERVIET ITINERARY — PREMIUM REDESIGN v4
+           * Airbnb/Google Travel quality UI
+           * ============================================================ */
+          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
           .travel-console-container {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 1.75rem;
             width: 100%;
             margin-top: 1rem;
+            font-family: 'Outfit', system-ui, sans-serif;
           }
 
-          /* Majestic Glassmorphic Tab Bar */
+          /* ── Tab Bar ── */
           .console-tabs-bar-v3 {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 8px;
-            border-radius: 30px;
+            gap: 0.375rem;
+            background: rgba(13, 20, 36, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 6px;
+            border-radius: 100px;
             width: 100%;
             overflow-x: auto;
-            scrollbar-width: none; /* Hide scrollbar Firefox */
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+            scrollbar-width: none;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.04);
           }
-          .console-tabs-bar-v3::-webkit-scrollbar {
-            display: none; /* Hide scrollbar Chrome/Safari */
-          }
+          .console-tabs-bar-v3::-webkit-scrollbar { display: none; }
 
           .console-tab-btn {
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.65);
-            padding: 10px 24px;
-            border-radius: 24px;
-            font-size: 0.9rem;
-            font-weight: 800;
+            color: rgba(255,255,255,0.5);
+            padding: 9px 20px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
             white-space: nowrap;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.1px;
           }
           .console-tab-btn:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-1px);
+            color: rgba(255,255,255,0.85);
+            background: rgba(255,255,255,0.06);
           }
           .console-tab-btn.active {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #fff;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 16px rgba(16,185,129,0.35), 0 1px 0 rgba(255,255,255,0.15) inset;
           }
 
-          /* Active Panel Transition */
+          /* ── Panel Animation ── */
           .itinerary-tab-panel {
-            animation: consolePanelFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: itinFadeUp 0.45s cubic-bezier(0.16,1,0.3,1) forwards;
             width: 100%;
           }
-          @keyframes consolePanelFadeIn {
-            from {
-              opacity: 0;
-              transform: translateY(12px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
+          @keyframes itinFadeUp {
+            from { opacity:0; transform:translateY(14px); }
+            to   { opacity:1; transform:translateY(0); }
           }
 
-          /* Card Container */
+          /* ── Overview Header Card ── */
           .timeline-header-premium-v3 {
-            background: linear-gradient(135deg, rgba(20, 30, 48, 0.6) 0%, rgba(36, 59, 85, 0.45) 100%) !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
-            border-radius: 2rem !important;
-            padding: 2.5rem !important;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), inset 0 2px 4px rgba(255, 255, 255, 0.05) !important;
+            background: linear-gradient(135deg, rgba(16,24,40,0.7) 0%, rgba(22,36,56,0.65) 100%) !important;
+            border: 1px solid rgba(255,255,255,0.09) !important;
+            border-radius: 1.75rem !important;
+            padding: 2.25rem !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06) !important;
             position: relative !important;
             overflow: hidden !important;
           }
+          .timeline-header-premium-v3::before {
+            content: '' !important;
+            position: absolute !important;
+            top: 0; left: 0; right: 0; height: 1px !important;
+            background: linear-gradient(90deg, transparent, rgba(16,185,129,0.5), transparent) !important;
+          }
 
-          /* Stat Box Layout */
+          /* ── Stat Grid ── */
           .itinerary-stats-grid-v3 {
             display: grid !important;
-            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)) !important;
-            gap: 1.25rem !important;
-            margin-top: 2rem !important;
+            grid-template-columns: repeat(auto-fit, minmax(195px, 1fr)) !important;
+            gap: 1rem !important;
+            margin-top: 1.75rem !important;
           }
           .stat-box-v3 {
-            background: rgba(15, 23, 42, 0.55) !important;
-            border: 1px solid rgba(255, 255, 255, 0.06) !important;
-            padding: 1.25rem !important;
-            border-radius: 1.25rem !important;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            background: rgba(13,20,36,0.6) !important;
+            border: 1px solid rgba(255,255,255,0.05) !important;
+            padding: 1.15rem 1.25rem !important;
+            border-radius: 1.15rem !important;
+            transition: all 0.35s cubic-bezier(0.16,1,0.3,1) !important;
             display: flex !important;
             align-items: center !important;
-            gap: 1rem !important;
+            gap: 0.875rem !important;
             position: relative !important;
             overflow: hidden !important;
-            cursor: pointer !important;
-          }
-          .stat-box-v3::before {
-            content: "" !important;
-            position: absolute !important;
-            inset: 0 !important;
-            background: linear-gradient(135deg, transparent 40%, rgba(255, 255, 255, 0.03)) !important;
-            opacity: 0 !important;
-            transition: opacity 0.3s ease !important;
-          }
-          .stat-box-v3:hover::before {
-            opacity: 1 !important;
+            cursor: default !important;
           }
           .stat-box-v3:hover {
-            transform: translateY(-5px) scale(1.02) !important;
-            background: rgba(15, 23, 42, 0.7) !important;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+            transform: translateY(-4px) !important;
+            background: rgba(20,30,50,0.75) !important;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3) !important;
           }
-          
-          /* Colorful themes for each stat box */
-          .stat-box-cost:hover { border-color: rgba(16, 185, 129, 0.45) !important; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.15) !important; }
-          .stat-box-pace:hover { border-color: rgba(245, 158, 11, 0.45) !important; box-shadow: 0 10px 25px rgba(245, 158, 11, 0.15) !important; }
-          .stat-box-vibe:hover { border-color: rgba(56, 189, 248, 0.45) !important; box-shadow: 0 10px 25px rgba(56, 189, 248, 0.15) !important; }
-          .stat-box-transport:hover { border-color: rgba(244, 114, 182, 0.45) !important; box-shadow: 0 10px 25px rgba(244, 114, 182, 0.15) !important; }
-          .stat-box-weather:hover { border-color: rgba(251, 191, 36, 0.45) !important; box-shadow: 0 10px 25px rgba(251, 191, 36, 0.15) !important; }
-          .stat-box-advice:hover { border-color: rgba(167, 139, 250, 0.45) !important; box-shadow: 0 10px 25px rgba(167, 139, 250, 0.15) !important; }
-
+          .stat-box-cost:hover   { border-color: rgba(16,185,129,0.4) !important; box-shadow: 0 12px 28px rgba(16,185,129,0.12) !important; }
+          .stat-box-pace:hover   { border-color: rgba(245,158,11,0.4) !important; box-shadow: 0 12px 28px rgba(245,158,11,0.12) !important; }
+          .stat-box-vibe:hover   { border-color: rgba(56,189,248,0.4) !important; box-shadow: 0 12px 28px rgba(56,189,248,0.12) !important; }
+          .stat-box-transport:hover { border-color: rgba(244,114,182,0.4) !important; box-shadow: 0 12px 28px rgba(244,114,182,0.12) !important; }
+          .stat-box-weather:hover   { border-color: rgba(251,191,36,0.4) !important; box-shadow: 0 12px 28px rgba(251,191,36,0.12) !important; }
+          .stat-box-advice:hover    { border-color: rgba(167,139,250,0.4) !important; box-shadow: 0 12px 28px rgba(167,139,250,0.12) !important; }
           .stat-icon-wrap {
-            width: 44px !important;
-            height: 44px !important;
-            border-radius: 50% !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-size: 1.3rem !important;
-            flex-shrink: 0 !important;
-            transition: transform 0.4s ease !important;
+            width: 42px !important; height: 42px !important;
+            border-radius: 12px !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
+            font-size: 1.2rem !important; flex-shrink: 0 !important;
+            transition: transform 0.35s ease !important;
           }
-          .stat-box-v3:hover .stat-icon-wrap {
-            transform: scale(1.15) rotate(5deg) !important;
-          }
+          .stat-box-v3:hover .stat-icon-wrap { transform: scale(1.12) rotate(4deg) !important; }
 
-          /* Accommodation styles */
+          /* ── Accommodation Card ── */
           .accomm-premium-card-v3 {
-            background: linear-gradient(135deg, rgba(20, 30, 48, 0.5) 0%, rgba(15, 23, 42, 0.75) 100%) !important;
-            border: 1px solid rgba(59, 130, 246, 0.25) !important;
-            border-left: 5px solid #3b82f6 !important;
-            padding: 2rem !important;
-            border-radius: 2rem !important;
-            backdrop-filter: blur(24px) !important;
-            -webkit-backdrop-filter: blur(24px) !important;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45) !important;
+            background: linear-gradient(135deg, rgba(16,24,48,0.6), rgba(13,20,36,0.8)) !important;
+            border: 1px solid rgba(59,130,246,0.2) !important;
+            border-left: 4px solid #3b82f6 !important;
+            padding: 1.75rem !important;
+            border-radius: 1.5rem !important;
+            backdrop-filter: blur(20px) !important;
+            box-shadow: 0 16px 45px rgba(0,0,0,0.4) !important;
             transition: all 0.3s ease !important;
           }
           .accomm-premium-card-v3:hover {
-            box-shadow: 0 20px 55px rgba(59, 130, 246, 0.15), 0 20px 50px rgba(0,0,0,0.5) !important;
+            box-shadow: 0 20px 55px rgba(59,130,246,0.12), 0 16px 45px rgba(0,0,0,0.45) !important;
           }
           .stay-card-v3 {
-            background: rgba(15, 23, 42, 0.45) !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            padding: 1.5rem !important;
-            border-radius: 1.5rem !important;
-            display: flex !important;
-            flex-direction: column !important;
+            background: rgba(13,20,36,0.5) !important;
+            border: 1px solid rgba(255,255,255,0.07) !important;
+            padding: 1.35rem !important;
+            border-radius: 1.25rem !important;
+            display: flex !important; flex-direction: column !important;
             justify-content: space-between !important;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            position: relative !important;
-            overflow: hidden;
+            transition: all 0.35s cubic-bezier(0.16,1,0.3,1) !important;
+            position: relative !important; overflow: hidden !important;
           }
-          .stay-card-v3:hover {
-            transform: translateY(-5px) !important;
-            background: rgba(15, 23, 42, 0.65) !important;
-          }
-          .stay-card-standard:hover { border-color: rgba(59, 130, 246, 0.45) !important; box-shadow: 0 12px 30px rgba(59, 130, 246, 0.25) !important; }
-          .stay-card-budget:hover { border-color: rgba(16, 185, 129, 0.45) !important; box-shadow: 0 12px 30px rgba(16, 185, 129, 0.25) !important; }
-          .stay-card-luxury:hover { border-color: rgba(245, 158, 11, 0.45) !important; box-shadow: 0 12px 30px rgba(245, 158, 11, 0.25) !important; }
-
+          .stay-card-v3:hover { transform: translateY(-4px) !important; background: rgba(20,30,50,0.65) !important; }
+          .stay-card-standard:hover { border-color: rgba(59,130,246,0.4) !important; box-shadow: 0 10px 28px rgba(59,130,246,0.18) !important; }
+          .stay-card-budget:hover   { border-color: rgba(16,185,129,0.4) !important; box-shadow: 0 10px 28px rgba(16,185,129,0.18) !important; }
+          .stay-card-luxury:hover   { border-color: rgba(245,158,11,0.4) !important; box-shadow: 0 10px 28px rgba(245,158,11,0.18) !important; }
           .stay-badge {
-            font-size: 0.65rem !important;
-            font-weight: 800 !important;
-            padding: 3px 10px !important;
-            border-radius: 12px !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.5px !important;
+            font-size: 0.62rem !important; font-weight: 800 !important;
+            padding: 3px 9px !important; border-radius: 10px !important;
+            text-transform: uppercase !important; letter-spacing: 0.5px !important;
           }
-
           .stay-map-btn-v3 {
             align-self: flex-start !important;
-            padding: 8px 16px !important;
-            border-radius: 20px !important;
-            font-size: 0.8rem !important;
-            font-weight: 700 !important;
+            padding: 7px 14px !important; border-radius: 100px !important;
+            font-size: 0.78rem !important; font-weight: 700 !important;
             text-decoration: none !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 6px !important;
-            transition: all 0.3s ease !important;
+            display: inline-flex !important; align-items: center !important; gap: 5px !important;
+            transition: all 0.25s ease !important;
           }
-          .stay-map-btn-standard { background: rgba(59, 130, 246, 0.15) !important; color: #93c5fd !important; border: 1px solid rgba(59, 130, 246, 0.3) !important; }
-          .stay-map-btn-standard:hover { background: #3b82f6 !important; color: #fff !important; transform: scale(1.05) !important; }
-          .stay-map-btn-budget { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.3) !important; }
-          .stay-map-btn-budget:hover { background: #10b981 !important; color: #fff !important; transform: scale(1.05) !important; }
-          .stay-map-btn-luxury { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; border: 1px solid rgba(245, 158, 11, 0.3) !important; }
-          .stay-map-btn-luxury:hover { background: #f59e0b !important; color: #fff !important; transform: scale(1.05) !important; }
+          .stay-map-btn-standard { background: rgba(59,130,246,0.12) !important; color: #93c5fd !important; border: 1px solid rgba(59,130,246,0.25) !important; }
+          .stay-map-btn-standard:hover { background: #3b82f6 !important; color: #fff !important; }
+          .stay-map-btn-budget   { background: rgba(16,185,129,0.12) !important; color: #34d399 !important; border: 1px solid rgba(16,185,129,0.25) !important; }
+          .stay-map-btn-budget:hover   { background: #10b981 !important; color: #fff !important; }
+          .stay-map-btn-luxury   { background: rgba(245,158,11,0.12) !important; color: #fbbf24 !important; border: 1px solid rgba(245,158,11,0.25) !important; }
+          .stay-map-btn-luxury:hover   { background: #f59e0b !important; color: #fff !important; }
 
-          /* Day Header */
+          /* ── Day Header ── */
           .day-header-meta-v3 {
-            margin-bottom: 2.25rem !important;
-            display: flex !important;
-            align-items: center !important;
-            gap: 1.5rem !important;
+            margin-bottom: 2rem !important;
+            display: flex !important; align-items: center !important; gap: 1.25rem !important;
           }
           .day-circle-v3 {
             flex-shrink: 0 !important;
-            width: 54px !important;
-            height: 54px !important;
+            width: 52px !important; height: 52px !important;
             border-radius: 50% !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-            color: white !important;
-            font-weight: 900 !important;
-            font-size: 1.25rem !important;
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.2) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            color: #fff !important; font-weight: 900 !important; font-size: 1.15rem !important;
+            box-shadow: 0 6px 20px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.25) !important;
           }
 
-          /* Activity Card layout - SMASH & REBUILD */
-          .premium-activity-card-v3 {
-            padding: 0 !important;
-            background: transparent !important;
-            border: none !important;
-            margin-bottom: 2.5rem !important;
-            display: flex !important;
-            gap: 1.5rem !important;
-            position: relative !important;
-          }
-          /* Day list vertical line */
+          /* ── Timeline Vertical Line ── */
           .activities-list-v3 {
-            padding-left: 30px !important;
-            border-left: 3px solid rgba(16, 185, 129, 0.2) !important;
-            margin-left: 25px !important;
+            padding-left: 28px !important;
+            border-left: 2px solid rgba(16,185,129,0.15) !important;
+            margin-left: 28px !important;
           }
-          .activity-time-block {
-            min-width: 80px !important;
+
+          /* ── Activity Card Wrapper ── */
+          .premium-activity-card-v3 {
             display: flex !important;
-            flex-direction: column !important;
+            gap: 1.25rem !important;
+            margin-bottom: 1.75rem !important;
+            position: relative !important;
+            align-items: flex-start !important;
+          }
+          /* Timeline dot */
+          .premium-activity-card-v3::before {
+            content: '' !important;
+            position: absolute !important;
+            left: -36px !important; top: 28px !important;
+            width: 10px !important; height: 10px !important;
+            border-radius: 50% !important;
+            background: #10b981 !important;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.2) !important;
+            z-index: 1 !important;
+          }
+
+          /* ── Time Column ── */
+          .activity-time-block {
+            min-width: 72px !important; max-width: 72px !important;
+            display: flex !important; flex-direction: column !important;
             align-items: center !important;
-            padding-top: 20px !important;
-            gap: 6px !important;
+            padding-top: 18px !important;
+            gap: 5px !important;
+            flex-shrink: 0 !important;
           }
           .activity-time-val {
+            font-size: 1.1rem !important;
             font-weight: 900 !important;
-            color: var(--accent, #10b981) !important;
-            font-size: 1.2rem !important;
-            letter-spacing: 0.5px !important;
+            color: #10b981 !important;
+            letter-spacing: -0.5px !important;
             line-height: 1 !important;
+            font-family: 'Outfit', sans-serif !important;
+          }
+          .act-session-badge {
+            font-size: 0.6rem !important;
+            font-weight: 800 !important;
+            color: var(--sc) !important;
+            background: color-mix(in srgb, var(--sc) 15%, transparent) !important;
+            border: 1px solid color-mix(in srgb, var(--sc) 30%, transparent) !important;
+            padding: 2px 7px !important;
+            border-radius: 100px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            white-space: nowrap !important;
           }
 
-          /* Rebuilt Glassmorphic Content Card */
+          /* ── Main Activity Card ── */
           .activity-content-card-v3 {
             flex: 1 !important;
-            background: rgba(30, 41, 59, 0.55) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 1.75rem !important;
+            min-width: 0 !important;
+            display: flex !important;
+            flex-direction: row !important;
+            background: linear-gradient(160deg, rgba(22,32,50,0.85) 0%, rgba(13,20,36,0.9) 100%) !important;
+            border: 1px solid rgba(255,255,255,0.06) !important;
+            border-radius: 1.5rem !important;
             overflow: hidden !important;
-            transition: all 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.05) !important;
-            position: relative !important;
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s ease, border-color 0.3s ease !important;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.04) !important;
+            min-height: 200px !important;
           }
           .activity-content-card-v3:hover {
-            border-color: rgba(16, 185, 129, 0.35) !important;
-            transform: translateY(-6px) scale(1.01) !important;
-            background: rgba(30, 41, 59, 0.68) !important;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.32), 0 0 25px rgba(16, 185, 129, 0.12) !important;
-          }
-
-          .activity-row-v3 {
-            display: flex !important;
-            align-items: stretch !important;
-            gap: 1rem !important;
-            padding: 1.5rem !important;
-            flex-wrap: wrap !important;
-          }
-
-          .activity-image-wrap-v3 {
-            flex: 0 0 min(320px, 40%) !important;
-            width: min(320px, 40%) !important;
-            min-width: 260px !important;
-            height: 260px !important;
-            position: relative !important;
-            overflow: hidden !important;
-            border-radius: 1.75rem !important;
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18) !important;
-          }
-
-          .activity-image-v3 {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
-            transition: transform 0.7s ease !important;
-          }
-
-          .activity-body-v3 {
-            flex: 1 1 1px !important;
-            min-width: 260px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-          }
-
-          .activity-body-v3 h4 {
-            word-break: break-word !important;
-          }
-
-          .activity-actions-v3 {
-            flex: 0 0 200px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-            gap: 0.85rem !important;
-            min-width: 180px !important;
-            padding: 1rem !important;
-            border-radius: 1.5rem !important;
-            background: rgba(255, 255, 255, 0.08) !important;
-            backdrop-filter: blur(18px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
-          }
-
-          .activity-actions-v3 .act-btn-v3 {
-            width: 100% !important;
-            padding: 0.95rem 1rem !important;
-            border-radius: 18px !important;
-            font-size: 0.82rem !important;
-            letter-spacing: 0.4px !important;
-          }
-
-          .activity-actions-v3 .act-btn-v3:hover {
-            transform: translateY(-1px) !important;
-          }
-
-          .activity-content-card-v3 {
-            min-width: 0 !important;
-          }
-          .activity-image-v3 {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: cover !important;
-            transition: transform 0.6s ease !important;
+            transform: translateY(-5px) !important;
+            border-color: rgba(16,185,129,0.2) !important;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px rgba(16,185,129,0.08), 0 0 30px rgba(16,185,129,0.06) !important;
           }
           .activity-content-card-v3:hover .activity-image-v3 {
-            transform: scale(1.06) !important;
+            transform: scale(1.05) !important;
           }
 
-          /* Overlay gradient for premium readability */
+          /* ── Image Panel ── */
+          .activity-image-wrap-v3 {
+            position: relative !important;
+            flex: 0 0 220px !important;
+            width: 220px !important;
+            align-self: stretch !important;
+            overflow: hidden !important;
+            border-radius: 0 !important;
+          }
+          .activity-image-v3 {
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 200px !important;
+            object-fit: cover !important;
+            display: block !important;
+            transition: transform 0.7s cubic-bezier(0.16,1,0.3,1) !important;
+            filter: contrast(1.04) saturate(1.08) brightness(0.97) !important;
+          }
+          /* Fade-to-right overlay so image blends into info */
           .activity-image-overlay-v3 {
             position: absolute !important;
             inset: 0 !important;
-            background: linear-gradient(to top, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.4) 50%, transparent 100%) !important;
+            background: linear-gradient(
+              to right,
+              transparent 50%,
+              rgba(13,20,36,0.6) 80%,
+              rgba(13,20,36,0.95) 100%
+            ), linear-gradient(
+              to top,
+              rgba(13,20,36,0.75) 0%,
+              transparent 50%
+            ) !important;
           }
 
-          /* Action Buttons - Tactile & Premium */
-          .act-btn-v3 {
+          /* Cost badge on image */
+          .act-cost-badge {
+            position: absolute !important;
+            top: 12px !important; right: 12px !important;
+            background: rgba(245,158,11,0.95) !important;
+            color: #000 !important;
+            font-size: 0.72rem !important;
+            font-weight: 900 !important;
+            padding: 4px 11px !important;
+            border-radius: 100px !important;
+            backdrop-filter: blur(6px) !important;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.25) !important;
+            letter-spacing: 0.2px !important;
+          }
+          .act-cost-free {
+            background: rgba(16,185,129,0.9) !important;
+            color: #fff !important;
+          }
+
+          /* Location badge on image */
+          .act-location-badge {
+            position: absolute !important;
+            bottom: 10px !important; left: 10px !important; right: 10px !important;
+            font-size: 0.72rem !important;
+            font-weight: 700 !important;
+            color: #fff !important;
+            background: rgba(0,0,0,0.55) !important;
+            backdrop-filter: blur(8px) !important;
+            padding: 5px 10px !important;
+            border-radius: 8px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+          }
+
+          /* ── Body Panel ── */
+          .activity-body-v3 {
             flex: 1 !important;
-            border: none !important;
-            padding: 11px 20px !important;
-            border-radius: 25px !important;
-            font-size: 0.8rem !important;
+            min-width: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 1.25rem !important;
+            justify-content: center !important;
+          }
+
+          .act-main-row {
+            display: flex !important;
+            flex-direction: row !important;
+            gap: 1.25rem !important;
+            align-items: flex-start !important;
+          }
+
+          .act-info-col {
+            flex: 1 !important;
+            min-width: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+          }
+
+          .act-title-text {
+            font-size: 1.15rem !important;
+            color: #f8fafc !important;
+            margin: 0 !important;
             font-weight: 800 !important;
-            cursor: pointer !important;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            line-height: 1.4 !important;
+            letter-spacing: -0.2px !important;
+          }
+
+          .act-tags-row {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            margin-top: 0.2rem !important;
+          }
+
+          .act-actions-col {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.6rem !important;
+            flex-shrink: 0 !important;
+            min-width: 155px !important;
+          }
+
+          /* Description Row (At the bottom) */
+          .act-desc-row {
+            margin-top: 1rem !important;
+            padding-top: 0.8rem !important;
+            border-top: 1px dashed rgba(255,255,255,0.1) !important;
+          }
+
+          .act-desc {
+            font-size: 0.88rem !important;
+            color: rgba(255,255,255,0.75) !important;
+            line-height: 1.6 !important;
+            margin: 0 !important;
+          }
+
+          /* ── Rating badge ── */
+          .act-rating-badge {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            background: rgba(251,191,36,0.1) !important;
+            padding: 4px 8px !important;
+            border-radius: 8px !important;
+            border: 1px solid rgba(251,191,36,0.2) !important;
+            white-space: nowrap !important;
+          }
+          .act-stars {
+            color: #fbbf24 !important;
+            font-size: 0.8rem !important;
+            letter-spacing: 1px !important;
+          }
+          .act-rating-num {
+            color: #fbbf24 !important;
+            font-weight: 800 !important;
+            font-size: 0.8rem !important;
+          }
+
+          /* ── Meta chip (transport) ── */
+          .act-meta-chip {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            background: rgba(255,255,255,0.06) !important;
+            border: 1px solid rgba(255,255,255,0.1) !important;
+            border-radius: 8px !important;
+            padding: 4px 10px !important;
+            font-size: 0.75rem !important;
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 600 !important;
+            white-space: nowrap !important;
+          }
+
+          /* ── Buttons ── */
+          .act-btn-v3 {
             display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
             gap: 6px !important;
-            text-decoration: none !important;
-          }
-          .act-btn-details {
-            background: linear-gradient(135deg, #10b981, #059669) !important;
-            color: #fff !important;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
-          }
-          .act-btn-details:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45) !important;
-          }
-          .act-btn-gps {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
-            color: #fff !important;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
-          }
-          .act-btn-gps:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45) !important;
-          }
-
-          /* Transit Step styling */
-          .transit-step-v3 {
-            margin: -1rem 0 1.5rem 105px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            gap: 8px !important;
-            color: #38bdf8 !important;
+            padding: 0.6rem 1rem !important;
+            border-radius: 10px !important;
             font-size: 0.8rem !important;
             font-weight: 700 !important;
-            background: rgba(56, 189, 248, 0.08) !important;
-            padding: 8px 16px !important;
-            border-radius: 20px !important;
-            border: 1px solid rgba(56, 189, 248, 0.2) !important;
+            cursor: pointer !important;
+            text-decoration: none !important;
+            transition: all 0.25s cubic-bezier(0.16,1,0.3,1) !important;
+            font-family: 'Outfit', sans-serif !important;
+            letter-spacing: 0.2px !important;
+            white-space: nowrap !important;
+            width: 100% !important;
+          }
+          .act-btn-v3:hover { transform: translateY(-2px) !important; }
+          
+          .act-btn-details {
+            background: rgba(16,185,129,0.12) !important;
+            color: #34d399 !important;
+            border: 1px solid rgba(16,185,129,0.3) !important;
+          }
+          .act-btn-details:hover {
+            background: rgba(16,185,129,0.2) !important;
+            border-color: rgba(16,185,129,0.5) !important;
+            color: #6ee7b7 !important;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.15) !important;
+          }
+          
+          .act-btn-gps {
+            background: rgba(59,130,246,0.12) !important;
+            color: #60a5fa !important;
+            border: 1px solid rgba(59,130,246,0.3) !important;
+          }
+          .act-btn-gps:hover {
+            background: rgba(59,130,246,0.2) !important;
+            border-color: rgba(59,130,246,0.5) !important;
+            color: #93c5fd !important;
+            box-shadow: 0 4px 15px rgba(59,130,246,0.15) !important;
+          }
+
+          /* ── Transit Step ── */
+          .transit-step-v3 {
+            margin: -0.5rem 0 1.25rem 97px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 7px !important;
+            color: #38bdf8 !important;
+            font-size: 0.78rem !important;
+            font-weight: 700 !important;
+            background: rgba(56,189,248,0.06) !important;
+            padding: 6px 14px !important;
+            border-radius: 100px !important;
+            border: 1px solid rgba(56,189,248,0.15) !important;
             width: fit-content !important;
-            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.1) !important;
-            transition: all 0.3s ease !important;
+            transition: all 0.25s ease !important;
           }
           .transit-step-v3:hover {
-            background: rgba(56, 189, 248, 0.15) !important;
-            border-color: rgba(56, 189, 248, 0.35) !important;
+            background: rgba(56,189,248,0.12) !important;
+            border-color: rgba(56,189,248,0.3) !important;
             transform: translateX(4px) !important;
+          }
+
+          /* ── Responsive ── */
+          @media (max-width: 768px) {
+            .activity-content-card-v3 { flex-direction: column !important; }
+            .activity-image-wrap-v3   { flex: none !important; width: 100% !important; height: 200px !important; border-radius: 0 !important; }
+            .activity-body-v3 { padding: 1rem !important; }
+            .act-main-row { flex-direction: column !important; gap: 1rem !important; }
+            .act-actions-col { width: 100% !important; flex-direction: row !important; }
+            .act-btn-v3 { flex: 1 !important; }
+            .activity-time-block { min-width: 60px !important; max-width: 60px !important; }
+            .premium-activity-card-v3::before { left: -33px !important; }
           }
         </style>
 
@@ -3146,6 +3281,7 @@ const initPlanner = function () {
             
             <!-- Panel 1: Overview Dashboard -->
             <div class="itinerary-tab-panel" id="itinerary-overview-panel">
+
               <div class="timeline-header-premium-v3">
                 <div class="timeline-header-content">
                   <div style="display:flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">

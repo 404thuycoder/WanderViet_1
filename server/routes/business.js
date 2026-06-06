@@ -58,24 +58,86 @@ const safeParseArray = (req, field, forceObjectArray = false) => {
 // GET /api/business/reviews — feedbacks for this business's places
 router.get('/reviews', businessAuth, async (req, res) => {
   try {
-    const places = await Place.find({ ownerId: req.user.id }).select('name reviews').lean();
+    const PlaceReview = require('../models/PlaceReview');
+    const { placeId } = req.query;
     
-    // Flatten reviews and attach place name
-    const feedbacks = [];
-    places.forEach(p => {
-      (p.reviews || []).forEach(r => {
-        feedbacks.push({
-          ...r,
-          placeName: p.name,
-          placeId: p._id
-        });
-      });
+    // Find all places owned by this business
+    const places = await Place.find({ ownerId: req.user.id }).select('name id').lean();
+    
+    let targetPlaces = places;
+    if (placeId) {
+      targetPlaces = places.filter(p => p._id.toString() === placeId || p.id === placeId);
+    }
+    
+    const placeIds = targetPlaces.map(p => p.id || p._id.toString());
+    const placeIdsObj = targetPlaces.map(p => p._id);
+
+    const reviews = await PlaceReview.find({
+      $or: [
+        { placeId: { $in: placeIds } },
+        { placeId: { $in: placeIdsObj } }
+      ]
+    }).lean();
+
+    const feedbacks = reviews.map(r => {
+      const p = places.find(place => (place.id && place.id === r.placeId) || (place._id && place._id.toString() === r.placeId.toString()));
+      return {
+        _id: r._id,
+        userId: r.userId,
+        userName: r.userName || 'Khách',
+        rating: r.rating,
+        comment: r.content || r.text || '',
+        text: r.content || r.text || '',
+        images: r.images || [],
+        createdAt: r.createdAt,
+        placeName: p ? p.name : 'Dịch vụ',
+        placeId: r.placeId
+      };
     });
 
     // Sort by date newest
     feedbacks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     res.json({ success: true, data: feedbacks, places });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// POST /api/business/reviews — create a test review (business test form)
+router.post('/reviews', businessAuth, async (req, res) => {
+  try {
+    const { serviceId, rating, comment } = req.body;
+    if (!serviceId || !rating || !comment) {
+      return res.status(400).json({ success: false, message: 'Thiếu thông tin bắt buộc' });
+    }
+
+    const PlaceReview = require('../models/PlaceReview');
+    const place = await Place.findById(serviceId);
+    if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+
+    const reviewData = {
+      placeId: serviceId,
+      userId: req.user.id,
+      userName: req.user.displayName || req.user.name || 'Doanh nghiệp',
+      userAvatar: req.user.avatar || '',
+      rating: parseInt(rating),
+      content: comment,
+      images: [],
+      status: 'approved',
+      createdAt: new Date()
+    };
+
+    const review = await PlaceReview.create(reviewData);
+
+    // Update place stats
+    const allReviews = await PlaceReview.find({ placeId: serviceId, status: 'approved' });
+    const avg = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+    place.ratingAvg = avg.toFixed(1);
+    place.reviewCount = allReviews.length;
+    await place.save();
+
+    res.json({ success: true, data: review });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -650,7 +712,19 @@ router.post('/places', businessAuth, upload.fields([
     }
 
     // Merge from body (URL strings)
-    if (req.body.images) {
+    if (req.body.gallery) {
+      const parsedGallery = typeof req.body.gallery === 'string' ? JSON.parse(req.body.gallery) : req.body.gallery;
+      if (Array.isArray(parsedGallery)) {
+        parsedGallery.forEach(item => {
+          const url = typeof item === 'string' ? item : item.url;
+          const category = item.category || 'other';
+          if (url && !galleryItems.find(gi => gi.url === url)) {
+            const isVideo = url.toLowerCase().match(/\.(mp4|webm|mov)$/i) || item.type === 'video';
+            galleryItems.push({ url, type: isVideo ? 'video' : 'image', category });
+          }
+        });
+      }
+    } else if (req.body.images) {
       const parsedImages = safeParseArray(req, 'images');
       parsedImages.forEach(url => {
         if (!galleryItems.find(it => it.url === url)) {
@@ -815,7 +889,7 @@ router.put('/places/:id', businessAuth, upload.fields([
 
     // 1. Image handling for Update
     const baseUrl = `${req.protocol}://${req.get('host')}`;
-    let galleryItems = place.gallery || [];
+    let galleryItems = []; // Fresh array to support deleting images from gallery
     
     // Primary Image (Cover)
     let mainImage = (req.body.image !== undefined) ? req.body.image : place.image;
@@ -873,6 +947,17 @@ router.put('/places/:id', businessAuth, upload.fields([
         if (!galleryItems.find(it => it.url === url)) {
           const isVideo = /\.(mp4|webm|mov|avi)$/i.test(url);
           galleryItems.push({ url, type: isVideo ? 'video' : 'image', category: 'other' });
+        }
+      });
+    }
+
+    // Preserve existing user-uploaded images that the business doesn't control
+    if (place.gallery && place.gallery.length > 0) {
+      place.gallery.forEach(existingItem => {
+        if (existingItem.uploadedBy === 'user') {
+          if (!galleryItems.find(it => it.url === existingItem.url)) {
+            galleryItems.push(existingItem);
+          }
         }
       });
     }

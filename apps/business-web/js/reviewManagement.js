@@ -315,8 +315,14 @@
         }
 
         list.innerHTML = filtered.map(r => {
-            const userName = r.user && r.user.name ? r.user.name : 'Khách hàng';
+            const userName = r.userName || (r.user && r.user.name ? r.user.name : 'Khách hàng');
             const initial = userName.charAt(0).toUpperCase();
+
+            const imagesHtml = (r.images && r.images.length > 0) 
+                ? `<div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+                    ${r.images.map(img => `<img src="${img}" style="width:70px; height:70px; object-fit:cover; border-radius:8px; border:1px solid rgba(255,255,255,0.1); cursor:pointer;" onclick="window.open('${img}')">`).join('')}
+                   </div>`
+                : '';
 
             return `
                 <div class="rm-item">
@@ -329,6 +335,7 @@
                         <div class="rm-time">${timeAgo(r.createdAt)}</div>
                     </div>
                     <div class="rm-comment">${r.comment}</div>
+                    ${imagesHtml}
                 </div>
             `;
         }).join('');

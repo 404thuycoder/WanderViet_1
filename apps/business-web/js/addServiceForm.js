@@ -885,6 +885,27 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     }
   }
 
+  // --- LOGIC: TOGGLE TOUR SECTION ---
+  const kindSelect = document.getElementById('svc-kind');
+  const tourExtrasSection = document.getElementById('tour-extras');
+  
+  function updateTourSectionVisibility() {
+    if (!kindSelect || !tourExtrasSection) return;
+    const isTourKind = kindSelect.value === 'tour' || kindSelect.value === 'trai-nghiem';
+    tourExtrasSection.style.display = isTourKind ? 'flex' : 'none';
+    // Also auto-set businessCategory to 'tour' if selecting tour kind
+    const bizCat = document.getElementById('svc-businessCategory');
+    if (bizCat && kindSelect.value === 'tour') {
+      bizCat.value = 'tour';
+    }
+  }
+  
+  if (kindSelect) {
+    kindSelect.addEventListener('change', updateTourSectionVisibility);
+    // Run once on init to set correct initial state
+    updateTourSectionVisibility();
+  }
+
   // --- LOGIC: BUILDER HÀNH TRÌNH ---
   const itineraryList = document.getElementById('itinerary-list');
   const btnAddDay = document.getElementById('btn-add-day');

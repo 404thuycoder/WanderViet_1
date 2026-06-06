@@ -1760,38 +1760,40 @@ router.post('/places/:id/detect-fake-images', adminTokenAuth, adminAuth, async (
 // Phát hiện đánh giá spam
 router.post('/places/:id/detect-spam-reviews', adminTokenAuth, adminAuth, async (req, res) => {
   try {
+    const PlaceReview = require('../models/PlaceReview');
     const place = await Place.findById(req.params.id);
     if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
 
-    const reviews = place.reviews || [];
+    const reviews = await PlaceReview.find({ placeId: req.params.id });
     const spamReviews = [];
 
     // Spam detection heuristics
     for (const review of reviews) {
       let spamScore = 0;
       const reasons = [];
+      const reviewText = review.content || review.text || '';
 
       // Check for very short reviews
-      if (review.text && review.text.length < 10) {
+      if (reviewText.length < 10) {
         spamScore += 30;
         reasons.push('Quá ngắn');
       }
 
       // Check for excessive punctuation
-      if (review.text && (review.text.match(/!/g) || []).length > 5) {
+      if ((reviewText.match(/!/g) || []).length > 5) {
         spamScore += 20;
         reasons.push('Nhiều dấu câu');
       }
 
       // Check for repeated characters
-      if (review.text && /(.)\1{4,}/.test(review.text)) {
+      if (/(.)\1{4,}/.test(reviewText)) {
         spamScore += 40;
         reasons.push('Lặp ký tự');
       }
 
       // Check for generic templates
       const genericPhrases = ['tốt lắm', 'rất hay', 'khá tốt', 'ổn áp'];
-      if (review.text && genericPhrases.some(phrase => review.text.toLowerCase().includes(phrase))) {
+      if (genericPhrases.some(phrase => reviewText.toLowerCase().includes(phrase))) {
         spamScore += 10;
         reasons.push('Mẫu chung');
       }
@@ -1800,7 +1802,7 @@ router.post('/places/:id/detect-spam-reviews', adminTokenAuth, adminAuth, async 
         spamReviews.push({
           reviewId: review._id,
           userId: review.userId,
-          text: review.text,
+          text: reviewText,
           spamScore,
           reasons
         });
@@ -1862,19 +1864,31 @@ router.post('/places/detect-duplicates', adminTokenAuth, adminAuth, async (req, 
 // Xóa đánh giá spam
 router.delete('/places/:placeId/reviews/:reviewId', adminTokenAuth, adminAuth, async (req, res) => {
   try {
+    const PlaceReview = require('../models/PlaceReview');
     const place = await Place.findById(req.params.placeId);
-    if (!place) return res.status(404).json({ success: false, message: 'Không tìm thấy địa điểm' });
+    
+    // Delete from PlaceReview collection
+    await PlaceReview.findByIdAndDelete(req.params.reviewId);
 
-    place.reviews = place.reviews.filter(r => r._id.toString() !== req.params.reviewId);
-    place.reviewCount = place.reviews.length;
-    if (place.reviews.length > 0) {
-      place.ratingAvg = (place.reviews.reduce((acc, curr) => acc + curr.rating, 0) / place.reviews.length).toFixed(1);
-    } else {
-      place.ratingAvg = '0';
+    if (place) {
+      // Also filter from legacy nested array if present
+      if (place.reviews) {
+        place.reviews = place.reviews.filter(r => r._id.toString() !== req.params.reviewId);
+      }
+      
+      // Recalculate stats from PlaceReview collection
+      const allReviews = await PlaceReview.find({ placeId: req.params.placeId, status: 'approved' });
+      place.reviewCount = allReviews.length;
+      if (allReviews.length > 0) {
+        const avg = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+        place.ratingAvg = avg.toFixed(1);
+      } else {
+        place.ratingAvg = '0';
+      }
+      await place.save();
     }
-    await place.save();
 
-    await logAction(req.user.email, req.user.role, 'REVIEW_DELETED', { placeId: place.id, reviewId: req.params.reviewId }, req.ip, req.headers['user-agent']);
+    await logAction(req.user.email, req.user.role, 'REVIEW_DELETED', { placeId: req.params.placeId, reviewId: req.params.reviewId }, req.ip, req.headers['user-agent']);
     res.json({ success: true, message: 'Đã xóa đánh giá' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

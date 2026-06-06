@@ -2673,7 +2673,7 @@
             renderItems();
         };
 
-        function initGallery(place) {
+        function initGallery(place, reviewsData = []) {
             const gallerySec = document.getElementById('gallery-sec');
             const galleryGrid = document.getElementById('gallery-grid');
             const filtersContainer = document.getElementById('gallery-filters');
@@ -2691,6 +2691,17 @@
                     uniqueMap.set(url, { url: url, category: 'general', type: 'image' });
                 }
             });
+
+            // Also merge reviews images into the gallery as 'customer' category
+            const reviewsToUse = reviewsData.length > 0 ? reviewsData : (window.currentReviews || []);
+            reviewsToUse.forEach(rev => {
+                (rev.images || []).forEach(url => {
+                    if (url && url !== 'undefined' && url !== 'null' && url.indexOf('uploads/undefined') === -1 && !uniqueMap.has(url)) {
+                        uniqueMap.set(url, { url: url, category: 'customer', type: 'image', caption: `Đánh giá từ ${rev.userName || 'Khách hàng'}` });
+                    }
+                });
+            });
+
             allGalleryItems = Array.from(uniqueMap.values());
             
             if (allGalleryItems.length === 0) {
@@ -4236,6 +4247,11 @@
                         aiSummaryEl.innerHTML = `Dựa trên <b>${total} đánh giá</b>, địa điểm này nhận được <b>${pct}% phản hồi tích cực</b>. Khách hàng đặc biệt ấn tượng với chất lượng dịch vụ và không gian tại đây.`;
                     } else if (aiSummaryEl) {
                         aiSummaryEl.innerText = "Chưa có đủ dữ liệu để tạo tóm tắt AI.";
+                    }
+
+                    // Synchronize/refresh gallery with review images
+                    if (window.currentPlace) {
+                        initGallery(window.currentPlace, json.data);
                     }
                 }
 

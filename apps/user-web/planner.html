@@ -44,7 +44,7 @@
     rel="stylesheet" />
   <link rel="stylesheet" href="css/global-tokens.css?v=6" />
   <link rel="stylesheet" href="css/styles.css?v=4" />
-  <link rel="stylesheet" href="css/planner.css?v=20260606_v5" />
+  <link rel="stylesheet" href="css/planner.css?v=20260606_v9" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" media="print" onload="this.media='all'" />
   <link rel="stylesheet" href="/planner_spot_detail_css_helper.css?v=1" />
   <style>
@@ -2936,7 +2936,7 @@
   <script src="js/chat-brain.js" defer></script>
   <script src="js/main.js?v=1778162961775" defer></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
-  <script src="js/planner.js?v=20260606_v2" defer></script>
+  <script src="js/planner.js?v=20260606_v9" defer></script>
   <script>
     // Fallback star rendering - planner.js (deferred) will overwrite this
     if (!window.getRatingStarsHtml) {
@@ -2991,8 +2991,8 @@
 
     const REGION_DESTINATIONS = {
       'Miền Bắc': [
-        { name: 'Hà Nội', img: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=200&h=150&fit=crop', spots: ['Hồ Hoàn Kiếm', 'Lăng Chủ tịch Hồ Chí Minh', 'Chùa Một Cột'] },
-        { name: 'Hạ Long', img: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=200&h=150&fit=crop', spots: ['Vịnh Hạ Long', 'Đảo Ti Tốp', 'Hang Sửng Sốt'] },
+        { name: 'Hà Nội', img: 'https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg', spots: ['Hồ Hoàn Kiếm', 'Lăng Chủ tịch Hồ Chí Minh', 'Chùa Một Cột'] },
+        { name: 'Hạ Long', img: 'https://dulichviet.com.vn/images/bandidau/%E1%BA%A2nh%20tour/tour%20du%20l%E1%BB%8Bch%20H%E1%BA%A1%20Long/gioi-thieu-ve-vinh-ha-long.webp', spots: ['Vịnh Hạ Long', 'Đảo Ti Tốp', 'Hang Sửng Sốt'] },
         { name: 'Sapa', img: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=150&fit=crop', spots: ['Fansipan', 'Cát Cát', 'Đèo Ô Quy Hồ'] },
         { name: 'Ninh Bình', img: 'https://images.unsplash.com/photo-1571637539223-27c9cd20e2d5?w=200&h=150&fit=crop', spots: ['Tràng An', 'Bái Đính', 'Hang Múa'] },
         { name: 'Hà Giang', img: 'https://images.unsplash.com/photo-1570829460005-c840387bb1ca?w=200&h=150&fit=crop', spots: ['Mã Pí Lèng', 'Cột cờ Lũng Cú', 'Dốc Thẩm Mã'] },
@@ -3220,13 +3220,13 @@
         const photos = [];
         if (typeof window.getVNPhoto === 'function') {
           const seen = new Set();
-          for (let i = 0; i < 6; i++) {
+          for (let i = 0; i < 12; i++) {
             const url = window.getVNPhoto(dest.name, i);
             if (url && !seen.has(url)) {
               seen.add(url);
               photos.push(url);
             }
-            if (photos.length >= 3) break;
+            if (photos.length >= 6) break;
           }
         }
         if (photos.length === 0 && dest.img) photos.push(dest.img);
@@ -3235,9 +3235,10 @@
         const imgSrc = photos[0];
 
         card.innerHTML = `
-          <div class="dest-card-image">
-            <img id="outerCardImg_${cardIdx}" src="${imgSrc}" alt="${dest.name}" style="transition: opacity 0.5s ease;" onerror="(window._failedImgUrls=window._failedImgUrls||new Set()).add(this.src);this.onerror=null;this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop';">
-            <div class="dest-card-badge">⭐ ${rating}</div>
+          <div class="dest-card-image" style="position: relative;">
+            <img id="outerCardImgA_${cardIdx}" src="${imgSrc}" alt="${dest.name}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 1;" onerror="(window._failedImgUrls=window._failedImgUrls||new Set()).add(this.src);this.onerror=null;this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop';">
+            <img id="outerCardImgB_${cardIdx}" src="" alt="${dest.name}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0;" onerror="(window._failedImgUrls=window._failedImgUrls||new Set()).add(this.src);this.onerror=null;this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&h=360&fit=crop';">
+            <div class="dest-card-badge" style="z-index: 2;">⭐ ${rating}</div>
           </div>
           <div class="dest-card-info">
             <div class="dest-card-location">${currentRegion || ''}</div>
@@ -3265,30 +3266,54 @@
           // Staggered interval: randomized between 3.0s and 5.0s
           const slideInterval = 3000 + Math.random() * 2000;
           let currentPhotoIdx = 0;
+          let isImgBVisible = false;
+
           const timer = setInterval(() => {
-            const el = document.getElementById(`outerCardImg_${cardIdx}`);
-            if (!el) {
+            const imgA = document.getElementById(`outerCardImgA_${cardIdx}`);
+            const imgB = document.getElementById(`outerCardImgB_${cardIdx}`);
+            if (!imgA || !imgB) {
               clearInterval(timer);
               return;
             }
             const failedUrls = window._failedImgUrls || new Set();
             let attempts = 0;
+            let nextUrl = '';
             do {
               currentPhotoIdx = (currentPhotoIdx + 1) % photos.length;
+              nextUrl = photos[currentPhotoIdx];
               attempts++;
-            } while (failedUrls.has(photos[currentPhotoIdx]) && attempts < photos.length);
+            } while (failedUrls.has(nextUrl) && attempts < photos.length);
 
             if (attempts >= photos.length) {
               clearInterval(timer);
               return;
             }
 
-            el.style.opacity = '0';
-            const nextUrl = photos[currentPhotoIdx];
-            setTimeout(() => {
-              el.src = nextUrl;
-              el.style.opacity = '1';
-            }, 300);
+            if (!isImgBVisible) {
+              // imgA is currently showing. We load nextUrl into imgB.
+              imgB.onload = () => {
+                if (typeof imgB.onload !== 'function') return;
+                imgB.onload = null;
+                imgB.style.opacity = '1';
+                isImgBVisible = true;
+              };
+              imgB.src = nextUrl;
+              if (imgB.complete && typeof imgB.onload === 'function') {
+                imgB.onload();
+              }
+            } else {
+              // imgB is currently showing. We load nextUrl into imgA.
+              imgA.onload = () => {
+                if (typeof imgA.onload !== 'function') return;
+                imgA.onload = null;
+                imgB.style.opacity = '0';
+                isImgBVisible = false;
+              };
+              imgA.src = nextUrl;
+              if (imgA.complete && typeof imgA.onload === 'function') {
+                imgA.onload();
+              }
+            }
           }, slideInterval);
           
           window._outerCardsTimers.push(timer);

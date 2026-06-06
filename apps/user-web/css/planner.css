@@ -4664,7 +4664,7 @@ html:not([data-theme="dark"]) .btn-back-step:hover,
 }
 .region-dest-card:hover .dest-card-image::after { opacity: 1; }
 .dest-card-image img {
-  transition: transform 0.5s cubic-bezier(0.4,0,0.2,1) !important;
+  transition: transform 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.8s cubic-bezier(0.4,0,0.2,1) !important;
 }
 .region-dest-card:hover .dest-card-image img { transform: scale(1.12) !important; }
 

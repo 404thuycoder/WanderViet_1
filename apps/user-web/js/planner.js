@@ -10,10 +10,13 @@ window.getRatingStarsHtml = function(rating, fontSize = '0.85rem') {
 const VN_DESTINATION_PHOTOS = {
   // --- MIỀN BẮC ---
   "hà nội": [
-    "https://images.pexels.com/photos/189349/pexels-photo-189349.jpeg",
-    "https://images.pexels.com/photos/3733102/pexels-photo-3733102.jpeg",
-    "https://images.unsplash.com/photo-1526483364030-5f22f1f281f6?auto=format&fit=crop&w=1170&q=80",
-    "https://images.unsplash.com/photo-1488747279002-c8523379faaa?auto=format&fit=crop&w=1170&q=80"
+    "https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg",
+    "https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg",
+    "https://hoidisanvanhoa.vn/wp-content/uploads/2024/12/39.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Hanoi_Temple_of_Literature_%28cropped%29.jpg/1280px-Hanoi_Temple_of_Literature_%28cropped%29.jpg",
+    "https://statics.vinpearl.com/cau-long-bien-6_1678872759.jpg",
+    "https://thoitiet24h.vn/images/pho-co-ha-noi-xua.jpg",
+    "https://hnm.1cdn.vn/2020/12/18/nhipsonghanoi.hanoimoi.com.vn-uploads-images-phananh-2020-12-17-_nha-tho-lon.jpg"
   ],
   "hồ hoàn kiếm": ["https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg"],
   "chùa một cột": ["https://hoidisanvanhoa.vn/wp-content/uploads/2024/12/39.jpg"],
@@ -86,7 +89,11 @@ const VN_DESTINATION_PHOTOS = {
   "café sách & góc chill phố cổ": ["https://hotelroyalhoian.vn/wp-content/uploads/2025/05/dac-san-hoi-an-1-2-4.jpg"],
   "nhà hàng rooftop ở west lake": ["https://topgo.vn/wp-content/uploads/2017/07/rooftop-bar-12-1.jpg"],
   "nhà hàng buffet lẩu / nướng nổi tiếng": ["https://melamine.vn/wp-content/uploads/2023/07/Seoul-Garden-Chuoi-nha-hang-buffet-lau-nuong-TPHCM.jpg"],
-  "hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop", "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&fit=crop", "https://upload.wikimedia.org/wikipedia/commons/4/42/Ha_Long_2019_taken_by_DJI_FC220.jpg"],
+  "hạ long": [
+    "https://dulichviet.com.vn/images/bandidau/%E1%BA%A2nh%20tour/tour%20du%20l%E1%BB%8Bch%20H%E1%BA%A1%20Long/gioi-thieu-ve-vinh-ha-long.webp",
+    "https://cdn.xanhsm.com/2025/02/7393eefb-vinh-ha-long-thumb.jpg",
+    "https://www.wyndhamhalong.com/uploads/THAO/check-in-vinh-ha-long-hon-trong-mai.jpg"
+  ],
   "vịnh hạ long": ["https://images.unsplash.com/photo-1528127269322-539801943592?w=800&fit=crop"],
   "sapa": ["https://booking.muongthanh.com/upload_images/images/Nhung/review-dia-diem-du-lich-sapa.jpg", "https://phetravel.com/uploads/30-06-2023-14-53-09-du-lich-sa-pa-0.jpg.webp", "https://topasecolodge.com/wp-content/uploads/2025/06/best-time-to-visit-sapa-04.jpg"],
   "fansipan": ["https://booking.muongthanh.com/upload_images/images/H%60/dinh-nui-fansipan.jpg"],
@@ -218,10 +225,24 @@ function getVNPhoto(query, idx = 0) {
   // Normalize Unicode NFC + lowercase để đồng nhất so sánh dấu tiếng Việt
   const qLower = query.normalize('NFC').toLowerCase().trim();
 
+  // 0. TRƯỚC HẾT: Ưu tiên TRÙNG KHỚP HOÀN TOÀN (EXACT MATCH) ở cả VN_DESTINATION_PHOTOS và SPOT_PHOTOS_DB
+  if (VN_DESTINATION_PHOTOS[qLower] && VN_DESTINATION_PHOTOS[qLower].length > 0) {
+    const photos = VN_DESTINATION_PHOTOS[qLower];
+    const photoIdx = (Math.abs(idx) + qLower.length) % photos.length;
+    return photos[photoIdx];
+  }
+  const customSpotPhotos = window.SPOT_PHOTOS_DB || {};
+  for (const [key, photos] of Object.entries(customSpotPhotos)) {
+    const keyLower = key.normalize('NFC').toLowerCase().trim();
+    if (keyLower === qLower && photos && photos.length > 0) {
+      const photoIdx = (Math.abs(idx) + qLower.length) % photos.length;
+      return photos[photoIdx];
+    }
+  }
+
   // 1. Ưu tiên bộ ảnh spot cụ thể từ planner.html (SPOT_PHOTOS_DB) — dùng bestMatch
   let bestMatch = null;
   let bestKeyLen = 0;
-  const customSpotPhotos = window.SPOT_PHOTOS_DB || {};
   for (const [key, photos] of Object.entries(customSpotPhotos)) {
     const keyLower = key.normalize('NFC').toLowerCase().trim();
     if (qLower.includes(keyLower) || keyLower.includes(qLower)) {

@@ -2302,7 +2302,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
       svg.id = 'rank-filter-svg';
       svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;';
-      svg.innerHTML = `<defs><filter id="remove-black" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 2.5 2.5 2.5 0 -1.5" /></filter></defs>`;
+      svg.innerHTML = `<defs><filter id="remove-black" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 10 10 10 0 -0.5" /></filter></defs>`;
       document.body.appendChild(svg);
     }
     if (document.getElementById('wander-shared-styles')) return;
@@ -2312,7 +2312,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       .rank-sprite {
         width: 80px; height: 80px; background-size: contain; background-repeat: no-repeat; background-position: center;
         flex-shrink: 0; display: inline-block; position: relative;
-        filter: url(#remove-black) drop-shadow(0 0 2px rgba(0,0,0,0.8));
+        filter: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxmaWx0ZXIgaWQ9InJlbW92ZS1ibGFjayI+PGZlQ29sb3JNYXRyaXggdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjEgMCAwIDAgMCAgMCAxIDAgMCAwICAwIDAgMSAwIDAgIDEwIDEwIDEwIDAgLTAuNSIvPjwvZmlsdGVyPjwvc3ZnPg==#remove-black") drop-shadow(0 0 2px rgba(0,0,0,0.8));
       }
       .rank-text { font-weight: 700; font-size: 0.9rem; letter-spacing: 0.5px; color: var(--text); margin-left: 4px; }
       .rank-bronze-1, .rank-bronze-2, .rank-bronze-3 { background-image: url('assets/img/rank_bronze.png'); }
@@ -2320,7 +2320,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       .rank-gold-1, .rank-gold-2, .rank-gold-3 { background-image: url('assets/img/rank_gold.png'); }
       .rank-platinum-1, .rank-platinum-2, .rank-platinum-3 { 
         background-image: url('assets/img/rank_platinum.png'); 
-        filter: url(#remove-black) hue-rotate(-20deg) brightness(1.3) saturate(1.2) drop-shadow(0 0 5px rgba(0, 240, 255, 0.4));
+        filter: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxmaWx0ZXIgaWQ9InJlbW92ZS1ibGFjayI+PGZlQ29sb3JNYXRyaXggdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjEgMCAwIDAgMCAgMCAxIDAgMCAwICAwIDAgMSAwIDAgIDEwIDEwIDEwIDAgLTAuNSIvPjwvZmlsdGVyPjwvc3ZnPg==#remove-black") hue-rotate(-20deg) brightness(1.3) saturate(1.2) drop-shadow(0 0 5px rgba(0, 240, 255, 0.4));
       }
       .rank-diamond-1, .rank-diamond-2, .rank-diamond-3 { background-image: url('assets/img/rank_diamond.png'); }
       .rank-legendary {

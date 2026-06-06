@@ -638,12 +638,16 @@ textarea:focus-visible {
   transform: none !important;
   margin: 0 !important;
   display: block !important;
-  /* Advanced separation technique */
-  filter: url(#remove-black) brightness(1.1) !important;
+  filter: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxmaWx0ZXIgaWQ9InJlbW92ZS1ibGFjayI+PGZlQ29sb3JNYXRyaXggdHlwZT0ibWF0cml4IiB2YWx1ZXM9IjEgMCAwIDAgMCAgMCAxIDAgMCAwICAwIDAgMSAwIDAgIDEwIDEwIDEwIDAgLTAuNSIvPjwvZmlsdGVyPjwvc3ZnPg==#remove-black") brightness(1.1) !important;
   mix-blend-mode: lighten !important;
   /* Hexagonal clipping to perfectly match the medal shape and remove the square frame */
   clip-path: polygon(50% 0%, 95% 25%, 95% 75%, 50% 100%, 5% 75%, 5% 25%);
   background-color: transparent !important;
+}
+
+/* Override mix-blend-mode for light background so it doesn't turn white/faint */
+html:not([data-theme="dark"]) .user-rank-badge .rank-sprite {
+  mix-blend-mode: normal !important;
 }
 
 .user-rank-badge .rank-text {

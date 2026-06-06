@@ -966,10 +966,10 @@ a {
 
 /* Dest Card Stars */
 .dest-card-stars {
-  font-size: 0.65rem;
-  color: #fbbf24;
-  letter-spacing: 1px;
-  margin: 0.25rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 4px 0;
 }
 
 /* Dest Card Meta Tags */
@@ -6429,4 +6429,419 @@ html:not([data-theme="dark"]) .ai-premium-loader {
 @keyframes stepPulse {
   0% { transform: scale(0.8); opacity: 1; }
   100% { transform: scale(1.8); opacity: 0; }
+}
+
+/* =====================================================================
+   STEP 2 FORM — ADAPTIVE PREMIUM REDESIGN
+   ===================================================================== */
+
+/* ── Form Step 2 Container ── */
+#formStep2 .step2-header h3 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: var(--text) !important;
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+  text-shadow: none !important;
+}
+
+#formStep2 .step2-header p {
+  color: var(--text-muted) !important;
+}
+
+#formStep2 .btn-back-step {
+  color: var(--text-muted) !important;
+  transition: all 0.2s ease !important;
+}
+#formStep2 .btn-back-step:hover {
+  color: var(--primary) !important;
+  transform: translateX(-3px);
+}
+
+/* ── Selected Destinations Panel ── */
+#formStep2 .selected-destinations-panel {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+}
+
+/* ── Field Labels ── */
+#formStep2 .planner-field-label {
+  color: var(--text) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.8px !important;
+  text-transform: uppercase !important;
+  opacity: 0.95;
+}
+
+/* ── Inputs ── */
+#formStep2 .planner-input,
+#formStep2 input[type="date"],
+#formStep2 input[type="time"],
+#formStep2 input[type="number"],
+#formStep2 textarea {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0.75rem !important;
+  color: var(--text) !important;
+  font-weight: 600 !important;
+  transition: all 0.25s ease !important;
+}
+#formStep2 .planner-input:focus,
+#formStep2 input[type="date"]:focus,
+#formStep2 input[type="time"]:focus,
+#formStep2 input[type="number"]:focus,
+#formStep2 textarea:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  background: var(--bg-elevated) !important;
+}
+
+/* ── +/- Circle Buttons ── */
+#formStep2 .btn-circle,
+#formStep2 .btn-circle--sm {
+  background: rgba(var(--primary-rgb), 0.08) !important;
+  border: 1.5px solid rgba(var(--primary-rgb), 0.25) !important;
+  color: var(--primary) !important;
+  transition: all 0.25s cubic-bezier(0.16,1,0.3,1) !important;
+}
+#formStep2 .btn-circle:hover,
+#formStep2 .btn-circle--sm:hover {
+  background: rgba(var(--primary-rgb), 0.16) !important;
+  border-color: var(--primary) !important;
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2) !important;
+}
+
+/* ── Style Chips ── */
+#formStep2 .style-chip {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+  padding: 0.55rem 1rem !important;
+  border-radius: 2rem !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1) !important;
+  backdrop-filter: var(--glass-blur);
+}
+#formStep2 .style-chip:hover {
+  background: rgba(var(--primary-rgb), 0.08) !important;
+  border-color: rgba(var(--primary-rgb), 0.3) !important;
+  color: var(--primary) !important;
+  transform: translateY(-2px) !important;
+}
+#formStep2 .style-chip.active {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.25) !important;
+}
+
+/* ── Highlight Chips ── */
+#formStep2 .highlight-chip {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+  padding: 0.5rem 0.9rem !important;
+  border-radius: 2rem !important;
+  backdrop-filter: var(--glass-blur);
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1) !important;
+}
+#formStep2 .highlight-chip:hover {
+  transform: translateY(-2px) !important;
+  border-color: var(--primary) !important;
+  color: var(--text) !important;
+}
+#formStep2 .highlight-chip.active {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Highlight chip colors (Light mode active state) */
+#formStep2 .hc-blue.active { background: rgba(59,130,246,0.12) !important; border-color: #3b82f6 !important; color: #1d4ed8 !important; }
+#formStep2 .hc-green.active { background: rgba(34,197,94,0.12) !important; border-color: #22c55e !important; color: #15803d !important; }
+#formStep2 .hc-purple.active { background: rgba(168,85,247,0.12) !important; border-color: #a855f7 !important; color: #7e22ce !important; }
+#formStep2 .hc-orange.active { background: rgba(249,115,22,0.12) !important; border-color: #f97316 !important; color: #c2410c !important; }
+#formStep2 .hc-pink.active { background: rgba(236,72,153,0.12) !important; border-color: #ec4899 !important; color: #be185d !important; }
+#formStep2 .hc-sky.active { background: rgba(14,165,233,0.12) !important; border-color: #0ea5e9 !important; color: #0369a1 !important; }
+
+/* Highlight chip colors (Dark mode active state) */
+[data-theme="dark"] #formStep2 .hc-blue.active { background: rgba(59,130,246,0.25) !important; border-color: #60a5fa !important; color: #93c5fd !important; }
+[data-theme="dark"] #formStep2 .hc-green.active { background: rgba(34,197,94,0.25) !important; border-color: #4ade80 !important; color: #86efac !important; }
+[data-theme="dark"] #formStep2 .hc-purple.active { background: rgba(168,85,247,0.25) !important; border-color: #c084fc !important; color: #d8b4fe !important; }
+[data-theme="dark"] #formStep2 .hc-orange.active { background: rgba(249,115,22,0.25) !important; border-color: #fb923c !important; color: #fdba74 !important; }
+[data-theme="dark"] #formStep2 .hc-pink.active { background: rgba(236,72,153,0.25) !important; border-color: #f472b6 !important; color: #f9a8d4 !important; }
+[data-theme="dark"] #formStep2 .hc-sky.active { background: rgba(14,165,233,0.25) !important; border-color: #38bdf8 !important; color: #7dd3fc !important; }
+
+/* ── Member Age Cards ── */
+#formStep2 .members-age-grid {
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 0.75rem !important;
+}
+#formStep2 .member-age-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 1rem !important;
+  padding: 1rem !important;
+  transition: all 0.3s ease !important;
+}
+#formStep2 .member-age-card:hover {
+  border-color: rgba(var(--primary-rgb), 0.3) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+#formStep2 .mac-blue { border-left: 3px solid #3b82f6 !important; }
+#formStep2 .mac-yellow { border-left: 3px solid #f59e0b !important; }
+#formStep2 .mac-red { border-left: 3px solid #ef4444 !important; }
+
+#formStep2 .mac-title { color: var(--text) !important; font-weight: 700 !important; font-size: 0.78rem !important; }
+
+/* Member Age Card labels (Light Mode) */
+#formStep2 .mac-blue .mac-price { background: rgba(59,130,246,0.1) !important; color: #2563eb !important; }
+#formStep2 .mac-yellow .mac-price { background: rgba(245,158,11,0.1) !important; color: #d97706 !important; }
+#formStep2 .mac-red .mac-price { background: rgba(239,68,68,0.1) !important; color: #dc2626 !important; }
+
+/* Member Age Card labels (Dark Mode) */
+[data-theme="dark"] #formStep2 .mac-blue .mac-price { background: rgba(59,130,246,0.2) !important; color: #93c5fd !important; }
+[data-theme="dark"] #formStep2 .mac-yellow .mac-price { background: rgba(245,158,11,0.2) !important; color: #fcd34d !important; }
+[data-theme="dark"] #formStep2 .mac-red .mac-price { background: rgba(239,68,68,0.2) !important; color: #fca5a5 !important; }
+
+#formStep2 .mac-price {
+  font-size: 0.62rem !important;
+  font-weight: 700 !important;
+  padding: 2px 8px !important;
+  border-radius: 10px !important;
+}
+
+#formStep2 .mac-controls {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.35rem !important;
+}
+#formStep2 .mac-controls input {
+  color: var(--text) !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+}
+
+/* ── Member Total Box ── */
+#formStep2 .member-total-box {
+  background: rgba(var(--primary-rgb), 0.06) !important;
+  border: 1px solid rgba(var(--primary-rgb), 0.15) !important;
+  border-radius: 0.75rem !important;
+  color: var(--text) !important;
+}
+#formStep2 .member-total-box span:last-child {
+  color: var(--primary) !important;
+  font-weight: 800;
+}
+
+/* ── Budget Estimate Section ── */
+#formStep2 .budget-estimate-section {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 1.25rem !important;
+  padding: 1.5rem !important;
+}
+
+#formStep2 .budget-duration-label {
+  background: rgba(var(--primary-rgb), 0.1) !important;
+  border: 1px solid rgba(var(--primary-rgb), 0.2) !important;
+  color: var(--primary) !important;
+  border-radius: 10px !important;
+}
+
+/* ── Travel Tier Selector ── */
+#formStep2 .travel-tier-selector {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0.75rem !important;
+  padding: 0.3rem !important;
+}
+#formStep2 .travel-tier-btn {
+  color: var(--text-muted) !important;
+  border-radius: 0.6rem !important;
+  font-weight: 600 !important;
+  transition: all 0.25s ease !important;
+}
+#formStep2 .travel-tier-btn:hover {
+  color: var(--text) !important;
+  background: rgba(var(--primary-rgb), 0.05) !important;
+}
+#formStep2 .travel-tier-btn.active {
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2) !important;
+}
+
+/* ── Budget Breakdown Items ── */
+#formStep2 .bb-item {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 0.85rem !important;
+  padding: 0.85rem 1rem !important;
+  transition: all 0.25s ease !important;
+}
+#formStep2 .bb-item:hover {
+  background: var(--bg-card) !important;
+  border-color: rgba(var(--primary-rgb), 0.2) !important;
+  transform: translateX(4px) !important;
+}
+#formStep2 .bb-title { color: var(--text) !important; font-size: 0.82rem !important; }
+#formStep2 .bb-total { color: var(--text) !important; font-weight: 700 !important; }
+#formStep2 .bb-detail { color: var(--text-muted) !important; }
+#formStep2 .bb-icon { font-size: 1.1rem !important; }
+
+/* Highlighted budget items (Light Mode default) */
+#formStep2 .bb-item-highlight {
+  background: rgba(59, 130, 246, 0.05) !important;
+  border: 1px solid rgba(59, 130, 246, 0.15) !important;
+  border-left: 4px solid #3b82f6 !important;
+}
+#formStep2 .bb-total-high { color: #1d4ed8 !important; font-size: 0.95rem !important; }
+#formStep2 .bb-route { color: #2563eb !important; }
+
+#formStep2 .bb-item-purple {
+  background: rgba(168, 85, 247, 0.05) !important;
+  border: 1px solid rgba(168, 85, 247, 0.15) !important;
+  border-left: 4px solid #a855f7 !important;
+}
+#formStep2 .bb-total-purple { color: #7e22ce !important; }
+#formStep2 .bb-list { color: #9333ea !important; }
+
+/* Highlighted budget items (Dark Mode override) */
+[data-theme="dark"] #formStep2 .bb-item-highlight {
+  background: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+}
+[data-theme="dark"] #formStep2 .bb-total-high { color: #60a5fa !important; }
+[data-theme="dark"] #formStep2 .bb-route { color: #60a5fa !important; }
+
+[data-theme="dark"] #formStep2 .bb-item-purple {
+  background: rgba(168, 85, 247, 0.1) !important;
+  border-color: rgba(168, 85, 247, 0.25) !important;
+}
+[data-theme="dark"] #formStep2 .bb-total-purple { color: #c084fc !important; }
+[data-theme="dark"] #formStep2 .bb-list { color: #d8b4fe !important; }
+
+/* ── Budget Total ── */
+#formStep2 .budget-total-section {
+  border-top: 2px dashed var(--border) !important;
+  padding-top: 1.25rem !important;
+}
+#formStep2 .budget-total-label { color: var(--text) !important; }
+#formStep2 .budget-members-summary { color: var(--text-muted) !important; }
+#formStep2 .budget-avg-text { color: var(--text-muted) !important; }
+
+/* Budget values colors (Light Mode default) */
+#formStep2 .budget-avg-val { color: #16a34a !important; }
+#formStep2 .budget-grand-total {
+  color: #16a34a !important;
+  font-size: 1.5rem !important;
+  text-shadow: none !important;
+  font-weight: 800 !important;
+}
+
+/* Budget values colors (Dark Mode override) */
+[data-theme="dark"] #formStep2 .budget-avg-val { color: #34d399 !important; }
+[data-theme="dark"] #formStep2 .budget-grand-total {
+  color: #34d399 !important;
+  text-shadow: 0 0 15px rgba(52, 211, 153, 0.3) !important;
+}
+
+/* ── Budget Note ── */
+#formStep2 .budget-note {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+  border-radius: 0.75rem !important;
+}
+
+/* ── Location Buttons ── */
+#formStep2 [onclick="getCurrentLocation()"],
+#formStep2 [onclick="toggleManualLocation()"] {
+  border-radius: 0.75rem !important;
+  font-weight: 600 !important;
+  transition: all 0.25s ease !important;
+}
+#formStep2 [onclick="getCurrentLocation()"] {
+  background: rgba(var(--primary-rgb), 0.1) !important;
+  border: 1px solid rgba(var(--primary-rgb), 0.25) !important;
+  color: var(--primary) !important;
+}
+#formStep2 [onclick="getCurrentLocation()"]:hover {
+  background: rgba(var(--primary-rgb), 0.18) !important;
+  border-color: var(--primary) !important;
+  transform: translateY(-2px) !important;
+}
+#formStep2 [onclick="toggleManualLocation()"] {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-muted) !important;
+}
+#formStep2 [onclick="toggleManualLocation()"]:hover {
+  border-color: rgba(var(--primary-rgb), 0.3) !important;
+  color: var(--text) !important;
+}
+
+#formStep2 #selectedLocationDisplay {
+  background: rgba(16, 185, 129, 0.08) !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+  color: #16a34a !important;
+}
+[data-theme="dark"] #formStep2 #selectedLocationDisplay {
+  color: #34d399 !important;
+}
+
+/* ── AI Suggest Button ── */
+#formStep2 .btn-tiny-ai {
+  background: rgba(139, 92, 246, 0.08) !important;
+  border: 1px solid rgba(139, 92, 246, 0.2) !important;
+  color: #7c3aed !important;
+  border-radius: 10px !important;
+  padding: 0.3rem 0.7rem !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+}
+#formStep2 .btn-tiny-ai:hover {
+  background: rgba(139, 92, 246, 0.15) !important;
+  border-color: #8b5cf6 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.15) !important;
+}
+[data-theme="dark"] #formStep2 .btn-tiny-ai {
+  background: rgba(168, 85, 247, 0.15) !important;
+  border-color: rgba(168, 85, 247, 0.3) !important;
+  color: #d8b4fe !important;
+}
+
+/* ── Main Action Button ── */
+#formStep2 .planner-btn.main-action {
+  background: var(--gradient-primary) !important;
+  border: none !important;
+  border-radius: 1rem !important;
+  padding: 1rem 2rem !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.3) !important;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1) !important;
+}
+#formStep2 .planner-btn.main-action:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 12px 35px rgba(var(--primary-rgb), 0.45) !important;
+  filter: brightness(1.05) !important;
+}
+
+/* ── Dates Row Responsive ── */
+@media (max-width: 480px) {
+  #formStep2 .members-age-grid {
+    grid-template-columns: 1fr !important;
+  }
 }

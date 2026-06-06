@@ -1,6 +1,12 @@
 /* ===================== PLANNER.JS ===================== */
 window.WanderPlanner = window.WanderPlanner || {};
 
+window.getRatingStarsHtml = function(rating, fontSize = '0.85rem') {
+  const r = parseFloat(rating) || 0;
+  const percent = Math.min(100, Math.max(0, (r / 5) * 100));
+  return '<span style="position:relative;display:inline-block;font-size:' + fontSize + ';color:rgba(156,163,175,0.35);white-space:nowrap;letter-spacing:1.5px;line-height:1;vertical-align:middle;">★★★★★<span style="position:absolute;top:0;left:0;width:' + percent + '%;overflow:hidden;color:#fbbf24;white-space:nowrap;letter-spacing:1.5px;line-height:1;">★★★★★</span></span>';
+};
+
 const VN_DESTINATION_PHOTOS = {
   // --- MIỀN BẮC ---
   "hà nội": [
@@ -448,6 +454,17 @@ const initPlanner = function () {
       });
     }
 
+    // Điểm khởi hành thay đổi -> cập nhật chi phí di chuyển
+    const departureLocationInput = document.getElementById('departureLocation');
+    if (departureLocationInput) {
+      departureLocationInput.addEventListener('input', () => {
+        setTimeout(() => updateBudgetEstimate(), 200);
+      });
+      departureLocationInput.addEventListener('change', () => {
+        updateBudgetEstimate();
+      });
+    }
+
     // Member inputs
     ['adults', 'children', 'toddlers', 'seniors'].forEach(type => {
       const input = document.getElementById(type);
@@ -679,6 +696,14 @@ const initPlanner = function () {
     const dateHint = document.getElementById('tripDateHint');
     const timeHint = document.getElementById('departureTimeHint');
 
+    if (tripDate) {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      tripDate.min = `${yyyy}-${mm}-${dd}`;
+    }
+
     if (tripDate && tripDate.value && dateHint) {
       const date = new Date(tripDate.value);
       const today = new Date();
@@ -702,14 +727,28 @@ const initPlanner = function () {
       const [hours, minutes] = departureTime.value.split(':');
       const hour = parseInt(hours);
 
-      if (hour >= 5 && hour < 12) {
-        timeHint.textContent = 'Buổi sáng';
-      } else if (hour >= 12 && hour < 18) {
-        timeHint.textContent = 'Buổi chiều';
-      } else if (hour >= 18 && hour < 22) {
-        timeHint.textContent = 'Buổi tối';
+      // Check if selected date and time is in the past
+      let isPast = false;
+      if (tripDate && tripDate.value) {
+        const selectedDateTime = new Date(`${tripDate.value}T${departureTime.value}`);
+        const currentDateTime = new Date();
+        if (selectedDateTime < currentDateTime) {
+          isPast = true;
+        }
+      }
+
+      if (isPast) {
+        timeHint.innerHTML = '<span style="color: #ef4444; font-weight: 600;">⚠️ Thời gian đã qua</span>';
       } else {
-        timeHint.textContent = 'Đêm khuya';
+        if (hour >= 5 && hour < 12) {
+          timeHint.textContent = 'Buổi sáng';
+        } else if (hour >= 12 && hour < 18) {
+          timeHint.textContent = 'Buổi chiều';
+        } else if (hour >= 18 && hour < 22) {
+          timeHint.textContent = 'Buổi tối';
+        } else {
+          timeHint.textContent = 'Đêm khuya';
+        }
       }
     }
   }
@@ -1215,12 +1254,18 @@ const initPlanner = function () {
   function getCoordsByName(name) {
     if (!name) return null;
 
-    // Chuẩn hóa tên (bỏ dấu, lowercase)
-    const normalizedName = name.toLowerCase().trim();
+    // Nếu chứa nhiều điểm đến cách nhau bởi dấu phẩy, lấy điểm đầu tiên
+    let primaryName = name;
+    if (name.includes(',')) {
+      primaryName = name.split(',')[0];
+    }
+
+    // Chuẩn hóa tên (normalize NFC, lowercase)
+    const normalizedName = primaryName.normalize('NFC').toLowerCase().trim();
 
     // Tìm trong database
     for (const [cityName, coords] of Object.entries(CITY_COORDS)) {
-      const normalizedCity = cityName.toLowerCase();
+      const normalizedCity = cityName.normalize('NFC').toLowerCase();
 
       // So khớp chính xác hoặc một phần
       if (normalizedCity.includes(normalizedName) || normalizedName.includes(normalizedCity)) {
@@ -1228,12 +1273,26 @@ const initPlanner = function () {
       }
 
       // Trường hợp TP.HCM / Sài Gòn
-      if (normalizedName.includes('hcm') || normalizedName.includes('sài gòn')) {
-        if (normalizedCity.includes('hcm') || normalizedCity.includes('sài gòn')) {
+      if (normalizedName.includes('hcm') || normalizedName.includes('sài gòn') || normalizedName.includes('sai gon')) {
+        if (normalizedCity.includes('hcm') || normalizedCity.includes('sài gòn') || normalizedCity.includes('sai gon')) {
           return coords;
         }
       }
     }
+
+    // Fallback: So khớp không dấu để tránh trường hợp nhập không dấu hoặc lỗi gõ tiếng Việt
+    const removeDiacritics = (str) => {
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    };
+
+    const cleanName = removeDiacritics(normalizedName);
+    for (const [cityName, coords] of Object.entries(CITY_COORDS)) {
+      const cleanCity = removeDiacritics(cityName);
+      if (cleanCity.includes(cleanName) || cleanName.includes(cleanCity)) {
+        return coords;
+      }
+    }
+
     return null;
   }
 
@@ -1313,12 +1372,36 @@ const initPlanner = function () {
       foodDetail.textContent = foodDesc;
     }
 
-    // ===== 3. TÍNH TIỀN DI CHUYỂN (DỰA TRÊN GPS) =====
-    // Lấy tọa độ khởi hành từ GPS hoặc mặc định Hà Nội
+    // ===== 3. TÍNH TIỀN DI CHUYỂN (DỰA TRÊN GPS HOẶC NHẬP THỦ CÔNG) =====
     const formStep2 = document.getElementById('aiPlannerFormStep2');
-    const hasGPS = formStep2?.dataset?.lat && formStep2?.dataset?.lon;
-    const depLat = parseFloat(formStep2?.dataset?.lat) || 21.0285; // Mặc định Hà Nội
-    const depLng = parseFloat(formStep2?.dataset?.lon) || 105.8542;
+    
+    // Lấy tên điểm khởi hành từ ô nhập thủ công hoặc GPS
+    const departureInput = document.getElementById('departureLocation')?.value?.trim();
+    let depLat = 21.0285; // Mặc định Hà Nội
+    let depLng = 105.8542;
+    let depName = 'Hà Nội (mặc định)';
+    let hasCoords = false;
+
+    if (departureInput) {
+      const depCoords = getCoordsByName(departureInput);
+      if (depCoords) {
+        depLat = depCoords.lat;
+        depLng = depCoords.lng;
+        depName = departureInput;
+        hasCoords = true;
+      }
+    }
+
+    if (!hasCoords) {
+      const hasGPS = formStep2?.dataset?.lat && formStep2?.dataset?.lon;
+      if (hasGPS) {
+        depLat = parseFloat(formStep2.dataset.lat);
+        depLng = parseFloat(formStep2.dataset.lon);
+        depName = formStep2.dataset.departureName || 'Vị trí của bạn';
+      } else if (departureInput) {
+        depName = departureInput;
+      }
+    }
 
     // Lấy tọa độ điểm đến
     const destCoords = getDestinationCoords();
@@ -1344,9 +1427,6 @@ const initPlanner = function () {
       const destInput = document.getElementById('dest');
       if (destInput?.value) destName = destInput.value;
     }
-
-    // Lấy tên điểm khởi hành
-    const depName = hasGPS ? (formStep2?.dataset?.departureName || 'Vị trí của bạn') : 'Hà Nội (mặc định)';
 
     // Hiển thị tuyến đường
     if (transportRoute) {
@@ -1703,6 +1783,21 @@ const initPlanner = function () {
       return;
     }
 
+    // Validate departure date/time (cannot be in the past)
+    if (tripDate) {
+      const selectedDateTime = new Date(`${tripDate}T${departureTime}`);
+      const currentDateTime = new Date();
+      if (selectedDateTime < currentDateTime) {
+        const msg = "Thời gian khởi hành không thể ở trong quá khứ! Vui lòng chọn ngày/giờ hiện tại hoặc tương lai.";
+        if (window.WanderToast) {
+          window.WanderToast.warning(msg);
+        } else {
+          alert(msg);
+        }
+        return;
+      }
+    }
+
     // Start Smart Wizard with this data
     if (window.SmartWizard && typeof window.SmartWizard.start === 'function') {
       window.SmartWizard.start(formData);
@@ -2019,13 +2114,27 @@ const initPlanner = function () {
         return;
       }
 
+      const tripDateVal = document.getElementById('tripDate').value;
+      const departureTimeVal = document.getElementById('departureTime')?.value || "08:00";
+
+      if (tripDateVal) {
+        const selectedDateTime = new Date(`${tripDateVal}T${departureTimeVal}`);
+        const currentDateTime = new Date();
+        if (selectedDateTime < currentDateTime) {
+          const msg = "Thời gian khởi hành không thể ở trong quá khứ! Vui lòng chọn ngày/giờ hiện tại hoặc tương lai.";
+          if (window.WanderToast) WanderToast.warning(msg);
+          else alert(msg);
+          return;
+        }
+      }
+
       this.data.destination = dest;
       this.data.days = days;
       this.data.budget = document.getElementById('budget').value;
-      this.data.tripDate = document.getElementById('tripDate').value;
+      this.data.tripDate = tripDateVal;
       this.data.companion = document.getElementById('companion').value;
       this.data.optionCount = document.getElementById('optionCount')?.value || "1";
-      this.data.departureTime = document.getElementById('departureTime')?.value || "08:00";
+      this.data.departureTime = departureTimeVal;
 
       // Fix sessions collection from style-chips
       this.data.sessions = Array.from(document.querySelectorAll('.style-chip.active[data-session]')).map(chip => chip.dataset.session);
@@ -2305,7 +2414,14 @@ const initPlanner = function () {
         body: JSON.stringify({ ...data, tripDate: data.tripDate || '' })
       });
 
-      if (!res.ok) throw new Error("API Generation Failed");
+      if (!res.ok) {
+        let errMsg = "API Generation Failed";
+        try {
+          const errJson = await res.json();
+          if (errJson && errJson.message) errMsg = errJson.message;
+        } catch (e) {}
+        throw new Error(errMsg);
+      }
 
       const json = await res.json();
       if (json.success) {
@@ -2547,12 +2663,7 @@ const initPlanner = function () {
         const categoryMeta = act.categoryMeta || getActivityCategoryMeta(inferActivityCategory(act));
         const categoryBadge = `<div style="display:inline-flex; align-items:center; gap:5px; font-size:0.72rem; font-weight:700; color:${categoryMeta.color}; background:${categoryMeta.bg}; border:1px solid ${categoryMeta.border}; border-radius:999px; padding:4px 10px;">${categoryMeta.icon} ${categoryMeta.label}</div>`;
 
-        let starHtml = '';
-        if (actRating > 0) {
-          starHtml = Array.from({ length: 5 }, (_, i) =>
-            i < Math.floor(actRating) ? '★' : (i < actRating ? '½' : '☆')
-          ).join('');
-        }
+        const ratingStars = actRating > 0 ? window.getRatingStarsHtml(actRating, '0.75rem') : '';
 
         const actData = JSON.stringify(act).replace(/'/g, "&apos;").replace(/\`/g, '&#96;');
         let actMapQuery = actLocation || actAddress || actName;
@@ -2574,7 +2685,7 @@ const initPlanner = function () {
           : '';
 
         const ratingBadge = actRating > 0
-          ? `<div class="act-rating-badge"><span class="act-stars">${starHtml}</span><span class="act-rating-num">${actRating}/5</span></div>`
+          ? `<div class="act-rating-badge">${ratingStars}<span class="act-rating-num" style="margin-left: 2px;">${actRating}/5</span></div>`
           : '';
 
         const transportBadge = actTransport
@@ -3436,7 +3547,7 @@ const initPlanner = function () {
                <span>📍 ${act.address || act.location || actName}</span>
                <span style="color:rgba(255,255,255,0.2);">•</span>
                <div style="display:flex; align-items:center; gap:4px;">
-                 <span style="color:#fbbf24; font-size:1rem; letter-spacing:2px;">${Array.from({ length: 5 }, (_, i) => i < Math.floor(parseFloat(act.rating) || 4.5) ? '★' : (i < (parseFloat(act.rating) || 4.5) ? '½' : '☆')).join('')}</span>
+                 ${window.getRatingStarsHtml(parseFloat(act.rating) || 4.5, '0.9rem')}
                  <span style="color:#fbbf24; font-weight:800; margin-left:4px;">${parseFloat(act.rating) || 4.5}/5</span>
                </div>
              </div>

@@ -416,6 +416,7 @@ router.post('/business/register', async (req, res) => {
 
 router.post('/business/login', async (req, res) => {
   try {
+    const { email, password } = req.body;
     const loginStr = String(email || '').trim().toLowerCase();
     const accounts = await BusinessAccount.find({
       $or: [
@@ -456,7 +457,8 @@ router.post('/business/login', async (req, res) => {
       } 
     });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    require('fs').writeFileSync(require('path').join(__dirname, '../../scratch/login_error.txt'), err.stack || err.message);
+    res.status(500).json({ success: false, message: err.message, stack: err.stack });
   }
 });
 

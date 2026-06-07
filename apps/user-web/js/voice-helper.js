@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _classCallCheck(a, n) { if (!(a instanceof n)) throw new TypeError("Cannot call a class as a function"); }
@@ -307,22 +307,36 @@ var VoiceGuide = /*#__PURE__*/function () {
       });
       if (filteredVoices.length === 0) return null;
 
+      // Ưu tiên các giọng nữ chất lượng cao hoặc các giọng đọc tự nhiên (Premium/Online/Google)
       var premiumVoice = filteredVoices.find(function (v) {
-        return v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Microsoft');
+        return v.name.includes('Google') || v.name.includes('Premium') || v.name.includes('Online') || v.name.includes('Natural');
       });
-      return premiumVoice || filteredVoices[0];
+      
+      var msVoice = filteredVoices.find(function(v) { return v.name.includes('Microsoft'); });
+
+      return premiumVoice || msVoice || filteredVoices[0];
     }
   }, {
     key: "speak",
     value: function speak(text) {
       var _this2 = this;
       if (!text) return;
+
+      // Tiền xử lý văn bản để đọc mượt mà hơn
+      var cleanText = text.replace(/<br\s*\/?>/gi, '. ') // Đổi <br> thành dấu chấm để nghỉ
+                          .replace(/<[^>]+>/g, '') // Xóa các thẻ HTML như <strong>, <em>, ...
+                          .replace(/&nbsp;/g, ' ') // Đổi HTML entity
+                          .replace(/[*_~`]/g, '') // Xóa ký tự markdown thừa
+                          .replace(/\s+/g, ' ') // Gom khoảng trắng
+                          .trim();
+
+      if (!cleanText) return;
       
       var now = Date.now();
       
       // 1. Chặn lặp lại câu cũ trong vòng 15 giây (tăng lên để tránh lặp lại phiền phức)
-      if (text === this.lastSpoken && (now - this.lastSpokenTime < 15000)) {
-        console.warn("🔊 VoiceGuide: Chặn lặp lại câu:", text);
+      if (cleanText === this.lastSpoken && (now - this.lastSpokenTime < 15000)) {
+        console.warn("🔊 VoiceGuide: Chặn lặp lại câu:", cleanText);
         return;
       }
 
@@ -332,16 +346,17 @@ var VoiceGuide = /*#__PURE__*/function () {
         return;
       }
 
-      this.lastSpoken = text;
+      this.lastSpoken = cleanText;
       this.lastSpokenTime = now;
       this.globalSpeakCooldown = now;
 
       if (this.synth.speaking) this.synth.cancel(); // Ngắt câu cũ để ưu tiên câu mới
       this.stop(); // Tắt mic khi nói để tránh Echo
       this.setStatus('speaking');
-      var utterance = new SpeechSynthesisUtterance(text);
       
-      var langCode = this.detectLanguage(text);
+      var utterance = new SpeechSynthesisUtterance(cleanText);
+      
+      var langCode = this.detectLanguage(cleanText);
       utterance.lang = langCode;
 
       // Chọn giọng đọc tốt nhất theo ngôn ngữ
@@ -352,7 +367,11 @@ var VoiceGuide = /*#__PURE__*/function () {
       } else {
         console.warn("No suitable voice found for", langCode, "falling back to default.");
       }
-      utterance.rate = 1.1;
+      
+      // Điều chỉnh tốc độ và cao độ để nghe thanh thoát, tự nhiên hơn
+      utterance.rate = 1.0; 
+      utterance.pitch = 1.02; // Tăng cao độ một chút cho giọng tươi sáng hơn
+      
       utterance.onend = function () {
         _this2.setStatus('idle');
         if (_this2.companionMode) {

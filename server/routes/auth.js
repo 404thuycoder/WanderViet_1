@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
@@ -416,10 +416,14 @@ router.post('/business/register', async (req, res) => {
 
 router.post('/business/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const accounts = await BusinessAccount.find({ email: String(email || '').toLowerCase() });
-    // console.log(`[AUTH DEBUG] Found ${accounts ? accounts.length : 0} accounts for ${email}`);
-    if (!accounts || accounts.length === 0) return res.status(400).json({ success: false, message: 'Email hoặc mật khẩu không đúng' });
+    const loginStr = String(email || '').trim().toLowerCase();
+    const accounts = await BusinessAccount.find({
+      $or: [
+        { email: loginStr },
+        { customId: loginStr }
+      ]
+    });
+    if (!accounts || accounts.length === 0) return res.status(400).json({ success: false, message: 'Email/Mã doanh nghiệp hoặc mật khẩu không đúng' });
     
     let matchedAccount = null;
     for (const acc of accounts) {

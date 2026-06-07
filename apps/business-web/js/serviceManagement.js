@@ -1,4 +1,4 @@
-﻿/**
+/**
  * serviceManagement.js — API Integrated version
  */
 (function() {
@@ -417,7 +417,11 @@
                     if (svc.image) {
                         const div = document.createElement('div');
                         div.className = 'preview-item';
-                        div.innerHTML = `<img src="${svc.image}"><button type="button" class="remove-btn">&times;</button>`;
+                        div.innerHTML = `
+                            <img src="${svc.image}" onerror="window.handleBrokenGalleryImage(this, '${svc.image.replace(/'/g, "\\'")}')">
+                            <button type="button" class="remove-btn">&times;</button>
+                            <div class="broken-tooltip">⚠️ Link ảnh lỗi</div>
+                        `;
                         div.querySelector('.remove-btn').onclick = () => {
                             div.remove();
                             if (mainImgInput) mainImgInput.value = '';
@@ -440,9 +444,12 @@
                         
                         const div = document.createElement('div');
                         div.className = 'preview-item';
+                        div.dataset.fromUrl = "true";
+                        div.dataset.url = url;
                         div.innerHTML = `
-                            <img src="${url}">
+                            <img src="${url}" onerror="window.handleBrokenGalleryImage(this, '${url.replace(/'/g, "\\'")}')">
                             <button type="button" class="remove-btn">&times;</button>
+                            <div class="broken-tooltip">⚠️ Link ảnh lỗi</div>
                             <select class="gallery-tag-select">
                                 <option value="other" ${category==='other'?'selected':''}>🏷️ Phân loại</option>
                                 <option value="view" ${['view','nature','space'].includes(category)?'selected':''}>🌅 Cảnh quan & Không gian</option>

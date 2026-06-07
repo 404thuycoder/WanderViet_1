@@ -3,6 +3,25 @@
  * Form thêm dịch vụ mới dạng Modal chuyên sâu cho đối tác Elite
  */
 
+window.handleBrokenGalleryImage = function(imgEl, url) {
+  const p = imgEl.closest('.preview-item');
+  if (!imgEl.src || !p) return;
+  p.classList.add('broken-link');
+  const t = p.querySelector('.broken-tooltip');
+  if (t) {
+    if (url.includes('...')) {
+      t.textContent = '⚠️ Link bị cắt ngắn (...)';
+      t.setAttribute('title', 'Đường dẫn ảnh bị cắt ngắn, vui lòng copy địa chỉ hình ảnh thực tế.');
+    } else if (url.startsWith('/') && !url.startsWith('/api/files/')) {
+      t.textContent = '⚠️ Link tương đối (thiếu tên miền)';
+      t.setAttribute('title', 'Ảnh copy từ trang khác bị thiếu tên miền chính. Vui lòng copy link đầy đủ dạng http/https.');
+    } else {
+      t.textContent = '⚠️ Không tải được ảnh';
+      t.setAttribute('title', 'Không thể truy cập ảnh này. Hãy kiểm tra lại link.');
+    }
+  }
+};
+
 (function injectModalStyles() {
   if (document.getElementById('add-svc-styles')) return;
   const style = document.createElement('style');
@@ -161,6 +180,35 @@
     }
     .preview-item:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.3); border-color: rgba(99,102,241,0.4); }
     .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+    .preview-item.broken-link {
+      border: 2px solid #ef4444 !important;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+    }
+    .preview-item.broken-link img {
+      filter: grayscale(1) opacity(0.5);
+    }
+    .preview-item .broken-tooltip {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(239, 68, 68, 0.95);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 8px;
+      text-align: center;
+      width: 85%;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+    .preview-item.broken-link .broken-tooltip {
+      display: block;
+    }
     .preview-item .remove-btn { 
       position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; 
       background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; 
@@ -791,6 +839,63 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
     let lat = hasCoordinates ? parseFloat(latEl.value) : 21.0285;
     let lng = hasCoordinates ? parseFloat(lngEl.value) : 105.8542;
 
+    if (!hasCoordinates) {
+      const regionEl = document.getElementById('svc-region');
+      const cityEl = document.getElementById('svc-city');
+      const regionVal = regionEl ? regionEl.value.trim().toLowerCase() : '';
+      const cityVal = cityEl ? cityEl.value.trim().toLowerCase() : '';
+
+      const regionCoords = {
+        'phú quốc': { lat: 10.2899, lng: 103.984 },
+        'kiên giang': { lat: 10.2899, lng: 103.984 },
+        'sơn la': { lat: 20.8542, lng: 104.6465 },
+        'mộc châu': { lat: 20.8542, lng: 104.6465 },
+        'đà nẵng': { lat: 16.0544, lng: 108.2022 },
+        'nha trang': { lat: 12.2388, lng: 109.1967 },
+        'khánh hòa': { lat: 12.2388, lng: 109.1967 },
+        'cần thơ': { lat: 10.0452, lng: 105.7469 },
+        'ninh bình': { lat: 20.2506, lng: 105.9745 },
+        'huế': { lat: 16.4637, lng: 107.5909 },
+        'thừa thiên': { lat: 16.4637, lng: 107.5909 },
+        'bình thuận': { lat: 10.9804, lng: 108.2591 },
+        'phan thiết': { lat: 10.9804, lng: 108.2591 },
+        'hồ chí minh': { lat: 10.8231, lng: 106.6297 },
+        'tphcm': { lat: 10.8231, lng: 106.6297 },
+        'sài gòn': { lat: 10.8231, lng: 106.6297 },
+        'côn đảo': { lat: 8.6914, lng: 106.6061 },
+        'bà rịa': { lat: 8.6914, lng: 106.6061 },
+        'vũng tàu': { lat: 8.6914, lng: 106.6061 },
+        'hà giang': { lat: 23.2241, lng: 104.9834 },
+        'quy nhơn': { lat: 13.7765, lng: 109.2235 },
+        'bình định': { lat: 13.7765, lng: 109.2235 },
+        'buôn ma thuột': { lat: 12.6797, lng: 108.0506 },
+        'đắk lắk': { lat: 12.6797, lng: 108.0506 },
+        'tam đảo': { lat: 21.4684, lng: 105.6436 },
+        'vĩnh phúc': { lat: 21.4684, lng: 105.6436 },
+        'sa pa': { lat: 22.3364, lng: 103.8438 },
+        'sapa': { lat: 22.3364, lng: 103.8438 },
+        'lào cai': { lat: 22.3364, lng: 103.8438 },
+        'quảng ninh': { lat: 20.9101, lng: 107.1839 },
+        'hạ long': { lat: 20.9101, lng: 107.1839 },
+        'hội an': { lat: 15.8801, lng: 108.338 },
+        'quảng nam': { lat: 15.8801, lng: 108.338 },
+        'hà nội': { lat: 21.0285, lng: 105.8542 }
+      };
+
+      let foundCoords = null;
+      for (const key in regionCoords) {
+        if (cityVal.includes(key) || regionVal.includes(key)) {
+          foundCoords = regionCoords[key];
+          break;
+        }
+      }
+
+      if (foundCoords) {
+        lat = foundCoords.lat;
+        lng = foundCoords.lng;
+      }
+    }
+
     if (mapInstance) {
       mapInstance.invalidateSize();
       mapInstance.setView([lat, lng], 13);
@@ -856,10 +961,12 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
       const cityVal = document.getElementById('svc-city') ? document.getElementById('svc-city').value.trim() : '';
       
       let searchQuery = addressVal;
-      if (regionVal && !searchQuery.includes(regionVal)) {
+      const lowerQuery = searchQuery.toLowerCase();
+      if (regionVal && !lowerQuery.includes(regionVal.toLowerCase())) {
         searchQuery += (searchQuery ? ', ' : '') + regionVal;
       }
-      if (cityVal && !searchQuery.includes(cityVal)) {
+      const lowerQuery2 = searchQuery.toLowerCase();
+      if (cityVal && !lowerQuery2.includes(cityVal.toLowerCase())) {
         searchQuery += (searchQuery ? ', ' : '') + cityVal;
       }
       
@@ -1607,8 +1714,11 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
             const div = document.createElement('div');
             div.className = 'preview-item';
             div.dataset.url = it.url;
+            div.dataset.fromUrl = "true";
             div.innerHTML = `
-              <img src="${it.url}"><button type="button" class="remove-btn">&times;</button>
+              <img src="${it.url}" onerror="window.handleBrokenGalleryImage(this, '${it.url.replace(/'/g, "\\'")}')">
+              <button type="button" class="remove-btn">&times;</button>
+              <div class="broken-tooltip">⚠️ Link ảnh lỗi</div>
               <select class="gallery-tag-select">
                 <option value="other" ${it.category==='other'?'selected':''}>Phân loại</option>
                 <option value="view" ${it.category==='view'?'selected':''}>🌅 Cảnh quan</option>
@@ -1689,7 +1799,11 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
       if (url) {
         const div = document.createElement('div');
         div.className = 'preview-item';
-        div.innerHTML = `<img src="${url}"><button type="button" class="remove-btn">&times;</button>`;
+        div.innerHTML = `
+          <img src="${url}" onerror="window.handleBrokenGalleryImage(this, '${url.replace(/'/g, "\\'")}')">
+          <button type="button" class="remove-btn">&times;</button>
+          <div class="broken-tooltip">⚠️ Link ảnh lỗi</div>
+        `;
         div.querySelector('.remove-btn').onclick = () => {
           div.remove();
           mainImgInput.value = '';
@@ -1705,7 +1819,39 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
   const galleryUrlPreview = document.getElementById('svc-gallery-preview');
   if (galleryUrlInput && galleryUrlPreview) {
     galleryUrlInput.addEventListener('input', () => {
-      const urls = galleryUrlInput.value.split(',').map(s => s.trim()).filter(s => s);
+      let rawVal = galleryUrlInput.value;
+      let foundOrigin = '';
+      const rawUrls = rawVal.split(',').map(s => s.trim()).filter(s => s);
+      for (const u of rawUrls) {
+        if (u.startsWith('http://') || u.startsWith('https://')) {
+          try {
+            foundOrigin = new URL(u).origin;
+            break;
+          } catch(e) {}
+        }
+      }
+      
+      let hasChanges = false;
+      const fixedUrls = rawUrls.map(u => {
+        if (u.startsWith('/') && !u.startsWith('/api/files/') && !u.startsWith('/uploads/') && foundOrigin) {
+          hasChanges = true;
+          return foundOrigin + u;
+        }
+        if (u.startsWith('/uploads/') && foundOrigin) {
+          const pathParts = u.split('/');
+          if (pathParts.length > 3) {
+            hasChanges = true;
+            return foundOrigin + u;
+          }
+        }
+        return u;
+      });
+
+      if (hasChanges) {
+        galleryUrlInput.value = fixedUrls.join(', ');
+      }
+
+      const urls = fixedUrls;
       
       // Lấy danh sách các URL đang hiển thị (chỉ lấy từ URL, không lấy từ File)
       const existingUrls = Array.from(galleryUrlPreview.querySelectorAll('.preview-item[data-from-url="true"]'))
@@ -1723,7 +1869,10 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
           div.className = 'preview-item';
           div.dataset.fromUrl = "true";
           div.dataset.url = url; // Lưu URL vào dataset để kiểm tra
-          div.innerHTML = `<img src="${url}"><button type="button" class="remove-btn">&times;</button>
+          div.innerHTML = `
+            <img src="${url}" onerror="window.handleBrokenGalleryImage(this, '${url.replace(/'/g, "\\'")}')">
+            <button type="button" class="remove-btn">&times;</button>
+            <div class="broken-tooltip">⚠️ Link ảnh lỗi</div>
             <select class="gallery-tag-select">
               <option value="other" selected>Phân loại</option>
               <option value="view">🌅 Cảnh quan</option>
@@ -1841,17 +1990,13 @@ function initAddServiceForm(rootId = 'modal-root', triggerSelector = '.btn-add')
       const select = div.querySelector('.gallery-tag-select');
       if (media && media.src && !div.dataset.isFile) {
         let url = media.src;
-        // Clean URL to be relative if it's from our server
-        if (url.includes('/uploads/')) {
-          url = '/uploads/' + url.split('/uploads/')[1];
-        } else {
-          try {
-            const urlObj = new URL(url);
-            if (urlObj.origin === window.location.origin) {
-              url = urlObj.pathname;
-            }
-          } catch(e) {}
-        }
+        try {
+          const urlObj = new URL(url);
+          const isLocal = urlObj.hostname === 'localhost' || urlObj.hostname === '127.0.0.1' || urlObj.hostname === window.location.hostname;
+          if (isLocal) {
+            url = urlObj.pathname;
+          }
+        } catch(e) {}
         
         galleryItems.push({
           url: url,

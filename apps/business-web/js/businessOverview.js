@@ -735,48 +735,106 @@
         `;
     }
 
-    // ── Chart Logic ──────────────────────────────────────────────
     function initChart() {
         const ctx = document.getElementById('revenueChart');
         if (!ctx) return;
         
-        // Fix: Destroy existing chart if it exists to avoid "Canvas is already in use" error
         const existingChart = Chart.getChart(ctx);
         if (existingChart) {
             existingChart.destroy();
         }
 
-        // Gradient
-        const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 260);
-        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.2)');
-        gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+        // Gradient cho tuần này
+        const gradientThis = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
+        gradientThis.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+        gradientThis.addColorStop(1, 'rgba(99, 102, 241, 0)');
 
         new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'CN'],
-                datasets: [{
-                    label: 'Doanh thu (VNĐ)',
-                    data: [1200000, 2500000, 1800000, 4200000, 3100000, 5600000, 4800000],
-                    borderColor: '#6366f1',
-                    borderWidth: 3,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#6366f1',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    fill: true,
-                    backgroundColor: gradient,
-                    tension: 0.4
-                }]
+                datasets: [
+                    {
+                        label: 'Kỳ này',
+                        data: [7500000, 6000000, 14000000, 10500000, 22500000, 34000000, 26000000],
+                        borderColor: '#6366f1',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#6366f1',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        backgroundColor: gradientThis,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Kỳ trước',
+                        data: [9000000, 7500000, 11000000, 9000000, 17500000, 25500000, 24000000],
+                        borderColor: 'rgba(148, 163, 184, 0.4)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
+                plugins: { 
+                    legend: { 
+                        display: true,
+                        position: 'top',
+                        align: 'end',
+                        labels: { color: '#94a3b8', usePointStyle: true, boxWidth: 8 }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#cbd5e1',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
-                    x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: 'rgba(255,255,255,0.05)', borderDash: [5, 5] }, 
+                        ticks: { 
+                            color: '#94a3b8', 
+                            font: { size: 11 },
+                            callback: function(value) {
+                                return value >= 1000000 ? (value / 1000000) + 'M' : value;
+                            }
+                        } 
+                    },
+                    x: { 
+                        grid: { display: false }, 
+                        ticks: { color: '#94a3b8', font: { size: 11 } } 
+                    }
                 }
             }
         });
@@ -1640,53 +1698,79 @@
         const existing = Chart.getChart(ctx);
         if (existing) existing.destroy();
 
-        const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(148, 163, 184, 0.15)'); // Neutral gray-blue gradient
-        gradient.addColorStop(1, 'rgba(148, 163, 184, 0)');
+        // Sử dụng dữ liệu giả định đẹp mắt để hiển thị (do người dùng yêu cầu không cần dữ liệu thật)
+        const mockLabels = ['2/6', '3/6', '4/6', '5/6', '6/6', '7/6', '8/6'];
+        const mockDataThis = [7500000, 6000000, 14000000, 10500000, 22500000, 34000000, 26000000];
+        const mockDataPrev = [9000000, 7500000, 11000000, 9000000, 17500000, 25500000, 24000000];
+
+        // Gradient cho tuần này
+        const gradientThis = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
+        gradientThis.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+        gradientThis.addColorStop(1, 'rgba(99, 102, 241, 0)');
 
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: seriesData.labels,
-                datasets: [{
-                    label: 'Doanh thu',
-                    data: seriesData.data,
-                    borderWidth: 2,
-                    pointBackgroundColor: '#fff',
-                    pointBorderColor: '#fff',
-                    pointRadius: 0, // Ẩn điểm giống chứng khoán
-                    pointHoverRadius: 6,
-                    pointHitRadius: 10,
-                    fill: true,
-                    backgroundColor: gradient,
-                    tension: 0, // Đường thẳng gãy khúc
-                    segment: {
-                        borderColor: ctx => {
-                            if (!ctx.p0 || !ctx.p1) return '#10b981';
-                            return ctx.p0.parsed.y > ctx.p1.parsed.y ? '#ef4444' : '#10b981'; // Đỏ nếu giảm, xanh nếu tăng
-                        }
+                labels: mockLabels,
+                datasets: [
+                    {
+                        label: 'Kỳ này',
+                        data: mockDataThis,
+                        borderColor: '#6366f1',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#6366f1',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        backgroundColor: gradientThis,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Kỳ trước',
+                        data: mockDataPrev,
+                        borderColor: 'rgba(148, 163, 184, 0.4)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        fill: false,
+                        tension: 0.3
                     }
-                }]
+                ]
             },
             options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { 
+                        display: true,
+                        position: 'top',
+                        align: 'end',
+                        labels: { color: '#94a3b8', usePointStyle: true, boxWidth: 8 }
+                    },
                     tooltip: {
                         mode: 'index',
                         intersect: false,
-                        callbacks: { label: (ctx) => ` ${formatMoney(ctx.raw)}` }
-                    }
-                },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { color: 'rgba(255,255,255,0.05)', borderDash: [5, 5] }, // Lưới đứt nét
-                        ticks: { color: '#94a3b8', callback: (v) => v/1000000 + 'M' } 
-                    },
-                    x: { 
-                        grid: { display: false }, 
-                        ticks: { color: '#94a3b8' } 
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleColor: '#fff',
+                        bodyColor: '#cbd5e1',
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
                     }
                 },
                 interaction: {
@@ -1700,13 +1784,13 @@
                     
                     if (activeElements.length > 0) {
                         const index = activeElements[0].index;
-                        const value = seriesData.data[index];
-                        const label = seriesData.labels[index];
+                        const value = mockDataThis[index];
+                        const label = mockLabels[index];
                         
                         // Compare with previous day to set color
                         let isUp = true;
                         if (index > 0) {
-                            isUp = value >= seriesData.data[index - 1];
+                            isUp = value >= mockDataThis[index - 1];
                         }
                         const color = isUp ? '#10b981' : '#ef4444';
                         const arrow = isUp ? '▲' : '▼';

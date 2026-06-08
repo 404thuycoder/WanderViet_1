@@ -5081,7 +5081,6 @@
       { label: 'Quản lý Chiến dịch', tab: 'campaigns', icon: '🚀', type: 'Menu' },
       { label: 'Mã khuyến mãi', tab: 'vouchers', icon: '🎫', type: 'Menu' },
       { label: 'Gửi thông báo', tab: 'broadcast', icon: '📢', type: 'Menu' },
-      { label: 'Trí tuệ AI Hub', tab: 'ai-intelligence', icon: '🧠', type: 'Menu' },
       { label: 'Nhật ký hệ thống', tab: 'logs', icon: '📋', type: 'Menu' },
       { label: 'Cấu hình chung', tab: 'system-config', icon: '⚙️', type: 'Menu' }
     ];

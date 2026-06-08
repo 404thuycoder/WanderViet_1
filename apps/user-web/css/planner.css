@@ -680,8 +680,9 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  padding: 1rem 0.75rem;
+  padding: 1.25rem 0.75rem;
   background: rgba(255,255,255,0.04);
   border: 1.5px solid var(--border);
   border-radius: 1rem;
@@ -708,7 +709,7 @@ a {
 }
 
 .region-card-name {
-  font-size: 0.8rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text);
   line-height: 1.2;
@@ -3400,8 +3401,9 @@ a {
   background: rgba(255,255,255,0.035) !important;
   border: 1.5px solid rgba(255,255,255,0.08) !important;
   border-radius: 12px !important;
-  padding: 1rem 0.75rem !important;
+  padding: 1.25rem 0.75rem !important;
   transition: all 0.25s ease !important;
+  justify-content: center !important;
 }
 
 [data-theme="dark"] .region-card:hover {
@@ -3422,7 +3424,7 @@ a {
 }
 
 .region-card-name {
-  font-size: 0.82rem !important;
+  font-size: 1.1rem !important;
   font-weight: 700 !important;
   color: rgba(255,255,255,0.9) !important;
 }

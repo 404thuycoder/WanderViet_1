@@ -2392,6 +2392,23 @@
         opacity: 0.7
       }
     }).addTo(tripMap);
+
+    // Hiển thị Quần đảo Hoàng Sa và Trường Sa (Việt Nam)
+    var hoangSaIcon = L.divIcon({
+      className: 'island-label',
+      html: '<div style="font-weight:bold; color:#1e40af; text-shadow: 1px 1px 2px #fff, -1px -1px 2px #fff, 1px -1px 2px #fff, -1px 1px 2px #fff; white-space:nowrap; font-size:12px; pointer-events:none; background:none; border:none;">Hoàng Sa (Việt Nam)</div>',
+      iconSize: [200, 20],
+      iconAnchor: [100, 10]
+    });
+    L.marker([16.3333, 112.0], {icon: hoangSaIcon, interactive: false}).addTo(tripMap);
+
+    var truongSaIcon = L.divIcon({
+      className: 'island-label',
+      html: '<div style="font-weight:bold; color:#1e40af; text-shadow: 1px 1px 2px #fff, -1px -1px 2px #fff, 1px -1px 2px #fff, -1px 1px 2px #fff; white-space:nowrap; font-size:12px; pointer-events:none; background:none; border:none;">Trường Sa (Việt Nam)</div>',
+      iconSize: [200, 20],
+      iconAnchor: [100, 10]
+    });
+    L.marker([10.0, 114.0], {icon: truongSaIcon, interactive: false}).addTo(tripMap);
   }
   function redrawMap() {
     initMapIfNeeded();

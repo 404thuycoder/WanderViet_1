@@ -812,6 +812,11 @@ router.get('/user/stats', auth, async (req, res) => {
     });
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
 
+    const PlaceReview = mongoose.models.PlaceReview || require('../models/PlaceReview');
+    const Booking = mongoose.models.Booking || require('../models/Booking');
+    const UserActivity = mongoose.models.UserActivity || require('../models/UserActivity');
+    const VoucherUsage = mongoose.models.VoucherUsage || require('../models/VoucherUsage');
+
     const itineraries = await Itinerary.find({ userId: req.user.id, isDeleted: false });
     
     // Đếm tin nhắn chatbot (userId trong Conversation là string)
@@ -820,99 +825,467 @@ router.get('/user/stats', auth, async (req, res) => {
     // Phân bổ vùng miền từ hành trình
     const regionMap = {};
     itineraries.forEach(itin => {
-      // Giả sử destination có dạng "Tên, Tỉnh" hoặc chỉ "Tên"
       const parts = itin.destination.split(',');
       const reg = parts[parts.length - 1].trim();
       regionMap[reg] = (regionMap[reg] || 0) + 1;
     });
 
-    // Phân bổ trạng thái
+    // Phân bổ trạng thái hành trình
     const statusMap = { planning: 0, completed: 0, missed: 0 };
     itineraries.forEach(itin => {
-      if (statusMap.hasOwnProperty(itin.status)) {
-        statusMap[itin.status]++;
-      }
+      if (statusMap.hasOwnProperty(itin.status)) statusMap[itin.status]++;
     });
 
-    // Tần suất hoạt động (7 ngày gần nhất)
+    // Tần suất hoạt động (7 ngày gần nhất) & xu hướng chi tiêu
     const activityDays = [0, 0, 0, 0, 0, 0, 0];
+    const spendingDays = [0, 0, 0, 0, 0, 0, 0];
     const weekAgo = new Date();
     weekAgo.setDate(weekAgo.getDate() - 7);
-    
     itineraries.filter(i => i.createdAt >= weekAgo).forEach(i => {
-      const day = (new Date(i.createdAt).getDay() + 6) % 7; // Chuyển sang 0=T2, 6=CN
+      const day = (new Date(i.createdAt).getDay() + 6) % 7;
       activityDays[day]++;
     });
 
     const realId = req.user._id || req.user.id;
     let userIdObj = null;
     if (mongoose.Types.ObjectId.isValid(realId)) {
-        userIdObj = new mongoose.Types.ObjectId(realId);
+      userIdObj = new mongoose.Types.ObjectId(realId);
     }
 
     // Thống kê social
-    const [friendCount, postCount, posts] = await Promise.all([
-        userIdObj ? Friendship.countDocuments({ $or: [{ requester: userIdObj }, { recipient: userIdObj }], status: 'accepted' }) : Promise.resolve(0),
-        userIdObj ? Post.countDocuments({ userId: userIdObj }) : Promise.resolve(0),
-        userIdObj ? Post.find({ userId: userIdObj }) : Promise.resolve([])
+    const [friendCount, postCount, posts, reviewsCount, bookingsCount, allBookings, userActivities] = await Promise.all([
+      userIdObj ? Friendship.countDocuments({ $or: [{ requester: userIdObj }, { recipient: userIdObj }], status: 'accepted' }) : Promise.resolve(0),
+      userIdObj ? Post.countDocuments({ userId: userIdObj }) : Promise.resolve(0),
+      userIdObj ? Post.find({ userId: userIdObj }).select('likes').lean() : Promise.resolve([]),
+      PlaceReview.countDocuments({ userId: req.user.id }),
+      Booking.countDocuments({ userId: req.user.id }),
+      Booking.find({ userId: req.user.id }).sort({ createdAt: -1 }).lean(),
+      UserActivity.find({ userId: req.user.id }).sort({ timestamp: -1 }).limit(15).lean()
     ]);
 
+    const recentBookings = allBookings.slice(0, 15);
     const totalLikes = (posts || []).reduce((sum, p) => sum + (p.likes ? p.likes.length : 0), 0);
 
-    // DEMO DATA FALLBACK: If user is new/empty, provide nice demo data
-    const isNewUser = itineraries.length === 0 && (user.favorites || []).length === 0 && messageCount === 0 && postCount === 0;
+    // ── Smart & Financial Stats ──────────────────────
+    // 1. Số ngày hoạt động kể từ khi đăng ký
+    const daysSinceJoined = user.createdAt
+      ? Math.max(1, Math.floor((Date.now() - new Date(user.createdAt).getTime()) / (1000 * 60 * 60 * 24)))
+      : 1;
+
+    // 2. Số nhiệm vụ đã hoàn thành
+    const questsCompleted = (user.claimedQuests || []).length;
+
+    // 3. Phân tích tài chính & hoạt động theo các phạm vi thời gian (7d, 30d, all-time)
+    const formatDisplay = (val) => {
+      if (val === 0) return '0 VNĐ';
+      if (val >= 1000000) return `${(val / 1000000).toFixed(1).replace(/\.0$/, '')} Tr VNĐ`;
+      if (val >= 1000) return `${Math.round(val / 1000)}K VNĐ`;
+      return `${val} VNĐ`;
+    };
+
+    // Tạo nhãn thời gian động cho trục biểu đồ
+    const labels7 = [];
+    const labels30 = [];
+    const labelsAll = [];
     
-    let summary = {
-      trips: itineraries.length,
-      favorites: (user.favorites || []).length,
-      messages: messageCount,
-      posts: postCount,
-      likes: totalLikes,
-      friends: friendCount,
-      exp: user.points || 0,
-      rank: (user.rank || 'Khám phá') + ' ' + (user.rankTier || '')
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      labels7.push(d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' }));
+    }
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      labels30.push(d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' }));
+    }
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      labelsAll.push('Thg ' + (d.getMonth() + 1));
+    }
+
+    // Thiết lập mốc thời gian bắt đầu
+    const start7 = new Date();
+    start7.setDate(start7.getDate() - 6);
+    start7.setHours(0,0,0,0);
+
+    const start30 = new Date();
+    start30.setDate(start30.getDate() - 29);
+    start30.setHours(0,0,0,0);
+
+    const startAll = new Date();
+    startAll.setMonth(startAll.getMonth() - 5);
+    startAll.setDate(1);
+    startAll.setHours(0,0,0,0);
+
+    const tfData = {
+      '7': {
+        spent: 0, savings: 0, bookingsCount: 0,
+        spendingTrend: new Array(7).fill(0),
+        activityTrend: new Array(7).fill(0),
+        categories: { stay: 0, dining: 0, tour: 0, rental: 0, other: 0 },
+        regions: {},
+        completedTrips: 0, totalTrips: 0
+      },
+      '30': {
+        spent: 0, savings: 0, bookingsCount: 0,
+        spendingTrend: new Array(30).fill(0),
+        activityTrend: new Array(30).fill(0),
+        categories: { stay: 0, dining: 0, tour: 0, rental: 0, other: 0 },
+        regions: {},
+        completedTrips: 0, totalTrips: 0
+      },
+      'all': {
+        spent: 0, savings: 0, bookingsCount: 0,
+        spendingTrend: new Array(6).fill(0),
+        activityTrend: new Array(6).fill(0),
+        categories: { stay: 0, dining: 0, tour: 0, rental: 0, other: 0 },
+        regions: {},
+        completedTrips: 0, totalTrips: 0
+      }
     };
 
-    let charts = {
-      activity: activityDays,
-      regions: regionMap,
-      status: statusMap,
-      interests: user.preferences?.interests || [],
-      radar: [
-        70 + (itineraries.length * 5) + (postCount * 2), // Khám phá
-        60 + (user.points / 100),                      // Kỹ năng
-        50 + (messageCount / 10),                      // AI
-        80 + (friendCount * 3),                        // Dịch vụ/Cộng đồng
-        90,                                            // Bền bỉ
-        50 + (totalLikes / 10)                         // Sở thích/Danh tiếng
-      ].map(v => Math.min(v, 100))
-    };
-
-    if (isNewUser) {
-      summary = {
-        trips: 12,
-        favorites: 24,
-        messages: 156,
-        posts: 8,
-        likes: 42,
-        friends: 15,
-        exp: 1250,
-        rank: 'Vàng I'
-      };
-      charts = {
-        activity: [3, 5, 2, 8, 12, 7, 9],
-        regions: { 'Hà Nội': 5, 'TP.HCM': 3, 'Đà Nẵng': 2, 'Sapa': 2 },
-        status: { planning: 4, completed: 8, missed: 0 },
-        interests: ['Văn hóa', 'Ẩm thực', 'Biển', 'Núi'],
-        radar: [85, 70, 90, 65, 80, 75]
+    const reqMonth = req.query.month ? parseInt(req.query.month) : null;
+    let monthStartDate, monthEndDate, monthDays;
+    let labelsMonth = [];
+    if (reqMonth >= 1 && reqMonth <= 12) {
+      const year = new Date().getFullYear();
+      monthStartDate = new Date(year, reqMonth - 1, 1, 0, 0, 0, 0);
+      monthEndDate = new Date(year, reqMonth, 0, 23, 59, 59, 999);
+      monthDays = monthEndDate.getDate();
+      for (let i = 1; i <= monthDays; i++) {
+        labelsMonth.push(`${i}/${reqMonth}`);
+      }
+      tfData['month'] = {
+        spent: 0, savings: 0, bookingsCount: 0,
+        spendingTrend: new Array(monthDays).fill(0),
+        activityTrend: new Array(monthDays).fill(0),
+        categories: { stay: 0, dining: 0, tour: 0, rental: 0, other: 0 },
+        regions: {},
+        completedTrips: 0, totalTrips: 0
       };
     }
 
-    res.json({
-      success: true,
-      summary,
-      charts
+    // Duyệt đặt dịch vụ
+    allBookings.forEach(bk => {
+      const bkDate = new Date(bk.createdAt || Date.now());
+      const isPaid = bk.status !== 'cancelled';
+
+      if (isPaid) {
+        // All-time grouping (theo tháng)
+        if (bkDate >= startAll) {
+          const diffMonths = (bkDate.getFullYear() - startAll.getFullYear()) * 12 + (bkDate.getMonth() - startAll.getMonth());
+          if (diffMonths >= 0 && diffMonths < 6) {
+            tfData['all'].spendingTrend[diffMonths] += (bk.totalPrice || 0);
+          }
+        }
+        tfData['all'].spent += (bk.totalPrice || 0);
+        tfData['all'].savings += (bk.discountAmount || 0);
+        tfData['all'].bookingsCount++;
+        const cat = bk.businessCategory || 'other';
+        const targetCat = tfData['all'].categories.hasOwnProperty(cat) ? cat : 'other';
+        tfData['all'].categories[targetCat] += (bk.totalPrice || 0);
+
+        // Last 30 days
+        if (bkDate >= start30) {
+          const diffDays = Math.floor((bkDate - start30) / (24 * 3600 * 1000));
+          if (diffDays >= 0 && diffDays < 30) {
+            tfData['30'].spendingTrend[diffDays] += (bk.totalPrice || 0);
+          }
+          tfData['30'].spent += (bk.totalPrice || 0);
+          tfData['30'].savings += (bk.discountAmount || 0);
+          tfData['30'].bookingsCount++;
+          tfData['30'].categories[tfData['30'].categories.hasOwnProperty(cat) ? cat : 'other'] += (bk.totalPrice || 0);
+        }
+
+        // Last 7 days
+        if (bkDate >= start7) {
+          const diffDays = Math.floor((bkDate - start7) / (24 * 3600 * 1000));
+          if (diffDays >= 0 && diffDays < 7) {
+            tfData['7'].spendingTrend[diffDays] += (bk.totalPrice || 0);
+          }
+          tfData['7'].spent += (bk.totalPrice || 0);
+          tfData['7'].savings += (bk.discountAmount || 0);
+          tfData['7'].bookingsCount++;
+          tfData['7'].categories[tfData['7'].categories.hasOwnProperty(cat) ? cat : 'other'] += (bk.totalPrice || 0);
+        }
+
+        // Month-specific
+        if (tfData['month'] && bkDate >= monthStartDate && bkDate <= monthEndDate) {
+          const dayOfMonth = bkDate.getDate() - 1;
+          if (dayOfMonth >= 0 && dayOfMonth < monthDays) {
+            tfData['month'].spendingTrend[dayOfMonth] += (bk.totalPrice || 0);
+          }
+          tfData['month'].spent += (bk.totalPrice || 0);
+          tfData['month'].savings += (bk.discountAmount || 0);
+          tfData['month'].bookingsCount++;
+          tfData['month'].categories[tfData['month'].categories.hasOwnProperty(cat) ? cat : 'other'] += (bk.totalPrice || 0);
+        }
+      }
     });
+
+    // Duyệt hành trình
+    itineraries.forEach(itin => {
+      const itinDate = new Date(itin.createdAt || Date.now());
+      const isCompleted = itin.status === 'completed';
+      const destParts = itin.destination ? itin.destination.split(',') : [];
+      const reg = destParts.length ? destParts[destParts.length - 1].trim() : 'Khác';
+
+      // All-time (theo tháng)
+      if (itinDate >= startAll) {
+        const diffMonths = (itinDate.getFullYear() - startAll.getFullYear()) * 12 + (itinDate.getMonth() - startAll.getMonth());
+        if (diffMonths >= 0 && diffMonths < 6) {
+          tfData['all'].activityTrend[diffMonths]++;
+        }
+      }
+      tfData['all'].totalTrips++;
+      if (isCompleted) tfData['all'].completedTrips++;
+      tfData['all'].regions[reg] = (tfData['all'].regions[reg] || 0) + 1;
+
+      // Last 30 days
+      if (itinDate >= start30) {
+        const diffDays = Math.floor((itinDate - start30) / (24 * 3600 * 1000));
+        if (diffDays >= 0 && diffDays < 30) {
+          tfData['30'].activityTrend[diffDays]++;
+        }
+        tfData['30'].totalTrips++;
+        if (isCompleted) tfData['30'].completedTrips++;
+        tfData['30'].regions[reg] = (tfData['30'].regions[reg] || 0) + 1;
+      }
+
+      // Last 7 days
+      if (itinDate >= start7) {
+        const diffDays = Math.floor((itinDate - start7) / (24 * 3600 * 1000));
+        if (diffDays >= 0 && diffDays < 7) {
+          tfData['7'].activityTrend[diffDays]++;
+        }
+        tfData['7'].totalTrips++;
+        if (isCompleted) tfData['7'].completedTrips++;
+        tfData['7'].regions[reg] = (tfData['7'].regions[reg] || 0) + 1;
+      }
+
+      // Month-specific
+      if (tfData['month'] && itinDate >= monthStartDate && itinDate <= monthEndDate) {
+        const dayOfMonth = itinDate.getDate() - 1;
+        if (dayOfMonth >= 0 && dayOfMonth < monthDays) {
+          tfData['month'].activityTrend[dayOfMonth]++;
+        }
+        tfData['month'].totalTrips++;
+        if (isCompleted) tfData['month'].completedTrips++;
+        tfData['month'].regions[reg] = (tfData['month'].regions[reg] || 0) + 1;
+      }
+    });
+
+    // Tiết kiệm qua voucher bổ sung từ VoucherUsage
+    let totalSavings = tfData['all'].savings;
+    try {
+      const usages = await VoucherUsage.find({ userId: req.user.id }).select('discountAmount').lean();
+      const voucherSavings = usages.reduce((sum, u) => sum + (u.discountAmount || 0), 0);
+      totalSavings = Math.max(totalSavings, voucherSavings);
+      tfData['all'].savings = totalSavings;
+    } catch (e) { /* VoucherUsage error fallback */ }
+
+    // 4. Chỉ số phát triển bền vững (ESG - quy đổi khí thải)
+    const carbonKg = Math.round((itineraries.length * 2.4 + tfData['all'].completedTrips * 1.6) * 10) / 10;
+    const carbonDisplay = carbonKg > 0 ? `${carbonKg} kg CO₂` : '0 kg CO₂';
+
+    // 5. Cấp độ thành viên doanh nghiệp & tiến trình XP
+    const userPoints = user.points || 0;
+    const currentLevel = Math.floor(userPoints / 1000) + 1;
+    const xpInLevel = userPoints % 1000;
+    const xpProgress = Math.round((xpInLevel / 1000) * 100);
+
+    // 6. Xây dựng cấu trúc dữ liệu theo timeframe
+    const timeframes = {};
+    const tfKeys = ['7', '30', 'all'];
+    if (tfData['month']) {
+      tfKeys.push('month');
+    }
+    tfKeys.forEach(tf => {
+      const data = tfData[tf];
+      
+      const tfCarbonKg = Math.round((data.totalTrips * 2.4 + data.completedTrips * 1.6) * 10) / 10;
+      const tfCarbonDisplay = tfCarbonKg > 0 ? `${tfCarbonKg} kg CO₂` : '0 kg CO₂';
+      
+      const tfCompletionRate = data.totalTrips > 0
+        ? Math.round((data.completedTrips / data.totalTrips) * 1000) / 10
+        : 0;
+
+      timeframes[tf] = {
+        summary: {
+          totalSpent: formatDisplay(data.spent),
+          savings: formatDisplay(data.savings),
+          carbon: tfCarbonDisplay,
+          completionRate: tfCompletionRate + '%',
+          trips: data.totalTrips,
+          bookingsCount: data.bookingsCount,
+          activeDays: daysSinceJoined,
+          quests: questsCompleted,
+          reviewsCount: reviewsCount,
+          level: currentLevel,
+          levelProgress: xpProgress,
+          rank: (user.rank || 'Khám phá') + ' ' + (user.rankTier || '')
+        },
+        charts: {
+          labels: tf === '7' ? labels7 : (tf === '30' ? labels30 : (tf === 'month' ? labelsMonth : labelsAll)),
+          spendingTrend: data.spendingTrend,
+          activity: data.activityTrend,
+          categoryBreakdown: data.categories,
+          regions: data.regions,
+          radar: [
+            70 + (data.totalTrips * 5) + (postCount * 2),
+            60 + (userPoints / 100),
+            50 + (messageCount / 10),
+            80 + (friendCount * 3),
+            90,
+            50 + (totalLikes / 10)
+          ].map(v => Math.min(v, 100))
+        }
+      };
+    });
+
+    // 7. Xác định tình trạng huy hiệu / thành tích
+    const badges = {
+      explorer: { unlocked: itineraries.length > 0, progress: Math.min(itineraries.length * 20, 100), label: 'Nhà Thám Hiểm', desc: 'Đã tạo ít nhất 1 lộ trình du lịch.' },
+      creator: { unlocked: postCount > 0, progress: Math.min(postCount * 33.3, 100), label: 'Cây Bút Trẻ', desc: 'Đã đăng bài viết trên cộng đồng.' },
+      aiFriend: { unlocked: messageCount >= 5, progress: Math.min((messageCount / 5) * 100, 100), label: 'Chiến Thần AI', desc: 'Tương tác trợ lý AI từ 5 lần trở lên.' },
+      critic: { unlocked: reviewsCount > 0, progress: Math.min(reviewsCount * 50, 100), label: 'Nhà Phê Bình', desc: 'Đăng đánh giá chất lượng về địa điểm.' },
+      vip: { unlocked: bookingsCount > 0 || tfData['all'].spent > 0, progress: Math.min(bookingsCount * 50, 100), label: 'Lữ Khách VIP', desc: 'Sử dụng dịch vụ hoặc đặt tour thành công.' },
+      eco: { unlocked: carbonKg >= 4, progress: Math.min((carbonKg / 4) * 100, 100), label: 'Đại Sứ Xanh', desc: 'Tiết kiệm phát thải carbon từ 4kg CO₂.' }
+    };
+
+    // DEMO DATA FALLBACK cho người dùng mới hoàn toàn
+    const isNewUser = itineraries.length === 0 && (user.favorites || []).length === 0 && messageCount === 0 && postCount === 0 && bookingsCount === 0;
+
+    let summary = timeframes['all'].summary;
+    let charts = timeframes['all'].charts;
+
+    let bookingsList = recentBookings;
+    let activitiesList = userActivities;
+
+    if (isNewUser) {
+      summary = {
+        trips: 12, favorites: 24, messages: 156, posts: 8,
+        likes: 42, friends: 15, exp: 1250, rank: 'Vàng I',
+        activeDays: 45, quests: 8,
+        savings: '1.2 Tr VNĐ', carbon: '28.8 kg CO₂',
+        reviewsCount: 14, bookingsCount: 18,
+        totalSpent: '12.4 Tr VNĐ', completionRate: '83.3%',
+        carbonKg: 28.8, level: 2, levelProgress: 25
+      };
+      charts = {
+        activity: [18, 22, 15, 32, 25, 12],
+        spendingTrend: [1800000, 2200000, 1500000, 3200000, 2500000, 1200000],
+        regions: { 'Hà Nội': 5, 'TP.HCM': 3, 'Đà Nẵng': 2, 'Sapa': 2 },
+        status: { planning: 4, completed: 8, missed: 0 },
+        interests: ['Văn hóa', 'Ẩm thực', 'Biển', 'Núi'],
+        categoryBreakdown: { stay: 6500000, dining: 1800000, tour: 3100000, rental: 1000000, other: 0 },
+        radar: [85, 70, 90, 65, 80, 75]
+      };
+      
+      // Fallback timeframes
+      timeframes['7'] = {
+        summary: {
+          totalSpent: '3.1 Tr VNĐ', savings: '450K VNĐ', carbon: '8.5 kg CO₂',
+          completionRate: '100%', trips: 3, bookingsCount: 4, activeDays: 45, quests: 8, reviewsCount: 14,
+          level: 2, levelProgress: 25, rank: 'Vàng I'
+        },
+        charts: {
+          labels: labels7,
+          spendingTrend: [450000, 850000, 0, 1200000, 600000, 0, 0],
+          activity: [1, 2, 0, 1, 1, 0, 0],
+          categoryBreakdown: { stay: 2000000, dining: 500000, tour: 600000, rental: 0, other: 0 },
+          regions: { 'Hà Nội': 2, 'Sapa': 1 },
+          radar: [85, 70, 90, 65, 80, 75]
+        }
+      };
+      timeframes['30'] = {
+        summary: {
+          totalSpent: '12.4 Tr VNĐ', savings: '1.2 Tr VNĐ', carbon: '28.8 kg CO₂',
+          completionRate: '83.3%', trips: 12, bookingsCount: 18, activeDays: 45, quests: 8, reviewsCount: 14,
+          level: 2, levelProgress: 25, rank: 'Vàng I'
+        },
+        charts: {
+          labels: labels30,
+          spendingTrend: [
+            350000, 450000, 0, 600000, 1200000, 0, 0,
+            850000, 450000, 1500000, 950000, 0, 1800000, 0,
+            300000, 0, 750000, 0, 1100000, 0, 500000,
+            0, 0, 600000, 0, 900000, 0, 0, 0, 0
+          ],
+          activity: [
+            1, 0, 0, 1, 2, 0, 0,
+            1, 0, 1, 1, 0, 1, 0,
+            0, 0, 1, 0, 1, 0, 1,
+            0, 0, 1, 0, 1, 0, 0, 0, 0
+          ],
+          categoryBreakdown: { stay: 6500000, dining: 1800000, tour: 3100000, rental: 1000000, other: 0 },
+          regions: { 'Hà Nội': 5, 'TP.HCM': 3, 'Đà Nẵng': 2, 'Sapa': 2 },
+          radar: [85, 70, 90, 65, 80, 75]
+        }
+      };
+      timeframes['all'] = {
+        summary: {
+          totalSpent: '12.4 Tr VNĐ', savings: '1.2 Tr VNĐ', carbon: '28.8 kg CO₂',
+          completionRate: '83.3%', trips: 12, bookingsCount: 18, activeDays: 45, quests: 8, reviewsCount: 14,
+          level: 2, levelProgress: 25, rank: 'Vàng I'
+        },
+        charts: {
+          labels: labelsAll,
+          spendingTrend: [1800000, 2200000, 1500000, 3200000, 2500000, 1200000],
+          activity: [2, 3, 1, 4, 1, 1],
+          categoryBreakdown: { stay: 6500000, dining: 1800000, tour: 3100000, rental: 1000000, other: 0 },
+          regions: { 'Hà Nội': 5, 'TP.HCM': 3, 'Đà Nẵng': 2, 'Sapa': 2 },
+          radar: [85, 70, 90, 65, 80, 75]
+        }
+      };
+
+      if (tfData['month']) {
+        const dummySpending = new Array(monthDays).fill(0);
+        const dummyActivity = new Array(monthDays).fill(0);
+        for (let i = 0; i < monthDays; i++) {
+          if (i % 4 === 0) {
+            dummySpending[i] = 300000 + (i * 25000) % 600000;
+            dummyActivity[i] = 1;
+          } else if (i % 7 === 0) {
+            dummySpending[i] = 750000 + (i * 15000) % 900000;
+            dummyActivity[i] = 2;
+          }
+        }
+        timeframes['month'] = {
+          summary: {
+            totalSpent: '4.2 Tr VNĐ', savings: '550K VNĐ', carbon: '10.8 kg CO₂',
+            completionRate: '80%', trips: 4, bookingsCount: 5, activeDays: daysSinceJoined, quests: questsCompleted, reviewsCount: reviewsCount,
+            level: currentLevel, levelProgress: xpProgress, rank: (user.rank || 'Khám phá') + ' ' + (user.rankTier || '')
+          },
+          charts: {
+            labels: labelsMonth,
+            spendingTrend: dummySpending,
+            activity: dummyActivity,
+            categoryBreakdown: { stay: 3000000, dining: 700000, tour: 500000, rental: 0, other: 0 },
+            regions: { 'Hà Nội': 3, 'Sapa': 1 },
+            radar: [85, 70, 90, 65, 80, 75]
+          }
+        };
+      }
+
+      bookingsList = [
+        { bookingId: 'BK-982130', placeName: 'Khách Sạn Mường Thanh Sapa', businessCategory: 'stay', useDate: new Date(Date.now() - 2 * 24 * 3600 * 1000), totalPrice: 3200000, paymentStatus: 'paid', status: 'completed' },
+        { bookingId: 'BK-761923', placeName: 'Nhà Hàng Cơm Niêu Đà Nẵng', businessCategory: 'dining', useDate: new Date(Date.now() - 5 * 24 * 3600 * 1000), totalPrice: 850000, paymentStatus: 'paid', status: 'completed' },
+        { bookingId: 'BK-552190', placeName: 'Tour Ngũ Hành Sơn - Hội An', businessCategory: 'tour', useDate: new Date(Date.now() - 10 * 24 * 3600 * 1000), totalPrice: 1500000, paymentStatus: 'paid', status: 'completed' },
+        { bookingId: 'BK-441239', placeName: 'Thuê Xe Máy Tự Lái Đà Nẵng', businessCategory: 'rental', useDate: new Date(Date.now() - 12 * 24 * 3600 * 1000), totalPrice: 450000, paymentStatus: 'paid', status: 'completed' },
+        { bookingId: 'BK-213904', placeName: 'Cáp Treo Bà Nà Hills', businessCategory: 'facility', useDate: new Date(Date.now() - 15 * 24 * 3600 * 1000), totalPrice: 1800000, paymentStatus: 'paid', status: 'completed' }
+      ];
+      activitiesList = [
+        { type: 'booking', description: 'Đặt thành công dịch vụ tại Khách Sạn Mường Thanh Sapa (Mã: BK-982130)', ip: '192.168.1.15', userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', timestamp: new Date(Date.now() - 2 * 24 * 3600 * 1000) },
+        { type: 'itinerary_gen', description: 'Hệ thống AI lập lộ trình du lịch Đà Nẵng - Hội An 3 ngày 2 đêm', ip: '192.168.1.15', userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', timestamp: new Date(Date.now() - 3 * 24 * 3600 * 1000) },
+        { type: 'review', description: 'Viết đánh giá 5 sao cho Nhà Hàng Cơm Niêu Đà Nẵng', ip: '115.79.132.4', userAgent: 'Chrome/125.0.0.0 (Windows)', timestamp: new Date(Date.now() - 5 * 24 * 3600 * 1000) },
+        { type: 'search', description: 'Tìm kiếm địa điểm: "Địa điểm checkin đẹp ở Sapa"', ip: '115.79.132.4', userAgent: 'Chrome/125.0.0.0 (Windows)', timestamp: new Date(Date.now() - 6 * 24 * 3600 * 1000) },
+        { type: 'social_post', description: 'Đăng bài viết mới trên cộng đồng WanderViet: "Chuyến đi Sapa đáng nhớ!"', ip: '115.79.132.4', userAgent: 'Chrome/125.0.0.0 (Windows)', timestamp: new Date(Date.now() - 7 * 24 * 3600 * 1000) }
+      ];
+    }
+
+    res.json({ success: true, summary, charts, timeframes, bookings: bookingsList, activities: activitiesList, badges });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

@@ -800,7 +800,7 @@ html:not([data-theme="dark"]) .user-rank-badge .rank-sprite {
   align-items: center;
   gap: 12px;
   padding: 0.75rem 1rem;
-  color: var(--text-muted);
+  color: var(--text);
   font-size: 0.9rem;
   border-radius: 10px;
   transition: all 0.2s;
@@ -809,11 +809,12 @@ html:not([data-theme="dark"]) .user-rank-badge .rank-sprite {
   border: none;
   background: transparent;
   text-align: left;
+  font-weight: 500;
 }
 
 .user-dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--text);
 }
 
 .user-dropdown-item--danger:hover {
@@ -7200,12 +7201,7 @@ a.user-dropdown__item:hover {
   border-bottom: 1px solid var(--border);
 }
 
-.stats-summary-cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.25rem;
-  margin-bottom: 2rem;
-}
+/* Stats Modal styles managed by SharedUI.js injection (wv-global-performance-styles) */
 
 .stats-card {
   padding: 1rem 1.25rem;
@@ -7360,167 +7356,17 @@ a.user-dropdown__item:hover {
   margin: 0 1.5rem 1rem;
 }
 
-/* --- Activity Stats Modal Premium Styling --- */
-.activity-stats-modal {
-  background: rgba(15, 23, 42, 0.8) !important;
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
-  overflow: hidden;
-}
-
-.stats-summary-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 2rem;
-}
-
-.stats-card {
-  background: rgba(255, 255, 255, 0.03);
-  padding: 1.5rem;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.stats-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.stats-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  transform: translateY(-4px);
-  border-color: rgba(0, 240, 255, 0.2);
-}
-
-.stats-card:hover::before {
-  opacity: 1;
-}
-
-.stats-card__label {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
-}
-
-.stats-card__value {
-  font-size: 2rem;
-  font-weight: 700;
-  font-family: var(--font-display);
-  color: var(--text);
-  line-height: 1;
-}
-
-.stats-card__trend {
-  margin-top: 0.75rem;
-  font-size: 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  color: var(--text-muted);
-}
-
-.stats-card__trend.up {
-  color: #10b981;
-}
-
-.stats-card__trend.down {
-  color: #f43f5e;
-}
-
-.activity-charts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
-}
-
-.chart-container {
-  background: rgba(255, 255, 255, 0.02);
-  padding: 1.5rem;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  min-height: 280px;
-  display: flex;
-  flex-direction: column;
-}
-
-.chart-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 1.25rem;
-  color: var(--text);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.extra-stats-section {
-  background: rgba(0, 240, 255, 0.03);
-  padding: 2rem;
-  border-radius: 28px;
-  border: 1px solid rgba(0, 240, 255, 0.08);
-}
-
-.extra-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-}
-
-.extra-stat-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 16px;
-}
-
-.extra-stat-item .icon {
-  font-size: 1.5rem;
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.extra-stat-item .info strong {
-  display: block;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.extra-stat-item .info span {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--accent);
-}
-
+/* Stats Modal responsive — layout managed by SharedUI.js injection */
 @media (max-width: 640px) {
   .activity-charts-grid {
     grid-template-columns: 1fr;
   }
+  .stats-summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
+
+
 
 /* --- Performance: Skeleton Loading --- */
 .skeleton {

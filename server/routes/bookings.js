@@ -31,7 +31,22 @@ router.post('/', auth, async (req, res) => {
     const totalPrice = req.body.totalPrice !== undefined ? Number(req.body.totalPrice) : ((place.price || place.priceFrom || 0) * (peopleCount || 1));
     const type = bookingType || (place.isTour ? 'tour' : 'service');
     // Tự động set businessCategory từ Place để phân loại Đặt chỗ / Thuê xe
-    const bizCat = place.businessCategory || (place.kind === 'thue-xe' ? 'rental' : 'other');
+    let bizCat = place.businessCategory || (place.kind === 'thue-xe' ? 'rental' : 'other');
+    const catMap = {
+      hotel: 'stay',
+      restaurant: 'dining',
+      spa: 'facility',
+      transport: 'rental',
+      activity: 'tour',
+      meeting: 'facility'
+    };
+    if (catMap[bizCat]) {
+      bizCat = catMap[bizCat];
+    }
+    const allowedCategories = ['dining', 'stay', 'tour', 'facility', 'rental', 'other'];
+    if (!allowedCategories.includes(bizCat)) {
+      bizCat = 'other';
+    }
 
     let finalPrice = totalPrice;
     let discountAmount = 0;

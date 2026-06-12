@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    WanderViet AI User Web — UI Upgrade v2.0
    Additive stylesheet: chỉ THÊM styles, không xóa logic cũ
    Import AFTER styles.css
@@ -628,9 +628,19 @@ h1, h2, h3,
 }
 
 .user-dropdown-item:hover {
-  background: rgba(99, 102, 241, 0.07) !important;
+  background: rgba(99, 102, 241, 0.08) !important;
   border-radius: 10px !important;
   color: #6366f1 !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="dark"] .user-dropdown-item {
+  color: rgba(241, 245, 249, 0.85) !important;
+}
+
+[data-theme="dark"] .user-dropdown-item:hover {
+  background: rgba(99, 102, 241, 0.14) !important;
+  color: #a5b4fc !important;
 }
 
 /* ============================================================

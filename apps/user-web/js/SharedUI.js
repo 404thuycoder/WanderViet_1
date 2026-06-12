@@ -314,7 +314,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     socket = io({ 
         auth: { token: token || '' },
-        transports: ['websocket', 'polling'],
+        transports: ['polling', 'websocket'],
         reconnectionAttempts: 5,
         timeout: 10000
     });

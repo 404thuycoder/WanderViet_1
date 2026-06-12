@@ -3327,10 +3327,15 @@
       var topPlaces = PLACES.filter(p => p.top).slice(0, 10);
       if (topPlaces.length < 5) topPlaces = PLACES.slice(0, 10);
       slides = topPlaces.map(p => {
-        var validImages = (p.images || []).filter(function(img) {
-          return img && img !== 'undefined' && img !== 'null' && img.indexOf('uploads/undefined') === -1;
-        });
-        var url = (validImages.length > 0) ? validImages[0] : (p.image && p.image !== 'undefined' && p.image !== 'null' && p.image.indexOf('uploads/undefined') === -1 ? p.image : 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200');
+        // Blacklist: only exclude known bad/collage thumbnails or broken paths
+        var badPatterns = ['danh-lam-thang-canh-ninh-binh-thumbnail', '20_dia_diem_du_lich_ha_giang_a', 'uploads/undefined'];
+        function isGoodImg(img) {
+          if (!img || img === 'undefined' || img === 'null') return false;
+          for (var i = 0; i < badPatterns.length; i++) { if (img.indexOf(badPatterns[i]) !== -1) return false; }
+          return true;
+        }
+        var validImages = (p.images || []).filter(isGoodImg);
+        var url = (validImages.length > 0) ? validImages[0] : (isGoodImg(p.image) ? p.image : 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200');
         return {
           url: url,
           id: p.id || p._id,
@@ -3346,11 +3351,21 @@
     // Fallback slides with extra metadata
     if (slides.length === 0) {
       slides = [
-        { url: 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1200', id: null, name: 'Phố cổ Hội An', region: 'Quảng Nam', verified: true, rating: 4.9, reviewCount: 2340 },
-        { url: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?q=80&w=1200', id: null, name: 'Vịnh Hạ Long', region: 'Quảng Ninh', verified: true, rating: 4.8, reviewCount: 5120 },
-        { url: 'https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?q=80&w=1200', id: null, name: 'Sa Pa', region: 'Lào Cai', verified: true, rating: 4.7, reviewCount: 1870 },
-        { url: 'https://images.unsplash.com/photo-1555431189-d58b1740006d?q=80&w=1200', id: null, name: 'Đà Nẵng', region: 'Miền Trung', verified: true, rating: 4.8, reviewCount: 3210 }
+        { url: 'https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=1600', id: null, name: 'Phố cổ Hội An', region: 'Quảng Nam', verified: true, rating: 4.9, reviewCount: 2340 },
+        { url: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?q=80&w=1600', id: null, name: 'Vịnh Hạ Long', region: 'Quảng Ninh', verified: true, rating: 4.8, reviewCount: 5120 },
+        { url: 'https://images.unsplash.com/photo-1509030450996-dd1a26dda07a?q=80&w=1600', id: null, name: 'Sa Pa', region: 'Lào Cai', verified: true, rating: 4.7, reviewCount: 1870 },
+        { url: 'https://images.unsplash.com/photo-1555431189-d58b1740006d?q=80&w=1600', id: null, name: 'Đà Nẵng', region: 'Miền Trung', verified: true, rating: 4.8, reviewCount: 3210 }
       ];
+    }
+
+    // Preload all slideshow images for smooth, flash-free transition
+    if (slides && slides.length > 0) {
+      slides.forEach(function(s) {
+        if (s.url) {
+          var img = new Image();
+          img.src = s.url;
+        }
+      });
     }
 
     var currentIndex = 0;

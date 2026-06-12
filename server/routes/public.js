@@ -1,4 +1,4 @@
-﻿const express = require('express');
+const express = require('express');
 const router = express.Router();
 console.log('✅ [public.js] Route module initialized');
 const mongoose = require('mongoose');
@@ -36,39 +36,57 @@ function buildIdQuery(id) {
 
 // GET /api/public/weather/open-meteo - Proxy for Open-Meteo weather API
 router.get('/weather/open-meteo', async (req, res) => {
+  const { lat, lng } = req.query;
+  if (!lat || !lng) {
+    return res.status(400).json({ error: 'lat and lng parameters required' });
+  }
   try {
-    const { lat, lng } = req.query;
-    if (!lat || !lng) {
-      return res.status(400).json({ error: 'lat and lng parameters required' });
-    }
-
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weathercode`;
     const response = await fetch(url);
     const data = await response.json();
-    
     res.json(data);
   } catch (err) {
-    console.error('[Weather/Open-Meteo Error]', err);
-    res.status(500).json({ error: 'Failed to fetch weather data', details: err.message });
+    console.warn('[Weather/Open-Meteo Fallback Mode - Offline or DNS Error]', err.message);
+    res.json({
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lng),
+      current: {
+        temperature_2m: 26.0,
+        weathercode: 0 // Clear sky
+      },
+      isFallback: true
+    });
   }
 });
 
 // GET /api/public/weather/wttr - Proxy for wttr.in weather API
 router.get('/weather/wttr', async (req, res) => {
+  const { q } = req.query;
+  if (!q) {
+    return res.status(400).json({ error: 'q parameter required' });
+  }
   try {
-    const { q } = req.query;
-    if (!q) {
-      return res.status(400).json({ error: 'q parameter required' });
-    }
-
     const url = `https://wttr.in/${encodeURIComponent(q)}?format=j1&lang=vi`;
     const response = await fetch(url);
     const data = await response.json();
-    
     res.json(data);
   } catch (err) {
-    console.error('[Weather/wttr.in Error]', err);
-    res.status(500).json({ error: 'Failed to fetch weather data', details: err.message });
+    console.warn('[Weather/wttr.in Fallback Mode - Offline or DNS Error]', err.message);
+    res.json({
+      current_condition: [
+        {
+          temp_C: "26",
+          weatherCode: "113",
+          weatherDesc: [{ value: "Trời quang đãng" }]
+        }
+      ],
+      nearest_area: [
+        {
+          region: [{ value: q || "Việt Nam" }]
+        }
+      ],
+      isFallback: true
+    });
   }
 });
 

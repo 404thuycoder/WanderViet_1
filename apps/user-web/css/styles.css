@@ -5967,7 +5967,6 @@ section[id] {
   position: relative;
   padding: 10rem 0 8rem;
   background-color: #0f172a; /* Fallback dark */
-  background-image: url('https://images.unsplash.com/photo-1528127269322-539801943592?q=80&w=2000');
   background-size: cover;
   background-position: center;
   overflow: visible;
@@ -5994,6 +5993,9 @@ section[id] {
   position: absolute;
   inset: 0;
   z-index: 1;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .hero-v2__slide {

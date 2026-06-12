@@ -644,9 +644,9 @@ window.WANDER_PLACES = [{
   meta: "Vịnh Hạ Long trên cạn & Di sản Tràng An UNESCO",
   top: true,
   text: "Ninh Bình là 'Vịnh Hạ Long trên cạn' với hệ thống núi đá vôi, sông nước và hang động tuyệt đẹp. Tràng An được UNESCO công nhận là Di sản Thế giới kép.",
-  image: "https://cdn-media.sforum.vn/storage/app/media/ctvseo_16/danh%20lam%20th%E1%BA%AFng%20c%E1%BA%A3nh%20Ninh%20B%C3%ACnh/danh-lam-thang-canh-ninh-binh-thumbnail.jpg",
+  image: "https://images.unsplash.com/photo-1571637539223-27c9cd20e2d5?w=1200&q=80",
   images: [
-    "https://cdn-media.sforum.vn/storage/app/media/ctvseo_16/danh%20lam%20th%E1%BA%AFng%20c%E1%BA%A3nh%20Ninh%20B%C3%ACnh/danh-lam-thang-canh-ninh-binh-thumbnail.jpg",
+    "https://images.unsplash.com/photo-1571637539223-27c9cd20e2d5?w=1200&q=80",
     "https://sodulich.ninhbinh.gov.vn/uploads/images/trang-an-bd_1737078235160%20(1).jpg",
     "https://thanhnienviet.mediacdn.vn/91575133199802368/2025/5/26/photo-1748230467546-17482304703661238448265.jpeg"
   ],

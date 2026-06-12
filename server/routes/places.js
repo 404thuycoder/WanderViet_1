@@ -430,6 +430,32 @@ router.post('/seed', adminTokenAuth, async (req, res) => {
   }
 });
 
+// API để xóa toàn bộ lượt yêu thích
+router.delete('/favorites/all', auth, async (req, res) => {
+  try {
+    const userId = req.user.id || req.user._id;
+    const userQuery = { $or: [{ customId: userId }, { id: userId }] };
+    if (mongoose.Types.ObjectId.isValid(userId)) {
+      userQuery.$or.push({ _id: userId });
+    }
+    const user = await User.findOne(userQuery);
+    if (!user) return res.status(404).json({ success: false, message: 'Người dùng không tồn tại' });
+    
+    if (Array.isArray(user.favorites) && user.favorites.length > 0) {
+      // Giảm favoritesCount cho tất cả địa điểm được thích
+      await Place.updateMany(
+        { _id: { $in: user.favorites } },
+        { $inc: { favoritesCount: -1 } }
+      );
+    }
+    user.favorites = [];
+    await user.save();
+    res.json({ success: true, message: 'Đã xóa toàn bộ danh sách yêu thích' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // API để cập nhật lượt yêu thích (Thả tim)
 router.post('/:id/favorite', auth, async (req, res) => {
   try {

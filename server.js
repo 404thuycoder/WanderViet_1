@@ -48,7 +48,11 @@ app.use((req, res, next) => {
     const isStaticAsset = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.woff', '.woff2', '.ttf'].includes(ext);
     
     if (isStaticAsset) {
-        res.setHeader('Cache-Control', 'public, max-age=86400');
+        if (['.js', '.css'].includes(ext)) {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        } else {
+            res.setHeader('Cache-Control', 'public, max-age=86400');
+        }
         if (['.js', '.css', '.svg', '.json'].includes(ext)) {
             if (ext === '.js') res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
             else if (ext === '.css') res.setHeader('Content-Type', 'text/css; charset=utf-8');
@@ -254,11 +258,19 @@ const dbOptions = {
 };
 
 mongoose.connect(process.env.MONGODB_URI.trim(), dbOptions)
-    .then(() => {
+    .then(async () => {
         console.log('👤 Web Người Dùng:   http://localhost:3000');
         console.log('🛡️ Web Quản Trị:     http://localhost:3001');
         console.log('💼 Web Doanh Nghiệp: http://localhost:3002');
         console.log('✅ MongoDB connected');
+        
+        // Auto-seed default vouchers if DB has 0 vouchers
+        try {
+            const { seedDefaultVouchers } = require('./server/utils/voucherSeeder');
+            await seedDefaultVouchers(false);
+        } catch (seedErr) {
+            console.error('[Auto-Seed] Lỗi nạp vouchers tự động:', seedErr.message);
+        }
         
         const server = http.createServer(app);
         initSocket(server);

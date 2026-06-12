@@ -11,6 +11,12 @@ const path = require('path');
 
 // Memory Cache for static fallback data
 let staticPlacesCache = null;
+
+// Geocoding caches
+const reverseCache = new Map();
+const geocodeSearchCache = new Map();
+const GEO_CACHE_TTL = 1000 * 60 * 60 * 24; // 24 hours
+
 function getPlacesFallback() {
   if (staticPlacesCache) return staticPlacesCache;
   try {
@@ -512,4 +518,94 @@ router.get('/nearby-discovery', async (req, res) => {
   }
 });
 
+// GET /api/public/geocode/reverse - Proxy for Nominatim Reverse Geocoding
+router.get('/geocode/reverse', async (req, res) => {
+  try {
+    const params = new URLSearchParams();
+    params.set('format', 'json');
+    
+    // Copy all query parameters
+    for (const [key, value] of Object.entries(req.query)) {
+      params.set(key, value);
+    }
+
+    const cacheKey = params.toString();
+    if (reverseCache.has(cacheKey)) {
+      const cached = reverseCache.get(cacheKey);
+      if (Date.now() - cached.time < GEO_CACHE_TTL) {
+        return res.json(cached.data);
+      }
+    }
+
+    const url = `https://nominatim.openstreetmap.org/reverse?${params.toString()}`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'WanderViet-Navigation/1.0 (contact@wanderviet.vn)',
+        'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7'
+      }
+    });
+
+    if (response.status === 429) {
+      console.warn('[Reverse Geocode Proxy] Nominatim rate limited (429)');
+      return res.status(429).json({ success: false, message: 'Too many requests' });
+    }
+
+    if (!response.ok) {
+      throw new Error(`Nominatim error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    reverseCache.set(cacheKey, { time: Date.now(), data });
+    res.json(data);
+  } catch (err) {
+    console.error('Reverse Geocode Proxy Error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi Proxy Reverse Geocoding' });
+  }
+});
+
+// GET /api/public/geocode/search - Proxy for Nominatim Address Searching
+router.get('/geocode/search', async (req, res) => {
+  try {
+    const params = new URLSearchParams();
+    params.set('format', 'json');
+    
+    for (const [key, value] of Object.entries(req.query)) {
+      params.set(key, value);
+    }
+
+    const cacheKey = params.toString();
+    if (geocodeSearchCache.has(cacheKey)) {
+      const cached = geocodeSearchCache.get(cacheKey);
+      if (Date.now() - cached.time < GEO_CACHE_TTL) {
+        return res.json(cached.data);
+      }
+    }
+
+    const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'WanderViet-Navigation/1.0 (contact@wanderviet.vn)',
+        'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7'
+      }
+    });
+
+    if (response.status === 429) {
+      console.warn('[Geocode Search Proxy] Nominatim rate limited (429)');
+      return res.status(429).json({ success: false, message: 'Too many requests' });
+    }
+
+    if (!response.ok) {
+      throw new Error(`Nominatim error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    geocodeSearchCache.set(cacheKey, { time: Date.now(), data });
+    res.json(data);
+  } catch (err) {
+    console.error('Geocode Search Proxy Error:', err);
+    res.status(500).json({ success: false, message: 'Lỗi Proxy Geocoding' });
+  }
+});
+
 module.exports = router;
+

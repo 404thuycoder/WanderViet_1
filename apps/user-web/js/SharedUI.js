@@ -90,7 +90,28 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   };
 
   window.fetch = async function (...args) {
-    const url = typeof args[0] === 'string' ? args[0] : (args[0] && args[0].url ? args[0].url : '');
+    let url = typeof args[0] === 'string' ? args[0] : (args[0] && args[0].url ? args[0].url : '');
+
+    // Intercept Nominatim OpenStreetMap API calls to redirect through our server proxy
+    if (url.includes('nominatim.openstreetmap.org')) {
+      try {
+        const urlObj = new URL(url);
+        const searchParams = urlObj.search;
+        if (urlObj.pathname.includes('/reverse')) {
+          url = `/api/public/geocode/reverse${searchParams}`;
+        } else {
+          url = `/api/public/geocode/search${searchParams}`;
+        }
+
+        if (typeof args[0] === 'string') {
+          args[0] = url;
+        } else if (args[0] && args[0].url) {
+          args[0] = new Request(url, args[0]);
+        }
+      } catch (e) {
+        console.warn('[SharedUI.js] Failed to proxy Nominatim URL:', url, e);
+      }
+    }
 
     // Big-Tech Pattern: Check prefetch cache first (Skip for dynamic user state)
     const cacheKey = 'wv_prefetch_' + url;

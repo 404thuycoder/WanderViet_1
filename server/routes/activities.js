@@ -49,4 +49,15 @@ router.get('/my', auth, async (req, res) => {
     }
 });
 
+// DELETE /api/activities/:id — Xóa một hoạt động
+router.delete('/:id', auth, async (req, res) => {
+    try {
+        const activity = await UserActivity.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+        if (!activity) return res.status(404).json({ success: false, message: 'Không tìm thấy hoạt động để xóa' });
+        res.json({ success: true, message: 'Đã xóa hoạt động thành công' });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 module.exports = router;

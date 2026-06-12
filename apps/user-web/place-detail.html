@@ -87,6 +87,16 @@
         .hero-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--bg-system) 2%, transparent 40%), linear-gradient(to right, rgba(6,9,18,0.8), transparent); }
         
         .hero-content { max-width: 1400px; margin: 0 auto; width: 100%; padding: 0 50px 100px; box-sizing: border-box; }
+        .hero-content h1#p-title {
+            color: #ffffff !important;
+            text-shadow: 0 2px 15px rgba(0,0,0,0.8), 0 1px 5px rgba(0,0,0,0.8);
+        }
+        .hero-content h1#p-title + div,
+        .hero-content h1#p-title + div b,
+        .hero-content h1#p-title + div span {
+            color: #ffffff !important;
+            text-shadow: 0 1px 8px rgba(0,0,0,0.8);
+        }
         .p-badge {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.4), rgba(168, 85, 247, 0.4));
             color: #fff; backdrop-filter: blur(12px); padding: 10px 24px; border-radius: 100px;
@@ -1016,6 +1026,8 @@
         }
 
         .content-container { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 1fr 440px; gap: 50px; padding: 0 50px 120px; margin-top: -80px; position: relative; z-index: 10; align-items: start; max-height: calc(100vh - 140px); overflow: hidden; overflow-x: hidden; }
+        .content-container.no-aside { grid-template-columns: 1fr !important; }
+        .content-container.no-aside .left-col { padding-right: 0 !important; max-width: 100% !important; width: 100% !important; }
         .left-col, aside { max-height: calc(100vh - 140px); overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(99,102,241,0.35) transparent; }
         .left-col { padding-right: 12px; }
         aside { padding-left: 12px; }
@@ -2106,6 +2118,20 @@
                         <button type="button" id="p-voucher-apply-btn" style="padding:14px 18px; border:none; border-radius:18px; background:linear-gradient(135deg,var(--primary),#818cf8); color:#fff; font-weight:700; cursor:pointer; white-space:nowrap;">Áp dụng</button>
                     </div>
                     <div id="p-voucher-msg" style="font-size:0.82rem; color:var(--text-dim); margin-top:10px; min-height:18px;"></div>
+
+                    <!-- Toggle Button for Available Vouchers -->
+                    <div id="p-voucher-toggle-wrap" style="display:none; margin-top:12px;">
+                        <button type="button" id="p-voucher-toggle-btn" onclick="toggleSidebarVouchers()" style="
+                            width:100%; padding:10px 16px; border:1px dashed rgba(99,102,241,0.25); border-radius:12px;
+                            background:rgba(99,102,241,0.04); color:#a78bfa; font-size:0.8rem; font-weight:700;
+                            cursor:pointer; display:flex; align-items:center; justify-content:space-between;
+                            transition:all 0.25s ease;
+                        ">
+                            <span style="display:flex; align-items:center; gap:6px;"><span style="font-size:1rem;">🎫</span> Chọn mã giảm giá <span id="p-voucher-count-badge" style="font-size:0.65rem; font-weight:800; background:linear-gradient(135deg,#6366f1,#a78bfa); color:#fff; padding:1px 8px; border-radius:100px;"></span></span>
+                            <span id="p-voucher-arrow" style="transition:transform 0.3s; font-size:0.7rem;">▼</span>
+                        </button>
+                    </div>
+                    <div id="p-available-vouchers-list" style="display:none; flex-direction:column; gap:6px; max-height:280px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(99,102,241,0.3) transparent; margin-top:8px; padding:2px;"></div>
                 </div>
 
                 <!-- VIEWERS LIVE -->
@@ -2746,30 +2772,50 @@
         let sideVoucherDiscount = 0;
         let sideVoucherType = null;
         let sideVoucherValue = 0;
+        let cachedVouchers = null;
+        let cachedUserRank = null;
 
         function parsePriceValue(text) {
             return parseInt((text || '').replace(/[^0-9]/g, '')) || 0;
         }
 
         function updateDetailPriceAfterVoucher() {
+            const isRental = window.currentPlace && window.currentPlace.kind === 'thue-xe';
             const originalEl = document.getElementById('p-price-original');
             const savingsEl = document.getElementById('price-savings');
             const voucherBadgeEl = document.getElementById('price-voucher-badge');
             const voucherSavingsEl = document.getElementById('price-voucher-savings');
+            
             if (!sideVoucherCode || sideVoucherDiscount <= 0) {
                 if (voucherBadgeEl) voucherBadgeEl.style.display = 'none';
                 if (voucherSavingsEl) voucherSavingsEl.style.display = 'none';
                 if (savingsEl && savingsEl.innerText) savingsEl.style.display = 'block';
+                
+                if (isRental) {
+                    const totalDisplay = document.getElementById('rental-total-price');
+                    if (totalDisplay) {
+                        totalDisplay.innerText = (window.rentalCalculatedTotal || 0).toLocaleString('vi-VN') + ' ₫';
+                    }
+                } else {
+                    if (!detailBaseDiscountedPrice) {
+                        detailBaseDiscountedPrice = parsePriceValue(document.getElementById('p-price').innerText);
+                    }
+                    document.getElementById('p-price').innerText = detailBaseDiscountedPrice.toLocaleString('vi-VN') + ' ₫';
+                }
+                return;
+            }
+            
+            let basePrice = 0;
+            if (isRental) {
+                basePrice = window.rentalCalculatedTotal || 0;
+            } else {
                 if (!detailBaseDiscountedPrice) {
                     detailBaseDiscountedPrice = parsePriceValue(document.getElementById('p-price').innerText);
                 }
-                document.getElementById('p-price').innerText = detailBaseDiscountedPrice.toLocaleString('vi-VN') + ' ₫';
-                return;
+                basePrice = detailBaseDiscountedPrice;
             }
-            if (!detailBaseDiscountedPrice) {
-                detailBaseDiscountedPrice = parsePriceValue(document.getElementById('p-price').innerText);
-            }
-            const finalPrice = Math.max(0, detailBaseDiscountedPrice - sideVoucherDiscount);
+            
+            const finalPrice = Math.max(0, basePrice - sideVoucherDiscount);
             if (voucherBadgeEl) {
                 if (sideVoucherType === 'percent') {
                     voucherBadgeEl.innerText = `-${sideVoucherValue}%`;
@@ -2785,7 +2831,15 @@
             if (savingsEl && savingsEl.innerText) {
                 savingsEl.style.display = 'block';
             }
-            document.getElementById('p-price').innerText = finalPrice.toLocaleString('vi-VN') + ' ₫';
+            
+            if (isRental) {
+                const totalDisplay = document.getElementById('rental-total-price');
+                if (totalDisplay) {
+                    totalDisplay.innerText = finalPrice.toLocaleString('vi-VN') + ' ₫';
+                }
+            } else {
+                document.getElementById('p-price').innerText = finalPrice.toLocaleString('vi-VN') + ' ₫';
+            }
         }
 
         function clearDetailVoucherState(message, isError) {
@@ -2804,8 +2858,17 @@
             const voucherSavingsEl = document.getElementById('price-voucher-savings');
             if (voucherBadgeEl) voucherBadgeEl.style.display = 'none';
             if (voucherSavingsEl) voucherSavingsEl.style.display = 'none';
-            if (detailBaseDiscountedPrice) {
-                document.getElementById('p-price').innerText = detailBaseDiscountedPrice.toLocaleString('vi-VN') + ' ₫';
+            
+            const isRental = window.currentPlace && window.currentPlace.kind === 'thue-xe';
+            if (isRental) {
+                const totalDisplay = document.getElementById('rental-total-price');
+                if (totalDisplay) {
+                    totalDisplay.innerText = (window.rentalCalculatedTotal || 0).toLocaleString('vi-VN') + ' ₫';
+                }
+            } else {
+                if (detailBaseDiscountedPrice) {
+                    document.getElementById('p-price').innerText = detailBaseDiscountedPrice.toLocaleString('vi-VN') + ' ₫';
+                }
             }
             if (savingsEl && savingsEl.innerText) savingsEl.style.display = 'block';
         }
@@ -2822,8 +2885,9 @@
                 }
                 return;
             }
-            const currentPrice = parsePriceValue(document.getElementById('p-price').innerText);
-            const total = detailBaseDiscountedPrice || currentPrice;
+            const isRental = window.currentPlace && window.currentPlace.kind === 'thue-xe';
+            const currentPrice = isRental ? 0 : parsePriceValue(document.getElementById('p-price').innerText);
+            const total = isRental ? (window.rentalCalculatedTotal || 0) : (detailBaseDiscountedPrice || currentPrice);
             if (msgEl) {
                 msgEl.style.color = '#94a3b8';
                 msgEl.textContent = 'Đang kiểm tra mã...';
@@ -2836,7 +2900,7 @@
                 });
                 const json = await res.json();
                 if (json.success) {
-                            sideVoucherCode = code;
+                    sideVoucherCode = code;
                     sideVoucherDiscount = Number(json.data.discountAmount) || 0;
                     sideVoucherType = json.data.voucher?.discountType || null;
                     sideVoucherValue = Number(json.data.voucher?.discountValue) || 0;
@@ -2867,8 +2931,13 @@
             if(btn) { btn.disabled = false; btn.innerText = 'XÁC NHẬN & THANH TOÁN'; }
 
             // Dynamic Price extraction
-            const presentPrice = parsePriceValue(document.getElementById('p-price').innerText);
-            originalBookingPrice = detailBaseDiscountedPrice || presentPrice;
+            const isRental = window.currentPlace && window.currentPlace.kind === 'thue-xe';
+            if (isRental) {
+                originalBookingPrice = window.rentalCalculatedTotal || 0;
+            } else {
+                const presentPrice = parsePriceValue(document.getElementById('p-price').innerText);
+                originalBookingPrice = detailBaseDiscountedPrice || presentPrice;
+            }
             
             // Reset voucher state
             appliedVoucherCode = null;
@@ -3056,6 +3125,218 @@
         if (detailVoucherBtn) {
             detailVoucherBtn.addEventListener('click', applyDetailVoucher);
         }
+
+        // ══════════════════════════════════════════════════════════════
+        //  SIDEBAR: Available Vouchers List (Toggle + Strict Filter)
+        // ══════════════════════════════════════════════════════════════
+        let _sidebarVouchersOpen = false;
+
+        window.toggleSidebarVouchers = function() {
+            const listEl = document.getElementById('p-available-vouchers-list');
+            const arrow = document.getElementById('p-voucher-arrow');
+            if (!listEl) return;
+            _sidebarVouchersOpen = !_sidebarVouchersOpen;
+            if (_sidebarVouchersOpen) {
+                listEl.style.display = 'flex';
+                if (arrow) arrow.style.transform = 'rotate(180deg)';
+            } else {
+                listEl.style.display = 'none';
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+            }
+        };
+
+        async function loadSidebarVouchers() {
+            const listEl = document.getElementById('p-available-vouchers-list');
+            const toggleWrap = document.getElementById('p-voucher-toggle-wrap');
+            const countBadge = document.getElementById('p-voucher-count-badge');
+            if (!listEl) return;
+
+            const token = localStorage.getItem('wander_token');
+            if (!token) {
+                if (toggleWrap) toggleWrap.style.display = 'none';
+                return;
+            }
+
+            try {
+                // Fetch user rank
+                let userRank = cachedUserRank;
+                if (!userRank) {
+                    try {
+                        const rankRes = await fetch('/api/auth/user/rank', { headers: { 'x-auth-token': token } });
+                        const rankJson = await rankRes.json();
+                        if (rankJson.success && rankJson.rank) {
+                            userRank = rankJson.rank;
+                            cachedUserRank = userRank;
+                        }
+                    } catch(e) {}
+                }
+                if (!userRank) userRank = 'Đồng';
+
+                let rawVouchers = cachedVouchers;
+                if (!rawVouchers) {
+                    if (window.voucherFetchPromise) {
+                        rawVouchers = await window.voucherFetchPromise;
+                    } else {
+                        window.voucherFetchPromise = fetch(`/api/vouchers/available?placeId=${pid}`, {
+                            headers: { 'x-auth-token': token }
+                        }).then(res => res.json()).then(json => {
+                            if (json.success && json.data) {
+                                cachedVouchers = json.data;
+                                return json.data;
+                            }
+                            return [];
+                        }).catch(err => {
+                            console.error(err);
+                            return [];
+                        });
+                        rawVouchers = await window.voucherFetchPromise;
+                    }
+                }
+
+                if (!rawVouchers || rawVouchers.length === 0) {
+                    if (toggleWrap) toggleWrap.style.display = 'none';
+                    listEl.innerHTML = '';
+                    return;
+                }
+
+                // Get current service price for minOrderValue check
+                const isRental = window.currentPlace && window.currentPlace.kind === 'thue-xe';
+                const currentPrice = isRental ? (window.rentalCalculatedTotal || 0) : (detailBaseDiscountedPrice || parsePriceValue(document.getElementById('p-price').innerText));
+
+                // Strict filter: rank match + minOrderValue + remaining uses
+                const vouchers = rawVouchers.filter(v => {
+                    // 1. Rank check: exact match or no rank requirement
+                    const vRank = v.minRank || v.autoGrantOnRank;
+                    if (vRank && vRank !== userRank) return false;
+                    // 2. Remaining uses
+                    if (v.remainingUses <= 0) return false;
+                    // 3. Min order value vs current price
+                    if (v.minOrderValue > 0 && currentPrice > 0 && currentPrice < v.minOrderValue) return false;
+                    return true;
+                });
+
+                if (sideVoucherCode) {
+                    const stillValid = vouchers.some(v => v.code === sideVoucherCode);
+                    if (!stillValid) {
+                        clearDetailVoucherState('Mã giảm giá không còn khả dụng cho gói này', true);
+                    }
+                }
+
+                if (vouchers.length === 0) {
+                    if (toggleWrap) toggleWrap.style.display = 'none';
+                    listEl.innerHTML = '';
+                    return;
+                }
+
+                // Show toggle button
+                if (toggleWrap) toggleWrap.style.display = 'block';
+                if (countBadge) countBadge.textContent = vouchers.length;
+
+                const RANK_COLORS = {
+                    'Đồng': { bg: 'rgba(205,127,50,0.12)', border: 'rgba(205,127,50,0.3)', text: '#cd7f32', icon: '🥉' },
+                    'Bạc': { bg: 'rgba(192,192,192,0.12)', border: 'rgba(192,192,192,0.3)', text: '#c0c0c0', icon: '🥈' },
+                    'Vàng': { bg: 'rgba(255,215,0,0.12)', border: 'rgba(255,215,0,0.3)', text: '#ffd700', icon: '🥇' },
+                    'Bạch Kim': { bg: 'rgba(229,228,226,0.12)', border: 'rgba(229,228,226,0.3)', text: '#e5e4e2', icon: '💎' },
+                    'Kim Cương': { bg: 'rgba(185,242,255,0.12)', border: 'rgba(185,242,255,0.3)', text: '#b9f2ff', icon: '💠' },
+                    'Huyền Thoại': { bg: 'rgba(255,69,0,0.12)', border: 'rgba(255,69,0,0.3)', text: '#ff4500', icon: '🔥' }
+                };
+
+                listEl.innerHTML = vouchers.map((v, idx) => {
+                    const isPercent = v.discountType === 'percent';
+                    const valText = isPercent
+                        ? `${v.discountValue}%`
+                        : `${Number(v.discountValue).toLocaleString('vi-VN')}đ`;
+                    const maxText = (isPercent && v.maxDiscount > 0)
+                        ? `<span style="font-size:0.6rem; color:var(--text-dim); margin-top:1px;">tối đa ${v.maxDiscount.toLocaleString('vi-VN')}đ</span>`
+                        : '';
+                    const condText = v.minOrderValue > 0
+                        ? `Đơn từ ${v.minOrderValue.toLocaleString('vi-VN')}đ`
+                        : 'Mọi đơn';
+                    const vRank = v.minRank || v.autoGrantOnRank;
+                    const rankInfo = vRank ? RANK_COLORS[vRank] || null : null;
+                    const rankBadge = rankInfo
+                        ? `<span style="font-size:0.55rem; font-weight:800; padding:1px 5px; border-radius:4px; background:${rankInfo.bg}; color:${rankInfo.text}; border:1px solid ${rankInfo.border};">${rankInfo.icon} ${vRank}</span>`
+                        : '';
+                    const usesLeft = v.remainingUses;
+                    const delay = idx * 50;
+
+                    return `
+                    <div class="sv-card" onclick="selectSidebarVoucher('${v.code}')" style="
+                        display:flex; align-items:center; gap:0; cursor:pointer;
+                        background:rgba(255,255,255,0.02); border:1px solid rgba(99,102,241,0.12);
+                        border-radius:12px; overflow:hidden; transition:all 0.25s ease;
+                        opacity:0; animation: svFadeIn 0.35s ${delay}ms forwards;
+                        flex-shrink:0;
+                    ">
+                        <!-- Left: Discount Value -->
+                        <div style="
+                            min-width:58px; padding:8px 4px; display:flex; flex-direction:column; align-items:center; justify-content:center;
+                            background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(168,85,247,0.06));
+                            border-right:1px dashed rgba(99,102,241,0.15);
+                        ">
+                            <span style="font-size:0.58rem; font-weight:700; color:var(--text-dim); text-transform:uppercase;">Giảm</span>
+                            <span style="font-size:1rem; font-weight:900; background:linear-gradient(135deg,#818cf8,#c084fc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; line-height:1.2;">${valText}</span>
+                            ${maxText}
+                        </div>
+                        <!-- Middle: Info -->
+                        <div style="flex:1; padding:7px 10px; min-width:0;">
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <span style="font-size:0.72rem; font-weight:800; color:#a78bfa; font-family:'Space Grotesk',monospace;">${v.code}</span>
+                                ${rankBadge}
+                            </div>
+                            <div style="font-size:0.63rem; color:var(--text-dim); margin-top:2px; display:flex; gap:6px; flex-wrap:wrap;">
+                                <span>${condText}</span>
+                                <span style="opacity:0.6;">· Còn ${usesLeft} lần</span>
+                            </div>
+                        </div>
+                        <!-- Right: Apply -->
+                        <div style="padding:0 8px;">
+                            <span style="font-size:0.65rem; font-weight:800; color:#fff; background:linear-gradient(135deg,#6366f1,#8b5cf6); padding:5px 10px; border-radius:8px; white-space:nowrap;">Dùng</span>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                // Inject styles
+                if (!document.getElementById('sv-card-anim-style')) {
+                    const s = document.createElement('style');
+                    s.id = 'sv-card-anim-style';
+                    s.textContent = `
+                        @keyframes svFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+                        .sv-card { flex-shrink:0 !important; }
+                        #p-available-vouchers-list::-webkit-scrollbar{width:3px}
+                        #p-available-vouchers-list::-webkit-scrollbar-track{background:transparent}
+                        #p-available-vouchers-list::-webkit-scrollbar-thumb{background:rgba(99,102,241,0.2);border-radius:3px}
+                        .sv-card:hover{background:rgba(99,102,241,0.06)!important;border-color:rgba(99,102,241,0.35)!important;transform:translateX(2px)}
+                        .sv-card:active{transform:scale(0.98)!important}
+                        #p-voucher-toggle-btn:hover{background:rgba(99,102,241,0.08)!important;border-color:rgba(99,102,241,0.4)!important}
+                    `;
+                    document.head.appendChild(s);
+                }
+            } catch (err) {
+                console.error('loadSidebarVouchers error:', err);
+                if (toggleWrap) toggleWrap.style.display = 'none';
+            }
+        }
+
+        window.selectSidebarVoucher = function(code) {
+            const input = document.getElementById('p-voucher-code');
+            if (input) {
+                input.value = code;
+                input.style.borderColor = '#6366f1';
+                input.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.15)';
+                setTimeout(() => {
+                    input.style.borderColor = 'rgba(255,255,255,0.12)';
+                    input.style.boxShadow = 'none';
+                }, 1200);
+            }
+            // Close dropdown after selecting
+            const listEl = document.getElementById('p-available-vouchers-list');
+            const arrow = document.getElementById('p-voucher-arrow');
+            if (listEl) listEl.style.display = 'none';
+            if (arrow) arrow.style.transform = 'rotate(0deg)';
+            _sidebarVouchersOpen = false;
+            applyDetailVoucher();
+        };
 
         async function doPay() {
             const name = document.getElementById('c-name').value;
@@ -3347,12 +3628,17 @@
                 const email = p.contactEmail || (p.owner && p.owner.contactEmail) || 'hello@wanderviet.vn';
                 setEl('biz-phone', phone);
                 setEl('biz-email', email);
-                document.getElementById('biz-phone-link').href = `tel:${phone.replace(/\s/g, '')}`;
+                document.getElementById('biz-phone-link').href = `tel:${String(phone).replace(/\s/g, '')}`;
                 document.getElementById('biz-email-link').href = `mailto:${email}`;
 
-                if (!p.ownerId && !p.owner) {
+                const hasOwner = p.ownerId && p.ownerId !== 'null' && p.ownerId !== 'undefined' && p.ownerId !== '' && p.owner && Object.keys(p.owner).length > 0;
+                if (!hasOwner) {
                     const asideEl = document.querySelector('aside');
                     if (asideEl) asideEl.style.display = 'none';
+                    const containerEl = document.querySelector('.content-container');
+                    if (containerEl) {
+                        containerEl.classList.add('no-aside');
+                    }
                 } else {
                     const btn = document.getElementById('btn-biz-feedback');
                     if (btn) btn.style.display = 'inline-flex';
@@ -3594,6 +3880,7 @@
                 
                 // ── Load Community Reviews ────────────────────────────
                 loadCommunityPosts();
+                loadSidebarVouchers();
                 if (p.kind === 'thue-xe') {
                     initVehicleRental(p);
                 }
@@ -4491,7 +4778,7 @@
         let selectedPkg = 'standard';
         let basePriceValue = 0;
 
-        function selectPkg(type, el) {
+        async function selectPkg(type, el) {
             selectedPkg = type;
             document.querySelectorAll('.pkg-option').forEach(p => p.classList.remove('active'));
             el.classList.add('active');
@@ -4500,7 +4787,11 @@
             const newPrice = Math.round(basePriceValue * multiplier);
             document.getElementById('p-price').innerText = newPrice.toLocaleString('vi-VN') + ' ₫';
             detailBaseDiscountedPrice = newPrice;
-            if (sideVoucherCode) updateDetailPriceAfterVoucher();
+            
+            if (sideVoucherCode) {
+                await applyDetailVoucher();
+            }
+            await loadSidebarVouchers();
         }
 
         function initPricing(basePrice) {
@@ -5113,6 +5404,14 @@
             
             // Sync with global billing parameters for checkout modal
             window.rentalCalculatedTotal = total;
+
+            // Update/validate vouchers when price changes
+            if (typeof loadSidebarVouchers === 'function') {
+                if (sideVoucherCode) {
+                    applyDetailVoucher();
+                }
+                loadSidebarVouchers();
+            }
         }
 
         function openRentalCheckout() {

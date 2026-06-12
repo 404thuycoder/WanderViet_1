@@ -60,15 +60,24 @@ router.post('/', auth, async (req, res) => {
         return res.status(400).json({ success: false, message: 'Bạn đã sử dụng mã này rồi' });
       }
 
-      if (voucher.minRank) {
+      if (voucher.minRank || voucher.autoGrantOnRank) {
         const userQuery = { $or: [ { customId: req.user.id }, { id: req.user.id } ] };
         if (mongoose.Types.ObjectId.isValid(req.user.id)) userQuery.$or.push({ _id: req.user.id });
         const userObj = await User.findOne(userQuery).select('rank');
         const RANK_ORDER = ['Đồng', 'Bạc', 'Vàng', 'Bạch Kim', 'Kim Cương', 'Huyền Thoại'];
         const userIdx = RANK_ORDER.indexOf(userObj?.rank || 'Đồng');
-        const reqIdx = RANK_ORDER.indexOf(voucher.minRank);
-        if (userIdx < reqIdx) {
-          return res.status(400).json({ success: false, message: `Mã này chỉ dành cho hạng ${voucher.minRank} trở lên` });
+        
+        if (voucher.minRank) {
+          const reqIdx = RANK_ORDER.indexOf(voucher.minRank);
+          if (userIdx < reqIdx) {
+            return res.status(400).json({ success: false, message: `Mã này chỉ dành cho hạng ${voucher.minRank} trở lên` });
+          }
+        }
+        if (voucher.autoGrantOnRank) {
+          const reqIdx = RANK_ORDER.indexOf(voucher.autoGrantOnRank);
+          if (userIdx < reqIdx) {
+            return res.status(400).json({ success: false, message: `Mã này chỉ dành cho hạng ${voucher.autoGrantOnRank} trở lên` });
+          }
         }
       }
 
@@ -347,6 +356,34 @@ router.put('/:id/status', businessAuth, async (req, res) => {
     }
 
     res.json({ success: true, data: booking });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// DELETE /api/bookings/all — Xóa toàn bộ đơn đặt (hỗ trợ phân loại service/rental)
+router.delete('/all', auth, async (req, res) => {
+  try {
+    const { type } = req.query; // 'service' hoặc 'rental'
+    const query = { userId: req.user.id };
+    if (type === 'service') {
+      query.businessCategory = { $ne: 'rental' };
+    } else if (type === 'rental') {
+      query.businessCategory = 'rental';
+    }
+    await Booking.deleteMany(query);
+    res.json({ success: true, message: 'Đã xóa toàn bộ lịch sử thành công!' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// DELETE /api/bookings/:id — Xóa một đơn đặt
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const booking = await Booking.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    if (!booking) return res.status(404).json({ success: false, message: 'Không tìm thấy đơn đặt hàng để xóa' });
+    res.json({ success: true, message: 'Đã xóa đơn đặt hàng thành công' });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

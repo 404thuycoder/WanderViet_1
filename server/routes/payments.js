@@ -209,4 +209,25 @@ router.post('/pay-booking', auth, async (req, res) => {
   }
 });
 
+// DELETE /api/payments/transactions/all — Xóa toàn bộ lịch sử giao dịch (cho history)
+router.delete('/transactions/all', auth, async (req, res) => {
+  try {
+    await Transaction.deleteMany({ userId: req.user.id });
+    res.json({ success: true, message: 'Đã xóa toàn bộ lịch sử giao dịch thành công!' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// DELETE /api/payments/transactions/:id — Xóa một giao dịch
+router.delete('/transactions/:id', auth, async (req, res) => {
+  try {
+    const txn = await Transaction.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+    if (!txn) return res.status(404).json({ success: false, message: 'Không tìm thấy giao dịch để xóa' });
+    res.json({ success: true, message: 'Đã xóa giao dịch thành công' });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;

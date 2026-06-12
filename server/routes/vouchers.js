@@ -284,11 +284,7 @@ router.get('/available', auth, async (req, res) => {
       const userUsed = usageMap[v._id.toString()] || 0;
       if (userUsed >= v.perUserLimit) return false;
 
-      // Check rank requirement
-      if (v.minRank) {
-        const reqIdx = RANK_ORDER.indexOf(v.minRank);
-        if (userRankIdx < reqIdx) return false;
-      }
+      // Rank vouchers are returned and displayed but will be locked on front-end/validation if rank doesn't match
 
       // Check forNewUsers (chỉ user tạo trong 7 ngày gần)
       if (v.forNewUsers) {
@@ -306,7 +302,16 @@ router.get('/available', auth, async (req, res) => {
       return true;
     });
 
-    res.json({ success: true, data: available });
+    const responseData = available.map(v => {
+      const userUsed = usageMap[v._id.toString()] || 0;
+      return {
+        ...v,
+        userUsedCount: userUsed,
+        remainingUses: Math.max(0, v.perUserLimit - userUsed)
+      };
+    });
+
+    res.json({ success: true, data: responseData });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -349,16 +354,25 @@ router.post('/apply', auth, async (req, res) => {
     }
 
     // Check rank
-    if (voucher.minRank) {
+    if (voucher.minRank || voucher.autoGrantOnRank) {
       const uid = req.user.id;
       const uq = { $or: [{ customId: uid }] };
       if (require('mongoose').Types.ObjectId.isValid(uid)) uq.$or.push({ _id: uid });
       const user = await User.findOne(uq).select('rank');
       const RANK_ORDER = ['Đồng', 'Bạc', 'Vàng', 'Bạch Kim', 'Kim Cương', 'Huyền Thoại'];
       const userIdx = RANK_ORDER.indexOf(user?.rank || 'Đồng');
-      const reqIdx = RANK_ORDER.indexOf(voucher.minRank);
-      if (userIdx < reqIdx) {
-        return res.status(400).json({ success: false, message: `Mã này chỉ dành cho hạng ${voucher.minRank} trở lên` });
+      
+      if (voucher.minRank) {
+        const reqIdx = RANK_ORDER.indexOf(voucher.minRank);
+        if (userIdx < reqIdx) {
+          return res.status(400).json({ success: false, message: `Mã này chỉ dành cho hạng ${voucher.minRank} trở lên` });
+        }
+      }
+      if (voucher.autoGrantOnRank) {
+        const reqIdx = RANK_ORDER.indexOf(voucher.autoGrantOnRank);
+        if (userIdx < reqIdx) {
+          return res.status(400).json({ success: false, message: `Mã này chỉ dành cho hạng ${voucher.autoGrantOnRank} trở lên` });
+        }
       }
     }
 
@@ -505,6 +519,18 @@ router.get('/for-place/:placeId', async (req, res) => {
     });
 
     res.json({ success: true, data: available });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// GET /api/vouchers/seed — Seeding thủ công/phát triển các mã giảm giá mẫu
+router.get('/seed', async (req, res) => {
+  try {
+    const { seedDefaultVouchers } = require('../utils/voucherSeeder');
+    const force = req.query.force === 'true'; // /api/vouchers/seed?force=true để nạp mới hoàn toàn
+    const result = await seedDefaultVouchers(force);
+    res.json({ success: true, message: result.message, count: result.data ? result.data.length : 0 });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }

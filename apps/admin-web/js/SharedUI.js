@@ -1,4 +1,4 @@
-﻿/**
+/**
  * WanderViet AI Shared UI Logic
  * Handles Theme, Settings Drawer, and Toast system across all portals.
  */
@@ -85,7 +85,65 @@ window.WanderUI = Object.assign(window.WanderUI || {}, (function() {
 
   initTheme();
 
-  return { setTheme, toggleTheme, showToast, setButtonLoading };
+  // --- WanderConfirm: Beautiful async confirm dialog ---
+  /**
+   * @param {Object} opts
+   * @param {string} opts.title       - Tiêu đề
+   * @param {string} opts.message     - Nội dung mô tả
+   * @param {string} [opts.icon]      - Emoji icon (default: '❓')
+   * @param {string} [opts.iconType]  - 'default'|'danger'|'success'|'warning'
+   * @param {string} [opts.okText]    - Text nút OK (default: 'Xác nhận')
+   * @param {string} [opts.cancelText]- Text nút Hủy (default: 'Hủy')
+   * @param {string} [opts.okType]    - CSS class thêm cho nút OK: 'danger'|'success'
+   * @param {boolean} [opts.hasInput] - Hiện textarea nhập lý do
+   * @param {string} [opts.inputPlaceholder]
+   * @returns {Promise<{confirmed:boolean, inputValue:string|null}>}
+   */
+  function showConfirm(opts = {}) {
+    return new Promise((resolve) => {
+      const icon = opts.icon || '❓';
+      const iconType = opts.iconType || 'default';
+      const title = opts.title || 'Xác nhận';
+      const message = opts.message || 'Bạn có chắc chắn muốn thực hiện thao tác này?';
+      const okText = opts.okText || 'Xác nhận';
+      const cancelText = opts.cancelText || 'Hủy';
+      const okClass = opts.okType ? ` ${opts.okType}` : '';
+
+      let overlay = document.getElementById('wander-confirm-overlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'wander-confirm-overlay';
+        document.body.appendChild(overlay);
+      }
+
+      overlay.innerHTML = `
+        <div id="wander-confirm-box">
+          <div class="wander-confirm__icon ${iconType !== 'default' ? iconType : ''}">${icon}</div>
+          <div class="wander-confirm__title">${title}</div>
+          <div class="wander-confirm__message">${message}</div>
+          ${opts.hasInput ? `<textarea id="wander-confirm-textarea" placeholder="${opts.inputPlaceholder || 'Nhập lý do...'}"></textarea>` : ''}
+          <div class="wander-confirm__actions">
+            <button class="wander-confirm__btn wander-confirm__btn--cancel" id="wander-confirm-cancel">${cancelText}</button>
+            <button class="wander-confirm__btn wander-confirm__btn--ok${okClass}" id="wander-confirm-ok">${okText}</button>
+          </div>
+        </div>`;
+
+      requestAnimationFrame(() => overlay.classList.add('is-visible'));
+
+      const close = (confirmed) => {
+        const inputValue = opts.hasInput ? (document.getElementById('wander-confirm-textarea')?.value || '') : null;
+        overlay.classList.remove('is-visible');
+        setTimeout(() => { overlay.innerHTML = ''; }, 300);
+        resolve({ confirmed, inputValue });
+      };
+
+      document.getElementById('wander-confirm-ok').onclick = () => close(true);
+      document.getElementById('wander-confirm-cancel').onclick = () => close(false);
+      overlay.onclick = (e) => { if (e.target === overlay) close(false); };
+    });
+  }
+
+  return { setTheme, toggleTheme, showToast, setButtonLoading, showConfirm };
 })());
 
 (function injectSharedStyles() {

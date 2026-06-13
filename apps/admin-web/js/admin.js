@@ -4383,7 +4383,16 @@
     tbody.querySelectorAll('[data-mod-approve]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-mod-approve');
-        if (!confirm('Xác nhận phê duyệt nội dung này hiển thị lên hệ thống?')) return;
+        const result = await WanderUI.showConfirm({
+          icon: '✅',
+          iconType: 'success',
+          title: 'Phê duyệt nội dung',
+          message: 'Nội dung này sẽ được hiển thị công khai lên hệ thống WanderViet AI.',
+          okText: 'Duyệt ngay',
+          cancelText: 'Hủy',
+          okType: 'success'
+        });
+        if (!result.confirmed) return;
         await moderatePlace(id, 'approved');
       });
     });
@@ -4391,9 +4400,19 @@
     tbody.querySelectorAll('[data-mod-reject]').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-mod-reject');
-        const reason = prompt('Lý do từ chối:');
-        if (reason === null) return;
-        await moderatePlace(id, 'rejected', reason);
+        const result = await WanderUI.showConfirm({
+          icon: '🚫',
+          iconType: 'danger',
+          title: 'Từ chối nội dung',
+          message: 'Vui lòng nhập lý do từ chối để thông báo cho đối tác.',
+          okText: 'Từ chối',
+          cancelText: 'Hủy',
+          okType: 'danger',
+          hasInput: true,
+          inputPlaceholder: 'Nhập lý do từ chối...'
+        });
+        if (!result.confirmed) return;
+        await moderatePlace(id, 'rejected', result.inputValue || '');
       });
     });
   }

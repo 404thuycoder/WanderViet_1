@@ -625,18 +625,39 @@
   };
 
   // Hàm toàn cục để bookingTable.js có thể gọi
-  window.updateBookingStatus = function(id, newStatus) {
-    if (!confirm('Bạn có chắc chắn muốn ' + (newStatus === 'confirmed' ? 'duyệt' : 'từ chối') + ' đơn này?')) return;
+  window.updateBookingStatus = async function(id, newStatus) {
+    const statusLabel = { confirmed: 'Xác nhận đơn', cancelled: 'Từ chối đơn' }[newStatus] || 'Cập nhật';
+    const isCancel = newStatus === 'cancelled';
+    
+    const result = await (window.WanderUI?.showConfirm ? window.WanderUI.showConfirm({
+      icon: isCancel ? '❌' : '✅',
+      iconType: isCancel ? 'danger' : 'success',
+      title: statusLabel,
+      message: isCancel
+        ? 'Đơn hàng sẽ bị từ chối và khách hàng sẽ được thông báo.'
+        : 'Xác nhận duyệt đơn hàng này cho khách hàng?',
+      okText: statusLabel,
+      cancelText: 'Không, giữ lại',
+      okType: isCancel ? 'danger' : 'success'
+    }) : { confirmed: window.confirm('Bạn có chắc chắn muốn ' + (newStatus === 'confirmed' ? 'duyệt' : 'từ chối') + ' đơn này?') });
+    
+    if (!result.confirmed) return;
     
     apiFetch(API + '/api/bookings/' + id, {
       method: 'PUT',
       body: JSON.stringify({ status: newStatus })
     }).then(function(json) {
       if (json.success) {
-        alert('Cập nhật trạng thái thành công!');
+        if (window.WanderUI?.showToast) {
+          window.WanderUI.showToast('Cập nhật trạng thái đơn hàng thành công!', 'success');
+        }
         window.syncAllData(); // Tải lại dữ liệu
       } else {
-        alert('Lỗi: ' + json.message);
+        if (window.WanderUI?.showToast) {
+          window.WanderUI.showToast('Lỗi: ' + json.message, 'error');
+        } else {
+          alert('Lỗi: ' + json.message);
+        }
       }
     });
   };

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * bookingManagement.js — Real Data Edition
  * Fetch đơn hàng thật từ API /api/bookings (role: business)
  * Hỗ trợ: lọc tab, tìm kiếm, cập nhật trạng thái, xuất CSV.
@@ -369,9 +369,24 @@
         `;
     }
 
-    window.updateBookingStatus = function(id, newStatus) {
+    window.updateBookingStatus = async function(id, newStatus) {
         const note = document.getElementById('bk-note-input')?.value || '';
-        if (!confirm('Xác nhận thay đổi trạng thái đơn này?')) return;
+        
+        const statusLabel = { confirmed: 'Xác nhận đơn', completed: 'Hoàn thành đơn', cancelled: 'Hủy đơn' }[newStatus] || 'Cập nhật';
+        const isCancel = newStatus === 'cancelled';
+        const result = await (window.WanderUI?.showConfirm ? window.WanderUI.showConfirm({
+            icon: isCancel ? '❌' : (newStatus === 'confirmed' ? '✅' : '🏁'),
+            iconType: isCancel ? 'danger' : 'success',
+            title: statusLabel,
+            message: isCancel
+                ? 'Bạn có chắc muốn hủy đơn hàng này? Khách hàng sẽ được thông báo.'
+                : `Xác nhận thay đổi trạng thái đơn hàng sang "${statusLabel}"?`,
+            okText: statusLabel,
+            cancelText: 'Không, giữ lại',
+            okType: isCancel ? 'danger' : 'success'
+        }) : { confirmed: window.confirm('Xác nhận thay đổi trạng thái đơn này?') });
+        
+        if (!result.confirmed) return;
         
         apiFetch('/api/bookings/' + id, {
             method: 'PUT',

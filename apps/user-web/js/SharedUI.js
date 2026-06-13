@@ -376,7 +376,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       const badge = document.querySelector('[data-notif-badge]');
       if (badge) {
         if (json.count > 0) {
-          badge.textContent = json.count > 20 ? '20+' : json.count;
+          badge.textContent = '';
           badge.style.display = 'flex';
           badge.classList.add('pulse-notif');
         } else {
@@ -6226,13 +6226,13 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         setVal('[data-stat-total-spent]', s.totalSpent || '0 VNĐ');
         setVal('[data-stat-savings]', s.savings || '0 VNĐ');
         setVal('[data-stat-carbon]', s.carbon || '0 kg CO₂');
-        setVal('#data-stat-completion-rate', (s.completionRate != null ? s.completionRate : 0) + '%');
+        setVal('#data-stat-completion-rate', s.completionRate != null ? s.completionRate : '0%');
 
         // ── Render Additional Smart Stats ──
         setVal('[data-stat-trips]', s.trips);
         setVal('[data-stat-reviews]', s.reviewsCount);
         setVal('[data-stat-chat]', s.messages);
-        setVal('[data-stat-friends-posts]', `${s.friends} bạn · ${s.posts} bài`);
+        setVal('[data-stat-friends-posts]', `${s.friends || 0} bạn · ${s.posts || 0} bài`);
 
         // ── Render Bookings Table ──
         const tbody = document.getElementById('registry-table-body');
@@ -6321,7 +6321,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                 review: '📝',
                 social_post: '👥',
                 share: '🔗',
-                itinerary_gen: '🤖'
+                itinerary_gen: '🤖',
+                filter_biz: '⚡'
               };
               const icon = iconMap[act.type] || '⚙️';
               
@@ -8299,6 +8300,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     }
   }
 
-  return { setTheme, toggleTheme, showToast, setButtonLoading, toggleNotificationDrawer, updateNotificationBadge, markAsRead, markAllAsRead, syncAuthUI, forceLogout, toggleUserMenu, openAuthModal, confirm, openPlaceDetail, openBookingDetail, openItineraryDetail, openNotificationDetailModal, getRankBadgeHTML, getRankIcon, getStoreKey, initSettingsHandlers, trackQuestActivity, getQuestActivity, startTopLoader, finishTopLoader, openModal, closeModal, copyToClipboard, viewImage };
+  return { setTheme, toggleTheme, showToast, setButtonLoading, toggleNotificationDrawer, updateNotificationBadge, markAsRead, markAllAsRead, syncAuthUI, forceLogout, toggleUserMenu, openAuthModal, confirm, openPlaceDetail, openBookingDetail, openItineraryDetail, openNotificationDetailModal, getRankBadgeHTML, getRankIcon, getStoreKey, initSettingsHandlers, trackQuestActivity, getQuestActivity, startTopLoader, finishTopLoader, openModal, closeModal, copyToClipboard, viewImage, recordActivity };
 })());
 

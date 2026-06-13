@@ -819,8 +819,14 @@ router.get('/user/stats', auth, async (req, res) => {
 
     const itineraries = await Itinerary.find({ userId: req.user.id, isDeleted: false });
     
+    const userIdsToMatch = [req.user.id];
+    if (user.customId) userIdsToMatch.push(user.customId);
+    if (user.id) userIdsToMatch.push(user.id);
+    if (user._id) userIdsToMatch.push(user._id.toString());
+    
     // Đếm tin nhắn chatbot (userId trong Conversation là string)
-    const messageCount = await Conversation.countDocuments({ userId: req.user.id });
+    // Hoặc có thể đếm số phiên (sessionId) duy nhất
+    const messageCount = await Conversation.distinct('sessionId', { userId: { $in: userIdsToMatch } }).then(res => res.length);
 
     // Phân bổ vùng miền từ hành trình
     const regionMap = {};
@@ -1122,6 +1128,9 @@ router.get('/user/stats', auth, async (req, res) => {
           activeDays: daysSinceJoined,
           quests: questsCompleted,
           reviewsCount: reviewsCount,
+          friends: friendCount,
+          posts: postCount,
+          messages: messageCount,
           level: currentLevel,
           levelProgress: xpProgress,
           rank: (user.rank || 'Khám phá') + ' ' + (user.rankTier || '')

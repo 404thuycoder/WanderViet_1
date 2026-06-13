@@ -3939,7 +3939,17 @@
           else if (p.kind === 'nha-hang' || p.kind === 'giai-tri') fallbackImg = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80';
           else if (p.isTour || p.kind === 'trai-nghiem') fallbackImg = 'https://images.unsplash.com/photo-1533130061792-64b345e4a833?w=600&q=80';
 
-          const displayImg = (p.images && p.images[0] && p.images[0].length > 5) ? p.images[0] : (p.image && p.image.length > 5 ? p.image : fallbackImg);
+          const isBroken = function(url) {
+            if (!url) return true;
+            return url.indexOf('dailyxedien.vn') !== -1 || url.indexOf('dulichmocchau.net') !== -1 || url.indexOf('cattour.vn') !== -1;
+          };
+
+          const rawImages = p.images || [];
+          const cleanImages = rawImages.filter(function(img) {
+            return img && img.length > 5 && !isBroken(img);
+          });
+
+          const displayImg = (cleanImages.length > 0) ? cleanImages[0] : (p.image && p.image.length > 5 && !isBroken(p.image) ? p.image : fallbackImg);
           const addrStr = (p.address||'').split(',').pop().trim() || 'Việt Nam';
           const ownerName = p.ownerName || 'WanderViet AI Partner';
           
@@ -3950,10 +3960,7 @@
           else if (p.kind === 'thue-xe' || p.businessCategory === 'rental' || p.businessCategory === 'transport') catLabel = 'Thuê xe Dịch vụ';
 
           // Build slideshow image tags for partner services
-          var imagesList = [];
-          if (p.images && p.images.length > 0) {
-            imagesList = p.images.filter(function(img) { return img && img.length > 5; }).slice(0, 3);
-          }
+          var imagesList = cleanImages.slice(0, 3);
           if (imagesList.length === 0) {
             imagesList = [displayImg];
           }

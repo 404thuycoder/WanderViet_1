@@ -6,7 +6,7 @@ const userActivitySchema = new mongoose.Schema({
     type: { 
         type: String, 
         required: true,
-        enum: ['view_place', 'search', 'save_trip', 'booking', 'review', 'social_post', 'share', 'itinerary_gen']
+        enum: ['view_place', 'search', 'save_trip', 'booking', 'review', 'social_post', 'share', 'itinerary_gen', 'filter_biz']
     },
     description: { type: String, required: true },
     metadata: {

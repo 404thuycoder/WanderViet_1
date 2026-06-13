@@ -391,6 +391,25 @@ router.post('/', optionalAuth, async (req, res) => {
     const targetLang = req.body.lang || 'auto';
     const scope = req.body.scope || 'user_portal';
 
+    // 1. Phân tích Lịch sử hội thoại từ SERVER theo Session (Đưa lên đầu để dùng cho Semantic Intent Classifier)
+    let chatHistory = [];
+    if (chatbotDb.readyState === 1 && currentSessionId) {
+      try {
+        const recentLogs = await Conversation.find({ sessionId: currentSessionId })
+          .sort({ timestamp: -1 })
+          .limit(10);
+
+        if (recentLogs.length > 0) {
+          chatHistory = recentLogs.reverse().map(log => ({
+            role: log.role === 'user' ? 'user' : 'assistant',
+            content: log.text
+          }));
+        }
+      } catch (err) {
+        console.warn("⚠️ Lỗi truy xuất lịch sử:", err.message);
+      }
+    }
+
     // ═════ SEMANTIC INTENT CLASSIFIER (PRE-ROUTER) ═════
     let semanticIntent = {
       isSensitive: false,
@@ -404,15 +423,15 @@ router.post('/', optionalAuth, async (req, res) => {
     // Chỉ thực hiện phân tích ngữ cảnh nâng cao cho user_portal
     if (scope === 'user_portal' && !placeContext) {
       try {
-        const routeCompletion = await createGroqChatCompletion({
-          messages: [
-            {
-              role: 'system',
-              content: `Bạn là bộ não phân tích ý định người dùng của hệ thống WanderViet AI - nền tảng du lịch Việt Nam.
-Hãy phân tích NGỮ CẢNH TOÀN VẸN, không đọc từng từ riêng lẻ.
+        const semanticMessages = [
+          {
+            role: 'system',
+            content: `Bạn là bộ não phân tích ý định người dùng của hệ thống WanderViet AI - nền tảng du lịch Việt Nam.
+Hãy phân tích NGỮ CẢNH TOÀN VẸN, không đọc từng từ riêng lẻ. Dựa trên lịch sử hội thoại (nếu có) để hiểu rõ ngữ cảnh của tin nhắn mới nhất.
 
 QUY TẮC QUAN TRỌNG NHẤT (BẮT BUỘC):
 - Nếu tin nhắn chứa TÊN ĐỊA DANH (tỉnh, thành, di tích, địa điểm), hoặc các từ liên quan LỊCH TRÌNH/DU LỊCH (lịch, ngày, tour, biển, núi, rừng, khách sạn, ăn uống, tham quan...) → isOffTopic PHẢI là false.
+- Nếu tin nhắn mới nhất là câu trả lời hoặc phản hồi nối tiếp cho câu hỏi trước đó của trợ lý (ví dụ: trợ lý hỏi "bạn có muốn...", "mình có thể giúp gì...", người dùng trả lời "có", "đồng ý", "muốn", "ok", v.v.) thì đây là câu trả lời hợp lệ liên quan đến chủ đề đang thảo luận → isOffTopic PHẢI là false.
 - Nếu isItineraryRequest là true HOẶC destination không phải null → isOffTopic PHẢI là false. Không được có mâu thuẫn.
 - "lập lịch", "tạo lịch", "lên kế hoạch", "đi chơi", "đi du lịch", "đi biển", "đi núi" → isItineraryRequest: true, isOffTopic: false.
 - Chỉ đặt isOffTopic: true khi câu hỏi HOÀN TOÀN không liên quan du lịch: toán học, lập trình code, y tế bệnh viện, chính trị, chứng khoán..."
@@ -431,13 +450,29 @@ Trả về duy nhất định dạng JSON:
 VÍ DỤ:
 - "lập lịch 2 ngày 3 triệu" → {isOffTopic:false, isItineraryRequest:true, days:2, budget:3}
 - "đi tuyên quang" → {isOffTopic:false, isItineraryRequest:true, destination:"Tuyên Quang"}
-- "giải phương trình toán" → {isOffTopic:true, isItineraryRequest:false}"
-|- "tôi muốn đi học" → {isOffTopic:true, isItineraryRequest:false}
-|- "tôi muốn đi Đà Lạt" → {isOffTopic:false, isItineraryRequest:true, destination:"Đà Lạt"}
+- "giải phương trình toán" → {isOffTopic:true, isItineraryRequest:false}
+- "tôi muốn đi học" → {isOffTopic:true, isItineraryRequest:false}
+- "tôi muốn đi Đà Lạt" → {isOffTopic:false, isItineraryRequest:true, destination:"Đà Lạt"}
 - "Quốc Tử Giám ở đâu" → {isOffTopic:false, isItineraryRequest:false, destination:"Quốc Tử Giám"}`
-            },
-            { role: 'user', content: `Tin nhắn: "${message}"` }
-          ],
+          }
+        ];
+
+        if (chatHistory && chatHistory.length > 0) {
+          chatHistory.slice(-5).forEach(h => {
+            semanticMessages.push({
+              role: h.role,
+              content: h.content
+            });
+          });
+        }
+
+        semanticMessages.push({
+          role: 'user',
+          content: `Tin nhắn: "${message}"`
+        });
+
+        const routeCompletion = await createGroqChatCompletion({
+          messages: semanticMessages,
           model: 'llama-3.1-8b-instant',
           temperature: 0.1,
           response_format: { type: 'json_object' }
@@ -447,7 +482,40 @@ VÍ DỤ:
         const parsed = JSON.parse(semanticRaw);
         // Gán lại biến semanticIntent đã khai báo ở dòng 315 (KHÔNG dùng const để tránh SyntaxError)
         semanticIntent = { ...semanticIntent, ...parsed };
+
+        // Ép isOffTopic về false nếu tin nhắn chứa từ khóa địa bàn biển đảo quan trọng hoặc các phản hồi ngắn khi có lịch sử
+        const territorialKeywords = ['hoàng sa', 'trường sa', 'hoang sa', 'truong sa', 'phú quốc', 'côn đảo'];
+        const cleanMsg = message.toLowerCase().trim().replace(/[?.,!]$/, "");
+        
+        if (territorialKeywords.some(k => cleanMsg.includes(k))) {
+          semanticIntent.isOffTopic = false;
+          if (!semanticIntent.destination) {
+            if (cleanMsg.includes('hoàng sa') || cleanMsg.includes('hoang sa')) {
+              semanticIntent.destination = 'Hoàng Sa';
+            } else if (cleanMsg.includes('trường sa') || cleanMsg.includes('truong sa')) {
+              semanticIntent.destination = 'Trường Sa';
+            }
+          }
+        }
+
+        const shortConfirmations = ['có', 'co', 'ok', 'yes', 'ừ', 'u', 'được', 'duoc', 'muốn', 'muon', 'đồng ý', 'dong y', 'đúng', 'dung', 'không', 'khong', 'không cần', 'khong can', 'chưa', 'chua'];
+        if (chatHistory && chatHistory.length > 0 && shortConfirmations.includes(cleanMsg)) {
+          semanticIntent.isOffTopic = false;
+        }
+
         console.log(`🧠 [Semantic Intent Parser] Analyzed:`, semanticIntent);
+
+        try {
+          fs.appendFileSync(path.join(__dirname, '../../debug_classification.log'), JSON.stringify({
+            timestamp: new Date().toISOString(),
+            message: message,
+            chatHistory: chatHistory,
+            semanticMessages: semanticMessages,
+            semanticIntent: semanticIntent
+          }, null, 2) + "\n\n");
+        } catch (logErr) {
+          console.error("Log error:", logErr);
+        }
 
         // -------------------------------------------------
         // Đặt các biến sẽ dùng ở các khối sau để tránh ReferenceError
@@ -526,25 +594,7 @@ VÍ DỤ:
     }
     // =============================================================
 
-    // 1. Phân tích Lịch sử hội thoại từ SERVER theo Session
-    let chatHistory = [];
-
-    if (chatbotDb.readyState === 1 && currentSessionId) {
-      try {
-        const recentLogs = await Conversation.find({ sessionId: currentSessionId })
-          .sort({ timestamp: -1 })
-          .limit(10);
-
-        if (recentLogs.length > 0) {
-          chatHistory = recentLogs.reverse().map(log => ({
-            role: log.role === 'user' ? 'user' : 'assistant',
-            content: log.text
-          }));
-        }
-      } catch (err) {
-        console.warn("⚠️ Lỗi truy xuất lịch sử:", err.message);
-      }
-    }
+    // 1. Phân tích Lịch sử hội thoại từ SERVER theo Session (Đã được chuyển lên đầu router)
 
     // 2. Xử lý ngữ cảnh hành trình & vị trí
     let tripContext = "Khách đang khám phá tự do.";

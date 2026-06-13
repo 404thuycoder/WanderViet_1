@@ -1,4 +1,4 @@
-﻿"use strict";
+"use strict";
 
 function _regenerator() { /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */ var e, t, r = "function" == typeof Symbol ? Symbol : {}, n = r.iterator || "@@iterator", o = r.toStringTag || "@@toStringTag"; function i(r, n, o, i) { var c = n && n.prototype instanceof Generator ? n : Generator, u = Object.create(c.prototype); return _regeneratorDefine2(u, "_invoke", function (r, n, o) { var i, c, u, f = 0, p = o || [], y = !1, G = { p: 0, n: 0, v: e, a: d, f: d.bind(e, 4), d: function d(t, r) { return i = t, c = 0, u = e, G.n = r, a; } }; function d(r, n) { for (c = r, u = n, t = 0; !y && f && !o && t < p.length; t++) { var o, i = p[t], d = G.p, l = i[2]; r > 3 ? (o = l === n) && (u = i[(c = i[4]) ? 5 : (c = 3, 3)], i[4] = i[5] = e) : i[0] <= d && ((o = r < 2 && d < i[1]) ? (c = 0, G.v = n, G.n = i[1]) : d < l && (o = r < 3 || i[0] > n || n > l) && (i[4] = r, i[5] = n, G.n = l, c = 0)); } if (o || r > 1) return a; throw y = !0, n; } return function (o, p, l) { if (f > 1) throw TypeError("Generator is already running"); for (y && 1 === p && d(p, l), c = p, u = l; (t = c < 2 ? e : u) || !y;) { i || (c ? c < 3 ? (c > 1 && (G.n = -1), d(c, u)) : G.n = u : G.v = u); try { if (f = 2, i) { if (c || (o = "next"), t = i[o]) { if (!(t = t.call(i, u))) throw TypeError("iterator result is not an object"); if (!t.done) return t; u = t.value, c < 2 && (c = 0); } else 1 === c && (t = i.return) && t.call(i), c < 2 && (u = TypeError("The iterator does not provide a '" + o + "' method"), c = 1); i = e; } else if ((t = (y = G.n < 0) ? u : r.call(n, G)) !== a) break; } catch (t) { i = e, c = 1, u = t; } finally { f = 1; } } return { value: t, done: y }; }; }(r, o, i), !0), u; } var a = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} t = Object.getPrototypeOf; var c = [][n] ? t(t([][n]())) : (_regeneratorDefine2(t = {}, n, function () { return this; }), t), u = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(c); function f(e) { return Object.setPrototypeOf ? Object.setPrototypeOf(e, GeneratorFunctionPrototype) : (e.__proto__ = GeneratorFunctionPrototype, _regeneratorDefine2(e, o, "GeneratorFunction")), e.prototype = Object.create(u), e; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, _regeneratorDefine2(u, "constructor", GeneratorFunctionPrototype), _regeneratorDefine2(GeneratorFunctionPrototype, "constructor", GeneratorFunction), GeneratorFunction.displayName = "GeneratorFunction", _regeneratorDefine2(GeneratorFunctionPrototype, o, "GeneratorFunction"), _regeneratorDefine2(u), _regeneratorDefine2(u, o, "Generator"), _regeneratorDefine2(u, n, function () { return this; }), _regeneratorDefine2(u, "toString", function () { return "[object Generator]"; }), (_regenerator = function _regenerator() { return { w: i, m: f }; })(); }
 function _regeneratorDefine2(e, r, n, t) { var i = Object.defineProperty; try { i({}, "", {}); } catch (e) { i = 0; } _regeneratorDefine2 = function _regeneratorDefine(e, r, n, t) { function o(r, n) { _regeneratorDefine2(e, r, function (e) { return this._invoke(r, n, e); }); } r ? i ? i(e, r, { value: n, enumerable: !t, configurable: !t, writable: !t }) : e[r] = n : (o("next", 0), o("throw", 1), o("return", 2)); }, _regeneratorDefine2(e, r, n, t); }
@@ -288,6 +288,49 @@ window.WanderUI = Object.assign(window.WanderUI || {}, function () {
     } catch(e) {}
   }
 
+  function showConfirm(opts) {
+    opts = opts || {};
+    return new Promise(function(resolve) {
+      var icon = opts.icon || '\u2753';
+      var iconType = opts.iconType || 'default';
+      var title = opts.title || 'X\u00e1c nh\u1eadn';
+      var message = opts.message || 'B\u1ea1n c\u00f3 ch\u1eafc ch\u1eafn mu\u1ed1n th\u1ef1c hi\u1ec7n thao t\u00e1c n\u00e0y?';
+      var okText = opts.okText || 'X\u00e1c nh\u1eadn';
+      var cancelText = opts.cancelText || 'H\u1ee7y';
+      var okClass = opts.okType ? ' ' + opts.okType : '';
+
+      var overlay = document.getElementById('wander-confirm-overlay');
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'wander-confirm-overlay';
+        document.body.appendChild(overlay);
+      }
+
+      overlay.innerHTML = '<div id="wander-confirm-box">' +
+        '<div class="wander-confirm__icon ' + (iconType !== 'default' ? iconType : '') + '">' + icon + '</div>' +
+        '<div class="wander-confirm__title">' + title + '</div>' +
+        '<div class="wander-confirm__message">' + message + '</div>' +
+        (opts.hasInput ? '<textarea id="wander-confirm-textarea" placeholder="' + (opts.inputPlaceholder || 'Nh\u1eadp l\u00fd do...') + '"></textarea>' : '') +
+        '<div class="wander-confirm__actions">' +
+          '<button class="wander-confirm__btn wander-confirm__btn--cancel" id="wander-confirm-cancel">' + cancelText + '</button>' +
+          '<button class="wander-confirm__btn wander-confirm__btn--ok' + okClass + '" id="wander-confirm-ok">' + okText + '</button>' +
+        '</div></div>';
+
+      requestAnimationFrame(function() { overlay.classList.add('is-visible'); });
+
+      function close(confirmed) {
+        var inputValue = opts.hasInput ? (document.getElementById('wander-confirm-textarea') || {}).value || '' : null;
+        overlay.classList.remove('is-visible');
+        setTimeout(function() { overlay.innerHTML = ''; }, 300);
+        resolve({ confirmed: confirmed, inputValue: inputValue });
+      }
+
+      document.getElementById('wander-confirm-ok').onclick = function() { close(true); };
+      document.getElementById('wander-confirm-cancel').onclick = function() { close(false); };
+      overlay.onclick = function(e) { if (e.target === overlay) close(false); };
+    });
+  }
+
   return {
     setTheme: setTheme,
     toggleTheme: toggleTheme,
@@ -296,7 +339,8 @@ window.WanderUI = Object.assign(window.WanderUI || {}, function () {
     toggleNotificationDrawer: toggleNotificationDrawer,
     updateNotificationBadge: updateNotificationBadge,
     markAsRead: markAsRead,
-    trackQuestActivity: trackQuestActivity
+    trackQuestActivity: trackQuestActivity,
+    showConfirm: showConfirm
   };
 }());
 (function injectSharedStyles() {
@@ -307,3 +351,35 @@ window.WanderUI = Object.assign(window.WanderUI || {}, function () {
   document.head.appendChild(style);
 })();
 
+/* ── WanderConfirm Modal Styles for Business Web ── */
+(function injectConfirmStyles() {
+  if (document.getElementById('wander-confirm-styles')) return;
+  var s = document.createElement('style');
+  s.id = 'wander-confirm-styles';
+  s.textContent = [
+    '#wander-confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;z-index:2147483647;opacity:0;transition:opacity .25s ease;pointer-events:none;}',
+    '#wander-confirm-overlay.is-visible{opacity:1;pointer-events:all;}',
+    '#wander-confirm-box{background:linear-gradient(145deg,#111827,#1a2035);border:1px solid rgba(99,102,241,.25);border-radius:24px;padding:2rem 2.25rem;width:100%;max-width:440px;box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 60px rgba(99,102,241,.08);transform:scale(.92) translateY(20px);transition:transform .3s cubic-bezier(.34,1.56,.64,1);position:relative;overflow:hidden;}',
+    '#wander-confirm-overlay.is-visible #wander-confirm-box{transform:scale(1) translateY(0);}',
+    '#wander-confirm-box::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(99,102,241,.6),transparent);}',
+    '.wander-confirm__icon{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 1.25rem;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);box-shadow:0 8px 24px rgba(99,102,241,.15);}',
+    '.wander-confirm__icon.danger{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.25);box-shadow:0 8px 24px rgba(239,68,68,.15);}',
+    '.wander-confirm__icon.success{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.25);box-shadow:0 8px 24px rgba(16,185,129,.15);}',
+    '.wander-confirm__icon.warning{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.25);}',
+    '.wander-confirm__title{text-align:center;font-size:1.15rem;font-weight:800;color:#f1f5f9;margin-bottom:.6rem;letter-spacing:-.01em;}',
+    '.wander-confirm__message{text-align:center;font-size:.9rem;color:#94a3b8;line-height:1.6;margin-bottom:1.75rem;}',
+    '.wander-confirm__actions{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}',
+    '.wander-confirm__btn{padding:.75rem 1.25rem;border-radius:12px;font-size:.9rem;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:inherit;}',
+    '.wander-confirm__btn--cancel{background:rgba(255,255,255,.06);color:#94a3b8;border:1px solid rgba(255,255,255,.1);}',
+    '.wander-confirm__btn--cancel:hover{background:rgba(255,255,255,.1);color:#f1f5f9;transform:translateY(-1px);}',
+    '.wander-confirm__btn--ok{background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;box-shadow:0 6px 20px rgba(99,102,241,.35);}',
+    '.wander-confirm__btn--ok:hover{background:linear-gradient(135deg,#4f46e5,#4338ca);box-shadow:0 10px 28px rgba(99,102,241,.5);transform:translateY(-2px);}',
+    '.wander-confirm__btn--ok.danger{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 6px 20px rgba(239,68,68,.35);}',
+    '.wander-confirm__btn--ok.danger:hover{background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 10px 28px rgba(239,68,68,.5);}',
+    '.wander-confirm__btn--ok.success{background:linear-gradient(135deg,#10b981,#059669);box-shadow:0 6px 20px rgba(16,185,129,.35);}',
+    '#wander-confirm-textarea{width:100%;min-height:80px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#f1f5f9;font-size:.88rem;padding:.75rem 1rem;resize:vertical;outline:none;font-family:inherit;margin-bottom:1.25rem;transition:border-color .2s;box-sizing:border-box;}',
+    '#wander-confirm-textarea:focus{border-color:rgba(99,102,241,.5);}',
+    '#wander-confirm-textarea::placeholder{color:#475569;}'
+  ].join('');
+  document.head.appendChild(s);
+})();

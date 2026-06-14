@@ -17,11 +17,11 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
         while (1) switch (_context2.p = _context2.n) {
           case 0:
             raw = (userText || "").trim();
-            if (raw) {
+            if (raw || (ctx && ctx.images && ctx.images.length > 0)) {
               _context2.n = 1;
               break;
             }
-            return _context2.a(2, "Bạn gõ câu hỏi tự nhiên là được.");
+            return _context2.a(2, "Bạn gõ câu hỏi tự nhiên hoặc gửi hình ảnh nhé.");
           case 1:
             deviceId = localStorage.getItem('wander_device_id') || 'dv_' + Math.random().toString(36).substring(2, 11);
             localStorage.setItem('wander_device_id', deviceId);
@@ -59,7 +59,8 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
                 deviceId: deviceId,
                 role: userRole,
                 sessionId: (ctx === null || ctx === void 0 ? void 0 : ctx.sessionId) || null,
-                lang: selectedLang
+                lang: selectedLang,
+                images: (ctx === null || ctx === void 0 ? void 0 : ctx.images) || []
               })
             });
           case 3:

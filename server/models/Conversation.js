@@ -6,7 +6,8 @@ const ConversationSchema = new mongoose.Schema({
   sessionId: { type: String, required: true, index: true }, // Mã phiên chat riêng biệt
   title: { type: String }, // Tiêu đề phiên chat (không để mặc định để dễ backfill)
   role: { type: String, enum: ['user', 'model'], required: true },
-  text: { type: String, required: true, index: true },
+  text: { type: String, index: true }, // Có thể rỗng nếu chỉ gửi ảnh
+  images: [{ type: String }],
   hasProposal: { type: Boolean, default: false },
   timestamp: { type: Date, default: Date.now },
   // Trí tuệ tự học (RLHF)

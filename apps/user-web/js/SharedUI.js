@@ -1556,7 +1556,55 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       <!-- Global Chatbot FAB -->
       <div class="chat-fab-wrap" id="global-chat-fab-wrap" style="display:none; z-index:9999;">
         <button type="button" class="chat-fab" id="global-chat-fab" aria-expanded="false">
-          <span aria-hidden="true">💬</span>
+          <div class="chat-fab-shimmer"></div>
+          <!-- Closed State Content (Pill shape) -->
+          <div class="chat-fab-content-closed">
+            <div class="chat-fab-avatar">
+              <svg class="robot-icon" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="robotBgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#818cf8" />
+                    <stop offset="100%" stop-color="#4f46e5" />
+                  </linearGradient>
+                </defs>
+                <!-- Background rounded box -->
+                <rect x="0" y="0" width="40" height="40" rx="14" fill="url(#robotBgGrad)" />
+                <!-- White face plate -->
+                <rect x="7" y="11" width="26" height="20" rx="7" fill="#ffffff" />
+                <!-- Eyes -->
+                <circle cx="14" cy="20" r="2.5" fill="#4f46e5" />
+                <circle cx="26" cy="20" r="2.5" fill="#4f46e5" />
+                <!-- Smile -->
+                <path d="M17 24.5c1 1.5 5 1.5 6 0" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" fill="none" />
+                <!-- Antenna -->
+                <circle cx="20" cy="6.5" r="1.5" fill="#ffffff" />
+                <line x1="20" y1="8" x2="20" y2="11" stroke="#ffffff" stroke-width="1.5" />
+                <!-- Sparkle star on top-right (Enlarged & Animated) -->
+                <path class="twinkle-star" d="M32 4c.4 2 1.6 3.2 3.6 3.6-2 .4-3.2 1.6-3.6 3.6-.4-2-1.6-3.2-3.6-3.6 2-.4 3.2-1.6 3.6-3.6z" fill="#ffffff" />
+              </svg>
+            </div>
+            <div class="chat-fab-text">
+              <div class="chat-fab-title">Trợ lý AI WanderViet</div>
+              <div class="chat-fab-subtitle">Hỏi gì cũng biết ✨</div>
+            </div>
+          </div>
+          <!-- Opened State Content (Circle shape) -->
+          <div class="chat-fab-content-opened">
+            <svg class="chat-fab-icon-opened" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="aiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#6366f1" />
+                  <stop offset="100%" stop-color="#ec4899" />
+                </linearGradient>
+              </defs>
+              <!-- Chat bubble -->
+              <path d="M19 11.5a7 7 0 0 1-.8 3.2 7.1 7.1 0 0 1-6.4 4c-1.1 0-2.2-.3-3.2-.8L4 19l1.6-4.8A7.1 7.1 0 0 1 4.8 11c0-3.9 3.2-7 7.1-7h.4a7 7 0 0 1 6.7 7.5z" stroke="url(#aiGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+              <!-- AI text -->
+              <text x="11.5" y="11.5" font-family="'Outfit', 'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="6.5" fill="url(#aiGrad)" text-anchor="middle" dominant-baseline="central">AI</text>
+              <!-- Sparkle star (Enlarged & Animated) -->
+              <path class="twinkle-star-pink" d="M19.5 1c.3 1.5 1.2 2.4 2.7 2.7-1.5.3-2.4 1.2-2.7 2.7-.3-1.5-1.2-2.4-2.7-2.7 1.5-.3 2.4-1.2 2.7-2.7z" fill="#6366f1" />
+            </svg>
+          </div>
           <span class="visually-hidden">Mở trợ lý du lịch</span>
         </button>
         <div id="global-chat-panel" class="chat-panel" hidden>
@@ -1721,15 +1769,25 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
               </div>
               
               <form class="chat-form" id="global-chat-form">
-                <label class="visually-hidden" for="global-chat-input">Nhập câu hỏi</label>
-                <input id="global-chat-input" type="text" placeholder="Hỏi về du lịch Việt Nam…" autocomplete="off" />
+                <input type="file" id="chat-image-file-input" accept="image/png, image/jpeg, image/webp" multiple style="display: none;">
+                <button type="button" class="chat-form-plus-btn" title="Thêm tùy chọn" aria-label="Thêm tùy chọn">
+                  <span>+</span>
+                </button>
+                <div class="chat-input-wrapper" style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+                  <label class="visually-hidden" for="global-chat-input">Nhập câu hỏi</label>
+                  <textarea id="global-chat-input" placeholder="Hỏi về du lịch Việt Nam…" autocomplete="off" rows="1"></textarea>
+                  <div class="chat-image-preview-container" id="chat-image-preview-container"></div>
+                </div>
                 <div class="companion-fab-wrapper">
                   <div class="companion-fab" id="companion-toggle" title="Chế độ Hướng dẫn viên Chuyên gia">
-                    <span class="mic-icon">🎙️</span>
-                    <div class="pulse-rings"></div>
+                    <svg class="mic-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                      <path d="M19 10v1a7 7 0 0 1-14 0v-1"></path>
+                      <line x1="12" x2="12" y1="17" y2="22"></line>
+                    </svg>
                   </div>
                 </div>
-                <button type="submit" class="btn btn--primary btn--small">Gửi</button>
+                <button type="submit" class="btn btn--primary btn--small" disabled>Gửi</button>
               </form>
             </div>
 
@@ -2968,10 +3026,181 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
     const fab = document.getElementById('global-chat-fab');
     const panel = document.getElementById('global-chat-panel');
+    if (panel) {
+      panel.removeAttribute('hidden');
+    }
     const closeBtn = document.getElementById('global-chat-close');
     const form = document.getElementById('global-chat-form');
     const input = document.getElementById('global-chat-input');
     const log = document.getElementById('global-chat-log');
+
+    // Image Uploading State & Preview logic
+    let uploadedImages = [];
+    window._uploadedImages = uploadedImages; // expose to submit handler
+    const fileInput = document.getElementById('chat-image-file-input');
+    const previewContainer = document.getElementById('chat-image-preview-container');
+    const plusBtn = form ? form.querySelector('.chat-form-plus-btn') : null;
+
+    if (plusBtn && fileInput) {
+      plusBtn.addEventListener('click', () => {
+        fileInput.click();
+      });
+    }
+
+    if (fileInput && previewContainer) {
+      fileInput.addEventListener('change', async (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+
+        for (const file of files) {
+          if (!file.type.startsWith('image/')) continue;
+          
+          if (uploadedImages.length >= 5) {
+            alert('Chỉ có thể gửi tối đa 5 hình ảnh cùng lúc.');
+            break;
+          }
+
+          try {
+            const base64 = await convertFileToBase64(file);
+            uploadedImages.push(base64);
+            renderPreviews();
+          } catch (err) {
+            console.error("Lỗi đọc hình ảnh:", err);
+          }
+        }
+        
+        fileInput.value = '';
+        updateSubmitBtnState();
+      });
+    }
+
+    function convertFileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    function renderPreviews() {
+      if (!previewContainer) return;
+      
+      if (uploadedImages.length === 0) {
+        previewContainer.style.display = 'none';
+        previewContainer.innerHTML = '';
+        return;
+      }
+
+      previewContainer.style.display = 'flex';
+      previewContainer.innerHTML = '';
+
+      uploadedImages.forEach((imgBase64, index) => {
+        const item = document.createElement('div');
+        item.className = 'chat-image-preview-item';
+        item.style.backgroundImage = `url(${imgBase64})`;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'chat-image-preview-remove';
+        removeBtn.innerHTML = '✕';
+        removeBtn.onclick = (e) => {
+          e.stopPropagation();
+          uploadedImages.splice(index, 1);
+          renderPreviews();
+          updateSubmitBtnState();
+        };
+
+        item.appendChild(removeBtn);
+        previewContainer.appendChild(item);
+      });
+    }
+
+    window._clearChatImages = function() {
+      uploadedImages.length = 0;
+      renderPreviews();
+      updateSubmitBtnState();
+    };
+
+    const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+    function updateSubmitBtnState() {
+      if (!input || !submitBtn) return;
+      const val = input.value.trim();
+      const hasImages = uploadedImages && uploadedImages.length > 0;
+      if (val || hasImages) {
+        submitBtn.removeAttribute('disabled');
+      } else {
+        submitBtn.setAttribute('disabled', 'true');
+      }
+    }
+
+    function autoResizeTextarea() {
+      if (!input) return;
+      input.style.setProperty('height', 'auto', 'important');
+      const panel = document.getElementById('global-chat-panel');
+      const isFullscreen = panel && panel.classList.contains('chat-panel--fullscreen');
+      const maxHeight = isFullscreen ? 104 : 84;
+      const minHeight = isFullscreen ? 28 : 24;
+      const scrollHeight = input.scrollHeight;
+      
+      const targetHeight = Math.min(Math.max(scrollHeight, minHeight), maxHeight);
+      input.style.setProperty('height', targetHeight + 'px', 'important');
+      
+      if (scrollHeight > maxHeight) {
+        input.style.setProperty('overflow-y', 'auto', 'important');
+      } else {
+        input.style.setProperty('overflow-y', 'hidden', 'important');
+      }
+
+      if (form) {
+        if (scrollHeight > minHeight + 4) {
+          form.classList.add('chat-form--multiline');
+        } else {
+          form.classList.remove('chat-form--multiline');
+        }
+      }
+    }
+
+    if (input) {
+      input.addEventListener('input', () => {
+        updateSubmitBtnState();
+        autoResizeTextarea();
+      });
+      input.addEventListener('change', () => {
+        updateSubmitBtnState();
+        autoResizeTextarea();
+      });
+      
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          const hasImages = uploadedImages && uploadedImages.length > 0;
+          if (input.value.trim() || hasImages) {
+            form.dispatchEvent(new Event('submit'));
+          }
+        }
+      });
+      
+      try {
+        const desc = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value');
+        if (desc && desc.set) {
+          Object.defineProperty(input, 'value', {
+            get: function() {
+              return desc.get.call(this);
+            },
+            set: function(val) {
+              desc.set.call(this, val);
+              updateSubmitBtnState();
+              autoResizeTextarea();
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('[ChatInput] Failed to hook value setter:', e);
+      }
+      updateSubmitBtnState();
+      autoResizeTextarea();
+    }
 
     function updateChatbotWeather() {
       const cityEl = document.getElementById('chatbot-weather-city');
@@ -3403,20 +3632,19 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     updateChatbotWeather();
 
     function togglePanel() {
-      const isOpen = !panel.hidden;
-      panel.hidden = isOpen;
-      fab.setAttribute('aria-expanded', !isOpen);
-
-      if (!isOpen) {
-        // Entrance animation enhancement
-        panel.style.transformOrigin = 'bottom right';
-        panel.animate([
-          { opacity: 0, transform: 'scale(0.8) translateY(20px) rotate(5deg)' },
-          { opacity: 1, transform: 'scale(1) translateY(0) rotate(0)' }
-        ], {
-          duration: 400,
-          easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
-        });
+      const isOpen = panel.classList.contains('chat-panel--open');
+      if (isOpen) {
+        panel.classList.remove('chat-panel--open');
+        fab.setAttribute('aria-expanded', 'false');
+      } else {
+        panel.classList.add('chat-panel--open');
+        fab.setAttribute('aria-expanded', 'true');
+        setTimeout(() => {
+          if (input) {
+            input.focus();
+            autoResizeTextarea();
+          }
+        }, 100);
       }
 
       // --- Stop AI voice when panel is closed ---
@@ -3444,8 +3672,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       expandBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         // Đảm bảo panel đang mở trước khi phóng to
-        if (panel.hidden) {
-          panel.hidden = false;
+        if (!panel.classList.contains('chat-panel--open')) {
+          panel.classList.add('chat-panel--open');
           fab.setAttribute('aria-expanded', 'true');
         }
         const isFullscreen = panel.classList.toggle('chat-panel--fullscreen');
@@ -3454,10 +3682,18 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         expandBtn.setAttribute('aria-pressed', String(isFullscreen));
         expandBtn.title = isFullscreen ? 'Thu nhỏ' : 'Phóng to toàn màn hình';
         
-        // Tự động cuộn xuống cuối khi đổi mode để không bị lệch view
+        // Recalculate sizes and layout alignment on toggle
+        autoResizeTextarea();
+        
+        // Run repeated checks during the 300ms transition to ensure layout aligns correctly as width adjusts
+        const checks = [50, 100, 150, 200, 250, 300, 400, 500, 600];
+        checks.forEach(delay => {
+          setTimeout(autoResizeTextarea, delay);
+        });
+
         setTimeout(() => {
           log.scrollTop = log.scrollHeight;
-        }, 300);
+        }, 150);
       });
     }
 
@@ -3690,6 +3926,237 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         requestAnimationFrame(() => {
             log.scrollTop = log.scrollHeight;
         });
+    }
+
+    // Format markdown-like text to HTML for chat bubbles
+    function formatChatMarkdown(text) {
+      if (!text) return '';
+      let html = escapeHtml(text);
+      // Bold: **text**
+      html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      // Italic: *text*
+      html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      // Inline code: `code`
+      html = html.replace(/`([^`]+)`/g, '<code style="background:rgba(255,255,255,0.1);padding:2px 5px;border-radius:4px;font-size:0.85em;">$1</code>');
+      // Headings: ### heading
+      html = html.replace(/^### (.+)$/gm, '<h4 style="margin:10px 0 4px;font-size:0.95em;color:#a78bfa;">$1</h4>');
+      html = html.replace(/^## (.+)$/gm, '<h3 style="margin:12px 0 6px;font-size:1em;color:#c4b5fd;">$1</h3>');
+      html = html.replace(/^# (.+)$/gm, '<h2 style="margin:14px 0 8px;font-size:1.1em;color:#ddd6fe;">$1</h2>');
+      // Unordered list items: - item or * item
+      html = html.replace(/^[-*] (.+)$/gm, '<li style="margin:3px 0;padding-left:4px;">$1</li>');
+      html = html.replace(/(<li[^>]*>.*<\/li>)/s, '<ul style="margin:6px 0;padding-left:18px;">$1</ul>');
+      // Numbered list
+      html = html.replace(/^\d+\. (.+)$/gm, '<li style="margin:3px 0;padding-left:4px;">$1</li>');
+      // Horizontal rule
+      html = html.replace(/^---$/gm, '<hr style="border:none;border-top:1px solid rgba(255,255,255,0.15);margin:10px 0;">');
+      // Links: [text](url)
+      html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:#60a5fa;text-decoration:underline;">$1</a>');
+      // Newlines → <br>
+      html = html.replace(/\n/g, '<br>');
+      // Clean up excessive <br>
+      html = html.replace(/(<br\s*\/?>\s*){3,}/g, '<br><br>');
+      return html;
+    }
+
+    // Append a message bubble to chat log
+    // role: 'user' | 'bot'
+    // images: array of base64/url strings
+    function appendMsg(info, role, skipSave, skipScroll, itineraryData, images) {
+      if (!log) return;
+      const msgTime = new Date();
+
+      // Extract [ITIN_CARD:...] and [ITIN_PROPOSALS:...] tags from bot message
+      let displayInfo = info || '';
+      let proposalsData = null;
+
+      if (role === 'bot') {
+        // Extract proposals tag
+        const proposalsMatch = displayInfo.match(/\[ITIN_PROPOSALS:([\s\S]*?)\]/);
+        if (proposalsMatch) {
+          try { proposalsData = JSON.parse(proposalsMatch[1]); } catch(e) {}
+          displayInfo = displayInfo.replace(/\[ITIN_PROPOSALS:[\s\S]*?\]/, '').trim();
+        }
+        // Extract itinerary card tag
+        const itinMatch = displayInfo.match(/\[ITIN_CARD:([\s\S]*?)\]/);
+        if (itinMatch) {
+          try { itineraryData = JSON.parse(itinMatch[1]); } catch(e) {}
+          displayInfo = displayInfo.replace(/\[ITIN_CARD:[\s\S]*?\]/, '').trim();
+        }
+      }
+
+      let isHtml = false;
+
+      if (role === 'bot') {
+        // Đã chuyển logic xử lý "Nổi bật" vào formatChatMarkdown
+        displayInfo = formatChatMarkdown(displayInfo);
+        isHtml = true;
+      }
+
+      // Save to shared chat (localStorage)
+      if (!skipSave) {
+        try {
+          const shared = JSON.parse(localStorage.getItem('wander_shared_chat') || '[]');
+          shared.push({ role, text: info || '', time: msgTime.toISOString() });
+          // Keep only last 50 messages
+          if (shared.length > 50) shared.splice(0, shared.length - 50);
+          localStorage.setItem('wander_shared_chat', JSON.stringify(shared));
+        } catch(e) {}
+      }
+
+      const timeStr = msgTime.getHours().toString().padStart(2, '0') + ':' + msgTime.getMinutes().toString().padStart(2, '0');
+
+      const msgContainer = document.createElement('div');
+      msgContainer.className = 'chat-message-row ' + (role === 'user' ? 'chat-message-row--user' : 'chat-message-row--bot');
+
+      const msg = document.createElement('div');
+      msg.className = 'chat-bubble chat-bubble--' + (role === 'user' ? 'user' : 'bot') + ' animate-bubble';
+
+      let contentHtml = isHtml ? displayInfo : escapeHtml(displayInfo);
+      if (images && images.length > 0) {
+        let imgsHtml = '<div class="chat-bubble-images" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;">';
+        images.forEach(img => {
+          imgsHtml += `<img src="${img}" style="max-width:120px; max-height:120px; border-radius:8px; border: 1px solid rgba(255,255,255,0.2); object-fit:cover;" />`;
+        });
+        imgsHtml += '</div>';
+        contentHtml += imgsHtml;
+      }
+
+      // Bot actions (Copy/Speak) - dùng data-attribute để tránh SyntaxError với ký tự đặc biệt
+      const msgId = 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+      if (!window._chatMsgCache) window._chatMsgCache = {};
+      window._chatMsgCache[msgId] = info || '';
+
+      const botActionsHtml = role === 'bot' ? `
+        <div class="chat-bubble__actions">
+          <button class="btn-bubble-action btn-copy-msg" data-msg-id="${msgId}" title="Sao chép">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          </button>
+          <button class="btn-bubble-action btn-speak-msg" data-msg-id="${msgId}" title="Nghe đọc">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+          </button>
+        </div>
+      ` : '';
+
+      msg.innerHTML = `
+        <div class="chat-bubble__content">${contentHtml}</div>
+        <div class="chat-bubble__footer">
+          <div class="chat-bubble__time">${timeStr}</div>
+          ${botActionsHtml}
+        </div>
+      `;
+
+      // Gắn event handler an toàn sau khi DOM được tạo
+      if (role === 'bot') {
+        const copyBtn = msg.querySelector('.btn-copy-msg');
+        if (copyBtn) {
+          copyBtn.addEventListener('click', function() {
+            const id = this.getAttribute('data-msg-id');
+            const text = (window._chatMsgCache || {})[id] || '';
+            if (window.WanderUI && window.WanderUI.copyToClipboard) {
+              window.WanderUI.copyToClipboard(text, this);
+            }
+          });
+        }
+        const speakBtn = msg.querySelector('.btn-speak-msg');
+        if (speakBtn) {
+          speakBtn.addEventListener('click', function() {
+            const id = this.getAttribute('data-msg-id');
+            const text = ((window._chatMsgCache || {})[id] || '')
+              .replace(/\[ITIN_PROPOSALS:.*?\]/g, '')
+              .replace(/\[ITIN_CARD:.*?\]/g, '')
+              .trim();
+            if (window.voiceGuide) window.voiceGuide.speak(text);
+          });
+        }
+      }
+
+      // WOW: Phát hiện lịch trình trong text để mời user xem card
+      const hasItin = /ngày\s*\d+|lịch trình|itinerary/i.test(info || '');
+      if (role === 'bot' && !isHtml && hasItin) {
+        const convertBtn = document.createElement('button');
+        convertBtn.className = 'btn-bubble-convert';
+        convertBtn.innerHTML = '✨ Xem thẻ hành trình chuyên nghiệp';
+        convertBtn.style.cssText = `
+          margin-top: 12px;
+          width: 100%;
+          padding: 10px;
+          border-radius: 12px;
+          background: rgba(59, 130, 246, 0.15);
+          border: 1px solid rgba(59, 130, 246, 0.3);
+          color: #60a5fa;
+          font-weight: 700;
+          font-size: 0.8rem;
+          cursor: pointer;
+          transition: all 0.2s;
+        `;
+        convertBtn.onclick = () => {
+          convertBtn.innerHTML = '⏳ Đang khởi tạo...';
+          convertBtn.disabled = true;
+          const input = document.getElementById('global-chat-input');
+          const form = document.getElementById('global-chat-form');
+          if (input && form) {
+            input.value = `Hãy cấu trúc hóa lịch trình ở trên thành dạng JSON card chuyên nghiệp`;
+            form.dispatchEvent(new Event('submit'));
+          }
+        };
+        msg.appendChild(convertBtn);
+      }
+
+      msgContainer.appendChild(msg);
+      log.appendChild(msgContainer);
+      if (!skipScroll) scrollToBottom();
+
+      // Render embedded itinerary/proposals nếu có
+      if (proposalsData && proposalsData.length > 0) {
+        renderItineraryProposals(proposalsData);
+      }
+      if (itineraryData) {
+        renderItineraryCard(itineraryData);
+      }
+    }
+
+    // Load chat history from localStorage (shared between tabs/pages)
+    function loadSharedChat() {
+      try {
+        const shared = JSON.parse(localStorage.getItem('wander_shared_chat') || '[]');
+        if (!shared || shared.length === 0) {
+          // Show welcome message
+          appendMsg('Xin chào! Mình là Trợ lý Du lịch WanderViet 🌟\n\nMình có thể giúp bạn:\n- Lập **lịch trình** du lịch\n- Tìm **địa điểm** tham quan\n- Gợi ý **ăn uống** đặc sản\n- Tư vấn **phương tiện** di chuyển\n\nBạn muốn khám phá nơi nào hôm nay? ✈️', 'bot', true);
+          return;
+        }
+        // Re-render last 20 messages from cache
+        const recent = shared.slice(-20);
+        recent.forEach(item => {
+          appendMsg(item.text, item.role, true, true);
+        });
+        scrollToBottom(true);
+      } catch(e) {
+        console.warn('[WanderChat] loadSharedChat error:', e);
+        appendMsg('Xin chào! Mình là Trợ lý Du lịch WanderViet 🌟\n\nBạn muốn đi đâu hôm nay? ✈️', 'bot', true);
+      }
+    }
+
+    // Load chat history from server
+    async function loadChatHistory(sessionId) {
+      if (!sessionId) return;
+      try {
+        const token = localStorage.getItem('wander_token');
+        const res = await fetch(`/api/chat/history?sessionId=${sessionId}`, {
+          headers: { 'x-auth-token': token || '' }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.messages && data.messages.length > 0) {
+          // Clear current and re-render from server
+          if (log) log.innerHTML = '';
+          data.messages.forEach(item => {
+            appendMsg(item.content || item.text, item.role === 'assistant' ? 'bot' : 'user', true, true);
+          });
+          scrollToBottom(true);
+        }
+      } catch(e) {
+        // Silent fail - use local cache
+      }
     }
 
     function renderSuggestions(options = []) {
@@ -4065,457 +4532,16 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     const QUICK_PLANNERS = [
       { text: '🌸 Đà Lạt 3 ngày', query: 'Lập lịch trình du lịch Đà Lạt 3 ngày 2 đêm' },
       { text: '🏖️ Nha Trang 4 ngày', query: 'Lập lịch trình du lịch Nha Trang 4 ngày 3 đêm' },
-      { text: '🏮 Hội An 2 ngày', query: 'Lập lịch trình du lịch Hội An 2 ngày 1 đêm' },
-      { text: '🏔️ Sapa 3 ngày', query: 'Lập lịch trình du lịch Sapa 3 ngày 2 đêm' },
-      { text: '🌊 Phú Quốc 4 ngày', query: 'Lập lịch trình du lịch Phú Quốc 4 ngày 3 đêm' },
-      { text: '🏙️ TP.HCM 2 ngày', query: 'Lập lịch trình du lịch TP.HCM 2 ngày 1 đêm' },
+      { text: '🌊 Phú Quốc 5 ngày', query: 'Lập lịch trình du lịch Phú Quốc 5 ngày 4 đêm' },
+      { text: '🏮 Hội An 3 ngày', query: 'Lập lịch trình du lịch Hội An 3 ngày 2 đêm' },
+      { text: '🏔️ Sapa 4 ngày', query: 'Lập lịch trình du lịch Sapa 4 ngày 3 đêm' },
     ];
-
-    // Render welcome message with Quick Planners
-    function renderWelcomeWithPlanner() {
-      // Welcome message - clean and professional
-      const welcomeDiv = document.createElement('div');
-      welcomeDiv.style.cssText = 'padding: 24px 20px 16px; text-align: center;';
-      welcomeDiv.innerHTML = `
-        <div style="font-size: 1.1rem; font-weight: 700; color: var(--text, #1e293b); margin-bottom: 6px;">WanderViet</div>
-        <div style="font-size: 0.8rem; color: var(--text-muted, #64748b); margin-bottom: 16px;">Trợ lý du lịch thông minh</div>
-        <button onclick="injectPlanningFormToChat()" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background: var(--primary, #6366f1); border: none; border-radius: 20px; color: #fff; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
-          🗺️ Lập lịch trình
-        </button>
-      `;
-      log.appendChild(welcomeDiv);
-
-      // Quick planners section
-      const qpSection = document.createElement('div');
-      qpSection.style.cssText = 'margin: 0 16px 16px;';
-      qpSection.innerHTML = `<div style="font-size: 0.65rem; color: var(--text-muted, #64748b); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;">Gợi ý nhanh</div>`;
-
-      const qpGrid = document.createElement('div');
-      qpGrid.className = 'chat-quick-planners';
-      QUICK_PLANNERS.forEach(qp => {
-        const card = document.createElement('div');
-        card.className = 'chat-quick-card';
-        card.textContent = qp.text;
-        card.onclick = () => {
-          const input = document.getElementById('global-chat-input');
-          const form = document.getElementById('global-chat-form');
-          if (input && form) {
-            input.value = qp.query;
-            form.dispatchEvent(new Event('submit'));
-          }
-        };
-        qpGrid.appendChild(card);
-      });
-      qpSection.appendChild(qpGrid);
-      log.appendChild(qpSection);
-
-      // Suggestions
-      renderSuggestions(PLANNING_SUGGESTIONS);
-      scrollToBottom();
-    }
-
-    function formatChatMarkdown(text) {
-      if (!text) return '';
-      let html = text;
-
-      // 1. Xử lý "Nổi bật" block (Ưu tiên xử lý trước để tránh bị dính regex khác)
-      html = html.replace(/✨ Nổi bật:([\s\S]*?)(?:\n\n|<br><br>|$)/g, (match, content) => {
-          return `<div class="chat-highlight-box"><span class="chat-highlight-tag">✨ Nổi bật:</span> ${content.trim()}</div>`;
-      });
-
-      // 2. Markdown links: [text](url) → <a href="url" target="_blank">text</a>
-      html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, (match, label, url) => {
-        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color:#38bdf8; text-decoration:underline; word-break:break-all;">${label}</a>`;
-      });
-
-      // 3. Bold: **text**
-      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-      // 3. Lists: + or - at start of line
-      const lines = html.split(/\n|<br>/);
-      let processedLines = lines.map(line => {
-        let trimmed = line.trim();
-        // Hỗ trợ cả + và - và * làm bullet point
-        if (trimmed.startsWith('+ ') || trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
-          return `<div class="chat-list-item">${trimmed.substring(2)}</div>`;
-        }
-        return line;
-      });
-      html = processedLines.join('\n');
-
-      // 4. Paragraph spacing
-      html = html.replace(/\n\n/g, '<div style="margin-bottom:12px;"></div>');
-      html = html.replace(/\n/g, '<br>');
-
-      return html;
-    }
-
-    let lastMsgTimestamp = null;
-
-    function appendMsg(text, role, isHtml, skipCache = false, forcedTime = null) {
-      if (!text) return;
-
-      const msgTime = forcedTime ? new Date(forcedTime) : new Date();
-      
-      // HIỂN THỊ DẢI PHÂN CÁCH THỜI GIAN (TIME DIVIDER)
-      // Nếu là tin nhắn đầu tiên hoặc cách tin trước đó > 15 phút
-      if (!lastMsgTimestamp || (msgTime - lastMsgTimestamp > 15 * 60 * 1000)) {
-        const divider = document.createElement('div');
-        divider.className = 'chat-time-divider';
-        const isToday = msgTime.toDateString() === new Date().toDateString();
-        const isYesterday = new Date(new Date().setDate(new Date().getDate()-1)).toDateString() === msgTime.toDateString();
-        
-        let label = '';
-        if (isToday) label = 'Hôm nay';
-        else if (isYesterday) label = 'Hôm qua';
-        else label = msgTime.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
-        
-        const timePart = msgTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-        divider.innerHTML = `<span>${label}, ${timePart}</span>`;
-        log.appendChild(divider);
-      }
-      lastMsgTimestamp = msgTime;
-
-      let displayInfo = text;
-      let proposalsData = null;
-      let itineraryData = null;
-
-      // Phát hiện dữ liệu ẩn (JSON proposals)
-      if (text.includes('[ITIN_PROPOSALS:')) {
-          const start = text.indexOf('[ITIN_PROPOSALS:');
-          const end = text.lastIndexOf(']');
-          if (start !== -1 && end !== -1) {
-              const jsonStr = text.substring(start + 16, end);
-              try { proposalsData = JSON.parse(jsonStr); } catch(e) {}
-              displayInfo = text.substring(0, start).trim();
-          }
-      }
-      // Phát hiện dữ liệu ẩn (JSON itinerary card)
-      if (text.includes('[ITIN_CARD:')) {
-          const start = text.indexOf('[ITIN_CARD:');
-          const end = text.lastIndexOf(']');
-          if (start !== -1 && end !== -1) {
-              const jsonStr = text.substring(start + 11, end);
-              try { itineraryData = JSON.parse(jsonStr); } catch(e) {}
-              displayInfo = text.substring(0, start).trim();
-          }
-      }
-
-      // Đã chuyển logic xử lý "Nổi bật" vào formatChatMarkdown
-      displayInfo = formatChatMarkdown(displayInfo);
-      isHtml = true;
-
-      const timeStr = msgTime.getHours().toString().padStart(2, '0') + ':' + msgTime.getMinutes().toString().padStart(2, '0');
-
-      const msgContainer = document.createElement('div');
-      msgContainer.className = 'chat-message-row ' + (role === 'user' ? 'chat-message-row--user' : 'chat-message-row--bot');
-
-      const msg = document.createElement('div');
-      msg.className = 'chat-bubble chat-bubble--' + (role === 'user' ? 'user' : 'bot') + ' animate-bubble';
-      
-      let contentHtml = displayInfo;
-      
-      // Bot actions (Copy/Speak) - dùng data-attribute để tránh SyntaxError với ký tự đặc biệt
-      const msgId = 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-      if (!window._chatMsgCache) window._chatMsgCache = {};
-      window._chatMsgCache[msgId] = displayInfo;
-
-      const botActionsHtml = role === 'bot' ? `
-        <div class="chat-bubble__actions">
-          <button class="btn-bubble-action btn-copy-msg" data-msg-id="${msgId}" title="Sao chép">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-          </button>
-          <button class="btn-bubble-action btn-speak-msg" data-msg-id="${msgId}" title="Nghe đọc">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
-          </button>
-        </div>
-      ` : '';
-
-      msg.innerHTML = `
-        <div class="chat-bubble__content">${contentHtml}</div>
-        <div class="chat-bubble__footer">
-          <div class="chat-bubble__time">${timeStr}</div>
-          ${botActionsHtml}
-        </div>
-      `;
-
-      // Gắn event handler an toàn sau khi DOM được tạo
-      if (role === 'bot') {
-        const copyBtn = msg.querySelector('.btn-copy-msg');
-        if (copyBtn) {
-          copyBtn.addEventListener('click', function() {
-            const id = this.getAttribute('data-msg-id');
-            const text = (window._chatMsgCache || {})[id] || '';
-            if (window.WanderUI && window.WanderUI.copyToClipboard) {
-              window.WanderUI.copyToClipboard(text, this);
-            }
-          });
-        }
-        const speakBtn = msg.querySelector('.btn-speak-msg');
-        if (speakBtn) {
-          speakBtn.addEventListener('click', function() {
-            const id = this.getAttribute('data-msg-id');
-            const text = ((window._chatMsgCache || {})[id] || '')
-              .replace(/\[ITIN_PROPOSALS:.*?\]/g, '')
-              .replace(/\[ITIN_CARD:.*?\]/g, '')
-              .trim();
-            if (window.voiceGuide) window.voiceGuide.speak(text);
-          });
-        }
-      }
-      
-      // WOW: Phát hiện lịch trình trong text để mời user xem card
-      const hasItin = /ngày\s*\d+|lịch trình|itinerary/i.test(displayInfo);
-      if (role === 'bot' && !isHtml && hasItin) {
-        const convertBtn = document.createElement('button');
-        convertBtn.className = 'btn-bubble-convert';
-        convertBtn.innerHTML = '✨ Xem thẻ hành trình chuyên nghiệp';
-        convertBtn.style.cssText = `
-          margin-top: 12px;
-          width: 100%;
-          padding: 10px;
-          border-radius: 12px;
-          background: rgba(59, 130, 246, 0.15);
-          border: 1px solid rgba(59, 130, 246, 0.3);
-          color: #60a5fa;
-          font-weight: 700;
-          font-size: 0.8rem;
-          cursor: pointer;
-          transition: all 0.2s;
-        `;
-        convertBtn.onclick = () => {
-          convertBtn.innerHTML = '⏳ Đang khởi tạo...';
-          convertBtn.disabled = true;
-          // Tự động gửi câu lệnh yêu cầu AI cấu trúc hóa lịch trình này
-          const destMatch = displayInfo.match(/(?:tại|đến|ở|đi)\s+([A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+(?:\s[A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+)*)/i);
-          const dest = destMatch ? destMatch[1] : (displayInfo.includes('Tuyên Quang') ? 'Tuyên Quang' : 'điểm đến');
-          const input = document.getElementById('global-chat-input');
-          const form = document.getElementById('global-chat-form');
-          if (input && form) {
-            input.value = `Lập lịch trình chi tiết (thẻ hành trình) cho chuyến đi ${dest} dựa trên gợi ý trên của bạn.`;
-            form.dispatchEvent(new Event('submit'));
-          }
-        };
-        msg.appendChild(convertBtn);
-      }
-      
-      // Nút mở form lập lịch trong chat
-      if (role === 'bot' && !isHtml) {
-        const planBtn = document.createElement('button');
-        planBtn.className = 'btn-bubble-plan';
-        planBtn.innerHTML = '🗺️ Lập lịch ngay';
-        planBtn.style.cssText = `
-          margin-top: 12px;
-          margin-right: 8px;
-          padding: 10px 16px;
-          border-radius: 12px;
-          background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15));
-          border: 1px solid rgba(99, 102, 241, 0.4);
-          color: #a5b4fc;
-          font-weight: 600;
-          font-size: 0.8rem;
-          cursor: pointer;
-          transition: all 0.2s;
-        `;
-        planBtn.onclick = () => openPlanningForm();
-        planBtn.onmouseenter = () => {
-          planBtn.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.35), rgba(139, 92, 246, 0.25))';
-          planBtn.style.transform = 'translateY(-1px)';
-        };
-        planBtn.onmouseleave = () => {
-          planBtn.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.15))';
-          planBtn.style.transform = 'translateY(0)';
-        };
-        msg.appendChild(planBtn);
-      }
-      
-      // Phát hiện form lập lịch nhúng trong chat
-      if (text.includes('[PLANNING_FORM]')) {
-
-        const formHtml = createInlinePlanningForm();
-        msg.querySelector('.chat-bubble__content').innerHTML = text.replace('[PLANNING_FORM]', '') + formHtml;
-        msg.querySelector('.chat-bubble__content').style.paddingBottom = '8px';
-      }
-      
-      msgContainer.appendChild(msg);
-      log.appendChild(msgContainer);
-      
-      scrollToBottom();
-
-      // Nếu có dữ liệu proposals, render các thẻ tương ứng
-      if (proposalsData && Array.isArray(proposalsData)) {
-          renderProposalOptions(proposalsData);
-      }
-      // Nếu có dữ liệu itinerary, render thẻ chi tiết
-      if (itineraryData) {
-          renderItineraryCard(itineraryData);
-      }
-
-      // Cache to localStorage for instant load on next page
-      if (!skipCache) {
-        try {
-          if (!text.includes("Đang tải") && !text.includes("đang suy nghĩ")) {
-            let arr = JSON.parse(localStorage.getItem('wander_shared_chat') || '[]');
-            arr.push({ role, text, timestamp: msgTime.getTime() });
-            if (arr.length > 50) arr = arr.slice(arr.length - 50);
-            localStorage.setItem('wander_shared_chat', JSON.stringify(arr));
-          }
-        } catch (e) { console.warn("Cache error", e); }
-      }
-    }
-
-    function loadSharedChat() {
-      log.innerHTML = '';
-      try {
-        const arr = JSON.parse(localStorage.getItem('wander_shared_chat') || '[]');
-        if (arr.length > 0) {
-          arr.forEach(m => {
-            appendMsg(m.text, m.role, false, true, m.timestamp); // skipCache = true, pass stored timestamp
-          });
-        } else if (!currentSessionId) {
-          renderWelcomeWithPlanner();
-        }
-      } catch (e) {
-        if (!currentSessionId) renderWelcomeWithPlanner();
-      }
-    }
-
-    function loadChatHistory(sid) {
-      const token = localStorage.getItem('wander_token');
-      // No longer clear log.innerHTML here to avoid flash if we already have cache
-      currentSessionId = sid;
-      localStorage.setItem('wander_current_session', sid);
-
-      const historyView = document.getElementById('global-chat-sessions-view');
-      if (historyView) {
-        historyView.classList.remove('is-active');
-        setTimeout(() => historyView.hidden = true, 300);
-      }
-
-      fetch("/api/chat/history/" + sid, {
-        headers: { 'x-auth-token': token || '' }
-      })
-        .then(r => r.json())
-        .then(json => {
-          if (json.success && json.messages && json.messages.length > 0) {
-            log.innerHTML = ''; // Only clear if we actually have server data to replace
-            json.messages.forEach(m => {
-              appendMsg(m.text, m.role === 'user' ? 'user' : 'bot', false, true, m.timestamp); // skipCache = true, pass server timestamp
-            });
-            // Update cache with server truth
-            localStorage.setItem('wander_shared_chat', JSON.stringify(json.messages.map(m => ({
-              role: m.role === 'user' ? 'user' : 'bot',
-              text: m.text,
-              timestamp: new Date(m.timestamp || m.createdAt).getTime()
-            }))));
-          }
-        })
-        .catch(() => {
-          log.innerHTML = '';
-          appendMsg('Lỗi kết nối khi tải lịch sử.', 'bot');
-        });
-    }
-
-    function loadChatSessions() {
-      const token = localStorage.getItem('wander_token');
-      const historyList = document.getElementById('global-chat-sessions-list');
-      if (!historyList) return;
-
-      if (!token) {
-        historyList.innerHTML = '<div class="chat-sessions-loading">Vui lòng đăng nhập để xem lịch sử.</div>';
-        return;
-      }
-      historyList.innerHTML = '<div class="chat-sessions-loading">Đang tải...</div>';
-      const deviceId = localStorage.getItem('wander_device_id');
-      fetch(`/api/chat/sessions?t=${Date.now()}&deviceId=${deviceId || ''}`, {
-        headers: { 'x-auth-token': token }
-      })
-      .then(r => r.json())
-      .then(json => {
-        if (json.success && json.sessions && json.sessions.length > 0) {
-          historyList.innerHTML = '';
-          json.sessions.forEach(s => {
-            const item = document.createElement('div');
-            item.className = 'chat-session-item';
-            const dateStr = new Date(s.updatedAt).toLocaleDateString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-            item.innerHTML = '<div class="chat-session-item__info">' +
-                               '<div class="chat-session-item__title">' + escapeHtml(s.title || 'Hội thoại du lịch') + '</div>' +
-                               '<div class="chat-session-item__date">' + dateStr + '</div>' +
-                             '</div>' +
-                             '<button type="button" class="btn-delete-session" title="Xóa">🗑️</button>';
-            
-            item.onclick = () => loadChatHistory(s.sessionId);
-            
-            const delBtn = item.querySelector('.btn-delete-session');
-            delBtn.onclick = (e) => {
-              e.stopPropagation();
-              if (confirm('Xóa vĩnh viễn đoạn hội thoại này?')) {
-                const deviceId = localStorage.getItem('wander_device_id');
-                fetch(`/api/chat/session/${s.sessionId}?deviceId=${deviceId || ''}`, {
-                  method: 'DELETE',
-                  headers: { 'x-auth-token': token }
-                })
-                .then(r => r.json())
-                .then(res => {
-                  if (res.success) {
-                    item.remove();
-                    if (currentSessionId === s.sessionId) {
-                      currentSessionId = null;
-                      localStorage.removeItem('wander_current_session');
-                      log.innerHTML = '';
-                      appendMsg('Hội thoại đã bị xóa.', 'bot');
-                    }
-                  }
-                });
-              }
-            };
-            historyList.appendChild(item);
-          });
-        } else {
-          historyList.innerHTML = '<div class="chat-sessions-loading">Chưa có hội thoại nào.</div>';
-        }
-      })
-      .catch(() => {
-        historyList.innerHTML = '<div class="chat-sessions-loading">Lỗi tải lịch sử.</div>';
-      });
-    }
-
-    // New Chat Button
-    const newBtn = document.getElementById('global-chat-new-btn');
-    if (newBtn) {
-      newBtn.onclick = () => {
-        currentSessionId = null;
-        localStorage.removeItem('wander_current_session');
-        localStorage.removeItem('wander_shared_chat');
-        log.innerHTML = '';
-        lastMsgTimestamp = null; // Reset divider logic
-        renderWelcomeWithPlanner();
-      };
-    }
-
-    // History Button
-    const historyBtn = document.getElementById('global-chat-history-btn');
-    const historyView = document.getElementById('global-chat-sessions-view');
-    const historyClose = document.getElementById('global-chat-history-close');
-
-    if (historyBtn && historyView) {
-      historyBtn.onclick = () => {
-        historyView.hidden = false;
-        setTimeout(() => historyView.classList.add('is-active'), 10);
-        loadChatSessions();
-      };
-    }
-    if (historyClose && historyView) {
-      historyClose.onclick = () => {
-        historyView.classList.remove('is-active');
-        setTimeout(() => historyView.hidden = true, 300);
-      };
-    }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const msg = input.value.trim();
-      if (!msg) return;
+      const hasImages = window._uploadedImages && window._uploadedImages.length > 0;
+      if (!msg && !hasImages) return;
       
       // Check if starting planning wizard (manual trigger)
       if (msg === '__START_WIZARD__') {
@@ -4547,148 +4573,134 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       const isPlanningIntent = matchedKeyword && (
         lowerMsg.length < 30 || 
         (lowerMsg.replace(matchedKeyword, '').length < 10)
-      );
-      
+      );        
+        const wasVoice = _lastInputWasVoice; // true nếu input từ mic, false nếu gõ text
+        _lastInputWasVoice = false; // Reset sau mỗi lần gửi
+        
+        const imagesToSend = window._uploadedImages ? [...window._uploadedImages] : [];
+        if (window._clearChatImages) {
+          window._clearChatImages();
+        }
 
-      
-      // Skip keyword detection nếu submit từ form lập lịch
-      if (isPlanningIntent && !window._fromPlanningForm) {
-        window._fromPlanningForm = false;
-        appendMsg(msg, 'user');
+        appendMsg(msg, 'user', false, false, null, imagesToSend);
         input.value = '';
-        injectPlanningFormToChat();
-        return;
-      }
-      
-      // Reset flag sau khi xử lý
-      window._fromPlanningForm = false;
-      
-      const wasVoice = _lastInputWasVoice; // true nếu input từ mic, false nếu gõ text
-      _lastInputWasVoice = false; // Reset sau mỗi lần gửi
-      appendMsg(msg, 'user');
-      input.value = '';
 
-      const typingRow = document.createElement('div');
-      typingRow.className = 'chat-message-row chat-message-row--bot';
-      typingRow.id = 'chat-typing-indicator';
-      typingRow.innerHTML = `
-        <div class="chat-bubble chat-bubble--bot animate-bubble" style="padding: 0.75rem 1.25rem;">
-          <div class="typing-dots"><span></span><span></span><span></span></div>
-        </div>
-      `;
-      log.appendChild(typingRow);
+        const typingRow = document.createElement('div');
+        typingRow.className = 'chat-message-row chat-message-row--bot';
+        typingRow.id = 'chat-typing-indicator';
+        typingRow.innerHTML = `
+          <div class="chat-bubble chat-bubble--bot animate-bubble" style="padding: 0.75rem 1.25rem;">
+            <div class="typing-dots"><span></span><span></span><span></span></div>
+          </div>
+        `;
+        log.appendChild(typingRow);
         scrollToBottom();
 
-      try {
-        let resData;
-        const selectedLang = localStorage.getItem('wander_chat_lang') || 'auto';
-        if (typeof window.wanderChatReply === 'function') {
-           resData = await window.wanderChatReply(msg, { 
-             lang: selectedLang,
-             sessionId: currentSessionId
-           });
-        } else {
-           const token = localStorage.getItem('wander_token');
-           const res = await fetch('/api/chat', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json', 'x-auth-token': token || '' },
-             body: JSON.stringify({ message: msg, lang: selectedLang, sessionId: currentSessionId })
-           });
-           resData = await res.json();
+        try {
+          let resData;
+          const selectedLang = localStorage.getItem('wander_chat_lang') || 'auto';
+          if (typeof window.wanderChatReply === 'function') {
+             resData = await window.wanderChatReply(msg, { 
+               lang: selectedLang,
+               sessionId: currentSessionId,
+               images: imagesToSend
+             });
+          } else {
+             const token = localStorage.getItem('wander_token');
+             const res = await fetch('/api/chat', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json', 'x-auth-token': token || '' },
+               body: JSON.stringify({ message: msg, lang: selectedLang, sessionId: currentSessionId, images: imagesToSend })
+             });
+             resData = await res.json();
+          }
+
+          const indicator = document.getElementById('chat-typing-indicator');
+          if (indicator) log.removeChild(indicator);
+
+          if (resData && resData.success) {
+              const aiReply = resData.answer || resData.reply;
+              
+              // appendMsg xử lý hiển thị tin nhắn văn bản + embed [ITIN_CARD/PROPOSALS] cho lịch sử
+              appendMsg(aiReply, 'bot');
+
+              // Track quest activity: Trò chuyện với Trợ lý AI
+              if (window.WanderUI && window.WanderUI.trackQuestActivity) {
+                window.WanderUI.trackQuestActivity('dailyChat');
+              }
+
+              // AI TALK BACK — chỉ đọc to khi user dùng giọng nói
+              if (wasVoice && window.voiceGuide && aiReply) {
+                  const cleanText = aiReply
+                    .replace(/\[ITIN_PROPOSALS:.*?\]/gs, '')
+                    .replace(/\[ITIN_CARD:.*?\]/gs, '')
+                    .replace(/https?:\/\/\S+/g, '').trim();
+                  window.voiceGuide.speak(cleanText);
+              }
+              if (resData.sessionId) {
+                currentSessionId = resData.sessionId;
+                localStorage.setItem('wander_current_session', currentSessionId);
+              }
+
+              // Render Itinerary Card trực tiếp từ API (chỉ khi appendMsg KHÔNG tự render từ tag)
+              // appendMsg đã xử lý [ITIN_CARD:] nên chỉ gọi renderItineraryCard khi không có tag trong answer
+              const hasEmbedTag = aiReply && (aiReply.includes('[ITIN_CARD:') || aiReply.includes('[ITIN_PROPOSALS:'));
+              if (!hasEmbedTag) {
+                  if (resData.action === 'show_quick_form') {
+                      renderQuickPlannerForm(resData.prefill || {});
+                  } else if (resData.itineraryCard) {
+                      renderItineraryCard(resData.itineraryCard);
+                  } else if (resData.proposals && Array.isArray(resData.proposals) && resData.proposals.length > 0) {
+                      renderProposalOptions(resData.proposals);
+                  } else if (resData.proposal) {
+                      renderProposalCard(resData.proposal);
+                  }
+              }
+
+              if (resData.suggestedTours && resData.suggestedTours.length > 0) {
+                  console.log("Rendering Tour Carousel with", resData.suggestedTours.length, "tours");
+                  renderTourCarousel(resData.suggestedTours);
+              }
+
+              // Render suggestedLink: nút mở link trực tiếp khi tour không có trong DB
+              if (resData.suggestedLink) {
+                  const linkWrap = document.createElement('div');
+                  linkWrap.style.cssText = 'margin: 12px 0; text-align: center;';
+                  const btn = document.createElement('a');
+                  btn.href = resData.suggestedLink.url;
+                  btn.target = '_blank';
+                  btn.rel = 'noopener noreferrer';
+                  btn.style.cssText = `
+                      display: inline-block;
+                      padding: 12px 24px;
+                      background: linear-gradient(135deg, #f43f5e, #e11d48);
+                      color: #fff;
+                      border-radius: 12px;
+                      font-weight: 700;
+                      font-size: 0.9rem;
+                      text-decoration: none;
+                      box-shadow: 0 4px 15px rgba(244,63,94,0.3);
+                      transition: transform 0.2s, box-shadow 0.2s;
+                  `;
+                  btn.textContent = resData.suggestedLink.label || '🔗 Xem thêm';
+                  btn.onmouseover = () => { btn.style.transform = 'translateY(-2px)'; btn.style.boxShadow = '0 6px 20px rgba(244,63,94,0.4)'; };
+                  btn.onmouseout = () => { btn.style.transform = 'none'; btn.style.boxShadow = '0 4px 15px rgba(244,63,94,0.3)'; };
+                  linkWrap.appendChild(btn);
+                  log.appendChild(linkWrap);
+                  scrollToBottom();
+              }
+          } else {
+              console.warn("Chatbot: API returned failure or invalid data", resData);
+              const errMsg = (resData && typeof resData === 'string') ? resData : (resData?.answer || 'Trợ lý đang bận, thử lại sau nhé.');
+              appendMsg(errMsg, 'bot');
+          }
+        } catch (err) {
+          console.error("Chatbot Submit Error:", err);
+          const indicator = document.getElementById('chat-typing-indicator');
+          if (indicator && log.contains(indicator)) log.removeChild(indicator);
+          appendMsg('Lỗi kết nối AI. Vui lòng kiểm tra internet hoặc tải lại trang.', 'bot');
         }
-
-        const indicator = document.getElementById('chat-typing-indicator');
-        if (indicator) log.removeChild(indicator);
-
-        if (resData && resData.success) {
-            const aiReply = resData.answer || resData.reply;
-            
-            // appendMsg xử lý hiển thị tin nhắn văn bản + embed [ITIN_CARD/PROPOSALS] cho lịch sử
-            appendMsg(aiReply, 'bot');
-
-            // Track quest activity: Trò chuyện với Trợ lý AI
-            if (window.WanderUI && window.WanderUI.trackQuestActivity) {
-              window.WanderUI.trackQuestActivity('dailyChat');
-            }
-
-            // AI TALK BACK — chỉ đọc to khi user dùng giọng nói
-            if (wasVoice && window.voiceGuide && aiReply) {
-                const cleanText = aiReply
-                  .replace(/\[ITIN_PROPOSALS:.*?\]/gs, '')
-                  .replace(/\[ITIN_CARD:.*?\]/gs, '')
-                  .replace(/https?:\/\/\S+/g, '').trim();
-                window.voiceGuide.speak(cleanText);
-            }
-            if (resData.sessionId) {
-              currentSessionId = resData.sessionId;
-              localStorage.setItem('wander_current_session', currentSessionId);
-            }
-
-            // Render Itinerary Card trực tiếp từ API (chỉ khi appendMsg KHÔNG tự render từ tag)
-            // appendMsg đã xử lý [ITIN_CARD:] nên chỉ gọi renderItineraryCard khi không có tag trong answer
-            const hasEmbedTag = aiReply && (aiReply.includes('[ITIN_CARD:') || aiReply.includes('[ITIN_PROPOSALS:'));
-            if (!hasEmbedTag) {
-                if (resData.action === 'show_quick_form') {
-                    renderQuickPlannerForm(resData.prefill || {});
-                } else if (resData.itineraryCard) {
-                    renderItineraryCard(resData.itineraryCard);
-                } else if (resData.proposals && Array.isArray(resData.proposals) && resData.proposals.length > 0) {
-                    renderProposalOptions(resData.proposals);
-                } else if (resData.proposal) {
-                    renderProposalCard(resData.proposal);
-                }
-            }
-
-            if (resData.discoveryPlaces && resData.discoveryPlaces.length > 0) {
-                // ĐÃ BỎ: Không render discovery carousel trong chat nữa vì gây confuse
-                // User ấn vào → gửi message lặp → vòng lặp. Chỉ hiện khi cần thiết.
-                // renderDiscoveryCarousel(resData.discoveryPlaces);
-            }
-
-            if (resData.suggestedTours && resData.suggestedTours.length > 0) {
-                console.log("Rendering Tour Carousel with", resData.suggestedTours.length, "tours");
-                renderTourCarousel(resData.suggestedTours);
-            }
-
-            // Render suggestedLink: nút mở link trực tiếp khi tour không có trong DB
-            if (resData.suggestedLink) {
-                const linkWrap = document.createElement('div');
-                linkWrap.style.cssText = 'margin: 12px 0; text-align: center;';
-                const btn = document.createElement('a');
-                btn.href = resData.suggestedLink.url;
-                btn.target = '_blank';
-                btn.rel = 'noopener noreferrer';
-                btn.style.cssText = `
-                    display: inline-block;
-                    padding: 12px 24px;
-                    background: linear-gradient(135deg, #f43f5e, #e11d48);
-                    color: #fff;
-                    border-radius: 12px;
-                    font-weight: 700;
-                    font-size: 0.9rem;
-                    text-decoration: none;
-                    box-shadow: 0 4px 15px rgba(244,63,94,0.3);
-                    transition: transform 0.2s, box-shadow 0.2s;
-                `;
-                btn.textContent = resData.suggestedLink.label || '🔗 Xem thêm';
-                btn.onmouseover = () => { btn.style.transform = 'translateY(-2px)'; btn.style.boxShadow = '0 6px 20px rgba(244,63,94,0.4)'; };
-                btn.onmouseout = () => { btn.style.transform = 'none'; btn.style.boxShadow = '0 4px 15px rgba(244,63,94,0.3)'; };
-                linkWrap.appendChild(btn);
-                log.appendChild(linkWrap);
-                scrollToBottom();
-            }
-        } else {
-            console.warn("Chatbot: API returned failure or invalid data", resData);
-            const errMsg = (resData && typeof resData === 'string') ? resData : (resData?.answer || 'Trợ lý đang bận, thử lại sau nhé.');
-            appendMsg(errMsg, 'bot');
-        }
-      } catch (err) {
-        console.error("Chatbot Submit Error:", err);
-        const indicator = document.getElementById('chat-typing-indicator');
-        if (indicator && log.contains(indicator)) log.removeChild(indicator);
-        appendMsg('Lỗi kết nối AI. Vui lòng kiểm tra internet hoặc tải lại trang.', 'bot');
-      }
-    });
+      });
 
     function renderQuickPlannerForm(prefill) {
         const wrapper = document.createElement('div');

@@ -379,11 +379,12 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
 
 router.post('/', optionalAuth, async (req, res) => {
   try {
-    const { message, coords, itinerary, activeTrip, deviceId, role, sessionId, placeContext } = req.body;
+    const { message: rawMessage, coords, itinerary, activeTrip, deviceId, role, sessionId, placeContext, images } = req.body;
+    const message = rawMessage || "";
     let currentSessionId = sessionId;
 
-    if (!message) {
-      return res.status(400).json({ success: false, answer: 'Vui lòng nhập câu hỏi.' });
+    if (!message && (!images || images.length === 0)) {
+      return res.status(400).json({ success: false, answer: 'Vui lòng nhập câu hỏi hoặc gửi hình ảnh.' });
     }
 
     // Định danh người dùng/phiên
@@ -421,7 +422,7 @@ router.post('/', optionalAuth, async (req, res) => {
     };
 
     // Chỉ thực hiện phân tích ngữ cảnh nâng cao cho user_portal
-    if (scope === 'user_portal' && !placeContext) {
+    if (scope === 'user_portal' && !placeContext && (!images || images.length === 0)) {
       try {
         const semanticMessages = [
           {
@@ -769,7 +770,7 @@ VÍ DỤ:
         ];
         const isItinEarly = itinKwsEarly.some(k => lowerMsg.includes(k));
 
-        if (!searchResult && !isContextSensitive && !isItinEarly && !isTimeSensitive && lowerMsg.length > 10) {
+        if (!searchResult && !isContextSensitive && !isItinEarly && !isTimeSensitive && lowerMsg.length > 10 && (!images || images.length === 0)) {
           // Tìm câu trả lời gần nhất cho câu hỏi y hệt này, nhưng CHỈ lấy nếu câu trả lời đó được đánh giá TỐT (up) hoặc là từ AI uy tín
           const prevQuestion = await Conversation.findOne({
             role: 'user',
@@ -924,6 +925,13 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
     systemPrompt += `\n- NGỮ CẢNH VỊ TRÍ: ${locationContext}`;
     systemPrompt += `\n- VAI TRÒ NGƯỜI DÙNG: ${userRole} || TRANG: ${scope}`;
     
+    if (images && images.length > 0) {
+      systemPrompt += `\n\n=== CHỈ THỊ PHÂN TÍCH HÌNH ẢNH (VISION INSTRUCTION) ===
+- Khách hàng đã gửi kèm hình ảnh. Hãy nhận diện nội dung hình ảnh đó: cảnh quan, di tích, ẩm thực, hoạt động du lịch, hoặc bất kỳ vật thể/văn bản nào xuất hiện.
+- Nhận biết hình ảnh đó nói đến địa điểm/sự kiện nào ở Việt Nam. Nếu hình ảnh giống hoặc gợi nhớ đến một địa điểm du lịch nổi tiếng nào của Việt Nam, hãy thảo luận và đưa ra so sánh hoặc gợi ý (Ví dụ: "Hình ảnh này trông giống như Vịnh Hạ Long...", "Bức ảnh này gợi nhớ đến phố cổ Hội An...").
+- Trả lời một cách tự nhiên, liên kết hình ảnh với sở thích hoặc nhu cầu du lịch của khách hàng.`;
+    }
+
     systemPrompt += `\n\nCHỈ THỊ CUỐI CÙNG: Trả lời bằng ngôn ngữ của khách. Thân thiện, ngắn gọn, cực kỳ am hiểu về dữ liệu trên.`;
 
     // --- PHÁT HIỆN YÊU CẦU LẬP LỊCH TRÌNH (ITINERARY GENERATION) ---
@@ -1346,33 +1354,63 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
         finalUserMessage = `${message}\n\n[SYSTEM INSTRUCTION: Detect the language of my message and reply in that same language.]`;
       }
 
-      // 4. MÔ HÌNH SUY LUẬN CHÍNH (MAIN REASONING MODEL) - Sử dụng Model mạnh nhất (70B)
+      // 4. MÔ HÌNH SUY LUẬN CHÍNH (MAIN REASONING MODEL) - Sử dụng Model mạnh nhất (70B) hoặc Vision nếu có hình ảnh
       const isBiz = userRole === 'business';
       
         let completion;
-        try {
-          completion = await createGroqChatCompletion({
-            messages: [
-              { role: "system", content: systemPrompt },
-              ...chatHistory,
-              { role: "user", content: finalUserMessage }
-            ],
-            model: "llama-3.3-70b-versatile", // Luôn dùng model mạnh để suy luận, kiến trúc hiện đại
-            temperature: 0.3,
-            max_tokens: 1000
-          }, isBiz);
-        } catch (err70b) {
-          console.warn("⚠️ [Groq Fallback] 70B Model failed/rate-limited, falling back to 8B Model:", err70b.message);
-          completion = await createGroqChatCompletion({
-            messages: [
-              { role: "system", content: systemPrompt },
-              ...chatHistory,
-              { role: "user", content: finalUserMessage }
-            ],
-            model: "llama-3.1-8b-instant",
-            temperature: 0.3,
-            max_tokens: 1000
-          }, isBiz);
+        if (images && images.length > 0) {
+          const userContent = [
+            { type: "text", text: finalUserMessage || "Hãy phân tích hình ảnh này." }
+          ];
+          images.forEach(img => {
+            userContent.push({
+              type: "image_url",
+              image_url: { url: img }
+            });
+          });
+
+          const visionMessages = [
+            { role: "system", content: systemPrompt },
+            ...chatHistory,
+            { role: "user", content: userContent }
+          ];
+
+          try {
+            completion = await createGroqChatCompletion({
+              messages: visionMessages,
+              model: "llama-3.2-11b-vision-preview",
+              temperature: 0.3,
+              max_tokens: 1000
+            }, isBiz);
+          } catch (visionErr) {
+            console.warn("⚠️ [Vision Groq Error] Failed to process image with Groq Vision:", visionErr.message);
+            throw visionErr;
+          }
+        } else {
+          try {
+            completion = await createGroqChatCompletion({
+              messages: [
+                { role: "system", content: systemPrompt },
+                ...chatHistory,
+                { role: "user", content: finalUserMessage }
+              ],
+              model: "llama-3.3-70b-versatile", // Luôn dùng model mạnh để suy luận, kiến trúc hiện đại
+              temperature: 0.3,
+              max_tokens: 1000
+            }, isBiz);
+          } catch (err70b) {
+            console.warn("⚠️ [Groq Fallback] 70B Model failed/rate-limited, falling back to 8B Model:", err70b.message);
+            completion = await createGroqChatCompletion({
+              messages: [
+                { role: "system", content: systemPrompt },
+                ...chatHistory,
+                { role: "user", content: finalUserMessage }
+              ],
+              model: "llama-3.1-8b-instant",
+              temperature: 0.3,
+              max_tokens: 1000
+            }, isBiz);
+          }
         }
 
         let aiAnswer = completion.choices[0]?.message?.content || "Mình chưa nghe rõ, bạn nói lại nhé!";
@@ -1394,7 +1432,7 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
           const firstMsgCount = await Conversation.countDocuments({ sessionId: currentSessionId });
           if (firstMsgCount === 0) {
             // Tự tạo tên ngắn gọn từ câu hỏi
-            let cleanMsg = message.replace(/[?.,!]/g, '').trim();
+            let cleanMsg = (message || "Hình ảnh").replace(/[?.,!]/g, '').trim();
             title = cleanMsg.split(' ').slice(0, 6).join(' ');
             if (cleanMsg.split(' ').length > 6) title += '...';
             if (!title) title = 'Hội thoại mới';
@@ -1407,7 +1445,8 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
             sessionId: currentSessionId,
             title: title, // Chỉ lưu title nếu đây là tin nhắn đầu tiên
             role: 'user',
-            text: message
+            text: message || "",
+            images: images || []
           }).save();
 
           const answerDoc = await new Conversation({

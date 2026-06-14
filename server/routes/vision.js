@@ -8,7 +8,7 @@ const groq = {
   chat: {
     completions: {
       create: async (params) => {
-        return await callGroq('user_chatbot', params);
+        return await callGroq('vision', params);
       }
     }
   }
@@ -66,7 +66,7 @@ router.post('/search', async (req, res) => {
           ],
         },
       ],
-      model: "llama-3.2-11b-vision-preview",
+      model: "llama-3.2-11b-vision",
       response_format: { type: "json_object" }
     });
 

@@ -6,7 +6,8 @@ const pools = {
     process.env.GROQ_API_KEY,
     process.env.GROQ_API_KEY_2,
     process.env.GROQ_API_KEY_3,
-    process.env.GROQ_API_KEY_4
+    process.env.GROQ_API_KEY_4,
+    process.env.GROQ_API_KEY_5
   ],
   planner: [
     process.env.GROQ_API_KEY_PLANNER,
@@ -21,6 +22,11 @@ const pools = {
   ],
   business: [
     process.env.GROQ_API_KEY_BUSINESS
+  ],
+  vision: [
+    process.env.GROQ_API_KEY_VISION,
+    process.env.GROQ_API_KEY_VISION_2,
+    process.env.GROQ_API_KEY_VISION_3
   ]
 };
 
@@ -35,7 +41,8 @@ const currentIndices = {
   planner: 0,
   navigation: 0,
   admin: 0,
-  business: 0
+  business: 0,
+  vision: 0
 };
 
 // Hàm lấy danh sách key khả dụng của một category, fallback về user_chatbot nếu category đó trống

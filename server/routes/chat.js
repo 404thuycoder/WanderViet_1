@@ -16,7 +16,10 @@ const { callGroq } = require('../utils/groq-rotator');
 
 // Helper để thực hiện call Groq với cơ chế tự động xoay vòng key (Key Rotation) & Fallback model cực mạnh từ rotator dùng chung
 async function createGroqChatCompletion(params, isBusiness = false) {
-  const category = isBusiness ? 'business' : 'user_chatbot';
+  let category = isBusiness ? 'business' : 'user_chatbot';
+  if (params && (params.model === 'llama-3.2-11b-vision' || params.model === 'llama-3.2-11b-vision-preview')) {
+    category = 'vision';
+  }
   return await callGroq(category, params);
 }
 
@@ -1359,34 +1362,75 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
       
         let completion;
         if (images && images.length > 0) {
-          const userContent = [
-            { type: "text", text: finalUserMessage || "Hãy phân tích hình ảnh này." }
-          ];
-          images.forEach(img => {
-            userContent.push({
-              type: "image_url",
-              image_url: { url: img }
-            });
-          });
+          // 1. Phân tích hình ảnh bằng model Vision (sử dụng API key vision chuyên dụng qua rotator)
+          let imageAnalyses = [];
+          for (let i = 0; i < images.length; i++) {
+            try {
+              console.log(`🖼️ [Vision Analyzer] Analyzing image ${i + 1}/${images.length} using llama-3.2-11b-vision...`);
+              const analysisCompletion = await createGroqChatCompletion({
+                messages: [
+                  {
+                    role: "user",
+                    content: [
+                      {
+                        type: "text",
+                        text: "Hãy phân tích hình ảnh này thật chi tiết. Nhận diện các địa điểm, danh lam thắng cảnh, món ăn, hoạt động văn hóa, hoặc các chi tiết nổi bật khác tại Việt Nam. Mô tả cụ thể về nội dung, màu sắc, bầu không khí và chữ viết hiển thị trong hình (nếu có). Trả lời bằng tiếng Việt."
+                      },
+                      {
+                        type: "image_url",
+                        image_url: { url: images[i] }
+                      }
+                    ]
+                  }
+                ],
+                model: "llama-3.2-11b-vision",
+                temperature: 0.2,
+                max_tokens: 800
+              }, false);
+              
+              const description = analysisCompletion.choices[0]?.message?.content;
+              if (description) {
+                imageAnalyses.push(`[Hình ảnh ${i + 1}]: ${description}`);
+              }
+            } catch (visionErr) {
+              console.warn(`⚠️ [Vision Groq Error] Failed to analyze image ${i + 1} with Groq Vision:`, visionErr.message);
+            }
+          }
 
-          const visionMessages = [
-            { role: "system", content: systemPrompt },
-            ...chatHistory,
-            { role: "user", content: userContent }
-          ];
+          // Ghép thông tin mô tả hình ảnh vào tin nhắn gửi chatbot chính
+          let finalUserMessageWithImageContext = finalUserMessage;
+          if (imageAnalyses.length > 0) {
+            finalUserMessageWithImageContext = `[THÔNG TIN PHÂN TÍCH HÌNH ẢNH MÀ NGƯỜI DÙNG TẢI LÊN]:\n${imageAnalyses.join('\n')}\n\n[CÂU HỎI VÀ YÊU CẦU CỦA NGƯỜI DÙNG]:\n${finalUserMessage}`;
+          }
 
+          // 2. Chatbot chính (llama-3.3-70b-versatile hoặc fallback 8b) trả lời dựa trên thông tin mô tả ảnh
           try {
+            console.log("🤖 [Chatbot Reasoning] Formulating response using llama-3.3-70b-versatile...");
             completion = await createGroqChatCompletion({
-              messages: visionMessages,
-              model: "llama-3.2-11b-vision-preview",
+              messages: [
+                { role: "system", content: systemPrompt },
+                ...chatHistory,
+                { role: "user", content: finalUserMessageWithImageContext }
+              ],
+              model: "llama-3.3-70b-versatile",
               temperature: 0.3,
               max_tokens: 1000
             }, isBiz);
-          } catch (visionErr) {
-            console.warn("⚠️ [Vision Groq Error] Failed to process image with Groq Vision:", visionErr.message);
-            throw visionErr;
+          } catch (err70b) {
+            console.warn("⚠️ [Groq Fallback] 70B Model failed/rate-limited during vision phase, falling back to 8B Model:", err70b.message);
+            completion = await createGroqChatCompletion({
+              messages: [
+                { role: "system", content: systemPrompt },
+                ...chatHistory,
+                { role: "user", content: finalUserMessageWithImageContext }
+              ],
+              model: "llama-3.1-8b-instant",
+              temperature: 0.3,
+              max_tokens: 1000
+            }, isBiz);
           }
         } else {
+          // Text-only flow
           try {
             completion = await createGroqChatCompletion({
               messages: [
@@ -1394,7 +1438,7 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
                 ...chatHistory,
                 { role: "user", content: finalUserMessage }
               ],
-              model: "llama-3.3-70b-versatile", // Luôn dùng model mạnh để suy luận, kiến trúc hiện đại
+              model: "llama-3.3-70b-versatile",
               temperature: 0.3,
               max_tokens: 1000
             }, isBiz);

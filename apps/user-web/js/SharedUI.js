@@ -1645,10 +1645,17 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
               <div class="chat-sessions-sidebar__inner">
                 <div class="chat-sessions-sidebar__header">
                   <span>Lịch sử trò chuyện</span>
-                  <button type="button" class="btn-close-sidebar" id="global-chat-history-close">×</button>
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <button type="button" class="btn-select-mode" id="global-chat-history-select-btn">Chọn</button>
+                    <button type="button" class="btn-close-sidebar" id="global-chat-history-close">×</button>
+                  </div>
                 </div>
                 <div class="chat-sessions-sidebar__body" id="global-chat-sessions-list">
                   <div class="chat-sessions-loading">Đang tải lịch sử...</div>
+                </div>
+                <div class="chat-sessions-sidebar__footer" id="global-chat-history-select-footer" style="display: none;">
+                  <button type="button" class="btn-select-all" id="global-chat-history-select-all">Chọn tất cả</button>
+                  <button type="button" class="btn-delete-selected" id="global-chat-history-delete-selected" disabled>Xóa (0)</button>
                 </div>
               </div>
             </div>
@@ -1768,15 +1775,27 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                 </div>
               </div>
               
+              <!-- Floating Options Menu for Plus Button -->
+              <div class="chat-form-plus-menu" id="chat-form-plus-menu" style="display: none;">
+                <button type="button" class="chat-plus-menu-item" id="chat-menu-add-image">
+                  <svg class="menu-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                  <span>Thêm ảnh</span>
+                </button>
+              </div>
+
               <form class="chat-form" id="global-chat-form">
                 <input type="file" id="chat-image-file-input" accept="image/png, image/jpeg, image/webp" multiple style="display: none;">
                 <button type="button" class="chat-form-plus-btn" title="Thêm tùy chọn" aria-label="Thêm tùy chọn">
                   <span>+</span>
                 </button>
                 <div class="chat-input-wrapper" style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+                  <div class="chat-image-preview-container" id="chat-image-preview-container"></div>
                   <label class="visually-hidden" for="global-chat-input">Nhập câu hỏi</label>
                   <textarea id="global-chat-input" placeholder="Hỏi về du lịch Việt Nam…" autocomplete="off" rows="1"></textarea>
-                  <div class="chat-image-preview-container" id="chat-image-preview-container"></div>
                 </div>
                 <div class="companion-fab-wrapper">
                   <div class="companion-fab" id="companion-toggle" title="Chế độ Hướng dẫn viên Chuyên gia">
@@ -3040,9 +3059,28 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     const fileInput = document.getElementById('chat-image-file-input');
     const previewContainer = document.getElementById('chat-image-preview-container');
     const plusBtn = form ? form.querySelector('.chat-form-plus-btn') : null;
+    const plusMenu = document.getElementById('chat-form-plus-menu');
+    const addImageBtn = document.getElementById('chat-menu-add-image');
 
-    if (plusBtn && fileInput) {
-      plusBtn.addEventListener('click', () => {
+    if (plusBtn && plusMenu) {
+      plusBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isVisible = plusMenu.style.display === 'flex';
+        plusMenu.style.display = isVisible ? 'none' : 'flex';
+      });
+      
+      // Close menu when clicking anywhere else
+      document.addEventListener('click', (e) => {
+        if (!plusMenu.contains(e.target) && e.target !== plusBtn) {
+          plusMenu.style.display = 'none';
+        }
+      });
+    }
+
+    if (addImageBtn && fileInput && plusMenu) {
+      addImageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        plusMenu.style.display = 'none';
         fileInput.click();
       });
     }
@@ -3666,6 +3704,205 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         if (window.voiceGuide) window.voiceGuide.cancelAll();
     });
 
+    // --- CHAT HISTORY & NEW CHAT LISTENERS ---
+    const newChatBtn = document.getElementById('global-chat-new-btn');
+    if (newChatBtn) {
+      newChatBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentSessionId = null;
+        localStorage.removeItem('wander_current_session');
+        localStorage.removeItem('wander_shared_chat');
+        if (log) {
+          log.innerHTML = '';
+        }
+        
+        // Đóng panel lịch sử nếu đang mở
+        const sessionsView = document.getElementById('global-chat-sessions-view');
+        if (sessionsView) {
+          sessionsView.setAttribute('hidden', 'true');
+        }
+        
+        loadSharedChat();
+      });
+    }
+
+    function resetSelectMode() {
+      isSelectMode = false;
+      selectedSessionIds.clear();
+      const sessionsView = document.getElementById('global-chat-sessions-view');
+      if (sessionsView) {
+        sessionsView.classList.remove('chat-sessions-sidebar--select-mode');
+      }
+      const selectBtn = document.getElementById('global-chat-history-select-btn');
+      if (selectBtn) {
+        selectBtn.textContent = 'Chọn';
+        selectBtn.classList.remove('is-active');
+      }
+      const selectFooter = document.getElementById('global-chat-history-select-footer');
+      if (selectFooter) {
+        selectFooter.style.display = 'none';
+      }
+      document.querySelectorAll('.chat-session-item').forEach(el => {
+        el.classList.remove('chat-session-item--selected');
+        el.classList.remove('chat-session-item--select-mode');
+      });
+      updateSelectFooter();
+    }
+
+    function updateSelectFooter() {
+      const footerBtn = document.getElementById('global-chat-history-delete-selected');
+      if (footerBtn) {
+        footerBtn.textContent = `Xóa (${selectedSessionIds.size})`;
+        footerBtn.disabled = selectedSessionIds.size === 0;
+      }
+    }
+
+    const historyBtn = document.getElementById('global-chat-history-btn');
+    const sessionsView = document.getElementById('global-chat-sessions-view');
+    if (historyBtn && sessionsView) {
+      historyBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isHidden = sessionsView.hasAttribute('hidden');
+        if (isHidden) {
+          sessionsView.removeAttribute('hidden');
+          loadChatSessions();
+        } else {
+          sessionsView.setAttribute('hidden', 'true');
+          resetSelectMode();
+        }
+      });
+    }
+
+    const historyCloseBtn = document.getElementById('global-chat-history-close');
+    if (historyCloseBtn && sessionsView) {
+      historyCloseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sessionsView.setAttribute('hidden', 'true');
+        resetSelectMode();
+      });
+    }
+
+    // Select mode button toggler
+    const selectBtn = document.getElementById('global-chat-history-select-btn');
+    const selectFooter = document.getElementById('global-chat-history-select-footer');
+    if (selectBtn) {
+      selectBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        isSelectMode = !isSelectMode;
+        selectedSessionIds.clear();
+        
+        const sessionsView = document.getElementById('global-chat-sessions-view');
+        if (sessionsView) {
+          sessionsView.classList.toggle('chat-sessions-sidebar--select-mode', isSelectMode);
+        }
+        
+        selectBtn.textContent = isSelectMode ? 'Hủy' : 'Chọn';
+        selectBtn.classList.toggle('is-active', isSelectMode);
+        
+        if (selectFooter) {
+          selectFooter.style.display = isSelectMode ? 'flex' : 'none';
+        }
+        
+        document.querySelectorAll('.chat-session-item').forEach(el => {
+          el.classList.remove('chat-session-item--selected');
+          el.classList.toggle('chat-session-item--select-mode', isSelectMode);
+        });
+        
+        const selectAllBtn = document.getElementById('global-chat-history-select-all');
+        if (selectAllBtn) {
+          selectAllBtn.textContent = 'Chọn tất cả';
+        }
+        
+        updateSelectFooter();
+      });
+    }
+
+    // Select all button
+    const selectAllBtn = document.getElementById('global-chat-history-select-all');
+    if (selectAllBtn) {
+      selectAllBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const items = document.querySelectorAll('.chat-session-item');
+        const allSelected = Array.from(items).every(item => item.classList.contains('chat-session-item--selected'));
+        
+        items.forEach(item => {
+          const sessionId = item.dataset.sessionId;
+          if (sessionId) {
+            if (allSelected) {
+              selectedSessionIds.delete(sessionId);
+              item.classList.remove('chat-session-item--selected');
+            } else {
+              selectedSessionIds.add(sessionId);
+              item.classList.add('chat-session-item--selected');
+            }
+          }
+        });
+        
+        selectAllBtn.textContent = allSelected ? 'Chọn tất cả' : 'Bỏ chọn';
+        updateSelectFooter();
+      });
+    }
+
+    // Delete selected sessions
+    const deleteSelectedBtn = document.getElementById('global-chat-history-delete-selected');
+    if (deleteSelectedBtn) {
+      deleteSelectedBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const count = selectedSessionIds.size;
+        if (count === 0) return;
+        
+        // Show confirm ONLY when count > 1
+        if (count > 1) {
+          const ok = await window.WanderUI.confirm('Xác nhận xóa', `Bạn có chắc chắn muốn xóa ${count} hội thoại đã chọn?`);
+          if (!ok) return;
+        }
+        
+        if (window.WanderUI && window.WanderUI.showLoading) {
+          window.WanderUI.showLoading(`Đang xóa ${count} hội thoại...`);
+        }
+        
+        try {
+          const token = localStorage.getItem('wander_token');
+          const deviceId = getDeviceId();
+          
+          const deletePromises = Array.from(selectedSessionIds).map(sessionId => 
+            fetch(`/api/chat/session/${sessionId}?deviceId=${deviceId}`, {
+              method: 'DELETE',
+              headers: { 'x-auth-token': token || '' }
+            })
+          );
+          
+          await Promise.all(deletePromises);
+          
+          if (selectedSessionIds.has(currentSessionId)) {
+            currentSessionId = null;
+            localStorage.removeItem('wander_current_session');
+            localStorage.removeItem('wander_shared_chat');
+            if (log) log.innerHTML = '';
+            loadSharedChat();
+          }
+          
+          if (window.WanderUI && window.WanderUI.hideLoading) {
+            window.WanderUI.hideLoading();
+          }
+          if (window.WanderUI && window.WanderUI.showToast) {
+            window.WanderUI.showToast(`Đã xóa thành công ${count} hội thoại`, 'success');
+          }
+          
+          resetSelectMode();
+          loadChatSessions();
+        } catch (err) {
+          if (window.WanderUI && window.WanderUI.hideLoading) {
+            window.WanderUI.hideLoading();
+          }
+          console.error('Lỗi khi xóa nhiều hội thoại:', err);
+          if (window.WanderUI && window.WanderUI.showToast) {
+            window.WanderUI.showToast('Có lỗi xảy ra khi xóa các hội thoại', 'error');
+          }
+        }
+      });
+    }
+
     // --- FULLSCREEN TOGGLE ---
     const expandBtn = document.getElementById('global-chat-expand-btn');
     if (expandBtn) {
@@ -3858,6 +4095,8 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     // localStorage.removeItem('wander_current_session');
     // localStorage.removeItem('wander_shared_chat');
     let currentSessionId = null;
+    let isSelectMode = false;
+    let selectedSessionIds = new Set();
 
     // Flag: chỉ đọc to (TTS) khi user dùng giọng nói, không đọc khi gõ text
     let _lastInputWasVoice = false;
@@ -3963,6 +4202,28 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     // images: array of base64/url strings
     function appendMsg(info, role, skipSave, skipScroll, itineraryData, images) {
       if (!log) return;
+      
+      const welcomeScreen = document.getElementById('chat-welcome-screen');
+      const hasMessages = log.querySelector('.chat-message-row');
+      if (welcomeScreen || !hasMessages) {
+        if (welcomeScreen) {
+          welcomeScreen.remove();
+        }
+        
+        const startBanner = document.createElement('div');
+        startBanner.className = 'chat-conversation-start';
+        const now = new Date();
+        const timeStr = now.toLocaleDateString('vi-VN', { weekday: 'long', day: 'numeric', month: 'numeric' });
+        startBanner.innerHTML = `
+          <div class="chat-start-badge">
+            <span class="chat-start-status-dot"></span>
+            <span>WanderViet AI · Đang trực tuyến</span>
+          </div>
+          <div class="chat-start-date">${timeStr}</div>
+        `;
+        log.appendChild(startBanner);
+      }
+
       const msgTime = new Date();
 
       // Extract [ITIN_CARD:...] and [ITIN_PROPOSALS:...] tags from bot message
@@ -4115,13 +4376,29 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       }
     }
 
+    function showWelcomeScreen() {
+      if (!log) return;
+      log.innerHTML = `
+        <div class="chat-welcome-screen" id="chat-welcome-screen">
+          <h2 class="chat-welcome-title">
+            <span class="chat-welcome-title-text">Chào mừng quay trở lại!</span>
+            <svg class="chat-welcome-map-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="3 6 3 20 9 17 15 21 21 17 21 3 15 6 9 2 3 6"></polygon>
+              <line x1="9" y1="2" x2="9" y2="17"></line>
+              <line x1="15" y1="6" x2="15" y2="21"></line>
+            </svg>
+          </h2>
+          <p class="chat-welcome-subtitle">Hôm nay tụi mình sẽ cùng vi vu ở đâu thế nhỉ? 🚀</p>
+        </div>
+      `;
+    }
+
     // Load chat history from localStorage (shared between tabs/pages)
     function loadSharedChat() {
       try {
         const shared = JSON.parse(localStorage.getItem('wander_shared_chat') || '[]');
         if (!shared || shared.length === 0) {
-          // Show welcome message
-          appendMsg('Xin chào! Mình là Trợ lý Du lịch WanderViet 🌟\n\nMình có thể giúp bạn:\n- Lập **lịch trình** du lịch\n- Tìm **địa điểm** tham quan\n- Gợi ý **ăn uống** đặc sản\n- Tư vấn **phương tiện** di chuyển\n\nBạn muốn khám phá nơi nào hôm nay? ✈️', 'bot', true);
+          showWelcomeScreen();
           return;
         }
         // Re-render last 20 messages from cache
@@ -4132,8 +4409,17 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         scrollToBottom(true);
       } catch(e) {
         console.warn('[WanderChat] loadSharedChat error:', e);
-        appendMsg('Xin chào! Mình là Trợ lý Du lịch WanderViet 🌟\n\nBạn muốn đi đâu hôm nay? ✈️', 'bot', true);
+        showWelcomeScreen();
       }
+    }
+
+    function getDeviceId() {
+      let dId = localStorage.getItem('wander_device_id');
+      if (!dId) {
+        dId = 'dev_' + Math.random().toString(36).substring(2, 15) + '_' + Date.now().toString(36);
+        localStorage.setItem('wander_device_id', dId);
+      }
+      return dId;
     }
 
     // Load chat history from server
@@ -4141,7 +4427,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       if (!sessionId) return;
       try {
         const token = localStorage.getItem('wander_token');
-        const res = await fetch(`/api/chat/history?sessionId=${sessionId}`, {
+        const res = await fetch(`/api/chat/history/${sessionId}`, {
           headers: { 'x-auth-token': token || '' }
         });
         if (!res.ok) return;
@@ -4150,12 +4436,166 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           // Clear current and re-render from server
           if (log) log.innerHTML = '';
           data.messages.forEach(item => {
-            appendMsg(item.content || item.text, item.role === 'assistant' ? 'bot' : 'user', true, true);
+            const role = (item.role === 'model' || item.role === 'assistant' || item.role === 'bot') ? 'bot' : 'user';
+            appendMsg(item.content || item.text, role, true, true);
           });
           scrollToBottom(true);
         }
       } catch(e) {
         // Silent fail - use local cache
+      }
+    }
+
+    // Load all chat sessions from server for history list
+    async function loadChatSessions() {
+      const listContainer = document.getElementById('global-chat-sessions-list');
+      if (!listContainer) return;
+
+      listContainer.innerHTML = '<div class="chat-sessions-loading">Đang tải lịch sử...</div>';
+
+      try {
+        const token = localStorage.getItem('wander_token');
+        const deviceId = getDeviceId();
+        const res = await fetch(`/api/chat/sessions?deviceId=${deviceId}`, {
+          headers: { 'x-auth-token': token || '' }
+        });
+        if (!res.ok) {
+          listContainer.innerHTML = '<div class="chat-sessions-error">Không thể tải lịch sử trò chuyện.</div>';
+          return;
+        }
+
+        const data = await res.json();
+        if (!data || !data.sessions || data.sessions.length === 0) {
+          listContainer.innerHTML = '<div class="chat-sessions-empty">Chưa có lịch sử trò chuyện nào.</div>';
+          return;
+        }
+
+        listContainer.innerHTML = '';
+        data.sessions.forEach(session => {
+          const item = document.createElement('div');
+          item.className = 'chat-session-item';
+          item.dataset.sessionId = session.sessionId;
+          
+          if (session.sessionId === currentSessionId) {
+            item.classList.add('chat-session-item--active');
+          }
+          
+          // Preserve selected class if loading sessions while in select mode
+          if (isSelectMode) {
+            item.classList.add('chat-session-item--select-mode');
+            if (selectedSessionIds.has(session.sessionId)) {
+              item.classList.add('chat-session-item--selected');
+            }
+          }
+
+          let dateStr = '';
+          if (session.updatedAt) {
+            const date = new Date(session.updatedAt);
+            dateStr = date.toLocaleDateString('vi-VN', { month: 'numeric', day: 'numeric' }) + ' ' + 
+                      date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+          }
+
+          item.innerHTML = `
+            <div class="chat-session-item__info">
+              <span class="chat-session-item__checkbox"></span>
+              <span class="chat-session-item__icon">
+                <svg class="chat-session-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </span>
+              <div class="chat-session-item__details">
+                <div class="chat-session-item__title" title="${escapeHtml(session.title)}">${escapeHtml(session.title)}</div>
+                <div class="chat-session-item__time">${dateStr}</div>
+              </div>
+            </div>
+            <button type="button" class="chat-session-item__delete" title="Xóa hội thoại">×</button>
+          `;
+
+          // Handle click to load session or select it
+          item.addEventListener('click', (e) => {
+            if (e.target.closest('.chat-session-item__delete')) return;
+
+            if (isSelectMode) {
+              const id = session.sessionId;
+              if (selectedSessionIds.has(id)) {
+                selectedSessionIds.delete(id);
+                item.classList.remove('chat-session-item--selected');
+              } else {
+                selectedSessionIds.add(id);
+                item.classList.add('chat-session-item--selected');
+              }
+              
+              // Update Select all button text dynamically
+              const items = document.querySelectorAll('.chat-session-item');
+              const allSelected = Array.from(items).every(el => el.classList.contains('chat-session-item--selected'));
+              const selectAllBtn = document.getElementById('global-chat-history-select-all');
+              if (selectAllBtn) {
+                selectAllBtn.textContent = allSelected ? 'Bỏ chọn' : 'Chọn tất cả';
+              }
+              
+              updateSelectFooter();
+              return;
+            }
+
+            const sessionsView = document.getElementById('global-chat-sessions-view');
+            if (sessionsView) {
+              sessionsView.setAttribute('hidden', 'true');
+            }
+
+            currentSessionId = session.sessionId;
+            localStorage.setItem('wander_current_session', currentSessionId);
+            
+            if (log) log.innerHTML = '';
+            
+            const loadingRow = document.createElement('div');
+            loadingRow.className = 'chat-message-row chat-message-row--bot';
+            loadingRow.innerHTML = `
+              <div class="chat-bubble chat-bubble--bot" style="padding: 0.75rem 1.25rem;">
+                <div class="typing-dots"><span></span><span></span><span></span></div>
+              </div>
+            `;
+            log.appendChild(loadingRow);
+            
+            loadChatHistory(currentSessionId);
+          });
+
+          // Handle delete session
+          const deleteBtn = item.querySelector('.chat-session-item__delete');
+          if (deleteBtn) {
+            deleteBtn.addEventListener('click', async (e) => {
+              e.stopPropagation();
+              // Delete 1 item immediately without showing confirmation
+              try {
+                const token = localStorage.getItem('wander_token');
+                const deleteRes = await fetch(`/api/chat/session/${session.sessionId}?deviceId=${deviceId}`, {
+                  method: 'DELETE',
+                  headers: { 'x-auth-token': token || '' }
+                });
+                const deleteData = await deleteRes.json();
+                if (deleteData.success) {
+                  if (session.sessionId === currentSessionId) {
+                    currentSessionId = null;
+                    localStorage.removeItem('wander_current_session');
+                    localStorage.removeItem('wander_shared_chat');
+                    if (log) log.innerHTML = '';
+                    loadSharedChat();
+                  }
+                  loadChatSessions();
+                } else {
+                  alert(deleteData.message || 'Không thể xóa hội thoại.');
+                }
+              } catch (err) {
+                console.error('Lỗi khi xóa hội thoại:', err);
+                alert('Có lỗi xảy ra khi xóa hội thoại.');
+              }
+            });
+          }
+
+          listContainer.appendChild(item);
+        });
+      } catch (err) {
+        console.error('Lỗi khi tải phiên chat:', err);
+        listContainer.innerHTML = '<div class="chat-sessions-error">Có lỗi xảy ra khi tải lịch sử.</div>';
       }
     }
 
@@ -4603,14 +5043,15 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
              resData = await window.wanderChatReply(msg, { 
                lang: selectedLang,
                sessionId: currentSessionId,
-               images: imagesToSend
+               images: imagesToSend,
+               deviceId: getDeviceId()
              });
           } else {
              const token = localStorage.getItem('wander_token');
              const res = await fetch('/api/chat', {
                method: 'POST',
                headers: { 'Content-Type': 'application/json', 'x-auth-token': token || '' },
-               body: JSON.stringify({ message: msg, lang: selectedLang, sessionId: currentSessionId, images: imagesToSend })
+               body: JSON.stringify({ message: msg, lang: selectedLang, sessionId: currentSessionId, images: imagesToSend, deviceId: getDeviceId() })
              });
              resData = await res.json();
           }
@@ -7199,40 +7640,39 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
   }
 
   function confirm(title, message) {
+    // If only one argument is provided, treat it as the message
+    if (message === undefined) {
+      message = title;
+      title = "Xác nhận";
+    }
     return new Promise((resolve) => {
       const modalHtml = `
-        <div id="temp-confirm-modal" class="modal" style="z-index: 11000;">
-          <div class="modal__inner" style="max-width: 400px; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
-            <div class="modal__header">
-              <h3 class="modal__title">${title}</h3>
+        <div id="temp-confirm-modal" class="modal" style="z-index: 2147483647; position: fixed; inset: 0; background: rgba(10, 18, 28, 0.65); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex !important; align-items: center; justify-content: center; pointer-events: auto; padding: 16px;">
+          <div class="modal__inner" style="max-width: 400px; width: 100%; background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); pointer-events: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+            <div class="modal__header" style="padding: 0; border: none; display: flex; align-items: center; justify-content: space-between;">
+              <h3 class="modal__title" style="margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--text); font-family: 'Outfit', sans-serif;">${title}</h3>
             </div>
-            <div class="modal__body">
-              <p style="color: var(--text-muted); line-height: 1.6;">${message}</p>
+            <div class="modal__body" style="padding: 0;">
+              <p style="color: var(--text-muted); line-height: 1.6; font-size: 0.95rem; margin: 0;">${message}</p>
             </div>
-            <div style="padding: 0 1.75rem 1.75rem; display: flex; gap: 10px;">
-              <button class="btn btn--outline flex-1" id="confirm-cancel">Hủy</button>
-              <button class="btn btn--danger flex-1" id="confirm-ok">Đồng ý</button>
+            <div style="display: flex; gap: 12px; margin-top: 8px;">
+              <button class="btn btn--outline flex-1" id="confirm-cancel" style="cursor: pointer; padding: 10px 16px; border-radius: 12px; font-weight: 600; transition: all 0.2s;">Hủy</button>
+              <button class="btn btn--danger flex-1" id="confirm-ok" style="cursor: pointer; padding: 10px 16px; border-radius: 12px; font-weight: 600; background: #ef4444; color: white; border: none; transition: all 0.2s;">Đồng ý</button>
             </div>
           </div>
         </div>
       `;
       const div = document.createElement('div');
+      div.id = 'temp-confirm-wrapper';
       div.innerHTML = modalHtml;
       document.body.appendChild(div);
 
-      const modal = document.getElementById('temp-confirm-modal');
-      const backdrop = document.querySelector('[data-modal-backdrop]');
-      if (backdrop) backdrop.hidden = false;
-      modal.hidden = false;
-
       document.getElementById('confirm-cancel').onclick = () => {
-        modal.remove();
-        if (backdrop) backdrop.hidden = true;
+        div.remove();
         resolve(false);
       };
       document.getElementById('confirm-ok').onclick = () => {
-        modal.remove();
-        if (backdrop) backdrop.hidden = true;
+        div.remove();
         resolve(true);
       };
     });

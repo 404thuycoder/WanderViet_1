@@ -196,6 +196,25 @@ QUAN TRỌNG: Khi lập lịch cho Hà Nội, BẮT BUỘC sử dụng ĐÚNG T�
 `;
     }
 
+    // Lấy thông tin thói quen người dùng từ DB để cá nhân hóa
+    let userContext = "";
+    if (req.user) {
+      try {
+        const userDoc = await User.findOne({
+          $or: [
+            { customId: req.user.id },
+            { id: req.user.id },
+            { _id: mongoose.Types.ObjectId.isValid(req.user.id) ? req.user.id : new mongoose.Types.ObjectId() }
+          ]
+        }).select('preferenceProfile');
+        if (userDoc && userDoc.preferenceProfile && Array.isArray(userDoc.preferenceProfile.aiInsights) && userDoc.preferenceProfile.aiInsights.length > 0) {
+          userContext = `\n- Thói quen & sở thích lịch trình đã lưu từ trước của người dùng (BẮT BUỘC ưu tiên áp dụng một cách tinh tế): ${userDoc.preferenceProfile.aiInsights.join(', ')}`;
+        }
+      } catch (err) {
+        console.warn('⚠️ Lỗi truy vấn profile người dùng để tối ưu hóa AI:', err.message);
+      }
+    }
+
     const prompt = `Bạn là SIÊU KIẾN TRÚC SƯ LỊCH TRÌNH của WanderViet AI. Nhiệm vụ của bạn là biến một chuyến đi thành một TÁC PHẨM NGHỆ THUẬT.
 
 === THÔNG TIN CHUYẾN ĐI ===
@@ -210,7 +229,7 @@ ${weatherInfo ? `- THỜI TIẾT THỰC TẾ NGAY LÚC NÀY: ${weatherInfo} (HÃ
 - Đi cùng: ${companion || 'Bạn bè'}
 - Nhịp độ: ${pace || 'Vừa phải'}
 - Không khí/Vibe mong muốn: ${vibe || 'Tự do/Khám phá'}
-- Yêu cầu đặc biệt: "${interestsStr || 'Không có'}"
+- Yêu cầu đặc biệt: "${interestsStr || 'Không có'}"${userContext}
 ${destinationLocationContext}
 
 === QUY TẮC "THẾ HỆ 2.0" (PHẢI TUÂN THỦ TỐI THƯỢNG) ===

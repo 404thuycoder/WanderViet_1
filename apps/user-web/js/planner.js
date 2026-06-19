@@ -391,7 +391,7 @@ const initPlanner = function () {
   const refineInput = document.getElementById('refineInput');
   const refineBtn = document.getElementById('refineBtn');
   const btnModeForm = document.getElementById('btnModeForm');
-  const btnModeDiscovery = document.getElementById('btnModeDiscovery');
+  const btnModeCreate = document.getElementById('btnModeCreate');
   const stepSmartWizard = document.getElementById('stepSmartWizard');
   const btnSaveTrip = document.getElementById('btnSaveTrip');
   const versionTabs = document.getElementById('versionTabs');
@@ -1864,14 +1864,16 @@ const initPlanner = function () {
   }
 
   if (btnModeForm) {
+    const btnModeCreate = document.getElementById('btnModeCreate');
     const btnModeCompare = document.getElementById('btnModeCompare');
     const stepDiscovery = document.getElementById('stepDiscovery');
+    const stepCreate = document.getElementById('stepCreate');
     const stepCompare = document.getElementById('stepCompare');
     const formStepNav = document.getElementById('formStepNav');
 
     function switchPath(activeBtn, targetStepId) {
       // Clear active class from all mode buttons
-      [btnModeForm, btnModeDiscovery, btnModeCompare].forEach(btn => btn?.classList.remove('active'));
+      [btnModeForm, btnModeCreate, btnModeCompare].forEach(btn => btn?.classList.remove('active'));
       activeBtn.classList.add('active');
 
       // Hide ALL steps/sections first
@@ -1883,6 +1885,7 @@ const initPlanner = function () {
 
       // Other paths
       if (stepDiscovery) stepDiscovery.style.display = 'none';
+      if (stepCreate) stepCreate.style.display = 'none';
       if (stepSmartWizard) stepSmartWizard.style.display = 'none';
       if (stepCompare) stepCompare.style.display = 'none';
 
@@ -1905,12 +1908,15 @@ const initPlanner = function () {
         }
         // Reset to step 1
         switchFormStep(1);
-      } else if (targetStepId === 'stepDiscovery') {
-        // Discovery Mode
-        if (stepDiscovery) stepDiscovery.style.display = 'flex';
-        if (discoveryHistory.length === 0 && discoveryMessages.children.length === 0) {
-          addDiscoveryBubble("Chào bạn! Tôi là WanderAI. Hãy cho tôi biết ngân sách và sở thích, tôi sẽ gợi ý cho bạn nhé! ✨", "ai");
-          renderDiscoverySuggestions();
+      } else if (targetStepId === 'stepCreate') {
+        // Create Mode
+        if (stepCreate) stepCreate.style.display = 'flex';
+        // Always sync the view based on active tab
+        const btnFormMode = document.getElementById('btnCreateSubForm');
+        if (btnFormMode && btnFormMode.classList.contains('active')) {
+          switchCreateSubMode('form');
+        } else {
+          switchCreateSubMode('chat');
         }
       } else if (targetStepId === 'stepCompare') {
         // Compare Mode
@@ -1925,6 +1931,11 @@ const initPlanner = function () {
       switchPath(btnModeForm, 'stepBasic');
     });
 
+    if (btnModeCreate) {
+      btnModeCreate.addEventListener('click', () => {
+        switchPath(btnModeCreate, 'stepCreate');
+      });
+    }
 
     if (btnModeCompare) {
       btnModeCompare.addEventListener('click', () => {
@@ -2165,12 +2176,14 @@ const initPlanner = function () {
       const formStep2 = document.getElementById('formStep2');
       const formStepNav = document.getElementById('formStepNav');
       const stepDiscovery = document.getElementById('stepDiscovery');
+      const stepCreate = document.getElementById('stepCreate');
       const stepCompare = document.getElementById('stepCompare');
 
       if (formStepNav) formStepNav.style.display = 'none';
       if (formStep1) formStep1.style.display = 'none';
       if (formStep2) formStep2.style.display = 'none';
       if (stepDiscovery) stepDiscovery.style.display = 'none';
+      if (stepCreate) stepCreate.style.display = 'none';
       if (stepCompare) stepCompare.style.display = 'none';
       if (stepSmartWizard) stepSmartWizard.style.display = 'flex';
 
@@ -2409,6 +2422,156 @@ const initPlanner = function () {
   window.WanderPlanner.getCurrentPlanIndex = () => currentPlanIndex;
   window.WanderPlanner.renderItinerary = (p, dst, d, dt) => renderItinerary(p, dst, d, dt);
   window.WanderPlanner.renderMultiItinerary = (ps, dsts) => renderMultiItinerary(ps, dsts);
+  window.WanderPlanner.doGenerate = doGenerate;
+  window.doGenerate = doGenerate;
+
+  // --- Manual Itinerary Helpers ---
+  let currentTripType = 'short';
+
+  function updateRemoveButtonsVisibility() {
+    const list = document.getElementById('manualLocationsList');
+    if (!list) return;
+    const items = list.querySelectorAll('.manual-location-item');
+    items.forEach((item, index) => {
+      const removeBtn = item.querySelector('.btn-remove-location');
+      const input = item.querySelector('.manual-location-input');
+      if (removeBtn) {
+        removeBtn.style.display = items.length > 1 ? 'flex' : 'none';
+      }
+      if (input) {
+        input.placeholder = `Nhập địa chỉ/điểm dừng ${index + 1}`;
+      }
+    });
+  }
+
+  window.switchCreateSubMode = function(mode) {
+    const btnChat = document.getElementById('btnCreateSubChat');
+    const btnForm = document.getElementById('btnCreateSubForm');
+    const chatArea = document.getElementById('createSubChatArea');
+    const formArea = document.getElementById('createSubFormArea');
+    const stepDiscovery = document.getElementById('stepDiscovery');
+
+    if (mode === 'chat') {
+      btnChat?.classList.add('active');
+      btnForm?.classList.remove('active');
+      if (chatArea) chatArea.style.display = 'block';
+      if (formArea) formArea.style.display = 'none';
+      if (stepDiscovery) {
+        stepDiscovery.style.display = 'flex';
+        if (discoveryHistory.length === 0 && discoveryMessages.children.length === 0) {
+          addDiscoveryBubble("Chào bạn! Tôi là WanderAI. Hãy cho tôi biết ngân sách và sở thích, tôi sẽ gợi ý cho bạn nhé! ✨", "ai");
+          renderDiscoverySuggestions();
+        }
+      }
+    } else {
+      btnChat?.classList.remove('active');
+      btnForm?.classList.add('active');
+      if (chatArea) chatArea.style.display = 'none';
+      if (formArea) formArea.style.display = 'block';
+      if (stepDiscovery) stepDiscovery.style.display = 'none';
+    }
+  };
+
+  window.addManualLocationField = function() {
+    const list = document.getElementById('manualLocationsList');
+    if (!list) return;
+    const newItem = document.createElement('div');
+    newItem.className = 'manual-location-item';
+    newItem.innerHTML = `
+      <input type="text" class="planner-input manual-location-input" placeholder="" required>
+      <button type="button" class="btn-circle btn-remove-location" style="background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3);" onclick="removeManualLocationField(this)">−</button>
+    `;
+    list.appendChild(newItem);
+    updateRemoveButtonsVisibility();
+  };
+
+  window.removeManualLocationField = function(btn) {
+    const item = btn.closest('.manual-location-item');
+    if (item) {
+      item.remove();
+      updateRemoveButtonsVisibility();
+    }
+  };
+
+  window.formatCreateBudget = function(input) {
+    let val = input.value.replace(/\D/g, '');
+    if (!val) {
+      input.value = '';
+      return;
+    }
+    let formatted = parseInt(val, 10).toLocaleString('vi-VN');
+    input.value = formatted + ' VNĐ';
+    
+    const suffixLen = 4;
+    if (input.selectionStart > input.value.length - suffixLen) {
+      const pos = input.value.length - suffixLen;
+      input.setSelectionRange(pos, pos);
+    }
+  };
+
+  window.updateCreateDurationLabel = function(value) {
+    const label = document.getElementById('createDurationVal');
+    if (label) {
+      label.textContent = `${value} ngày`;
+    }
+  };
+
+  window.setTripType = function(type) {
+    currentTripType = type;
+    const btnShort = document.getElementById('btnTripTypeShort');
+    const btnLong = document.getElementById('btnTripTypeLong');
+    if (type === 'short') {
+      btnShort?.classList.add('active');
+      btnLong?.classList.remove('active');
+    } else {
+      btnShort?.classList.remove('active');
+      btnLong?.classList.add('active');
+    }
+  };
+
+  window.submitCreateItinerary = function() {
+    const customPrompt = document.getElementById('createCustomPrompt')?.value.trim() || '';
+    const budget = document.getElementById('createBudgetInput')?.value.trim() || 'Tự do';
+    const days = document.getElementById('createDurationSlider')?.value || 3;
+
+    const destinations = Array.from(document.querySelectorAll('.manual-location-input'))
+      .map(input => input.value.trim())
+      .filter(Boolean);
+
+    if (destinations.length === 0) {
+      const msg = "Vui lòng nhập ít nhất một địa điểm/điểm dừng!";
+      if (window.WanderToast) {
+        window.WanderToast.warning(msg);
+      } else {
+        alert(msg);
+      }
+      return;
+    }
+
+    const additionalInfoText = `Yêu cầu cá nhân: ${customPrompt}. Tuyến đường đi qua các điểm dừng nhập tay: ${destinations.join(', ')}. Loại hình chuyến đi: ${currentTripType === 'short' ? 'Ngắn ngày' : 'Dài ngày'}.`;
+
+    const formData = {
+      destination: destinations.join(' - '),
+      days: days,
+      budget: budget,
+      additionalInfo: additionalInfoText,
+      companion: 'Bạn bè',
+      pace: 'Vừa phải',
+      transport: 'Tự do',
+      accommodation: 'Tùy chọn',
+      skipWizard: true
+    };
+
+    console.log("🚀 [Manual Itinerary Form] Submitting direct generation:", formData);
+
+    if (typeof doGenerate === 'function') {
+      doGenerate(formData);
+    } else if (window.WanderPlanner && typeof window.WanderPlanner.doGenerate === 'function') {
+      window.WanderPlanner.doGenerate(formData);
+    } else {
+      console.error("Không tìm thấy hàm doGenerate để khởi chạy lập lịch.");
+    }
+  };
 
   async function doGenerate(data) {
     // PHASE 2: Switch to result view FIRST so loader is visible
@@ -3880,12 +4043,14 @@ const initPlanner = function () {
       const formStep1 = document.getElementById('formStep1');
       const formStep2 = document.getElementById('formStep2');
       const stepDiscovery = document.getElementById('stepDiscovery');
+      const stepCreate = document.getElementById('stepCreate');
       const stepCompare = document.getElementById('stepCompare');
 
       if (formStepNav) formStepNav.style.display = 'none';
       if (formStep1) formStep1.style.display = 'none';
       if (formStep2) formStep2.style.display = 'none';
       if (stepDiscovery) stepDiscovery.style.display = 'none';
+      if (stepCreate) stepCreate.style.display = 'none';
       if (stepCompare) stepCompare.style.display = 'none';
       if (stepSmartWizard) stepSmartWizard.style.display = 'none';
 
@@ -3985,10 +4150,12 @@ const initPlanner = function () {
 
     // Other paths
     const stepDiscovery = document.getElementById('stepDiscovery');
+    const stepCreate = document.getElementById('stepCreate');
     const stepSmartWizard = document.getElementById('stepSmartWizard');
     const stepCompare = document.getElementById('stepCompare');
 
     if (stepDiscovery) stepDiscovery.style.display = 'none';
+    if (stepCreate) stepCreate.style.display = 'none';
     if (stepSmartWizard) stepSmartWizard.style.display = 'none';
     if (stepCompare) stepCompare.style.display = 'none';
 

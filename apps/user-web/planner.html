@@ -1594,6 +1594,71 @@
       border-color: rgba(59, 130, 246, 0.4) !important;
     }
 
+    /* --- Chức năng Tạo lịch trình thủ công & Cá nhân hóa --- */
+    .manual-location-item {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      margin-top: 0.5rem;
+      animation: slideInLoc 0.2s ease-out;
+    }
+    @keyframes slideInLoc {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .btn-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border, #cbd5e1);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text, #0f172a);
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      padding: 0;
+      line-height: 1;
+    }
+    .btn-circle:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: scale(1.05);
+    }
+    [data-theme="dark"] .btn-circle {
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    .planner-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.15);
+      outline: none;
+      margin: 10px 0;
+    }
+    .planner-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #3b82f6;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+      transition: transform 0.1s;
+    }
+    .planner-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+    [data-theme="light"] .planner-slider {
+      background: rgba(0, 0, 0, 0.1);
+    }
+
   </style>
 </head>
 
@@ -1931,6 +1996,10 @@
           <div class="planner-mode-selector">
             <button type="button" id="btnModeForm" class="mode-toggle-btn active">
               <span>📋</span> Lập lịch
+            </button>
+
+            <button type="button" id="btnModeCreate" class="mode-toggle-btn">
+              <span>✏️</span> Tạo lịch
             </button>
 
             <button type="button" id="btnModeCompare" class="mode-toggle-btn">
@@ -2501,31 +2570,112 @@
 
           </div><!-- end #formStep2 -->
 
-          <!-- PATH B: AI DISCOVERY (CHAT CONSOLE) -->
-          <div id="stepDiscovery" class="planner-path-discovery" style="display:none;">
-            <div class="discovery-console">
-              <div class="console-header">
-                <div class="console-status"><span class="status-dot"></span> AI Đang Trực Tuyến</div>
-                <h3>WanderAI Assistant</h3>
-                <p>Trò chuyện để tìm cảm hứng điểm đến</p>
+          <!-- STEP TẠO LỊCH TRÌNH THỦ CÔNG (TẠO LỊCH) -->
+          <div id="stepCreate" class="form-step-content" style="display:none; flex-direction:column; gap:1.25rem;">
+            
+            <!-- Sub-selector for Chatbot vs Form inside Tạo lịch tab -->
+            <div class="create-sub-selector" style="display: flex; background: rgba(0, 0, 0, 0.2); border-radius: 12px; padding: 4px; border: 1px solid var(--border);">
+              <button type="button" id="btnCreateSubChat" class="mode-toggle-btn active" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 0.5rem; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;" onclick="switchCreateSubMode('chat')">
+                <span>💬</span> Trò chuyện AI
+              </button>
+              <button type="button" id="btnCreateSubForm" class="mode-toggle-btn" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 0.5rem; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;" onclick="switchCreateSubMode('form')">
+                <span>⚡</span> Tạo lịch nhanh
+              </button>
+            </div>
+
+            <!-- SUB-MODE 1: CHATBOT CONTAINER -->
+            <div id="createSubChatArea" style="display: block;">
+              <div id="stepDiscovery" class="planner-path-discovery" style="display:block;">
+                <div class="discovery-console">
+                  <div class="console-header">
+                    <div class="console-status"><span class="status-dot"></span> AI Đang Trực Tuyến</div>
+                    <h3>WanderAI Assistant</h3>
+                    <p>Trò chuyện để tìm cảm hứng điểm đến</p>
+                  </div>
+                  
+                  <div id="discoveryMessages" class="console-messages"></div>
+                  
+                  <div class="console-input-area">
+                    <div id="discoveryChips" class="console-chips"></div>
+                    <form id="discoveryForm" class="console-form">
+                      <input type="text" id="discoveryInput" placeholder="VD: 5 triệu đi đâu mát mẻ?" autocomplete="off">
+                      <button type="submit">Hỏi AI</button>
+                    </form>
+                  </div>
+
+                  <div id="discoveryActionBox" class="console-action-box" style="display:none;">
+                    <p>Bạn đã chọn được điểm đến?</p>
+                    <button id="btnAcceptDiscovery" class="btn-confirm-discovery">
+                      ✅ Đồng ý điểm đến này
+                    </button>
+                  </div>
+                </div>
               </div>
-              
-              <div id="discoveryMessages" class="console-messages"></div>
-              
-              <div class="console-input-area">
-                <div id="discoveryChips" class="console-chips"></div>
-                <form id="discoveryForm" class="console-form">
-                  <input type="text" id="discoveryInput" placeholder="VD: 5 triệu đi đâu mát mẻ?" autocomplete="off">
-                  <button type="submit">Hỏi AI</button>
-                </form>
+            </div>
+
+            <!-- SUB-MODE 2: QUICK FORM CONTAINER -->
+            <div id="createSubFormArea" style="display: none;">
+              <div class="step2-header" style="margin-bottom: 1.25rem;">
+                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text);">Lập lịch trình linh hoạt</h3>
+                <p style="margin: 0.25rem 0 0; font-size: 0.8rem; color: var(--text-muted);">Tự chọn địa điểm mong muốn và thiết lập các tùy chọn</p>
               </div>
 
-              <div id="discoveryActionBox" class="console-action-box" style="display:none;">
-                <p>Bạn đã chọn được điểm đến?</p>
-                <button id="btnAcceptDiscovery" class="btn-confirm-discovery">
-                  ✅ Đồng ý điểm đến này
+              <form id="aiPlannerFormCreate" class="structured-form">
+                <!-- Yêu cầu cá nhân -->
+                <div class="planner-field-group" style="margin-bottom: 1.25rem;">
+                  <label class="planner-field-label">💡 Yêu cầu cá nhân</label>
+                  <textarea id="createCustomPrompt" class="planner-input" placeholder="VD: Chuyến đi nghỉ dưỡng yên tĩnh, muốn đi ăn đồ địa phương..." rows="2" style="height: 60px; resize: none;"></textarea>
+                </div>
+
+                <!-- Danh sách địa chỉ thủ công -->
+                <div class="planner-field-group" style="margin-bottom: 1.25rem;">
+                  <label class="planner-field-label">📍 Nhập địa chỉ thủ công (Điểm dừng)</label>
+                  <div id="manualLocationsList" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <!-- Hàng ô nhập đầu tiên -->
+                    <div class="manual-location-item">
+                      <input type="text" class="planner-input manual-location-input" placeholder="Nhập địa chỉ/điểm dừng 1" required>
+                      <button type="button" class="btn-circle btn-remove-location" style="display: none; background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3);" onclick="removeManualLocationField(this)">−</button>
+                    </div>
+                  </div>
+                  <button type="button" id="btnAddManualLocation" class="style-chip" style="display: inline-flex; align-items: center; gap: 0.3rem; border: 1px dashed var(--border); background: transparent;" onclick="addManualLocationField()">
+                    <span>+</span> Thêm địa điểm
+                  </button>
+                </div>
+
+                <!-- Ngân sách dự kiến -->
+                <div class="planner-field-group" style="margin-bottom: 1.25rem;">
+                  <label class="planner-field-label">💵 Ngân sách dự kiến (tối đa)</label>
+                  <input type="text" id="createBudgetInput" class="planner-input" placeholder="VD: 5.000.000 VNĐ" oninput="formatCreateBudget(this)">
+                </div>
+
+                <!-- Thời gian di chuyển (Travel Duration) -->
+                <div class="planner-field-group" style="margin-bottom: 1.25rem;">
+                  <label class="planner-field-label" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0;">
+                    <span>⏱️ Thời gian di chuyển</span>
+                    <span id="createDurationVal" style="font-weight: 700; color: #60a5fa;">3 ngày</span>
+                  </label>
+                  <input type="range" id="createDurationSlider" class="planner-slider" min="1" max="14" value="3" oninput="updateCreateDurationLabel(this.value)">
+                </div>
+
+                <!-- Loại hình chuyến đi -->
+                <div class="planner-field-group" style="margin-bottom: 1.5rem;">
+                  <label class="planner-field-label">✈️ Loại hình chuyến đi</label>
+                  <div class="compare-type-toggle" style="margin: 0; width: 100%; display: flex; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 4px; border: 1px solid var(--border);">
+                    <button type="button" id="btnTripTypeShort" class="compare-type-btn active" style="flex: 1; padding: 0.5rem; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;" onclick="setTripType('short')">
+                      Chuyến đi ngắn
+                    </button>
+                    <button type="button" id="btnTripTypeLong" class="compare-type-btn" style="flex: 1; padding: 0.5rem; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;" onclick="setTripType('long')">
+                      Chuyến đi dài
+                    </button>
+                  </div>
+                </div>
+
+                <!-- NÚT TẠO LỊCH TRÌNH -->
+                <button type="button" id="btnSubmitCreateItinerary" class="planner-btn main-action" onclick="submitCreateItinerary()" style="margin-top: 1rem;">
+                  <span>🚀 Lên lịch trình linh hoạt</span>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
-              </div>
+              </form>
             </div>
           </div>
 

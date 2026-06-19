@@ -1202,6 +1202,12 @@
         updateWithAnim('stat-daily-interactions', data.dailyInteractions || 0);
         updateWithAnim('stat-total-iti', data.itineraryCount || 0);
 
+        // Also update the KPI stats in the Analytics panel
+        updateWithAnim('an-stat-total-users', data.totalUsers || 0);
+        updateWithAnim('an-stat-total-biz', data.businessCount || 0);
+        updateWithAnim('an-stat-daily-interactions', data.dailyInteractions || 0);
+        updateWithAnim('an-stat-total-iti', data.itineraryCount || 0);
+
         // Update Analytics tab metrics (the ones I just added in index.html)
         const elNewUsers = document.getElementById('an-stat-new-users');
         if (elNewUsers) elNewUsers.textContent = (data.newUsersToday > 0 ? '+' : '') + (data.newUsersToday || 0);

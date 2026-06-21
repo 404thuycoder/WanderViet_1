@@ -49,6 +49,27 @@ try {
   console.error("Error loading places fallback data:", e);
 }
 
+// --- GLOBAL DATA CONSTANTS FOR GEOGRAPHY ---
+const PROVINCES = [
+  'Hà Nội', 'Hồ Chí Minh', 'Sài Gòn', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ', 'Lào Cai', 'Sa Pa', 'Yên Bái', 'Điện Biên', 'Lai Châu', 'Sơn La', 'Hòa Bình', 'Hà Giang', 'Tuyên Quang', 'Cao Bằng', 'Bắc Kạn', 'Thái Nguyên', 'Lạng Sơn', 'Bắc Giang', 'Quảng Ninh', 'Hạ Long', 'Phú Thọ', 'Vĩnh Phúc', 'Bắc Ninh', 'Hải Dương', 'Hưng Yên', 'Thái Bình', 'Hà Nam', 'Nam Định', 'Ninh Bình', 'Thanh Hóa', 'Nghệ An', 'Hà Tĩnh', 'Quảng Bình', 'Quảng Trị', 'Thừa Thiên Huế', 'Huế', 'Quảng Nam', 'Hội An', 'Quảng Ngãi', 'Bình Định', 'Quy Nhơn', 'Phú Yên', 'Khánh Hòa', 'Nha Trang', 'Ninh Thuận', 'Bình Thuận', 'Mũi Né', 'Kon Tum', 'Gia Lai', 'Đắk Lắk', 'Đắk Nông', 'Lâm Đồng', 'Đà Lạt', 'Bình Phước', 'Tây Ninh', 'Bình Dương', 'Đồng Nai', 'Bà Rịa Vũng Tàu', 'Vũng Tàu', 'Long An', 'Tiền Giang', 'Bến Tre', 'Trà Vinh', 'Vĩnh Long', 'Đồng Tháp', 'An Giang', 'Kiên Giang', 'Phú Quốc', 'Hậu Giang', 'Sóc Trăng', 'Bạc Liêu', 'Cà Mau'
+];
+
+const LANDMARK_TO_PROVINCE = {
+  'văn miếu': 'Hà Nội', 'quốc tử giám': 'Hà Nội', 'hoàn kiếm': 'Hà Nội', 'hồ gươm': 'Hà Nội',
+  'ba đình': 'Hà Nội', 'chùa một cột': 'Hà Nội', 'lăng bác': 'Hà Nội', 'tây hồ': 'Hà Nội',
+  'đông anh': 'Hà Nội', 'bát tràng': 'Hà Nội', 'thăng long': 'Hà Nội',
+  'sơn trà': 'Đà Nẵng', 'ngũ hành sơn': 'Đà Nẵng', 'bà nà': 'Đà Nẵng',
+  'phố cổ': 'Hội An', 'chùa cầu': 'Hội An',
+  'tháp bà': 'Nha Trang', 'vinpearl': 'Nha Trang',
+  'dinh độc lập': 'Hồ Chí Minh', 'bến thành': 'Hồ Chí Minh',
+  'bãi sao': 'Phú Quốc', 'cáp treo hòn thơm': 'Phú Quốc',
+  'tràng an': 'Ninh Bình', 'tam cốc': 'Ninh Bình', 'bích động': 'Ninh Bình',
+  'fansipan': 'Sa Pa', 'ruộng bậc thang': 'Sa Pa',
+  'đỉnh bà đen': 'Tây Ninh',
+  'núi bà rá': 'Bình Phước',
+  'hang sơn đoòng': 'Quảng Bình', 'phong nha': 'Quảng Bình',
+};
+
 // --- HELPER: GENERATE RESPONSE METADATA (PROPOSALS, DISCOVERY, TOURS) ---
 async function generateResponseMetadata(message, aiAnswer, locationContext, isItineraryRequest = false) {
   // Ensure isItineraryRequest is always boolean (prevent 0/null being truthy/falsy)
@@ -65,30 +86,9 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
   const isWeatherContext = weatherKeywords.some(k => lowerUserMsg.includes(k));
 
   // 1. Tự động nhận diện Tỉnh/Thành/Địa điểm được hỏi
-  const provinces = [
-    'Hà Nội', 'Hồ Chí Minh', 'Sài Gòn', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ', 'Lào Cai', 'Sa Pa', 'Yên Bái', 'Điện Biên', 'Lai Châu', 'Sơn La', 'Hòa Bình', 'Hà Giang', 'Tuyên Quang', 'Cao Bằng', 'Bắc Kạn', 'Thái Nguyên', 'Lạng Sơn', 'Bắc Giang', 'Quảng Ninh', 'Hạ Long', 'Phú Thọ', 'Vĩnh Phúc', 'Bắc Ninh', 'Hải Dương', 'Hưng Yên', 'Thái Bình', 'Hà Nam', 'Nam Định', 'Ninh Bình', 'Thanh Hóa', 'Nghệ An', 'Hà Tĩnh', 'Quảng Bình', 'Quảng Trị', 'Thừa Thiên Huế', 'Huế', 'Quảng Nam', 'Hội An', 'Quảng Ngãi', 'Bình Định', 'Quy Nhơn', 'Phú Yên', 'Khánh Hòa', 'Nha Trang', 'Ninh Thuận', 'Bình Thuận', 'Mũi Né', 'Kon Tum', 'Gia Lai', 'Đắk Lắk', 'Đắk Nông', 'Lâm Đồng', 'Đà Lạt', 'Bình Phước', 'Tây Ninh', 'Bình Dương', 'Đồng Nai', 'Bà Rịa Vũng Tàu', 'Vũng Tàu', 'Long An', 'Tiền Giang', 'Bến Tre', 'Trà Vinh', 'Vĩnh Long', 'Đồng Tháp', 'An Giang', 'Kiên Giang', 'Phú Quốc', 'Hậu Giang', 'Sóc Trăng', 'Bạc Liêu', 'Cà Mau'
-  ];
-
-  // Map địa danh/di tích nổi tiếng → tỉnh thành chính xác để lọc tour/discovery
-  const landmarkToProvince = {
-    'văn miếu': 'Hà Nội', 'quốc tử giám': 'Hà Nội', 'hoàn kiếm': 'Hà Nội', 'hồ gươm': 'Hà Nội',
-    'ba đình': 'Hà Nội', 'chùa một cột': 'Hà Nội', 'lăng bác': 'Hà Nội', 'tây hồ': 'Hà Nội',
-    'đông anh': 'Hà Nội', 'bát tràng': 'Hà Nội', 'thăng long': 'Hà Nội',
-    'sơn trà': 'Đà Nẵng', 'ngũ hành sơn': 'Đà Nẵng', 'bà nà': 'Đà Nẵng',
-    'phố cổ': 'Hội An', 'chùa cầu': 'Hội An',
-    'tháp bà': 'Nha Trang', 'vinpearl': 'Nha Trang',
-    'dinh độc lập': 'Hồ Chí Minh', 'bến thành': 'Hồ Chí Minh',
-    'bãi sao': 'Phú Quốc', 'cáp treo hòn thơm': 'Phú Quốc',
-    'tràng an': 'Ninh Bình', 'tam cốc': 'Ninh Bình', 'bích động': 'Ninh Bình',
-    'fansipan': 'Sa Pa', 'ruộng bậc thang': 'Sa Pa',
-    'đỉnh bà đen': 'Tây Ninh',
-    'núi bà rá': 'Bình Phước',
-    'hang sơn đoòng': 'Quảng Bình', 'phong nha': 'Quảng Bình',
-  };
-
   // Ưu tiên: trích xuất tên địa danh/di tích CỤ THỂ từ message
   let specificLandmark = null;
-  for (const [kw, prov] of Object.entries(landmarkToProvince)) {
+  for (const [kw, prov] of Object.entries(LANDMARK_TO_PROVINCE)) {
     if (lowerUserMsg.includes(kw)) {
       specificLandmark = kw; // giữ nguyên tên landmark gốc
       break;
@@ -97,27 +97,24 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
 
   let detectedDest = null;
   if (specificLandmark) {
-    detectedDest = landmarkToProvince[specificLandmark];
+    detectedDest = LANDMARK_TO_PROVINCE[specificLandmark];
   } else {
     // ƯU TIÊN 1: Tìm trong câu hỏi của người dùng trước
-    for (const p of provinces) {
+    for (const p of PROVINCES) {
       if (lowerUserMsg.includes(p.toLowerCase())) {
         detectedDest = p;
         break;
       }
     }
     // ƯU TIÊN 2: ĐÃ BỎ - KHÔNG lấy detectedDest từ câu trả lời AI
-    // Lý do: Nếu user hỏi "lịch sử VN", AI trả lời nhắc đến "Đà Nẵng" trong ngữ cảnh lịch sử
-    // → KHÔNG nên hiển thị discovery Đà Nẵng. Discovery chỉ hiện khi USER chủ động hỏi về địa điểm.
-    // Việc extract từ AI answer làm sai ngữ cảnh.
     // ƯU TIÊN 3: Dùng Regex bắt các địa danh cấp huyện (như Sóc Sơn) không có trong list tỉnh thành
     if (!detectedDest) {
        let destMatch = lowerUserMsg.match(/(?:ở|tại|đến|đi|cho|tìm|về)\s+([a-zà-ỹ]+(?:\s[a-zà-ỹ]+){1,3})/i);
        if (destMatch) {
            const captured = destMatch[1].trim();
            // ⚠️ Validate: chỉ chấp nhận nếu captured MATCH tỉnh thành hoặc landmark thực sự
-           const isValidProvince = provinces.some(p => p.toLowerCase() === captured || p.toLowerCase().includes(captured) || captured.includes(p.toLowerCase()));
-           const isValidLandmark = Object.keys(landmarkToProvince).some(lm => lm === captured || captured.includes(lm));
+           const isValidProvince = PROVINCES.some(p => p.toLowerCase() === captured || p.toLowerCase().includes(captured) || captured.includes(p.toLowerCase()));
+           const isValidLandmark = Object.keys(LANDMARK_TO_PROVINCE).some(lm => lm === captured || captured.includes(lm));
            const badDests = ['trình', 'kế hoạch', 'đi', 'đến', 'này', 'nhé', 'đó', 'đây', 'chơi', 'giúp', 'cho', 'nha', 'chuyến', 'với', 'nhé', 'điểm', 'diem', 'tour', 'dịch vụ', 'khách sạn', 'đâu', 'đâu không', 'gì', 'anh hùng', 'chiến tranh', 'lịch sử', 'văn hóa', 'bác hồ', 'hồ chí minh', 'việt nam', 'các', 'vị', 'viet nam'];
            if (!badDests.includes(captured) && captured.length > 2 && (isValidProvince || isValidLandmark)) {
                detectedDest = captured;
@@ -380,7 +377,76 @@ async function generateResponseMetadata(message, aiAnswer, locationContext, isIt
   return { proposal, discoveryPlaces, suggestedTours, suggestedLink };
 }
 
+function createDefaultFallbackPlan(dest, days, budget, styleObj) {
+  const itinerary = [];
+  for (let d = 1; d <= days; d++) {
+    itinerary.push({
+      day: String(d),
+      highlight: `Khám phá các địa danh nổi tiếng tại ${dest}`,
+      activities: [
+        {
+          time: "08:00",
+          session: "Sáng",
+          task: `Ăn sáng đặc sản địa phương và tham quan thắng cảnh tại ${dest}`,
+          location: `${dest} Discovery`,
+          address: `Trung tâm ${dest}`,
+          cost: "50.000đ",
+          transport: "Xe máy",
+          rating: 4.5,
+          description: `Bắt đầu ngày thứ ${d} khám phá vẻ đẹp tự nhiên và văn hóa đặc trưng của ${dest}.`,
+          visualNote: "Góc check-in đẹp",
+          transitToNext: "Di chuyển bằng phương tiện cá nhân"
+        },
+        {
+          time: "12:00",
+          session: "Trưa",
+          task: `Thưởng thức ẩm thực trưa đặc sản vùng miền tại ${dest}`,
+          location: `Nhà hàng đặc sản ${dest}`,
+          address: `${dest}`,
+          cost: "150.000đ",
+          transport: "Xe máy",
+          rating: 4.6,
+          description: "Thưởng thức các món ngon truyền thống được chế biến từ nguyên liệu tươi ngon của địa phương.",
+          visualNote: "Bàn ăn view đẹp",
+          transitToNext: "Nghỉ ngơi và di chuyển chiều"
+        },
+        {
+          time: "18:00",
+          session: "Tối",
+          task: `Đi dạo chợ đêm hoặc cafe chill tối tại ${dest}`,
+          location: `Phố đi bộ / Cafe trung tâm ${dest}`,
+          address: `${dest}`,
+          cost: "100.000đ",
+          transport: "Đi bộ",
+          rating: 4.5,
+          description: `Tận hưởng không khí mát mẻ về đêm và nhịp sống thanh bình tại ${dest}.`,
+          visualNote: "Không gian lãng mạn",
+          transitToNext: "Về khách sạn nghỉ ngơi"
+        }
+      ]
+    });
+  }
+
+  return {
+    tripSummary: `Hành trình ${styleObj.title} tại ${dest} trong ${days} ngày được thiết kế tối ưu, giúp bạn có những trải nghiệm tuyệt vời và đáng nhớ nhất.`,
+    estimatedCost: `${budget} triệu VNĐ`,
+    emotionalTone: "Hào hứng",
+    accommodationSuggestion: {
+      typeLabel: styleObj.accommodation,
+      icon: "🏨",
+      nameAndCost: `Khách sạn / Homestay đề xuất tại ${dest} - 500.000đ/đêm`,
+      reason: "Vị trí thuận tiện di chuyển, dịch vụ tốt và được đánh giá cao."
+    },
+    itinerary
+  };
+}
+
 router.post('/', optionalAuth, async (req, res) => {
+  let clientDisconnected = false;
+  req.on('close', () => {
+    clientDisconnected = true;
+  });
+
   try {
     const { message: rawMessage, coords, itinerary, activeTrip, deviceId, role, sessionId, placeContext, images } = req.body;
     const message = rawMessage || "";
@@ -395,173 +461,25 @@ router.post('/', optionalAuth, async (req, res) => {
     const targetLang = req.body.lang || 'auto';
     const scope = req.body.scope || 'user_portal';
 
-    // 1. Phân tích Lịch sử hội thoại từ SERVER theo Session (Đưa lên đầu để dùng cho Semantic Intent Classifier)
-    let chatHistory = [];
-    if (chatbotDb.readyState === 1 && currentSessionId) {
-      try {
-        const recentLogs = await Conversation.find({ sessionId: currentSessionId })
-          .sort({ timestamp: -1 })
-          .limit(10);
-
-        if (recentLogs.length > 0) {
-          chatHistory = recentLogs.reverse().map(log => ({
-            role: log.role === 'user' ? 'user' : 'assistant',
-            content: log.text
-          }));
-        }
-      } catch (err) {
-        console.warn("⚠️ Lỗi truy xuất lịch sử:", err.message);
-      }
-    }
-
-    // ═════ SEMANTIC INTENT CLASSIFIER (PRE-ROUTER) ═════
-    let semanticIntent = {
-      isSensitive: false,
-      isOffTopic: false,
-      isItineraryRequest: false,
-      destination: null,
-      days: null,
-      budget: null
-    };
-
-    // Chỉ thực hiện phân tích ngữ cảnh nâng cao cho user_portal
-    if (scope === 'user_portal' && !placeContext && (!images || images.length === 0)) {
-      try {
-        const semanticMessages = [
-          {
-            role: 'system',
-            content: `Bạn là bộ não phân tích ý định người dùng của hệ thống WanderViet AI - nền tảng du lịch Việt Nam.
-Hãy phân tích NGỮ CẢNH TOÀN VẸN, không đọc từng từ riêng lẻ. Dựa trên lịch sử hội thoại (nếu có) để hiểu rõ ngữ cảnh của tin nhắn mới nhất.
-
-QUY TẮC QUAN TRỌNG NHẤT (BẮT BUỘC):
-- Nếu tin nhắn chứa TÊN ĐỊA DANH (tỉnh, thành, di tích, địa điểm), hoặc các từ liên quan LỊCH TRÌNH/DU LỊCH (lịch, ngày, tour, biển, núi, rừng, khách sạn, ăn uống, tham quan...) → isOffTopic PHẢI là false.
-- Nếu tin nhắn mới nhất là câu trả lời hoặc phản hồi nối tiếp cho câu hỏi trước đó của trợ lý (ví dụ: trợ lý hỏi "bạn có muốn...", "mình có thể giúp gì...", người dùng trả lời "có", "đồng ý", "muốn", "ok", v.v.) thì đây là câu trả lời hợp lệ liên quan đến chủ đề đang thảo luận → isOffTopic PHẢI là false.
-- Nếu isItineraryRequest là true HOẶC destination không phải null → isOffTopic PHẢI là false. Không được có mâu thuẫn.
-- "lập lịch", "tạo lịch", "lên kế hoạch", "đi chơi", "đi du lịch", "đi biển", "đi núi" → isItineraryRequest: true, isOffTopic: false.
-- Chỉ đặt isOffTopic: true khi câu hỏi HOÀN TOÀN không liên quan du lịch: toán học, lập trình code, y tế bệnh viện, chính trị, chứng khoán..."
-| PHÂN BIỆT "ĐI" (động từ thường) vs "ĐI" (chỉ địa điểm du lịch): Câu hỏi có động từ như "học", "làm", "kiếm tiền", "chữa bệnh", "thi", "ôn bài" KẾT HỢP với "đi" → KHÔNG phải du lịch → isOffTopic: true.
-
-Trả về duy nhất định dạng JSON:
-{
-  "isSensitive": boolean, // true nếu hỏi về tài chính cá nhân (số dư, lương, chi tiêu), thông tin bảo mật cá nhân (CMND, mật khẩu, địa chỉ nhà riêng)
-  "isOffTopic": boolean, // true CHỈ KHI câu hỏi hoàn toàn ngoài phạm vi du lịch/văn hóa/lịch sử Việt Nam. KHÔNG được true khi đã có destination hoặc isItineraryRequest=true
-  "isItineraryRequest": boolean, // true nếu có ý định lên lịch trình, đi chơi, đề xuất điểm đến du lịch
-  "destination": string | null, // Địa danh hoặc địa điểm du lịch được nhắc đến, null nếu không có
-  "days": number | null, // Số ngày du lịch, null nếu không có
-  "budget": number | null // Ngân sách (triệu VNĐ), null nếu không có
-}
-
-VÍ DỤ:
-- "lập lịch 2 ngày 3 triệu" → {isOffTopic:false, isItineraryRequest:true, days:2, budget:3}
-- "đi tuyên quang" → {isOffTopic:false, isItineraryRequest:true, destination:"Tuyên Quang"}
-- "giải phương trình toán" → {isOffTopic:true, isItineraryRequest:false}
-- "tôi muốn đi học" → {isOffTopic:true, isItineraryRequest:false}
-- "tôi muốn đi Đà Lạt" → {isOffTopic:false, isItineraryRequest:true, destination:"Đà Lạt"}
-- "Quốc Tử Giám ở đâu" → {isOffTopic:false, isItineraryRequest:false, destination:"Quốc Tử Giám"}`
-          }
-        ];
-
-        if (chatHistory && chatHistory.length > 0) {
-          chatHistory.slice(-5).forEach(h => {
-            semanticMessages.push({
-              role: h.role,
-              content: h.content
-            });
-          });
-        }
-
-        semanticMessages.push({
-          role: 'user',
-          content: `Tin nhắn: "${message}"`
-        });
-
-        const routeCompletion = await createGroqChatCompletion({
-          messages: semanticMessages,
-          model: 'llama-3.1-8b-instant',
-          temperature: 0.1,
-          response_format: { type: 'json_object' }
-        }, false);
-
-        const semanticRaw = routeCompletion.choices[0]?.message?.content || '{}';
-        const parsed = JSON.parse(semanticRaw);
-        // Gán lại biến semanticIntent đã khai báo ở dòng 315 (KHÔNG dùng const để tránh SyntaxError)
-        semanticIntent = { ...semanticIntent, ...parsed };
-
-        // Ép isOffTopic về false nếu tin nhắn chứa từ khóa địa bàn biển đảo quan trọng hoặc các phản hồi ngắn khi có lịch sử
-        const territorialKeywords = ['hoàng sa', 'trường sa', 'hoang sa', 'truong sa', 'phú quốc', 'côn đảo'];
-        const cleanMsg = message.toLowerCase().trim().replace(/[?.,!]$/, "");
-        
-        if (territorialKeywords.some(k => cleanMsg.includes(k))) {
-          semanticIntent.isOffTopic = false;
-          if (!semanticIntent.destination) {
-            if (cleanMsg.includes('hoàng sa') || cleanMsg.includes('hoang sa')) {
-              semanticIntent.destination = 'Hoàng Sa';
-            } else if (cleanMsg.includes('trường sa') || cleanMsg.includes('truong sa')) {
-              semanticIntent.destination = 'Trường Sa';
-            }
-          }
-        }
-
-        const shortConfirmations = ['có', 'co', 'ok', 'yes', 'ừ', 'u', 'được', 'duoc', 'muốn', 'muon', 'đồng ý', 'dong y', 'đúng', 'dung', 'không', 'khong', 'không cần', 'khong can', 'chưa', 'chua'];
-        if (chatHistory && chatHistory.length > 0 && shortConfirmations.includes(cleanMsg)) {
-          semanticIntent.isOffTopic = false;
-        }
-
-        console.log(`🧠 [Semantic Intent Parser] Analyzed:`, semanticIntent);
-
-        try {
-          fs.appendFileSync(path.join(__dirname, '../../debug_classification.log'), JSON.stringify({
-            timestamp: new Date().toISOString(),
-            message: message,
-            chatHistory: chatHistory,
-            semanticMessages: semanticMessages,
-            semanticIntent: semanticIntent
-          }, null, 2) + "\n\n");
-        } catch (logErr) {
-          console.error("Log error:", logErr);
-        }
-
-        // -------------------------------------------------
-        // Đặt các biến sẽ dùng ở các khối sau để tránh ReferenceError
-        // specificLandmark sẽ được xác định sau khi duyệt landmarkToProvinceEarly
-        let specificLandmark = null;
-        // Các từ khóa dùng để phát hiện câu hỏi ngữ cảnh (bây giờ, hôm nay, ...)
-        const contextKeywords = ['đây','bây giờ','tối nay','hiện tại','này','mình','tôi','em'];
-        // -------------------------------------------------
-
-        // Đã gỡ bỏ chốt chặn isSensitive và isOffTopic cứng nhắc ở đây
-        // AI LLaMA chính đã có system prompt từ chối khéo các câu hỏi nhạy cảm hoặc ngoài lề, nhưng sẽ hiểu được ngữ cảnh các câu nối tiếp như "trước hay sau sáp nhập".
-
-        // Bỏ chặn off-topic cứng nhắc ở đây để AI tự nhiên hơn trong hội thoại nhiều lượt.
-        // AI LLaMA chính đã có system prompt từ chối khéo các câu hỏi ngoài lề, nhưng sẽ hiểu được ngữ cảnh các câu nối tiếp như "nói rõ vào".
-      } catch (err) {
-        console.error("⚠️ Error in Semantic Intent Parser:", err.message);
-      }
-    }
-
     // --- QUICK RESPONSE ---
     const lowerMsg = message.toLowerCase().trim().replace(/[?.,!]$/, "");
     const quickGreetings = ['alo', 'chào', 'hi', 'hello', 'ơi', 'ê', 'hey', 'ê hả', 'xin chào', 'hi soul', 'hello wander', 'annyeonghaseyo', 'bonjour', 'konnichiwa', 'ni hao'];
 
     if (quickGreetings.includes(lowerMsg)) {
-      // Chỉ sử dụng Quick Response tiếng Việt nếu:
-      // 1. targetLang là 'vi'
-      // 2. targetLang là 'auto' VÀ từ khóa chào hỏi là thuần Việt
-        const isVietnameseIntent = (targetLang === 'vi') || (targetLang === 'auto' && ['alo', 'chào', 'ơi', 'ê', 'ê hả', 'xin chào'].includes(lowerMsg));
+      const isVietnameseIntent = (targetLang === 'vi') || (targetLang === 'auto' && ['alo', 'chào', 'ơi', 'ê', 'ê hả', 'xin chào'].includes(lowerMsg));
 
-      // Nếu là ngôn ngữ khác (en, jp, kr, fr), BẮT BUỘC bỏ qua Quick Response để AI tự trả lời đúng thứ tiếng
       if (isVietnameseIntent) {
         const answer = "Chào bạn! Mình là Trợ lý du lịch WanderViet AI đây. Bạn cần mình tư vấn địa điểm nào hay có thắc mắc gì về chuyến đi không?";
         
-        // Ghi lại lịch sử ngay cả với Quick Response để session không bị "rỗng" trong History
-        if (chatbotDb.readyState === 1) {
+        if (chatbotDb.readyState === 1 && !clientDisconnected) {
           if (!currentSessionId) currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-          
-          // Tạo title từ tin nhắn chào hỏi
           let title = message.split(' ').slice(0, 5).join(' ');
           
-          await new Conversation({ userId: sessionKey, sessionId: currentSessionId, title: title, role: 'user', text: message }).save();
-          await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: answer }).save();
+          // Non-blocking save to database
+          Promise.all([
+            new Conversation({ userId: sessionKey, sessionId: currentSessionId, title: title, role: 'user', text: message }).save(),
+            new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: answer }).save()
+          ]).catch(err => console.error("Lỗi lưu DB Quick Response:", err.message));
         }
 
         return res.json({
@@ -573,34 +491,43 @@ VÍ DỤ:
       }
     }
 
-    // =============================================================
-    // 🚫 Fix 1: CHẶN NGAY nếu Semantic Intent đánh dấu OFF-TOPIC
-    // Từ chối TẠI SERVER — không tạo discovery cards, không gọi Groq
-    // =============================================================
-    if (semanticIntent.isOffTopic) {
-      const refusalMsg = "Dù rất muốn chia sẻ cùng bạn nhưng mình là Wander-Soul - Trợ lý chuyên trách về du lịch và khám phá Việt Nam của WanderViet AI mất rồi nè! Căn bếp nhỏ của mình hiện tại chỉ có sẵn 'bí kíp' về các cung đường đẹp, món ăn ngon, lịch sử địa danh và lịch trình du lịch siêu chill thôi. Bạn có muốn mình gợi ý một điểm đến thú vị hay lên kế hoạch cho chuyến đi sắp tới của bạn không?";
-
-      if (chatbotDb.readyState === 1) {
-        if (!currentSessionId) currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        const title = message.split(' ').slice(0, 5).join(' ');
-        await new Conversation({ userId: sessionKey, sessionId: currentSessionId, title: title, role: 'user', text: message }).save();
-        await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: refusalMsg }).save();
+    // 1. Phân tích Lịch sử hội thoại & Profile người dùng từ SERVER song song
+    let chatHistory = [];
+    let fullUser = null;
+    try {
+      const dbPromises = [];
+      if (chatbotDb.readyState === 1 && currentSessionId) {
+        dbPromises.push(
+          Conversation.find({ sessionId: currentSessionId })
+            .sort({ timestamp: -1 })
+            .limit(20)
+            .then(recentLogs => {
+              if (recentLogs && recentLogs.length > 0) {
+                chatHistory = recentLogs.reverse().map(log => ({
+                  role: log.role === 'user' ? 'user' : 'assistant',
+                  content: log.text
+                }));
+              }
+            })
+        );
       }
-
-      console.log(`🚫 [Off-Topic Guard] Rejected at server level — no discovery cards generated.`);
-      return res.json({
-        success: true,
-        answer: refusalMsg,
-        sessionId: currentSessionId,
-        source: 'off-topic-guard'
-        // KHÔNG có discoveryPlaces, suggestedTours, proposal → chặn tuyệt đối
-      });
+      if (req.user && req.user.id) {
+        dbPromises.push(
+          User.findById(req.user.id)
+            .select('preferenceProfile')
+            .then(u => {
+              fullUser = u;
+            })
+        );
+      }
+      if (dbPromises.length > 0) {
+        await Promise.all(dbPromises);
+      }
+    } catch (err) {
+      console.warn("⚠️ Lỗi truy xuất lịch sử/profile song song:", err.message);
     }
-    // =============================================================
 
-    // 1. Phân tích Lịch sử hội thoại từ SERVER theo Session (Đã được chuyển lên đầu router)
-
-    // 2. Xử lý ngữ cảnh hành trình & vị trí
+    // 2. Xử lý ngữ cảnh hành trình & vị trí sớm để dùng cho các luồng kế tiếp
     let tripContext = "Khách đang khám phá tự do.";
     if (itinerary && itinerary.length > 0) {
       const stops = itinerary.map(s => s.name || s).join(' -> ');
@@ -616,207 +543,407 @@ VÍ DỤ:
       if (nearest) locationContext = `Vị trí hiện tại: ${nearest.name} (${nearest.region}). Đặc tả: ${nearest.text}.`;
     }
 
-    // --- START SMART CACHE (TRÍ NHỚ PHẢN XẠ) ---
-    // Kiểm tra câu hỏi có trong Database chưa để tiết kiệm API (Chỉ áp dụng cho tiếng Việt hoặc Auto)
-    let searchResult = null; // Lưu kết quả nếu phải đi "tìm kiếm"
-
-    if (!placeContext && chatbotDb.readyState === 1 && message.length > 2 && (targetLang === 'vi' || targetLang === 'auto')) {
-      const timeSensitiveKeywords = ['thứ mấy', 'ngày nào', 'mấy giờ', 'hôm nay', 'bây giờ', 'thu may', 'ngay nao', 'may gio', 'hom nay', 'bay gio'];
-      const isTimeSensitive = timeSensitiveKeywords.some(k => lowerMsg.includes(k));
-      
-      try {
-        // A. Ưu tiên tìm trong bảng Knowledge (Kiến thức Admin soạn hoặc AI đã học)
-        // Dùng khớp chính xác (strict match) thay vì regex để tránh "trượt" kiến thức
-        const knowledgeMatch = await Knowledge.findOne({
-          $or: [
-            { question: lowerMsg },
-            { question: message.trim() }
-          ]
-        });
-
-        if (knowledgeMatch && !isTimeSensitive) {
-          console.log("➡️ [SmartCache] Khớp kiến thức:", knowledgeMatch.question);
-          
-          if (chatbotDb.readyState === 1) {
-            if (!currentSessionId) currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            const title = message.split(' ').slice(0, 5).join(' ');
-            await new Conversation({ userId: sessionKey, sessionId: currentSessionId, title: title, role: 'user', text: message }).save();
-            await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: knowledgeMatch.answer }).save();
+    // 3. Trích xuất địa danh dự kiến (candidate destination) từ tin nhắn hoặc lịch sử để truy vấn DB trước
+    let candidateDest = null;
+    const lowerUserMsg = message.toLowerCase();
+    
+    for (const [kw, prov] of Object.entries(LANDMARK_TO_PROVINCE)) {
+      if (lowerUserMsg.includes(kw)) {
+        candidateDest = prov;
+        break;
+      }
+    }
+    if (!candidateDest) {
+      for (const p of PROVINCES) {
+        if (lowerUserMsg.includes(p.toLowerCase())) {
+          candidateDest = p;
+          break;
+        }
+      }
+    }
+    if (!candidateDest && chatHistory.length > 0) {
+      const knownRegions = [...new Set(cachedPlaces.map(p => p.region))].concat(['Tuyên Quang', 'Hà Giang', 'Hà Tuyên', 'Bắc Giang', 'Phú Thọ', 'Yên Bái', 'Vĩnh Phúc', 'Thái Nguyên', 'Bắc Kạn']);
+      for (let i = chatHistory.length - 1; i >= 0; i--) {
+        const text = chatHistory[i].content.toLowerCase();
+        let foundRegion = null;
+        for (const region of knownRegions) {
+          if (region && text.includes(region.toLowerCase())) {
+            if (!foundRegion || region.length > foundRegion.length) {
+              foundRegion = region;
+            }
           }
+        }
+        if (foundRegion) {
+          candidateDest = foundRegion;
+          break;
+        }
+      }
+    }
 
-          const meta = await generateResponseMetadata(message, knowledgeMatch.answer, locationContext, false);
-          return res.json({
-            success: true,
-            answer: knowledgeMatch.answer,
-            sessionId: currentSessionId,
-            proposal: meta.proposal,
-            discoveryPlaces: meta.discoveryPlaces,
-            suggestedTours: meta.suggestedTours,
-            source: 'smart-cache-knowledge'
+    // ═════ SEMANTIC INTENT CLASSIFIER & DB PRE-FETCHING (PARALLEL EXECUTION) ═════
+    let semanticIntent = {
+      isSensitive: false,
+      isOffTopic: false,
+      isItineraryRequest: false,
+      destination: null,
+      days: null,
+      budget: null
+    };
+
+    let parsedSemantic = null;
+    let knowledgeMatch = null;
+    let preFetchedWiki = null;
+    let preFetchedTourCount = -1;
+
+    try {
+      const parallelTasks = [];
+
+      // Task A: Semantic intent parser LLM call (8B model)
+      if (scope === 'user_portal' && !placeContext && (!images || images.length === 0)) {
+        const semanticMessages = [
+          {
+            role: 'system',
+            content: `Bạn là bộ não phân tích ý định người dùng của hệ thống WanderViet AI - nền tảng du lịch Việt Nam.
+Hãy phân tích NGỮ CẢNH TOÀN VẸN, không đọc từng từ riêng lẻ. Dựa trên lịch sử hội thoại (nếu có) để hiểu rõ ngữ cảnh của tin nhắn mới nhất.
+
+QUY TẮC QUAN TRỌNG NHẤT (BẮT BUỘC):
+- Nếu tin nhắn mới nhất liên quan đến chủ đề du lịch, văn hóa, danh lam thắng cảnh, ẩm thực, đặc sản, khách sạn, di tích lịch sử hoặc địa lý Việt Nam → isOffTopic PHẢI là false.
+- LỜI CHÀO & GIAO TIẾP BAN ĐẦU (GREETINGS/SOCIAL STARTERS): Mọi câu chào hỏi, làm quen xã giao (kể cả viết tắt, viết sai chính tả, không dấu như: "helo", "heloo", "hiii", "xin chao", "chao ban", "chao ad", "ad oi", "alo", "chao", "hello", "hi", "hey", v.v.) → isOffTopic BẮT BUỘC PHẢI là false. Lời chào xã giao bắt đầu câu chuyện là hợp lệ.
+- ĐẶC BIỆT CHÚ Ý NGỮ CẢNH LỊCH SỬ CHAT:
+  + Nếu tin nhắn là câu tiếp nối, đính chính, sửa lỗi hoặc phản hồi cho câu trả lời trước đó của trợ lý (ví dụ: "sai rồi, phải là...", "cập nhật câu trên vào đi", "tổ chức ở đâu", "tại sao vậy", "đâu em", "ở đâu vậy", v.v.) liên quan đến một chủ đề du lịch/lịch sử/vị trí địa lý đã thảo luận ở trên → isOffTopic PHẢI là false.
+  + Nếu tin nhắn chứa các từ ngữ ngắn hoặc đại từ chỉ định ("câu trên", "nơi đó", "ở đây", "chỗ này", "này", "vậy", "đó") tham chiếu tới nội dung đang chat → isOffTopic PHẢI là false.
+  + Kể cả người dùng có viết sai chính tả, viết tắt, không dấu, hoặc diễn đạt lệch đi nhưng có thể suy luận ngữ cảnh đang nói về du lịch/lịch sử Việt Nam → isOffTopic PHẢI là false.
+- QUY TẮC BẮT BUỘC VỀ THÔNG TIN ĐIỂM XUẤT PHÁT / CHỈNH SỬA LỊCH TRÌNH:
+  + Nếu người dùng cung cấp thêm thông tin về điểm xuất phát, điểm đi từ, phương tiện di chuyển hoặc chỉnh sửa nhỏ cho lịch trình đang thảo luận (ví dụ: "tôi bắt đầu đi từ Hà Nội", "đi bằng xe máy", "không lấy khách sạn") → isItineraryRequest PHẢI là false, vì đây chỉ là thông tin bổ sung cho cuộc thảo luận, không phải yêu cầu tạo mới 3 phương án lịch trình từ đầu.
+- Chỉ đặt isOffTopic: true khi câu hỏi HOÀN TOÀN nằm ngoài phạm vi du lịch/văn hóa/lịch sử/ẩm thực Việt Nam và không hề liên quan gì đến cuộc hội thoại trước đó (ví dụ: giải toán học, viết code lập trình, khám bệnh y tế, chính trị quốc tế, chứng khoán...).
+- Nếu isItineraryRequest là true HOÀN TOÀN destination không phải null → isOffTopic PHẢI là false. Không được có mâu thuẫn.
+
+Trả về duy nhất định dạng JSON:
+{
+  "isSensitive": boolean,
+  "isOffTopic": boolean,
+  "isItineraryRequest": boolean,
+  "destination": string | null,
+  "days": number | null,
+  "budget": number | null
+}`
+          }
+        ];
+
+        if (chatHistory && chatHistory.length > 0) {
+          chatHistory.slice(-15).forEach(h => {
+            semanticMessages.push({
+              role: h.role,
+              content: h.content
+            });
           });
         }
 
-        // B. WIKIPEDIA WEB SEARCH & SMART CACHE (Tải TOÀN BỘ thông tin thật và lưu DB)
-        // Determine destination to search. Initially use semantic intent; later fallback mechanisms will refine.
-        let destToSearch = semanticIntent.destination;
+        semanticMessages.push({
+          role: 'user',
+          content: `Tin nhắn: "${message}"`
+        });
+
+        parallelTasks.push(
+          createGroqChatCompletion({
+            messages: semanticMessages,
+            model: 'llama-3.1-8b-instant',
+            temperature: 0.1,
+            response_format: { type: 'json_object' }
+          }, false).then(comp => {
+            const semanticRaw = comp.choices[0]?.message?.content || '{}';
+            parsedSemantic = JSON.parse(semanticRaw);
+          }).catch(err => {
+            console.error("⚠️ Error in parallel Semantic Intent Parser:", err.message);
+          })
+        );
+      }
+
+      // Task B: Smart Cache (Knowledge) Lookup
+      if (!placeContext && chatbotDb.readyState === 1 && message.length > 2 && (targetLang === 'vi' || targetLang === 'auto')) {
+        const timeSensitiveKeywords = ['thứ mấy', 'ngày nào', 'mấy giờ', 'hôm nay', 'bây giờ', 'thu may', 'ngay nao', 'may gio', 'hom nay', 'bay gio'];
+        const isTimeSensitive = timeSensitiveKeywords.some(k => lowerMsg.includes(k));
         
-        // Cứu cánh cho câu hỏi nối tiếp (VD: "bây giờ cơ mà"): Lục lại lịch sử chat để tìm địa danh đang nói đến
-        if (!destToSearch && chatHistory.length > 0) {
-            const allText = chatHistory.map(h => h.content).join(' ').toLowerCase();
-            const knownRegions = [...new Set(cachedPlaces.map(p => p.region))].concat(['Tuyên Quang', 'Hà Giang', 'Hà Tuyên', 'Bắc Giang', 'Phú Thọ', 'Yên Bái', 'Vĩnh Phúc', 'Thái Nguyên', 'Bắc Kạn']);
-            
-            for (const region of knownRegions) {
-                if (region && allText.includes(region.toLowerCase())) {
-                    destToSearch = region;
-                    break;
-                }
-            }
-        }
-        if (destToSearch && destToSearch.length > 2 && !searchResult) {
-            try {
-                const wikiKey = `WIKI_${destToSearch.toLowerCase()}`;
-                const cachedWiki = await Knowledge.findOne({ question: wikiKey });
-                
-                if (cachedWiki) {
-                    searchResult = cachedWiki.answer;
-                    if (searchResult && searchResult.length > 3000) {
-                        searchResult = searchResult.substring(0, 3000) + "...";
-                    }
-                    console.log(`🌐 [Wiki Cache] Đã lấy kho dữ liệu khổng lồ từ Database cho: ${destToSearch}`);
-                } else {
-                    const https = require('https');
-                    const wikiUrl = `https://vi.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1&titles=${encodeURIComponent(destToSearch)}`;
-                    const options = {
-                        timeout: 5000,
-                        headers: {
-                            'User-Agent': 'WanderVietBot/1.0 (wanderviet@example.com)'
-                        }
-                    };
-                    
-                    searchResult = await new Promise((resolve) => {
-                        https.get(wikiUrl, options, (resp) => {
-                            let data = '';
-                            resp.on('data', (chunk) => { data += chunk; });
-                            resp.on('end', () => {
-                                try {
-                                    const wikiData = JSON.parse(data);
-                                    const pages = wikiData.query.pages;
-                                    const pageId = Object.keys(pages)[0];
-                                    if (pageId !== '-1' && pages[pageId].extract && pages[pageId].extract.length > 100) {
-                                        const fullExtract = pages[pageId].extract;
-                                        let snippet = fullExtract;
-                                        let extract = fullExtract;
-                                        // Groq models have large context windows. We can easily pass 12000 chars (approx 3000 tokens)
-                                        // to ensure the LLM reads the "Tourism" and "Culture" sections of provinces.
-                                        if (snippet.length > 12000) {
-                                            const query = destToSearch.toLowerCase();
-                                            const lowerExtract = fullExtract.toLowerCase();
-                                            const idx = lowerExtract.indexOf(query);
-                                            if (idx !== -1) {
-                                                const start = Math.max(0, idx - 1000);
-                                                const end = Math.min(extract.length, idx + 11000);
-                                                extract = extract.substring(start, end);
-                                            } else {
-                                                extract = extract.substring(0, 12000);
-                                            }
-                                            snippet = extract;
-                                        }
-                                        resolve({ snippet, full: fullExtract });
-                                    } else {
-                                        resolve(null);
-                                    }
-                                } catch (e) { resolve(null); }
-                            });
-                        }).on("error", () => resolve(null)).on("timeout", () => resolve(null));
-                    });
-                    
-                    if (searchResult) {
-                        // searchResult now an object { snippet, full }
-                        console.log(`🌐 [Wiki Fact-Check] Đã tải thông tin cho: ${destToSearch}`);
-                        // Store full article in DB for future use
-                        Knowledge.create({
-                            question: wikiKey,
-                            answer: searchResult.full, // store the full article
-                            userName: 'AI System',
-                            source: 'ai_learned'
-                        }).catch(err => console.error("Lỗi lưu wiki vào DB:", err));
-                        // Use snippet for immediate response
-                        searchResult = searchResult.snippet;
-                    }
-                }
-            } catch (e) {
-                console.error("Wiki fetch error:", e.message);
-            }
-        }
-
-        // If user explicitly asks for full detail, return the stored full article
-        if ((lowerMsg.includes('chi tiết') || lowerMsg.includes('toàn bộ')) && destToSearch) {
-            const wikiKey = `WIKI_${destToSearch.toLowerCase()}`;
-            const fullDoc = await Knowledge.findOne({ question: wikiKey });
-            if (fullDoc) {
-                return res.json({
-                    success: true,
-                    answer: fullDoc.answer,
-                    source: 'wiki_full_detail'
-                });
-            }
-        }
-
-        // C. Tìm trong lịch sử hội thoại toàn cầu (Global Conversation Cache) - dùng contextKeywords đã khai báo ở dưới
-        const historyContextKeywords = ['đó', 'đấy', 'kia', 'này', 'nơi đó', 'chỗ đó', 'ở đó', 'ở đấy', 'vừa rồi', 'trước đó', 'do', 'day', 'kia', 'nay', 'noi do', 'cho do', 'o do', 'o day', 'vua roi', 'truoc do'];
-        const isContextSensitive = historyContextKeywords.some(k => lowerMsg.includes(k));
-
-        // Bỏ qua SmartCache nếu là yêu cầu lập lịch (cần xử lý đặc biệt)
-        const itinKwsEarly = [
-          'lập lịch', 'tạo lịch', 'lên kế hoạch', 'lịch trình', 'itinerary', 'hành trình cho', 'đặt lịch', 'thiết kế chuyến', 'tạo chuyến',
-          'lap lich', 'tao lich', 'len ke hoach', 'lich trinh', 'hanh trinh cho', 'dat lich', 'thiet ke chuyen', 'tao chuyen'
-        ];
-        const isItinEarly = itinKwsEarly.some(k => lowerMsg.includes(k));
-
-        if (!searchResult && !isContextSensitive && !isItinEarly && !isTimeSensitive && lowerMsg.length > 10 && (!images || images.length === 0)) {
-          // Tìm câu trả lời gần nhất cho câu hỏi y hệt này, nhưng CHỈ lấy nếu câu trả lời đó được đánh giá TỐT (up) hoặc là từ AI uy tín
-          const prevQuestion = await Conversation.findOne({
-            role: 'user',
-            text: { $regex: new RegExp(`^${message.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
-          }).sort({ timestamp: -1 });
-
-          if (prevQuestion) {
-            const prevAnswer = await Conversation.findOne({
-              role: 'model',
-              sessionId: prevQuestion.sessionId, // Phải cùng phiên để đảm bảo ngữ cảnh
-              timestamp: { $gt: prevQuestion.timestamp },
+        if (!isTimeSensitive) {
+          parallelTasks.push(
+            Knowledge.findOne({
               $or: [
-                { feedback: 'up' },
-                { isVerified: true } // Các câu trả lời được admin xác nhận
+                { question: lowerMsg },
+                { question: message.trim() }
               ]
-            }).sort({ timestamp: 1 });
+            }).then(kMatch => {
+              knowledgeMatch = kMatch;
+            }).catch(err => {
+              console.error("⚠️ Error in parallel SmartCache lookup:", err.message);
+            })
+          );
+        }
+      }
 
-            if (prevAnswer && prevAnswer.text) {
-              console.log("➡️ [SmartCache] Khớp lịch sử cộng đồng:", message);
-              
-              if (chatbotDb.readyState === 1) {
-                if (!currentSessionId) currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                const title = message.split(' ').slice(0, 5).join(' ');
-                await new Conversation({ userId: sessionKey, sessionId: currentSessionId, title: title, role: 'user', text: message }).save();
-                await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: prevAnswer.text }).save();
-              }
+      // Task C: Wiki Cache pre-fetch for candidate destination
+      if (candidateDest && candidateDest.length > 2 && chatbotDb.readyState === 1) {
+        const wikiKey = `WIKI_${candidateDest.toLowerCase()}`;
+        parallelTasks.push(
+          Knowledge.findOne({ question: wikiKey }).then(wikiCache => {
+            preFetchedWiki = wikiCache;
+          }).catch(err => {
+            console.error("⚠️ Error in parallel Wiki pre-fetch:", err.message);
+          })
+        );
+      }
 
-              const meta = await generateResponseMetadata(message, prevAnswer.text, locationContext, false);
-              return res.json({
-                success: true,
-                answer: prevAnswer.text,
-                sessionId: currentSessionId,
-                proposal: meta.proposal,
-                discoveryPlaces: meta.discoveryPlaces,
-                suggestedTours: meta.suggestedTours,
-                source: 'smart-cache-history'
-              });
-            }
+      // Task D: Tour Place Count pre-fetch for candidate destination
+      const exactTourKeywords = ['tour', 'gói tour', 'tour trọn gói', 'đặt tour', 'tìm tour'];
+      const exactServiceKeywords = ['dịch vụ', 'khách sạn', 'nhà hàng', 'resort', 'homestay', 'chỗ nghỉ', 'quán ăn', 'chuyến đi'];
+      const hasTourKeyword = exactTourKeywords.some(k => lowerMsg.includes(k));
+      const hasServiceKeyword = exactServiceKeywords.some(k => lowerMsg.includes(k));
+      const strongItinKeywords = ['lên lịch', 'lập lịch', 'tạo lịch', 'lịch trình', 'kế hoạch'];
+      const hasStrongItinKeyword = strongItinKeywords.some(k => lowerMsg.includes(k));
+
+      if ((hasTourKeyword || hasServiceKeyword) && !hasStrongItinKeyword && candidateDest) {
+        const guardQuery = { 
+          isDeleted: { $ne: true }, 
+          status: 'approved', 
+          $or: [{ name: new RegExp(candidateDest, 'i') }, { region: new RegExp(candidateDest, 'i') }] 
+        };
+        parallelTasks.push(
+          Place.countDocuments(guardQuery).then(count => {
+            preFetchedTourCount = count;
+          }).catch(err => {
+            console.error("⚠️ Error in parallel Place count pre-fetch:", err.message);
+          })
+        );
+      }
+
+      if (parallelTasks.length > 0) {
+        await Promise.all(parallelTasks);
+      }
+    } catch (parallelErr) {
+      console.error("⚠️ Lỗi thực thi song song các tác vụ phân tích & pre-fetch:", parallelErr.message);
+    }
+
+    // Merge intent classifier results
+    if (parsedSemantic) {
+      semanticIntent = { ...semanticIntent, ...parsedSemantic };
+
+      // Ép isOffTopic về false nếu tin nhắn chứa từ khóa địa bàn biển đảo quan trọng hoặc các phản hồi ngắn khi có lịch sử
+      const territorialKeywords = ['hoàng sa', 'trường sa', 'hoang sa', 'truong sa', 'phú quốc', 'côn đảo'];
+      const cleanMsg = message.toLowerCase().trim().replace(/[?.,!]$/, "");
+      
+      if (territorialKeywords.some(k => cleanMsg.includes(k))) {
+        semanticIntent.isOffTopic = false;
+        if (!semanticIntent.destination) {
+          if (cleanMsg.includes('hoàng sa') || cleanMsg.includes('hoang sa')) {
+            semanticIntent.destination = 'Hoàng Sa';
+          } else if (cleanMsg.includes('trường sa') || cleanMsg.includes('truong sa')) {
+            semanticIntent.destination = 'Trường Sa';
           }
         }
-      } catch (cacheErr) {
-        console.error("⚠️ SmartCache Error Stack:", cacheErr.stack);
       }
+
+      const shortConfirmations = ['có', 'co', 'ok', 'yes', 'ừ', 'u', 'được', 'duoc', 'muốn', 'muon', 'đồng ý', 'dong y', 'đúng', 'dung', 'không', 'khong', 'không cần', 'khong can', 'chưa', 'chua', 'đâu em', 'dau em', 'đâu', 'dau', 'ở đâu', 'o dau', 'chỗ nào', 'cho nao', 'nào', 'nao', 'thế nào', 'the nao', 'sao', 'sao em', 'sao ad', 'đâu vậy', 'dau vay', 'ở đâu vậy', 'o dau vay', 'ở đâu thế', 'o dau the'];
+      if (chatHistory && chatHistory.length > 0 && (shortConfirmations.includes(cleanMsg) || cleanMsg.length < 15)) {
+        semanticIntent.isOffTopic = false;
+      }
+
+      console.log(`🧠 [Semantic Intent Parser] Analyzed:`, semanticIntent);
+
+      try {
+        fs.appendFileSync(path.join(__dirname, '../../debug_classification.log'), JSON.stringify({
+          timestamp: new Date().toISOString(),
+          message: message,
+          chatHistory: chatHistory,
+          semanticIntent: semanticIntent
+        }, null, 2) + "\n\n");
+      } catch (logErr) {
+        console.error("Log error:", logErr);
+      }
+    }
+
+    // --- RETURN SMART CACHE ANSWER IF AVAILABLE ---
+    if (knowledgeMatch) {
+      console.log("➡️ [SmartCache] Khớp kiến thức:", knowledgeMatch.question);
+      
+      if (chatbotDb.readyState === 1 && !clientDisconnected) {
+        if (!currentSessionId) currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const title = message.split(' ').slice(0, 5).join(' ');
+        Promise.all([
+          new Conversation({ userId: sessionKey, sessionId: currentSessionId, title: title, role: 'user', text: message }).save(),
+          new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: knowledgeMatch.answer }).save()
+        ]).catch(err => console.error("Lỗi lưu DB SmartCache:", err.message));
+      }
+
+      const meta = await generateResponseMetadata(message, knowledgeMatch.answer, locationContext, false);
+      return res.json({
+        success: true,
+        answer: knowledgeMatch.answer,
+        sessionId: currentSessionId,
+        proposal: meta.proposal,
+        discoveryPlaces: meta.discoveryPlaces,
+        suggestedTours: meta.suggestedTours,
+        source: 'smart-cache-knowledge'
+      });
+    }
+
+    let searchResult = null;
+    let destToSearch = semanticIntent.destination;
+    try {
+      let specificLandmark = null;
+      const contextKeywords = ['đây','bây giờ','tối nay','hiện tại','này','mình','tôi','em'];
+
+      // B. WIKIPEDIA WEB SEARCH & SMART CACHE (Tải TOÀN BỘ thông tin thật và lưu DB)
+      
+      // Cứu cánh cho câu hỏi nối tiếp (VD: "bây giờ cơ mà"): Lục lại lịch sử chat để tìm địa danh đang nói đến
+      if (!destToSearch && chatHistory.length > 0) {
+        destToSearch = candidateDest;
+      }
+
+      if (destToSearch && destToSearch.length > 2 && !searchResult) {
+        try {
+          let wikiRecord = null;
+          if (candidateDest && destToSearch.toLowerCase() === candidateDest.toLowerCase()) {
+            wikiRecord = preFetchedWiki;
+          } else {
+            const wikiKey = `WIKI_${destToSearch.toLowerCase()}`;
+            wikiRecord = await Knowledge.findOne({ question: wikiKey });
+          }
+
+          if (wikiRecord) {
+            searchResult = wikiRecord.answer;
+            if (searchResult && searchResult.length > 3000) {
+              searchResult = searchResult.substring(0, 3000) + "...";
+            }
+            console.log(`🌐 [Wiki Cache] Đã lấy kho dữ liệu khổng lồ từ Database cho: ${destToSearch}`);
+          } else {
+            const wikiKey = `WIKI_${destToSearch.toLowerCase()}`;
+            const https = require('https');
+            const wikiUrl = `https://vi.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1&titles=${encodeURIComponent(destToSearch)}`;
+            const options = {
+              timeout: 5000,
+              headers: {
+                'User-Agent': 'WanderVietBot/1.0 (wanderviet@example.com)'
+              }
+            };
+            
+            const fetchedResult = await new Promise((resolve) => {
+              https.get(wikiUrl, options, (resp) => {
+                let data = '';
+                resp.on('data', (chunk) => { data += chunk; });
+                resp.on('end', () => {
+                  try {
+                    const wikiData = JSON.parse(data);
+                    const pages = wikiData.query.pages;
+                    const pageId = Object.keys(pages)[0];
+                    if (pageId !== '-1' && pages[pageId].extract && pages[pageId].extract.length > 100) {
+                      const fullExtract = pages[pageId].extract;
+                      let snippet = fullExtract;
+                      let extract = fullExtract;
+                      // Groq models have large context windows. We can easily pass 12000 chars (approx 3000 tokens)
+                      if (snippet.length > 12000) {
+                        const query = destToSearch.toLowerCase();
+                        const lowerExtract = fullExtract.toLowerCase();
+                        const idx = lowerExtract.indexOf(query);
+                        if (idx !== -1) {
+                          const start = Math.max(0, idx - 1000);
+                          const end = Math.min(extract.length, idx + 11000);
+                          extract = extract.substring(start, end);
+                        } else {
+                          extract = extract.substring(0, 12000);
+                        }
+                        snippet = extract;
+                      }
+                      resolve({ snippet, full: fullExtract });
+                    } else {
+                      resolve(null);
+                    }
+                  } catch (e) { resolve(null); }
+                });
+              }).on("error", () => resolve(null)).on("timeout", () => resolve(null));
+            });
+            
+            if (fetchedResult) {
+              console.log(`🌐 [Wiki Fact-Check] Đã tải thông tin cho: ${destToSearch}`);
+              Knowledge.create({
+                question: wikiKey,
+                answer: fetchedResult.full,
+                userName: 'AI System',
+                source: 'ai_learned'
+              }).catch(err => console.error("Lỗi lưu wiki vào DB:", err));
+              searchResult = fetchedResult.snippet;
+            }
+          }
+        } catch (e) {
+          console.error("Wiki fetch error:", e.message);
+        }
+      }
+
+      // If user explicitly asks for full detail, return the stored full article
+      if ((lowerMsg.includes('chi tiết') || lowerMsg.includes('toàn bộ')) && destToSearch) {
+          const wikiKey = `WIKI_${destToSearch.toLowerCase()}`;
+          const fullDoc = await Knowledge.findOne({ question: wikiKey });
+          if (fullDoc) {
+              return res.json({
+                  success: true,
+                  answer: fullDoc.answer,
+                  source: 'wiki_full_detail'
+              });
+          }
+      }
+
+      // C. Tìm trong lịch sử hội thoại toàn cầu (Global Conversation Cache) - dùng contextKeywords đã khai báo ở dưới
+      const historyContextKeywords = ['đó', 'đấy', 'kia', 'này', 'nơi đó', 'chỗ đó', 'ở đó', 'ở đấy', 'vừa rồi', 'trước đó', 'do', 'day', 'kia', 'nay', 'noi do', 'cho do', 'o do', 'o day', 'vua roi', 'truoc do'];
+      const isContextSensitive = historyContextKeywords.some(k => lowerMsg.includes(k));
+
+      // Bỏ qua SmartCache nếu là yêu cầu lập lịch (cần xử lý đặc biệt)
+      const itinKwsEarly = [
+        'lập lịch', 'tạo lịch', 'lên kế hoạch', 'lịch trình', 'itinerary', 'hành trình cho', 'đặt lịch', 'thiết kế chuyến', 'tạo chuyến',
+        'lap lich', 'tao lich', 'len ke hoach', 'lich trinh', 'hanh trinh cho', 'dat lich', 'thiet ke chuyen', 'tao chuyen'
+      ];
+      const isItinEarly = itinKwsEarly.some(k => lowerMsg.includes(k));
+
+      if (!searchResult && !isContextSensitive && !isItinEarly && !isTimeSensitive && lowerMsg.length > 10 && (!images || images.length === 0)) {
+        // Tìm câu trả lời gần nhất cho câu hỏi y hệt này, nhưng CHỈ lấy nếu câu trả lời đó được đánh giá TỐT (up) hoặc là từ AI uy tín
+        const prevQuestion = await Conversation.findOne({
+          role: 'user',
+          text: { $regex: new RegExp(`^${message.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }
+        }).sort({ timestamp: -1 });
+
+        if (prevQuestion) {
+          const prevAnswer = await Conversation.findOne({
+            role: 'model',
+            sessionId: prevQuestion.sessionId, // Phải cùng phiên để đảm bảo ngữ cảnh
+            timestamp: { $gt: prevQuestion.timestamp },
+            $or: [
+              { feedback: 'up' },
+              { isVerified: true } // Các câu trả lời được admin xác nhận
+            ]
+          }).sort({ timestamp: 1 });
+
+          if (prevAnswer && prevAnswer.text) {
+            console.log("➡️ [SmartCache] Khớp lịch sử cộng đồng:", message);
+            
+            if (chatbotDb.readyState === 1) {
+              if (!currentSessionId) currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+              const title = message.split(' ').slice(0, 5).join(' ');
+              await new Conversation({ userId: sessionKey, sessionId: currentSessionId, title: title, role: 'user', text: message }).save();
+              await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: prevAnswer.text }).save();
+            }
+
+            const meta = await generateResponseMetadata(message, prevAnswer.text, locationContext, false);
+            return res.json({
+              success: true,
+              answer: prevAnswer.text,
+              sessionId: currentSessionId,
+              proposal: meta.proposal,
+              discoveryPlaces: meta.discoveryPlaces,
+              suggestedTours: meta.suggestedTours,
+              source: 'smart-cache-history'
+            });
+          }
+        }
+      }
+    } catch (cacheErr) {
+      console.error("⚠️ SmartCache Error Stack:", cacheErr.stack);
     }
     // --- END SMART CACHE ---
 
@@ -849,12 +976,54 @@ QUY TẮC TỐI THƯỢNG (PHẢI TUÂN THỦ):
     } else if (scope === 'business_portal') {
       systemPrompt = `BẠN LÀ: CỐ VẤN KINH DOANH WanderViet AI. Hỗ trợ doanh nghiệp tối ưu vận hành.`;
     } else {
-      systemPrompt = `BẠN LÀ: WANDER-SOUL - Trợ lý du lịch thông thái, am hiểu sâu sắc và tinh tế bậc nhất của hệ thống WanderViet AI.
-=== 1. PHONG CÁCH & DIỆN MẠO CHUYÊN GIA ===
+      systemPrompt = `BẠN LÀ: WanderViet AI - Trợ lý du lịch thông thái, am hiểu sâu sắc và tinh tế bậc nhất.
+
+=== 1. WANDERVIET AI - BỘ NÃO NGỮ CẢNH (CONTEXT INTELLIGENCE SYSTEM) ===
+Nhiệm vụ của bạn không chỉ là trả lời câu hỏi hiện tại mà còn phải duy trì sự liên tục của cuộc hội thoại, ghi nhớ ngữ cảnh, suy luận hợp lý và hỗ trợ người dùng như một người đồng hành du lịch thực sự.
+
+* NGUYÊN TẮC CỐT LÕI:
+  - Luôn ưu tiên NGỮ CẢNH hơn từ khóa đơn lẻ. Không phân tích từng câu hỏi một cách tách biệt.
+  - Mỗi câu hỏi mới phải được hiểu trong mối liên hệ với: Chủ đề đang thảo luận, Điểm đến gần nhất, Kế hoạch du lịch hiện tại, Sở thích đã đề cập, và Thông tin người dùng đã cung cấp trước đó.
+  - Mục tiêu là duy trì một cuộc hội thoại liên tục và tự nhiên.
+
+* BỘ NHỚ HỘI THOẠI:
+  - Trong suốt cuộc trò chuyện, hãy chủ động ghi nhớ các thông tin quan trọng: Điểm đến, Địa phương, Thành phố, Tỉnh thành, Số ngày du lịch, Ngân sách, Nhóm khách, Sở thích, Loại hình du lịch, Khách sạn, Nhà hàng, Địa điểm tham quan, Chủ đề đang trao đổi.
+  - Khi người dùng đã cung cấp thông tin, không yêu cầu họ lặp lại nếu không thực sự cần thiết.
+
+* DUY TRÌ CHỦ ĐỀ & TOPIC LOCK:
+  - Nếu người dùng đang nói về một điểm đến:
+    Ví dụ: "Tôi muốn đi Đà Nẵng 3 ngày."
+    Mọi câu hỏi tiếp theo như: "Nên ở đâu?", "Ăn gì?", "Chi phí thế nào?", "Có đáng đi không?", "Ngày thứ hai nên đi đâu?" đều phải được hiểu là đang nói về Đà Nẵng. Không được tự ý đổi sang địa điểm khác. Không được quên địa điểm hiện tại chỉ vì xuất hiện một địa danh khác trong nội dung trả lời trước đó.
+  - Khi đã xác định được chủ đề chính của cuộc hội thoại: Giữ nguyên chủ đề đó. Chỉ chuyển chủ đề khi người dùng chủ động thay đổi (Ví dụ: "Tôi đang tìm hiểu Đà Lạt." -> "Khách sạn nào đẹp?" -> hiểu là khách sạn ở Đà Lạt; "Còn Sapa thì sao?" -> đây là tín hiệu chuyển chủ đề sang Sapa, lúc này mới bắt đầu phân tích Sapa).
+
+* XỬ LÝ CÂU HỎI NGẮN:
+  - Các câu hỏi ngắn phải được suy luận dựa trên ngữ cảnh gần nhất (Ví dụ: "Nên ở đâu?", "Ăn gì?", "Có đáng không?", "Bao nhiêu tiền?", "Đi mùa nào đẹp?", "Có phù hợp gia đình không?"). Không được coi đây là câu hỏi độc lập. Luôn tìm đối tượng đang được thảo luận gần nhất.
+
+* ƯU TIÊN SUY LUẬN NGỮ CẢNH & KHÔNG HÀNH XỬ MÁY MÓC:
+  - Trước khi trả lời, luôn tự kiểm tra:
+    1. Người dùng đang nói về địa điểm nào?
+    2. Chủ đề hiện tại là gì?
+    3. Có thông tin nào đã được cung cấp trước đó không?
+    4. Câu hỏi hiện tại đang tham chiếu tới điều gì?
+    5. Có cần hỏi lại hay có thể suy luận hợp lý?
+  - Nếu có thể suy luận an toàn từ ngữ cảnh: Trả lời trực tiếp.
+  - Nếu có từ hai cách hiểu trở lên: Hỏi lại ngắn gọn để xác nhận.
+  - Tuyệt đối không được trả lời theo kiểu máy móc: "Bạn muốn đi đâu?", "Bạn đang nói về địa điểm nào?", "Bạn có thể cung cấp thêm thông tin không?" nếu thông tin đó đã xuất hiện trong cuộc trò chuyện. Ưu tiên sử dụng trí nhớ hội thoại.
+
+* KHÔNG PHÁ VỠ LOGIC HỆ THỐNG:
+  - Không được bịa đặt dữ liệu. Không được tạo ra địa điểm không tồn tại. Không được thay đổi thông tin đã xác nhận.
+  - Không được suy luận vượt quá dữ kiện đã có. Được phép suy luận hợp lý từ ngữ cảnh. Không được suy diễn vô căn cứ.
+
+* PHONG CÁCH PHẢN HỒI & KIỂM TRA TRƯỚC KHI TRẢ LỜI:
+  - Phong cách: Tự nhiên, thân thiện, thông minh, chủ động, có khả năng ghi nhớ và liên kết thông tin. Trả lời như một chuyên gia du lịch thực thụ. Mỗi phản hồi phải thể hiện rằng bạn hiểu cuộc trò chuyện đang diễn ra chứ không chỉ hiểu riêng câu hỏi hiện tại.
+  - Trước mỗi phản hồi, hãy tự đánh giá: Tôi có đang nhớ đúng chủ đề hiện tại không? Tôi có đang nhớ đúng điểm đến hiện tại không? Tôi có đang tận dụng ngữ cảnh trước đó không? Người dùng có đang tiếp tục câu chuyện hay đang mở chủ đề mới? Câu trả lời của tôi có mang tính liên tục không? Chỉ sau khi hoàn thành các bước trên mới đưa ra phản hồi cuối cùng.
+
+=== 2. PHONG CÁCH & DIỆN MẠO CHUYÊN GIA ===
 - Phong cách: Thân thiện, hiếu khách, nhiệt tình nhưng cực kỳ chuyên nghiệp và đáng tin cậy. Thể hiện đẳng cấp của một cố vấn du lịch thực thụ.
-- Cách xưng hô: Xưng "mình" hoặc "Wander-Soul", gọi khách là "bạn" (hoặc xưng hô linh hoạt, lịch sự theo ngữ cảnh hội thoại). Sử dụng tự nhiên các từ đệm như "nè", "nha", "nhé" để tạo cảm giác gần gũi.
+- Cách xưng hô: Xưng "mình" hoặc "WanderViet AI", gọi khách là "bạn" (hoặc xưng hô linh hoạt, lịch sự theo ngữ cảnh hội thoại). Sử dụng tự nhiên các từ đệm như "nè", "nha", "nhé" để tạo cảm giác gần gũi.
 - Trình bày: BẮT BUỘC sử dụng định dạng Markdown sang trọng (in đậm, gạch đầu dòng, danh sách, emoji sinh động, bảng biểu khi cần thiết). Không viết những khối văn bản dài dặc gây mỏi mắt. Chia đoạn rõ ràng, rành mạch.
-=== 2. RANH GIỚI PHẠM VI NHIỆM VỤ (STRICT BOUNDARIES) ===
+
+=== 3. RANH GIỚI PHẠM VI NHIỆM VỤ (STRICT BOUNDARIES) ===
 Bạn phải có ranh giới nhiệm vụ cực kỳ rõ ràng và nghiêm ngặt:
 * NẰM TRONG PHẠM VI HỖ TRỢ (IN-SCOPE):
   - Địa điểm du lịch, danh lam thắng cảnh, điểm vui chơi giải trí trên khắp Việt Nam.
@@ -863,18 +1032,19 @@ Bạn phải có ranh giới nhiệm vụ cực kỳ rõ ràng và nghiêm ngặ
   - Lập kế hoạch chuyến đi, thiết kế lịch trình cá nhân hóa, dự trù ngân sách, phương tiện di chuyển.
   - Hướng dẫn đặt tour, phòng khách sạn, thuê xe... có trên hệ thống WanderViet.
 * NẰM NGOÀI PHẠM VI HỖ TRỢ (OUT-OF-SCOPE):
-  - Các câu hỏi không liên quan đến du lịch, văn hóa, ẩm thực, lịch sử hay địa lý Việt Nam.
+  - Các câu hỏi hoàn toàn không liên quan đến du lịch, văn hóa, ẩm thực, lịch sử hay địa lý Việt Nam.
   - Ví dụ: "tôi muốn đi học", "con chó có màu gì", giải toán, viết code, tư vấn tài chính, y khoa, chính trị nhạy cảm...
-  - NGUYÊN TẮC TỪ CHỐI KHÉO: Khi khách hỏi những câu này, tuyệt đối KHÔNG trả lời trực tiếp nội dung đó, không thô lỗ hay máy móc. Hãy từ chối khéo léo, duyên dáng và lập tức điều hướng khách quay lại chủ đề du lịch.
-  * Mẫu câu từ chối chuẩn: "Dù rất muốn chia sẻ cùng bạn nhưng mình là Wander-Soul - Trợ lý chuyên trách về du lịch và khám phá Việt Nam của WanderViet AI mất rồi nè! Căn bếp nhỏ của mình hiện tại chỉ có sẵn 'bí kíp' về các cung đường đẹp, món ăn ngon, lịch sử địa danh và lịch trình du lịch siêu chill thôi. Bạn có muốn mình gợi ý một điểm đến thú vị hay lên kế hoạch cho chuyến đi sắp tới của bạn không?"
-=== 3. HIỂU NGỮ CẢNH SÂU & CHỐNG SPAM TOUR BỪA BÃI (DEEP CONTEXT & ANTI-SPAM) ===
-Bạn sở hữu trí tuệ cảm xúc cao, hiểu sâu sắc ngôn ngữ tự nhiên chứ không hoạt động dựa trên việc quét từ khóa thô sơ.
-- Hiểu sâu toàn bộ câu và lịch sử chat (chatHistory): Đọc hiểu toàn bộ ý nghĩa câu nói của khách kết hợp lịch sử trò chuyện để nắm bắt tâm tư, hoàn cảnh của họ.
+  - NGUYÊN TẮC XỬ LÝ CÂU HỎI NGẮN & ĐẠI TỪ CHỈ ĐỊNH: Các câu hỏi ngắn như "đâu em", "ở đâu", "chỗ nào", "sao", "thế nào", "sao thế", "ở đâu vậy" là các câu hỏi nối tiếp của cuộc thảo luận phía trên. Bạn TUYỆT ĐỐI không được coi đây là câu hỏi ngoài lề (Out-of-scope) và không được sử dụng mẫu câu từ chối. Bạn phải kết nối trực tiếp với lịch sử trò chuyện gần nhất để suy luận đối tượng được nhắc đến (ví dụ: nếu vừa gợi ý phương án lịch trình, hãy giải thích vị trí hoặc các phương án đang hiển thị ở thẻ bên dưới).
+  - NGUYÊN TẮC TỪ CHỐI KHÉO: Khi khách hỏi các câu độc lập hoàn toàn ngoài lề du lịch Việt Nam, hãy từ chối khéo léo.
+  * Mẫu câu từ chối chuẩn: "Dù rất muốn chia sẻ cùng bạn nhưng mình là WanderViet AI - Trợ lý chuyên trách về du lịch và khám phá Việt Nam mất rồi nè! Căn bếp nhỏ của mình hiện tại chỉ có sẵn 'bí kíp' về các cung đường đẹp, món ăn ngon, lịch sử địa danh và lịch trình du lịch siêu chill thôi. Bạn có muốn mình gợi ý một điểm đến thú vị hay lên kế hoạch cho chuyến đi sắp tới của bạn không?"
+
+=== 4. HIỂU NGỮ CẢNH SÂU & CHỐNG SPAM TOUR BỪA BÃI (DEEP CONTEXT & ANTI-SPAM) ===
 - Xử lý lỗi gõ nhanh/viết tắt/không dấu của khách: Khách hàng có thể nhắn tin rất nhanh dẫn đến sai chính tả hoặc viết tắt (VD: "lịch trìn hn", "tuyen qang 2n", "ksan hnoi", "đi chơi gi"). Hãy dùng năng lực suy luận ngữ cảnh để hiểu đúng ý họ muốn nói (ví dụ: "tuyen qang 2n" -> "Tuyên Quang 2 ngày") thay vì hỏi lại hoặc trả lời lạc đề.
 - NGUYÊN TẮC CHỐNG SPAM TOUR/LỊCH TRÌNH:
   + Tán gẫu & Hỏi đáp kiến thức thuần túy: Khi khách chỉ chào hỏi, hỏi thăm sức khỏe, hoặc hỏi kiến thức lịch sử/địa lý thuần túy (VD: "Cầu Long Biên được xây năm nào?", "Hà Giang giáp những tỉnh nào?"), bạn CHỈ TRẢ LỜI CHÍNH XÁC kiến thức đó. Tuyệt đối KHÔNG tự ý chèn link giới thiệu tour du lịch hay lịch trình chi tiết vào lúc này vì sẽ gây cảm giác chèo kéo phiền phức.
   + Chỉ gợi ý khi có nhu cầu thực tế: Chỉ bắt đầu tư vấn dịch vụ, đề xuất tour hoặc thiết kế lịch trình khi khách chủ động yêu cầu (VD: "Lập cho mình lịch trình...", "Ở đây có tour nào không bạn?", "Gợi ý cho mình khách sạn đẹp ở Đà Lạt") hoặc khi câu chuyện tự nhiên dẫn dắt đến việc khách đang chuẩn bị đi du lịch và cần giải pháp cụ thể.
-=== 4. QUY TRÌNH THIẾT KẾ LỊCH TRÌNH LINH HOẠT & CÁ NHÂN HÓA ===
+
+=== 5. QUY TRÌNH THIẾT KẾ LỊCH TRÌNH LINH HOẠT & CÁ NHÂN HÓA ===
 Khi khách yêu cầu lập lịch trình, bạn phải thiết kế một cách linh hoạt, cá nhân hóa tối đa theo các thông số được cung cấp:
 1. Địa điểm (Destination): Phải chính xác tuyệt đối về mặt địa lý thực tế ở Việt Nam. Tuyệt đối không râu ông nọ cắm cằm bà kia (CẤM lấy món ăn/địa danh Hà Nội gán vào Đà Nẵng).
 2. Thời gian & Ngày tháng: Chia lịch trình theo từng ngày rõ ràng (Ngày 1, Ngày 2...), phân bổ hoạt động hợp lý theo buổi Sáng, Trưa, Chiều, Tối. Nhịp độ di chuyển phải phù hợp (thong thả hay năng động).
@@ -883,7 +1053,8 @@ Khi khách yêu cầu lập lịch trình, bạn phải thiết kế một cách
    - Đi với gia đình có người già/trẻ nhỏ -> Lịch trình thong thả, an toàn, ít di chuyển xa.
    - Đi với nhóm bạn trẻ -> Năng động, trải nghiệm phượt, check-in các điểm hot, ẩm thực đường phố.
    - Đi cặp đôi -> Lãng mạn, chill, cafe view đẹp, nghỉ dưỡng sang trọng.
-=== 5. QUY TẮC PHỐI HỢP VỚI HỆ THỐNG WANDERVIET ===
+
+=== 6. QUY TẮC PHỐI HỢP VỚI HỆ THỐNG WANDERVIET ===
 Hãy quan sát kỹ tín hiệu từ hệ thống được truyền vào qua ngữ cảnh (system context) ở cuối prompt để phản hồi đồng nhất:
 - Nếu hệ thống thông báo "Đã tìm thấy [X] bài đăng doanh nghiệp (tour/dịch vụ)...": Bạn phải trả lời một cách tự nhiên rằng hệ thống WanderViet đã tìm thấy các dịch vụ/tour cực kỳ chất lượng tại đây. Hãy nhiệt tình hướng dẫn khách hàng xem và bấm chọn các thẻ gợi ý (Tours/Services) trực quan đang hiển thị ngay phía dưới khung chat để biết thêm thông tin chi tiết và đặt dịch vụ.
 - Nếu hệ thống thông báo "HIỆN TẠI CHƯA CÓ TOUR HOẶC DỊCH VỤ...": Hãy trả lời trung thực với khách: "Hiện tại hệ thống WanderViet chưa có sẵn tour hay dịch vụ đối tác đăng ký tại [Địa danh]." Tuy nhiên, hãy thể hiện sự chu đáo bằng cách chủ động đề nghị tự mình lên một lịch trình (Itinerary) tự túc chi tiết, cá nhân hóa thay thế ngay trong khung chat cho khách.`;
@@ -1070,6 +1241,10 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
 
     if (isItineraryRequest) {
       try {
+        if (semanticIntent.isOffTopic) {
+          isItineraryRequest = false;
+          throw new Error("bypass_itinerary_generation");
+        }
         // Trích xuất thông tin từ tin nhắn - regex linh hoạt hơn
         let destMatch = message.match(/(?:ở|tại|đến|đi du lịch|đi chuyến|khám phá)\s+([A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+(?:\s[A-ZÀ-Ỹa-zà-ỹ][a-zà-ỹ]+)*)/i);
         if (!destMatch) {
@@ -1108,11 +1283,8 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
         const days = semanticIntent.days || (daysMatch ? parseInt(daysMatch[1]) : (isAutoGen ? 3 : null));
         const budget = semanticIntent.budget || (budgetMatch ? parseInt(budgetMatch[1]) : null);
 
-        // Cứu cánh cho câu hỏi nối tiếp nếu không tìm thấy địa danh trực tiếp
+        // Cứu cánh cho câu hỏi nối tiếp nếu không tìm thấy địa danh trực tiếp (duyệt ngược để tôn trọng thứ tự thời gian)
         if (!destination && chatHistory.length > 0) {
-            const allText = chatHistory.map(h => h.content).join(' ').toLowerCase();
-            
-            // Ưu tiên 1: Tìm landmark nổi tiếng cụ thể trong lịch sử (VD: quốc tử giám, hồ gươm...)
             const landmarkMap = {
                 'quốc tử giám': 'Quốc Tử Giám', 'văn miếu': 'Quốc Tử Giám - Văn Miếu',
                 'hồ gươm': 'Hà Nội', 'hoàn kiếm': 'Hà Nội', 'hồ tây': 'Hà Nội', 'tây hồ': 'Hà Nội',
@@ -1126,22 +1298,39 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
                 'tháp bà': 'Nha Trang', 'vinpearl': 'Nha Trang',
                 'khu di tích tân trào': 'Tuyên Quang', 'suối khoáng mỹ lâm': 'Tuyên Quang'
             };
-            for (const [kw, dest] of Object.entries(landmarkMap)) {
-                if (allText.includes(kw)) {
-                    destination = dest;
-                    console.log(`[Itinerary Follow-up] Recovered destination from landmark in history: '${kw}' → '${dest}'`);
+            const provinces = ['Hà Nội', 'Hồ Chí Minh', 'Sài Gòn', 'Đà Lạt', 'Đà Nẵng', 'Hội An', 'Nha Trang', 'Phú Quốc', 'Huế', 'Hạ Long', 'Sa Pa', 'Cần Thơ', 'Mũi Né', 'Phan Thiết', 'Tuyên Quang', 'Ninh Bình', 'Quy Nhơn', 'Bình Định', 'Vũng Tàu', 'Côn Đảo', 'Sóc Sơn', 'Điện Biên', 'Lào Cai', 'Hà Giang', 'Yên Bái', 'Quảng Ninh'];
+
+            for (let i = chatHistory.length - 1; i >= 0; i--) {
+                const text = chatHistory[i].content.toLowerCase();
+                
+                // Ưu tiên 1: Tìm landmark cụ thể trong tin nhắn này
+                let foundLm = null;
+                for (const [kw, dest] of Object.entries(landmarkMap)) {
+                    if (text.includes(kw)) {
+                        if (!foundLm || kw.length > foundLm.kw.length) {
+                            foundLm = { kw, dest };
+                        }
+                    }
+                }
+                if (foundLm) {
+                    destination = foundLm.dest;
+                    console.log(`[Itinerary Follow-up] Recovered destination from landmark in history: '${foundLm.kw}' → '${destination}'`);
                     break;
                 }
-            }
-            
-            // Ưu tiên 2: Tìm tỉnh thành
-            if (!destination) {
-                const provinces = ['Hà Nội', 'Hồ Chí Minh', 'Sài Gòn', 'Đà Lạt', 'Đà Nẵng', 'Hội An', 'Nha Trang', 'Phú Quốc', 'Huế', 'Hạ Long', 'Sa Pa', 'Cần Thơ', 'Mũi Né', 'Phan Thiết', 'Tuyên Quang', 'Ninh Bình', 'Quy Nhơn', 'Bình Định', 'Vũng Tàu', 'Côn Đảo', 'Sóc Sơn', 'Điện Biên', 'Lào Cai'];
+
+                // Ưu tiên 2: Tìm tỉnh thành
+                let foundProvince = null;
                 for (const p of provinces) {
-                    if (allText.includes(p.toLowerCase())) {
-                        destination = p;
-                        break;
+                    if (text.includes(p.toLowerCase())) {
+                        if (!foundProvince || p.length > foundProvince.length) {
+                            foundProvince = p;
+                        }
                     }
+                }
+                if (foundProvince) {
+                    destination = foundProvince;
+                    console.log(`[Itinerary Follow-up] Recovered destination from province in history: '${destination}'`);
+                    break;
                 }
             }
         }
@@ -1162,38 +1351,16 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
                 const hasBadWord = badWords.some(bw => destLower.includes(bw));
                 
                 if (hasBadWord || destination.trim().length < 3) {
-                    const askDestMsg = "Mình cần biết bạn muốn đi đâu thật sự nè! Bạn cho mình biết tên tỉnh thành hoặc địa điểm du lịch cụ thể nhé (ví dụ: Đà Lạt, Hội An, Văn Miếu...). Mình sẽ lập lịch trình cực xịn cho bạn! 😊";
-                    if (chatbotDb.readyState === 1) {
-                        if (!currentSessionId) currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                        await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'user', text: message }).save();
-                        await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: askDestMsg }).save();
-                    }
-                    return res.json({
-                        success: true,
-                        answer: askDestMsg,
-                        sessionId: currentSessionId,
-                        source: 'invalid-destination-guard'
-                    });
+                    isItineraryRequest = false;
+                    throw new Error("bypass_itinerary_generation");
                 }
             }
         }
         // =============================================================
 
         if (!destination) {
-            const askDestMsg = "Tuyệt vời! Bạn muốn lập lịch trình đi đâu, trong khoảng mấy ngày và ngân sách dự kiến là bao nhiêu nhỉ? (Ví dụ: 'Tuyên Quang 2 ngày 3 triệu')";
-            
-            if (chatbotDb.readyState === 1) {
-                if (!currentSessionId) currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'user', text: message }).save();
-                await new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: askDestMsg }).save();
-            }
-
-            return res.json({
-                success: true,
-                answer: askDestMsg,
-                sessionId: currentSessionId,
-                source: 'itinerary-question'
-            });
+            isItineraryRequest = false;
+            throw new Error("bypass_itinerary_generation");
         }
 
         const finalDest = destination;
@@ -1275,8 +1442,8 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
         const plans = await Promise.all(styles.map(style => 
             generatePlanForStyle(finalDest, finalDays, finalBudget, style)
                 .catch(err => {
-                    console.error("Lỗi tạo plan cho style:", style.title, err);
-                    return null;
+                    console.error("Lỗi tạo plan cho style:", style.title, err.message);
+                    return createDefaultFallbackPlan(finalDest, finalDays, finalBudget, style);
                 })
         ));
 
@@ -1291,39 +1458,39 @@ ${placeContext ? `2. BẠN ĐANG TRONG CHẾ ĐỘ 'CHUYÊN GIA DỊCH VỤ CỤ
           }
         }
 
-        const savedProposals = [];
-        for (let i = 0; i < plans.length; i++) {
-          const plan = plans[i];
-          if (!plan || !plan.itinerary) continue;
-          
-          const styleObj = styles[i];
-          
-          const itinerary = new Itinerary({
-            userId: req.user ? req.user.id : null,
-            destination: String(finalDest),
-            days: Number(finalDays),
-            budget: `${finalBudget} triệu VNĐ`,
-            companion: String(companion),
-            interests: String(interests || styleObj.vibe),
-            planJson: plan,
-            userName,
-            userEmail,
-            isDraft: true // Nháp
+        let savedProposals = [];
+        if (!clientDisconnected) {
+          const itineraryPromises = plans.map(async (plan, i) => {
+            if (!plan || !plan.itinerary) return null;
+            const styleObj = styles[i];
+            const itinerary = new Itinerary({
+              userId: req.user ? req.user.id : null,
+              destination: String(finalDest),
+              days: Number(finalDays),
+              budget: `${finalBudget} triệu VNĐ`,
+              companion: String(companion),
+              interests: String(interests || styleObj.vibe),
+              planJson: plan,
+              userName,
+              userEmail,
+              isDraft: true // Nháp
+            });
+            const saved = await itinerary.save();
+            return {
+              _id: saved._id.toString(),
+              title: styleObj.title,
+              destination: finalDest,
+              days: finalDays,
+              budget: `${finalBudget} triệu VNĐ`,
+              style: styleObj.title,
+              description: plan.tripSummary || styleObj.vibe
+            };
           });
-          
-          const saved = await itinerary.save();
-          savedProposals.push({
-            _id: saved._id.toString(),
-            title: styleObj.title,
-            destination: finalDest,
-            days: finalDays,
-            budget: `${finalBudget} triệu VNĐ`,
-            style: styleObj.title,
-            description: plan.tripSummary || styleObj.vibe
-          });
+          const results = await Promise.all(itineraryPromises);
+          savedProposals = results.filter(p => p !== null);
         }
 
-        if (savedProposals.length > 0) {
+        if (savedProposals.length > 0 && !clientDisconnected) {
           const summaryMsg = `Dựa trên sở thích của bạn, Trợ lý WanderViet AI đã thiết kế riêng **${savedProposals.length} phương án lịch trình thực tế** siêu chất lượng tại **${finalDest}**.
 
 Hãy bấm vào phương án bạn thích bên dưới để chuyển trực tiếp đến **Travel Planner AI** xem chi tiết bản đồ di chuyển, gợi ý phòng, dự trù ngân sách và video review nhé! 👇\n[ITIN_PROPOSALS:${JSON.stringify(savedProposals)}]`;
@@ -1343,11 +1510,17 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
           });
         }
       } catch (itinErr) {
-        console.error('Lỗi generate lịch trình premium:', itinErr.message);
+        if (itinErr.message !== "bypass_itinerary_generation") {
+          console.error('Lỗi generate lịch trình premium:', itinErr.message);
+        }
       }
     }
 
     try {
+      // Smart routing: Use 70B model only for itinerary/planning queries, and 8B for normal queries
+      const chosenModel = isItineraryRequest ? "llama-3.3-70b-versatile" : "llama-3.1-8b-instant";
+      console.log(`🤖 [Chatbot Routing] Using model: ${chosenModel} (isItineraryRequest=${isItineraryRequest})`);
+
       // Ép model tuân thủ ngôn ngữ bằng cách nhúng thẳng lệnh vào câu hỏi cuối cùng
       let finalUserMessage = message;
       if (targetLang !== 'auto') {
@@ -1357,7 +1530,7 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
         finalUserMessage = `${message}\n\n[SYSTEM INSTRUCTION: Detect the language of my message and reply in that same language.]`;
       }
 
-      // 4. MÔ HÌNH SUY LUẬN CHÍNH (MAIN REASONING MODEL) - Sử dụng Model mạnh nhất (70B) hoặc Vision nếu có hình ảnh
+      // 4. MÔ HÌNH SUY LUẬN CHÍNH (MAIN REASONING MODEL) - Sử dụng Model đã định tuyến hoặc Vision nếu có hình ảnh
       const isBiz = userRole === 'business';
       
         let completion;
@@ -1403,21 +1576,21 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
             finalUserMessageWithImageContext = `[THÔNG TIN PHÂN TÍCH HÌNH ẢNH MÀ NGƯỜI DÙNG TẢI LÊN]:\n${imageAnalyses.join('\n')}\n\n[CÂU HỎI VÀ YÊU CẦU CỦA NGƯỜI DÙNG]:\n${finalUserMessage}`;
           }
 
-          // 2. Chatbot chính (llama-3.3-70b-versatile hoặc fallback 8b) trả lời dựa trên thông tin mô tả ảnh
+          // 2. Chatbot chính trả lời dựa trên thông tin mô tả ảnh
           try {
-            console.log("🤖 [Chatbot Reasoning] Formulating response using llama-3.3-70b-versatile...");
+            console.log(`🤖 [Chatbot Reasoning] Formulating response using ${chosenModel}...`);
             completion = await createGroqChatCompletion({
               messages: [
                 { role: "system", content: systemPrompt },
                 ...chatHistory,
                 { role: "user", content: finalUserMessageWithImageContext }
               ],
-              model: "llama-3.3-70b-versatile",
+              model: chosenModel,
               temperature: 0.3,
               max_tokens: 1000
             }, isBiz);
           } catch (err70b) {
-            console.warn("⚠️ [Groq Fallback] 70B Model failed/rate-limited during vision phase, falling back to 8B Model:", err70b.message);
+            console.warn(`⚠️ [Groq Fallback] Chosen model ${chosenModel} failed/rate-limited during vision phase, falling back to 8B Model:`, err70b.message);
             completion = await createGroqChatCompletion({
               messages: [
                 { role: "system", content: systemPrompt },
@@ -1432,18 +1605,19 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
         } else {
           // Text-only flow
           try {
+            console.log(`🤖 [Chatbot Reasoning] Formulating response using ${chosenModel}...`);
             completion = await createGroqChatCompletion({
               messages: [
                 { role: "system", content: systemPrompt },
                 ...chatHistory,
                 { role: "user", content: finalUserMessage }
               ],
-              model: "llama-3.3-70b-versatile",
+              model: chosenModel,
               temperature: 0.3,
               max_tokens: 1000
             }, isBiz);
           } catch (err70b) {
-            console.warn("⚠️ [Groq Fallback] 70B Model failed/rate-limited, falling back to 8B Model:", err70b.message);
+            console.warn(`⚠️ [Groq Fallback] Chosen model ${chosenModel} failed/rate-limited, falling back to 8B Model:`, err70b.message);
             completion = await createGroqChatCompletion({
               messages: [
                 { role: "system", content: systemPrompt },
@@ -1462,47 +1636,42 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
       // 4.5. MÔ HÌNH KIỂM DUYỆT (VERIFIER AI) - Đã gỡ bỏ để tăng tốc độ phản hồi và chống lỗi dịch tiếng Trung ngẫu nhiên.
       // Thay vào đó, model 70B với temperature 0.3 đã đủ độ tin cậy để xử lý ngữ cảnh 12,000 ký tự.
 
-      // 5. LƯU TRÍ NHỚ (Ghi vào DB Server theo Session)
-      if (chatbotDb.readyState === 1 && aiAnswer) {
+      // 5. LƯU TRÍ NHỚ SONG SONG (Ghi vào DB Server theo Session)
+      if (chatbotDb.readyState === 1 && aiAnswer && !clientDisconnected) {
         try {
-          // Nếu chưa có sessionId (phiên mới), tạo một cái
           if (!currentSessionId) {
             currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            // console.log("🆕 Generated new sessionId:", currentSessionId);
           }
 
-          // Lấy tiêu đề từ tin nhắn đầu tiên (Xử lý thông minh hơn)
           let title = undefined;
           const firstMsgCount = await Conversation.countDocuments({ sessionId: currentSessionId });
           if (firstMsgCount === 0) {
-            // Tự tạo tên ngắn gọn từ câu hỏi
             let cleanMsg = (message || "Hình ảnh").replace(/[?.,!]/g, '').trim();
             title = cleanMsg.split(' ').slice(0, 6).join(' ');
             if (cleanMsg.split(' ').length > 6) title += '...';
             if (!title) title = 'Hội thoại mới';
-            // console.log("📝 Set session title:", title);
           }
 
-
-          await new Conversation({
+          const userMsgPromise = new Conversation({
             userId: sessionKey,
             sessionId: currentSessionId,
-            title: title, // Chỉ lưu title nếu đây là tin nhắn đầu tiên
+            title: title,
             role: 'user',
             text: message || "",
             images: images || []
           }).save();
 
-          const answerDoc = await new Conversation({
+          const modelMsgPromise = new Conversation({
             userId: sessionKey,
             sessionId: currentSessionId,
             role: 'model',
             text: aiAnswer
           }).save();
-          
-          res.locals.messageId = answerDoc._id; // Store to return later
+
+          const [userDoc, answerDoc] = await Promise.all([userMsgPromise, modelMsgPromise]);
+          res.locals.messageId = answerDoc._id;
         } catch (saveErr) {
-          console.error("Lỗi lưu trí nhớ:", saveErr.message);
+          console.error("Lỗi lưu trí nhớ song song:", saveErr.message);
         }
       } else if (chatbotDb.readyState !== 1) {
         console.warn("⚠️ Chatbot DB not ready (readyState: " + chatbotDb.readyState + "). Message not saved.");
@@ -1525,7 +1694,7 @@ Hãy bấm vào phương án bạn thích bên dưới để chuyển trực ti�
         discoveryPlaces: finalMeta.discoveryPlaces,
         suggestedTours: finalMeta.suggestedTours,
         suggestedLink: finalMeta.suggestedLink,
-        source: 'wander-soul-gen3-ultimate'
+        source: 'wanderviet-ai-gen3-ultimate'
       });
       
       // --- BACKGROUND LEARNING (ASYNCHRONOUS) ---

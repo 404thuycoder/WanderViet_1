@@ -276,6 +276,14 @@ mongoose.connect(process.env.MONGODB_URI.trim(), dbOptions)
         } catch (seedErr) {
             console.error('[Auto-Seed] Lỗi nạp vouchers tự động:', seedErr.message);
         }
+
+        // Auto-fix broken database image references
+        try {
+            const { runDbRepair } = require('./server/utils/dbRepair');
+            runDbRepair().catch(err => console.error('[DB Repair Error]', err.message));
+        } catch (repairErr) {
+            console.error('[DB Repair Setup Error]', repairErr.message);
+        }
         
         const server = http.createServer(app);
         initSocket(server);

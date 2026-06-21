@@ -48,6 +48,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             
             return fetch('/api/chat', {
               method: 'POST',
+              signal: (ctx === null || ctx === void 0 ? void 0 : ctx.signal) || null,
               headers: {
                 'Content-Type': 'application/json',
                 'x-auth-token': token
@@ -79,6 +80,10 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
           case 6:
             _context2.p = 6;
             _t = _context2.v;
+            if (_t && (_t.name === 'AbortError' || _t.name === 'AbortException')) {
+              console.debug("[Chatbot] Chat request aborted by user");
+              return _context2.a(2, { success: false, aborted: true });
+            }
             console.error("Chat Error Detail:", _t);
             return _context2.a(2, "Lỗi kết nối AI. Vui lòng thử lại sau hoặc tải lại trang.");
         }

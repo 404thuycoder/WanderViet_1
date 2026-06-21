@@ -12723,6 +12723,69 @@ html.translated-ltr #translate-curtain, html.translated-rtl #translate-curtain {
   color: #ef4444 !important;
 }
 
+/* --- Premium Stop/Continue Chatbot Interface Elements --- */
+.chat-form .btn--primary.btn--stop {
+  color: #f87171 !important; /* Soft bright red */
+  background: rgba(248, 113, 113, 0.12) !important;
+  border: 1px solid rgba(248, 113, 113, 0.4) !important;
+  border-radius: 12px !important;
+  padding: 6px 16px !important;
+  box-shadow: 0 0 12px rgba(248, 113, 113, 0.15) !important;
+  font-weight: 700 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.chat-form .btn--primary.btn--stop:hover {
+  background: rgba(248, 113, 113, 0.22) !important;
+  border-color: rgba(248, 113, 113, 0.6) !important;
+  transform: scale(1.04) !important;
+  box-shadow: 0 0 16px rgba(248, 113, 113, 0.25) !important;
+}
+
+.btn-bubble-continue {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1.5px dashed rgba(0, 240, 255, 0.35);
+  border-radius: 12px;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  box-shadow: 0 4px 12px rgba(0, 240, 255, 0.05);
+}
+
+.btn-bubble-continue:hover {
+  background: rgba(0, 240, 255, 0.18);
+  border-style: solid;
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 240, 255, 0.15);
+}
+
+/* Dynamic glow effect when chatbot bubble updates successfully */
+@keyframes bubbleGlowUpdate {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4);
+    border-color: rgba(0, 240, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 20px 0 rgba(0, 240, 255, 0);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+}
+
+.chat-bubble--updated {
+  animation: bubbleGlowUpdate 1s ease-out;
+}
+
 
 
 

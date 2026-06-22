@@ -12786,6 +12786,274 @@ html.translated-ltr #translate-curtain, html.translated-rtl #translate-curtain {
   animation: bubbleGlowUpdate 1s ease-out;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   CHATBOT — Proposal Card Premium
+   ══════════════════════════════════════════════════════════════════ */
 
+.chat-proposal-card-premium {
+  background: rgba(10, 18, 28, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 16px;
+  padding: 14px;
+  margin: 10px 0;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: fadeInUp 0.5s ease both;
+}
 
+.chat-proposal-card-premium::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #10b981, #34d399, #06b6d4, #10b981);
+  background-size: 200% 100%;
+  animation: shimmerGradient 3s ease infinite;
+}
+
+.chat-proposal-card-premium:hover {
+  border-color: rgba(16, 185, 129, 0.45);
+  transform: translateY(-3px);
+  box-shadow:
+    0 12px 40px rgba(16, 185, 129, 0.15),
+    0 0 0 1px rgba(16, 185, 129, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.chat-proposal-card-premium .proposal-header {
+  font-size: 0.62rem;
+  color: #10b981;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+}
+
+.chat-proposal-card-premium .proposal-body {
+  padding: 2px 0;
+}
+
+/* ── Proposal Action Button ── */
+
+.btn-proposal-action {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.82rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.3px;
+}
+
+.btn-proposal-action::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%; right: 0; bottom: 0;
+  width: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition: left 0.6s ease;
+}
+
+.btn-proposal-action:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+}
+
+.btn-proposal-action:hover::before {
+  left: 100%;
+}
+
+.btn-proposal-action:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.btn-proposal-action:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ── Shimmer Gradient Animation ── */
+@keyframes shimmerGradient {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── FadeInUp Animation ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CHATBOT — Quick Planner Form
+   ══════════════════════════════════════════════════════════════════ */
+
+.chat-quick-planner-form {
+  background: rgba(10, 18, 28, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-radius: 16px;
+  padding: 16px;
+  margin: 10px 0;
+  animation: fadeInUp 0.4s ease both;
+}
+
+.chat-quick-planner-form .cqp-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.chat-quick-planner-form .cqp-icon {
+  font-size: 1.4rem;
+}
+
+.chat-quick-planner-form .cqp-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.chat-quick-planner-form .cqp-sub {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+.chat-quick-planner-form .cqp-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chat-quick-planner-form .cqp-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.chat-quick-planner-form .cqp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat-quick-planner-form .cqp-field label {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.chat-quick-planner-form .cqp-field input,
+.chat-quick-planner-form .cqp-field select,
+.chat-quick-planner-form .cqp-field textarea {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 9px 12px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-family: inherit;
+  transition: all 0.25s ease;
+  outline: none;
+  resize: none;
+}
+
+.chat-quick-planner-form .cqp-field input:focus,
+.chat-quick-planner-form .cqp-field select:focus,
+.chat-quick-planner-form .cqp-field textarea:focus {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.08);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.chat-quick-planner-form .cqp-field select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8.5L1.5 4h9z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+
+.chat-quick-planner-form .cqp-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.chat-quick-planner-form .cqp-btn-submit {
+  width: 100%;
+  padding: 11px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.82rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.chat-quick-planner-form .cqp-btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.chat-quick-planner-form .cqp-btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.chat-quick-planner-form .cqp-btn-skip {
+  width: 100%;
+  padding: 9px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.chat-quick-planner-form .cqp-btn-skip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.chat-quick-planner-form .cqp-btn-skip:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 

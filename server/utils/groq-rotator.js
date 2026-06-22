@@ -7,7 +7,16 @@ const pools = {
     process.env.GROQ_API_KEY_2,
     process.env.GROQ_API_KEY_3,
     process.env.GROQ_API_KEY_4,
-    process.env.GROQ_API_KEY_5
+    process.env.GROQ_API_KEY_5,
+    process.env.GROQ_API_KEY_PLANNER,
+    process.env.GROQ_API_KEY_PLANNER_2,
+    process.env.GROQ_API_KEY_PLANNER_3,
+    process.env.GROQ_API_KEY_NAVIGATION,
+    process.env.GROQ_API_KEY_ADMIN,
+    process.env.GROQ_API_KEY_BUSINESS,
+    process.env.GROQ_API_KEY_VISION,
+    process.env.GROQ_API_KEY_VISION_2,
+    process.env.GROQ_API_KEY_VISION_3
   ],
   planner: [
     process.env.GROQ_API_KEY_PLANNER,

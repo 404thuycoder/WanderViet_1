@@ -817,6 +817,16 @@ router.get('/recent-proposals', optionalAuth, async (req, res) => {
   }
 });
 
+// Debug route to list itineraries
+router.get('/debug-list', async (req, res) => {
+  try {
+    const list = await Itinerary.find({}, '_id destination days').lean();
+    res.json({ success: true, count: list.length, list });
+  } catch(e) {
+    res.json({ success: false, error: e.message });
+  }
+});
+
 // Lấy chi tiết một lịch trình cụ thể
 router.get('/itinerary/:id', optionalAuth, async (req, res) => {
   try {

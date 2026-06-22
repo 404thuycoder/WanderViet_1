@@ -4088,7 +4088,7 @@ const initPlanner = function () {
   });
 
   btnSaveTrip?.addEventListener('click', async () => {
-    if (!currentItineraryId) return;
+    if (!currentItineraryId && (!planHistory || planHistory.length === 0)) return;
     const token = localStorage.getItem('wander_token');
     if (!token) {
       alert("Vui lòng đăng nhập để lưu lịch trình.");
@@ -4098,10 +4098,18 @@ const initPlanner = function () {
     btnSaveTrip.disabled = true;
     btnSaveTrip.textContent = "Đang lưu...";
     try {
+      let payload = { itineraryId: currentItineraryId };
+      if (!currentItineraryId || currentItineraryId === 'undefined' || currentItineraryId === 'null' || currentItineraryId === 'new') {
+         payload = { 
+           planJson: planHistory[currentPlanIndex], 
+           destination: window._currentDest || "Điểm đến của tôi", 
+           days: window._currentDays || 3 
+         };
+      }
       const res = await fetch('/api/planner/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-auth-token': token },
-        body: JSON.stringify({ itineraryId: currentItineraryId })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (data.success) {
@@ -4198,12 +4206,15 @@ const initPlanner = function () {
       const itinId = urlParams.get('itinId');
 
       const processPlan = (plan, destination, days) => {
+        window._currentDest = destination || (plan && plan.destination);
+        window._currentDays = days || (plan && plan.days);
+
         // Kích hoạt show-result để CSS hiển thị timelineResult và tự động ẩn formCard
         document.querySelector('.planner-container')?.classList.add('show-result');
         const plannerFormCard = document.getElementById('plannerFormCard');
-        // Đã xóa inline style vì CSS show-result quản lý
+        
         const btnSaveTrip = document.getElementById('btnSaveTrip');
-        if (btnSaveTrip) btnSaveTrip.style.display = 'none';
+        if (btnSaveTrip) btnSaveTrip.style.display = 'inline-flex';
 
         if (placeholder) placeholder.style.display = 'none';
         if (loader) loader.style.display = 'none';
@@ -4235,9 +4246,13 @@ const initPlanner = function () {
       };
 
       if (savedTripJson) {
-        const plan = JSON.parse(savedTripJson);
-        processPlan(plan);
-      } else if (itinId) {
+        const parsed = JSON.parse(savedTripJson);
+        if (parsed.planJson) {
+          processPlan(parsed.planJson, parsed.destination, parsed.days);
+        } else {
+          processPlan(parsed);
+        }
+      } else if (itinId && itinId !== 'undefined' && itinId !== 'null') {
         if (loader) loader.style.display = 'flex';
         const token = localStorage.getItem('wander_token');
         fetch(`/api/planner/itinerary/${itinId}`, {

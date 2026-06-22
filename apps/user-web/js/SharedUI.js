@@ -4241,13 +4241,17 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       html = html.replace(/\n/g, '<br>');
       // Clean up excessive <br>
       html = html.replace(/(<br\s*\/?>\s*){3,}/g, '<br><br>');
+
+      if (html.includes('[PLANNING_FORM]')) {
+        html = html.replace('[PLANNING_FORM]', createInlinePlanningForm());
+      }
       return html;
     }
 
     // Append a message bubble to chat log
     // role: 'user' | 'bot'
     // images: array of base64/url strings
-    function appendMsg(info, role, skipSave, skipScroll, itineraryData, images) {
+    function appendMsg(info, role, skipSave, skipScroll, itineraryData, images, proposals) {
       if (!log) return;
       
       const welcomeScreen = document.getElementById('chat-welcome-screen');
@@ -4432,8 +4436,11 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       if (!skipScroll) scrollToBottom();
 
       // Render embedded itinerary/proposals nếu có
-      if (proposalsData && proposalsData.length > 0) {
-        renderProposalOptions(proposalsData);
+      const finalProposals = (proposals && Array.isArray(proposals) && proposals.length > 0)
+        ? proposals
+        : proposalsData;
+      if (finalProposals && finalProposals.length > 0) {
+        renderProposalOptions(finalProposals);
       }
       if (itineraryData) {
         renderItineraryCard(itineraryData);
@@ -5165,8 +5172,12 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
       }
 
       const hasEmbedTag = aiReply && (aiReply.includes('[ITIN_CARD:') || aiReply.includes('[ITIN_PROPOSALS:'));
-      if (proposalsData && proposalsData.length > 0) {
-        renderProposalOptions(proposalsData);
+      // Ưu tiên resData.proposals (có planJson cho sessionStorage) > proposalsData từ text tag (nhẹ, không có planJson)
+      const finalProposals = (resData.proposals && Array.isArray(resData.proposals) && resData.proposals.length > 0)
+        ? resData.proposals
+        : proposalsData;
+      if (finalProposals && finalProposals.length > 0) {
+        renderProposalOptions(finalProposals);
       }
       if (itineraryData) {
         renderItineraryCard(itineraryData);
@@ -5177,8 +5188,6 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           renderQuickPlannerForm(resData.prefill || {});
         } else if (resData.itineraryCard) {
           renderItineraryCard(resData.itineraryCard);
-        } else if (resData.proposals && Array.isArray(resData.proposals) && resData.proposals.length > 0) {
-          renderProposalOptions(resData.proposals);
         } else if (resData.proposal) {
           renderProposalCard(resData.proposal);
         }
@@ -5279,7 +5288,7 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
           if (bubbleEl) {
             updateExistingBotBubble(bubbleEl, aiReply, resData, wasVoice);
           } else {
-            appendMsg(aiReply, 'bot');
+            appendMsg(aiReply, 'bot', false, false, null, null, resData.proposals);
             
             const hasEmbedTag = aiReply && (aiReply.includes('[ITIN_CARD:') || aiReply.includes('[ITIN_PROPOSALS:'));
             if (!hasEmbedTag) {
@@ -5408,50 +5417,42 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                     <div class="cqp-sub">Cung cấp các thông tin cơ bản để bắt đầu</div>
                 </div>
             </div>
-            <div class="cqp-body">
+            <div class="cqp-fields">
                 <div class="cqp-field">
-                    <label>📍 Điểm đến mong muốn</label>
-                    <input id="cqpDest" type="text" placeholder="VD: Đà Lạt, Phú Quốc..." value="${prefill.destination || ''}" />
+                    <label for="cqpDest">📍 Điểm đến</label>
+                    <input type="text" id="cqpDest" placeholder="VD: Đà Lạt, Phú Quốc..." value="${prefill.destination || ''}">
                 </div>
                 <div class="cqp-row">
                     <div class="cqp-field">
-                        <label>📅 Số ngày</label>
-                        <input id="cqpDays" type="number" min="1" max="30" placeholder="3" value="${prefill.days || 3}" />
+                        <label for="cqpDays">📅 Số ngày</label>
+                        <input type="number" id="cqpDays" value="${prefill.days || 3}" min="1" max="30">
                     </div>
                     <div class="cqp-field">
-                        <label>📅 Ngày đi</label>
-                        <input id="cqpDate" type="date" />
+                        <label for="cqpBudget">💰 Ngân sách (triệu)</label>
+                        <input type="number" id="cqpBudget" value="${prefill.budget || 5}" min="1" max="100">
                     </div>
                 </div>
                 <div class="cqp-field">
-                    <label>💰 Ngân sách dự kiến</label>
-                    <select id="cqpBudget">
-                        <option value="2">1M - 3M VNĐ (Tiết kiệm)</option>
-                        <option value="5" selected>3M - 7M VNĐ (Tiêu chuẩn)</option>
-                        <option value="10">7M - 15M VNĐ (Thoải mái)</option>
-                        <option value="20">15M+ VNĐ (Cao cấp)</option>
-                    </select>
-                </div>
-                <div class="cqp-field">
-                    <label>👥 Thành viên</label>
+                    <label for="cqpCompanion">👥 Đi cùng</label>
                     <select id="cqpCompanion">
-                        <option value="Solo">Solo (Một mình)</option>
-                        <option value="Cặp đôi">Đi cặp đôi</option>
-                        <option value="Gia đình">Gia đình</option>
-                        <option value="Nhóm bạn" selected>Nhóm bạn</option>
+                        <option value="solo">Một mình</option>
+                        <option value="couple">Đôi/Cặp</option>
+                        <option value="family">Gia đình</option>
+                        <option value="friends">Bạn bè</option>
                     </select>
                 </div>
                 <div class="cqp-field">
-                    <label>💡 Yêu cầu thêm <span class="cqp-optional">(tùy chọn)</span></label>
-                    <textarea id="cqpExtra" placeholder="VD: Tôi muốn leo núi và ăn tối lãng mạn..." rows="2"></textarea>
+                    <label for="cqpExtra">✏️ Yêu cầu thêm</label>
+                    <textarea id="cqpExtra" placeholder="VD: Thích ẩm thực, thích thiên nhiên..." rows="2"></textarea>
                 </div>
             </div>
             <div class="cqp-actions">
-                <button class="cqp-btn-submit" type="button">Tiếp tục — AI lên lịch ngay →</button>
-                <button class="cqp-btn-skip" type="button">⚡ Bỏ qua — AI tự tạo</button>
+                <button type="button" class="cqp-btn-submit">Tiếp tục — AI lên lịch ngay →</button>
+                <button type="button" class="cqp-btn-skip">⚡ Bỏ qua — AI tự tạo</button>
             </div>
         `;
 
+        // Submit handler
         wrapper.querySelector('.cqp-btn-submit').onclick = async () => {
             const dest = wrapper.querySelector('#cqpDest').value.trim();
             const days = parseInt(wrapper.querySelector('#cqpDays').value) || 3;
@@ -5545,15 +5546,23 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
     function renderProposalCard(proposal) {
         const card = document.createElement('div');
         card.className = 'chat-proposal-card-premium';
+        const imgSrc = proposal.image || getDestinationImage(proposal.destination || proposal.title || '');
         card.innerHTML = `
             <div class="proposal-header">✨ Đề xuất hành trình</div>
-            <div class="proposal-body">
-                <h4 style="margin:0 0 4px; color:#fff;">${proposal.title || 'Hành trình ' + (proposal.destination || '')}</h4>
-                <p style="margin:0; font-size:0.85rem; opacity:0.8;">${proposal.days} ngày | ${proposal.style || 'Cơ bản'}</p>
-                <div class="proposal-budget" style="margin-top:8px; color:var(--accent); font-weight:700;">💰 ${proposal.budget}</div>
-                <p style="margin:6px 0 0; font-size:0.75rem; color:#94a3b8; font-style:italic;">"${proposal.description || ''}"</p>
+            <div style="position:relative; width:100%; height:110px; border-radius:12px; overflow:hidden; margin:8px 0 4px;">
+                <img src="${imgSrc}" alt="${proposal.title || proposal.destination || ''}" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=400&h=300&fit=crop'">
+                <div style="position:absolute; inset:0; background:linear-gradient(180deg, transparent 40%, rgba(10,18,28,0.85) 100%);"></div>
+                <div style="position:absolute; bottom:8px; left:8px; display:flex; gap:6px;">
+                    <span style="font-size:0.62rem; background:rgba(16,185,129,0.85); color:#fff; padding:3px 9px; border-radius:12px; font-weight:700;">📅 ${proposal.days} ngày</span>
+                    <span style="font-size:0.62rem; background:rgba(0,0,0,0.6); color:#fff; padding:3px 9px; border-radius:12px; font-weight:700;">📍 ${proposal.destination || 'Việt Nam'}</span>
+                </div>
             </div>
-            <button type="button" class="btn-proposal-action" style="margin-top:12px; width:100%; padding:10px; border-radius:10px; background:var(--accent); color:#000; font-weight:800; border:none; cursor:pointer; transition:all 0.2s; box-shadow: 0 4px 12px rgba(16,185,129,0.3);">Xem chi tiết & Chỉnh sửa 🚀</button>
+            <div class="proposal-body">
+                <h4 style="margin:4px 0 4px; color:#fff; font-size:0.95rem; font-weight:800;">${proposal.title || 'Hành trình ' + (proposal.destination || '')}</h4>
+                <div class="proposal-budget" style="margin-top:2px; color:#fbbf24; font-weight:700; font-size:0.85rem;">💰 Dự kiến: ${proposal.budget}</div>
+                <p style="margin:6px 0 0; font-size:0.75rem; color:#94a3b8; font-style:italic; line-height:1.4;">"${proposal.description || ''}"</p>
+            </div>
+            <button type="button" class="btn-proposal-action" style="margin-top:12px;">Xem chi tiết & Chỉnh sửa 🚀</button>
         `;
         const btn = card.querySelector('button');
         btn.onclick = () => {
@@ -5573,11 +5582,23 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                 togglePanel();
             }
 
+            // Lưu planJson và metadata vào sessionStorage để planner.js có thể render ngay lập tức
+            if (proposal.planJson) {
+                try {
+                    sessionStorage.setItem('wander_view_trip', JSON.stringify({
+                        itinId: proposal._id,
+                        planJson: proposal.planJson,
+                        destination: proposal.destination,
+                        days: proposal.days
+                    }));
+                } catch(e) {}
+            }
+
             // Chuyển hướng trực tiếp sang AI Assistant
             window.location.href = `/planner.html?view=true&itinId=${proposal._id}`;
         };
         log.appendChild(card);
-          scrollToBottom();
+        scrollToBottom();
     }
 
     function renderDiscoveryCarousel(places = []) {
@@ -5757,6 +5778,19 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
                     fabWrap.classList.remove('is-fullscreen');
                 }
                 if (typeof togglePanel === 'function') togglePanel();
+
+                // Lưu planJson vào sessionStorage — planner.js ưu tiên dùng dữ liệu này
+                if (p.planJson) {
+                    try {
+                        sessionStorage.setItem('wander_view_trip', JSON.stringify({
+                            itinId: p._id,
+                            planJson: p.planJson,
+                            destination: p.destination,
+                            days: p.days
+                        }));
+                    } catch(e) {}
+                }
+
                 window.location.href = `/planner.html?view=true&itinId=${p._id}`;
             };
 

@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const plannerDb = require('./dbPlanner'); // Dùng kết nối riêng cho Travel Planner
 
 // Dùng kết nối chung hoặc kết nối riêng tuỳ ý (ở đây dùng mongoose mặc định để Admin dễ truy xuất chung với User)
 const itinerarySchema = new mongoose.Schema({
@@ -26,4 +25,4 @@ const itinerarySchema = new mongoose.Schema({
 
 itinerarySchema.index({ userId: 1, createdAt: -1 });
 
-module.exports = plannerDb.model('Itinerary', itinerarySchema);
+module.exports = mongoose.model('Itinerary', itinerarySchema);

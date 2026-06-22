@@ -76,7 +76,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
             }
             return _context2.a(2, data);
           case 5:
-            return _context2.a(2, { success: false, answer: "Trợ lý đang bận, thử lại sau nhé." });
+            return _context2.a(2, data || { success: false, answer: "Trợ lý đang bận, thử lại sau nhé." });
           case 6:
             _context2.p = 6;
             _t = _context2.v;

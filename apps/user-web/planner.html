@@ -2024,11 +2024,25 @@
           <!-- STEP 1: CHỌN ĐIỂM ĐẾN -->
           <div id="formStep1" class="form-step-content">
             
+            <!-- THANH TÌM KIẾM & GỢI Ý TOÀN CẦU -->
+            <div class="region-search-container" style="margin: 0 0 1.25rem 0; display: flex; flex-direction: column; gap: 0.6rem;">
+              <div class="planner-region-label" style="margin-bottom: 0.25rem;">🔍 Tìm kiếm điểm đến nhanh</div>
+              <div style="position: relative; display: flex; align-items: center; width: 100%;">
+                <input type="text" id="regionDestSearchInput" oninput="filterRegionDestinations()" placeholder="Tìm kiếm địa điểm (VD: Hà Nội, Sapa, Tràng An, Cầu Vàng...)" style="width: 100%; padding: 0.7rem 1.2rem 0.7rem 2.4rem; border-radius: 24px; border: 1.5px solid var(--border); background: rgba(0, 0, 0, 0.25); color: var(--text); font-size: 0.88rem; outline: none; transition: all 0.2s;" />
+                <span style="position: absolute; left: 0.9rem; color: var(--text-muted); font-size: 0.95rem; pointer-events: none; line-height: 1;">🔍</span>
+                <button type="button" onclick="clearRegionDestSearch()" id="btnClearRegionDestSearch" style="position: absolute; right: 0.9rem; background: none; border: none; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; display: none; padding: 0;">✕</button>
+              </div>
+              <!-- CHIPS GỢI Ý PHỔ BIẾN -->
+              <div id="regionSearchSuggestions" style="display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;">
+                <span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-right: 2px;">Gợi ý phổ biến:</span>
+              </div>
+            </div>
+
             <!-- VÙNG MIỀN - Region Selector Cards giống ảnh tham khảo -->
             <div class="planner-region-section">
               <div class="planner-region-label">📍 Chọn vùng du lịch</div>
               <div class="region-cards-grid" id="regionCards">
-                <div class="region-card active" data-region="Miền Bắc" onclick="selectRegion(this)">
+                <div class="region-card" data-region="Miền Bắc" onclick="selectRegion(this)">
                   <span class="region-card-name">Miền Bắc</span>
                 </div>
                 <div class="region-card" data-region="Miền Trung" onclick="selectRegion(this)">
@@ -3162,10 +3176,9 @@
         updateTotalMembers();
       }
 
-      // Kích hoạt render vùng đầu tiên ngay khi tải trang
-      const activeRegion = document.querySelector('.region-card.active') || document.querySelector('.region-card');
-      if (activeRegion && typeof selectRegion === 'function') {
-        selectRegion(activeRegion);
+      // Kích hoạt hiển thị các gợi ý tìm kiếm ngay khi tải trang
+      if (typeof renderGlobalSearchSuggestions === 'function') {
+        renderGlobalSearchSuggestions();
       }
     });
 
@@ -3256,6 +3269,90 @@
       }
     });
 
+    // Region Search & Suggestions logic
+    window.filterRegionDestinations = function() {
+      const query = document.getElementById('regionDestSearchInput')?.value.trim() || '';
+      const clearBtn = document.getElementById('btnClearRegionDestSearch');
+      if (clearBtn) {
+        clearBtn.style.display = query ? 'block' : 'none';
+      }
+      
+      renderDestinations(query);
+      
+      if (query.length > 0) {
+        openRegionPanel();
+        // Bỏ active của các thẻ vùng để thể hiện chế độ tìm kiếm toàn cầu
+        document.querySelectorAll('.region-card').forEach(c => c.classList.remove('active'));
+      } else {
+        // Khi xóa từ khóa:
+        if (currentRegion) {
+          // Hiển thị lại vùng đã chọn trước đó
+          const card = document.querySelector(`.region-card[data-region="${currentRegion}"]`);
+          if (card) {
+            document.querySelectorAll('.region-card').forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+          }
+          renderDestinations();
+        } else {
+          // Nếu chưa từng chọn vùng nào, đóng bảng điểm đến
+          closeRegionPanel();
+        }
+      }
+    };
+
+    window.clearRegionDestSearch = function() {
+      const searchInput = document.getElementById('regionDestSearchInput');
+      if (searchInput) {
+        searchInput.value = '';
+        filterRegionDestinations();
+      }
+    };
+
+    function renderGlobalSearchSuggestions() {
+      const container = document.getElementById('regionSearchSuggestions');
+      if (!container) return;
+      
+      container.innerHTML = `<span style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600; margin-right: 2px;">Gợi ý phổ biến:</span>`;
+      
+      const list = ['Hà Nội', 'Sapa', 'Hạ Long', 'Đà Nẵng', 'Hội An', 'Đà Lạt', 'TP.HCM', 'Phú Quốc', 'Vũng Tàu'];
+      list.forEach(name => {
+        const chip = document.createElement('span');
+        chip.className = 'region-suggestion-chip';
+        chip.textContent = name;
+        chip.style.cssText = `
+          font-size: 0.72rem;
+          padding: 3px 10px;
+          border-radius: 12px;
+          border: 1px solid var(--border);
+          background: rgba(255,255,255,0.04);
+          color: var(--text);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        `;
+        
+        chip.onmouseover = () => {
+          chip.style.background = 'rgba(59,130,246,0.15)';
+          chip.style.borderColor = 'rgba(59,130,246,0.4)';
+          chip.style.color = '#60a5fa';
+        };
+        chip.onmouseout = () => {
+          chip.style.background = 'rgba(255,255,255,0.04)';
+          chip.style.borderColor = 'var(--border)';
+          chip.style.color = 'var(--text)';
+        };
+        
+        chip.onclick = () => {
+          const searchInput = document.getElementById('regionDestSearchInput');
+          if (searchInput) {
+            searchInput.value = name;
+            filterRegionDestinations();
+          }
+        };
+        
+        container.appendChild(chip);
+      });
+    }
+
     // Region card selection handler - Toggle behavior
     window.selectRegion = function(card) {
       const clickedRegion = card.dataset.region;
@@ -3272,6 +3369,14 @@
       card.classList.add('active');
       currentRegion = clickedRegion;
       currentDestIndex = 0;
+
+      // Reset search input (but do not clear global suggestions chip listing)
+      const searchInput = document.getElementById('regionDestSearchInput');
+      if (searchInput) {
+        searchInput.value = '';
+      }
+      const clearBtn = document.getElementById('btnClearRegionDestSearch');
+      if (clearBtn) clearBtn.style.display = 'none';
 
       // Ẩn panel các điểm cụ thể và xóa lựa chọn cũ
       const attContainer = document.getElementById('cityAttractionsContainer');
@@ -3366,11 +3471,10 @@
     }
     window._outerCardsTimers = [];
 
-    function renderDestinations() {
+    function renderDestinations(customQuery) {
       const scrollContainer = document.getElementById('regionDestCards');
       const label = document.getElementById('regionDestLabel');
       
-      if (label) label.textContent = currentRegion;
       if (!scrollContainer) return;
       scrollContainer.innerHTML = '';
 
@@ -3379,7 +3483,39 @@
       }
       window._outerCardsTimers = [];
 
-      const allDest = REGION_DESTINATIONS[currentRegion] || [];
+      let allDest = [];
+      let query = (customQuery || '').trim().toLowerCase();
+      let searchActive = query.length > 0;
+
+      if (searchActive) {
+        // Search globally across all regions
+        Object.entries(REGION_DESTINATIONS).forEach(([regionName, destList]) => {
+          destList.forEach(dest => {
+            const cityData = detailsMap[dest.name] || {};
+            const spots = dest.spots || [];
+            const matchesSpots = spots.some(spot => spot.toLowerCase().includes(query));
+            if (dest.name.toLowerCase().includes(query) || regionName.toLowerCase().includes(query) || matchesSpots) {
+              allDest.push({ ...dest, regionName });
+            }
+          });
+        });
+        if (label) label.innerHTML = `🔍 Kết quả tìm kiếm: <span style="color:#60a5fa;">"${customQuery}"</span> (${allDest.length} kết quả)`;
+      } else {
+        // Standard region render
+        if (label) label.textContent = currentRegion;
+        const regionDest = REGION_DESTINATIONS[currentRegion] || [];
+        allDest = regionDest.map(dest => ({ ...dest, regionName: currentRegion }));
+      }
+
+      if (allDest.length === 0) {
+        scrollContainer.innerHTML = `
+          <div style="width:100%; text-align:center; padding:2rem 1rem; color:var(--text-muted); font-size:0.9rem;">
+            ❌ Không tìm thấy điểm đến nào phù hợp với từ khóa của bạn.
+          </div>
+        `;
+        return;
+      }
+
       // Render as a larger grid of cards (tile view)
       allDest.forEach((dest, cardIdx) => {
         const card = document.createElement('div');
@@ -3421,7 +3557,7 @@
             <div class="dest-card-badge" style="z-index: 2;">⭐ ${rating}</div>
           </div>
           <div class="dest-card-info">
-            <div class="dest-card-location">${currentRegion || ''}</div>
+            <div class="dest-card-location">${dest.regionName || ''}</div>
             <div class="dest-card-name">${dest.name}</div>
             <div class="dest-card-stars">
               ${starsHtml}

@@ -1848,38 +1848,72 @@ a {
 
 .console-input-area {
   padding: 1.25rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.05);
   border-top: 1px solid var(--border);
+}
+[data-theme="dark"] .console-input-area {
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .console-form {
   display: flex;
   gap: 0.5rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
   border-radius: 1rem;
   padding: 0.4rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+.console-form:focus-within {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="dark"] .console-form {
+  background: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+[data-theme="dark"] .console-form:focus-within {
+  border-color: #60a5fa !important;
+  box-shadow: 0 4px 16px rgba(96, 165, 250, 0.2);
 }
 
 .console-form input {
   flex: 1;
   background: transparent;
   border: none;
-  color: #fff;
+  color: #1e293b !important;
   padding: 0.5rem 0.75rem;
   font-size: 0.95rem;
+}
+.console-form input::placeholder {
+  color: #64748b !important;
+}
+
+[data-theme="dark"] .console-form input {
+  color: #ffffff !important;
+}
+[data-theme="dark"] .console-form input::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .console-form input:focus { outline: none; }
 
 .console-form button {
-  background: var(--accent);
+  background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
   color: #fff;
   border: none;
   padding: 0.5rem 1.25rem;
   border-radius: 0.75rem;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+.console-form button:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
 }
 
 /* Path C: Smart Wizard */
@@ -2033,70 +2067,77 @@ a {
 
 .chat-chip-premium {
   padding: 0.6rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border);
-  border-radius: 2rem;
-  color: var(--text);
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 2rem !important;
+  color: #1e293b !important;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
 }
 
 .chat-chip-premium:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(59, 130, 246, 0.3);
-  transform: translateY(-2px);
+  background: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
 }
 
 .chat-chip-premium.active {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: #3b82f6;
-  color: #60a5fa;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25) !important;
 }
 
 .chip-icon {
-  font-size: 1.1rem;
+  font-size: 1.1rem !important;
 }
 
 .main-action-small {
-  padding: 0.75rem 1.5rem;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  padding: 0.75rem 1.5rem !important;
+  font-size: 0.9rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
   background: linear-gradient(135deg, #10b981, #059669) !important;
 }
 
 /* Discovery Console Overrides */
 .console-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  padding: 0 0.5rem;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.5rem !important;
+  margin-bottom: 1rem !important;
+  padding: 0 0.5rem !important;
 }
 
 .chip-refresh-btn {
-  padding: 0.5rem 0.9rem;
-  background: transparent;
-  border: 1px dashed rgba(255,255,255,0.2);
-  border-radius: 2rem;
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
+  padding: 0.5rem 0.9rem !important;
+  background: #ffffff !important;
+  border: 1px dashed #cbd5e1 !important;
+  border-radius: 2rem !important;
+  color: #475569 !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
 }
 .chip-refresh-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: rgba(16,185,129,0.06);
+  border-color: #10b981 !important;
+  color: #10b981 !important;
+  background: #f0fdf4 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.12) !important;
 }
 
 /* -------- Animations -------- */
@@ -5003,28 +5044,54 @@ html:not([data-theme="dark"]) .btn-back-step:hover,
 .chat-bubble {
   border-radius: 1.25rem !important;
   padding: 1.1rem 1.35rem !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06) !important;
   font-size: 0.9rem !important;
   line-height: 1.65 !important;
   margin-bottom: 1.25rem !important;
   animation: fadeInUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
+/* Light Theme (Default) */
 .chat-bubble.ai {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.9)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  color: #1e293b !important;
   border-top-left-radius: 0.25rem !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04) !important;
+}
+.chat-bubble.ai .chat-name {
+  color: #4f46e5 !important; /* Premium Indigo */
+}
+.chat-bubble.ai .chat-header {
+  border-bottom-color: rgba(0, 0, 0, 0.06) !important;
 }
 
 .chat-bubble.user {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.25)) !important;
-  border: 1px solid rgba(96, 165, 250, 0.3) !important;
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  border: none !important;
+  color: #ffffff !important;
   border-top-right-radius: 0.25rem !important;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2) !important;
 }
 
-.chat-bubble.ai .chat-header {
+/* Dark Theme Overrides */
+[data-theme="dark"] .chat-bubble.ai {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.75), rgba(15, 23, 42, 0.9)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+[data-theme="dark"] .chat-bubble.ai .chat-name {
+  color: #60a5fa !important;
+}
+[data-theme="dark"] .chat-bubble.ai .chat-header {
   border-bottom-color: rgba(255, 255, 255, 0.07) !important;
-  margin-bottom: 0.6rem !important;
+}
+
+[data-theme="dark"] .chat-bubble.user {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.25)) !important;
+  border: 1px solid rgba(96, 165, 250, 0.3) !important;
+  color: #ffffff !important;
 }
 
 /* --- D. Timeline Result & Itinerary Custom Styles --- */
@@ -6846,4 +6913,378 @@ html:not([data-theme="dark"]) .ai-premium-loader {
   #formStep2 .members-age-grid {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* ============================================================ */
+/* QUICK FORM — GPS Button                                       */
+/* ============================================================ */
+.btn-quick-gps {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: 0.6rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  min-height: 42px;
+}
+.btn-quick-gps:hover {
+  background: rgba(59, 130, 246, 0.22);
+  border-color: #60a5fa;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+}
+.btn-quick-gps:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================================ */
+/* QUICK FORM — Destination Autocomplete Dropdown               */
+/* ============================================================ */
+.autocomplete-suggestions-list {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--bg-card, #1e293b);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  max-height: 260px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.autocomplete-suggestion-item {
+  padding: 0.6rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text, #e2e8f0);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border, rgba(255,255,255,0.05));
+  transition: background 0.15s;
+}
+.autocomplete-suggestion-item:last-child { border-bottom: none; }
+.autocomplete-suggestion-item:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  padding-left: 1.25rem;
+}
+
+/* ============================================================ */
+/* QUICK FORM — Duration Spinner                                 */
+/* ============================================================ */
+.duration-spinner-container {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem;
+  background: var(--bg-elevated, rgba(0,0,0,0.15));
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  width: fit-content;
+}
+.spinner-btn {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--border) !important;
+  background: var(--bg-card) !important;
+  color: var(--text) !important;
+  font-size: 1.25rem !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease !important;
+  font-weight: 400 !important;
+  flex-shrink: 0;
+}
+.spinner-btn:hover {
+  background: rgba(59,130,246,0.15) !important;
+  border-color: #60a5fa !important;
+  color: #60a5fa !important;
+  transform: scale(1.1) !important;
+}
+.spinner-input {
+  text-align: center !important;
+  font-weight: 800 !important;
+  font-size: 1.1rem !important;
+  width: 64px !important;
+  border: none !important;
+  background: transparent !important;
+  color: #60a5fa !important;
+  outline: none !important;
+  pointer-events: none;
+  padding: 0 !important;
+}
+
+/* ============================================================ */
+/* QUICK FORM — Style & Companion Chips                         */
+/* ============================================================ */
+.quick-chip {
+  padding: 0.45rem 0.9rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  white-space: nowrap;
+}
+.quick-chip:hover {
+  border-color: rgba(59,130,246,0.5);
+  background: rgba(59,130,246,0.1);
+  transform: translateY(-1px);
+}
+.quick-chip.active {
+  background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+}
+
+/* ============================================================ */
+/* QUICK FORM — Budget Predict Button & Result Box              */
+/* ============================================================ */
+.btn-predict-budget {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  border-radius: 0.65rem;
+  background: rgba(139, 92, 246, 0.08);
+  color: #a78bfa;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.2s;
+}
+.btn-predict-budget:hover {
+  background: rgba(139, 92, 246, 0.2);
+  border-color: #a78bfa;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.2);
+  transform: translateY(-1px);
+}
+.budget-prediction-result {
+  padding: 0.85rem 1rem;
+  background: rgba(16, 185, 129, 0.07);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 0.75rem;
+  animation: fadeSlideIn 0.3s ease;
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark mode adjustments for Quick Form */
+[data-theme="dark"] .autocomplete-suggestions-list {
+  background: #0f172a;
+  border-color: rgba(255,255,255,0.08);
+}
+[data-theme="dark"] .btn-quick-gps {
+  background: rgba(59,130,246,0.12);
+  border-color: rgba(59,130,246,0.25);
+}
+[data-theme="dark"] .quick-chip {
+  background: rgba(255,255,255,0.03);
+}
+
+/* ============================================================ */
+/* DISCOVERY — Action Box & Confirm Button (Premium)            */
+/* ============================================================ */
+.console-action-box {
+  padding: 1rem 1.25rem;
+  background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(99,102,241,0.06));
+  border-top: 1px solid rgba(16,185,129,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  animation: fadeInUp 0.3s ease both;
+}
+[data-theme="dark"] .console-action-box {
+  background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(99,102,241,0.1));
+  border-top-color: rgba(16,185,129,0.25);
+}
+.console-action-box p {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.btn-confirm-discovery {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 0.75rem !important;
+  padding: 0.6rem 1.35rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(16,185,129,0.3) !important;
+  transition: all 0.2s cubic-bezier(0.4,0,0.2,1) !important;
+  flex-shrink: 0;
+}
+.btn-confirm-discovery:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(16,185,129,0.4) !important;
+  filter: brightness(1.08);
+}
+.btn-confirm-discovery:active {
+  transform: translateY(0) !important;
+}
+
+/* ============================================================ */
+/* QUICK FORM — Premium Overhaul (#createSubFormArea)           */
+/* ============================================================ */
+#createSubFormArea {
+  padding: 0.25rem 0.25rem 1rem;
+}
+
+/* Header section */
+#createSubFormArea .step2-header {
+  background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(6,182,212,0.06));
+  border: 1px solid rgba(99,102,241,0.15);
+  border-radius: 1rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem !important;
+}
+#createSubFormArea .step2-header h3 {
+  font-size: 1rem !important;
+  background: linear-gradient(135deg, #6366f1, #06b6d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 800 !important;
+}
+#createSubFormArea .step2-header p {
+  font-size: 0.78rem !important;
+  opacity: 0.8;
+}
+
+/* Field groups — subtle card style */
+#createSubFormArea .planner-field-group {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.75rem !important;
+  transition: border-color 0.2s;
+}
+#createSubFormArea .planner-field-group:focus-within {
+  border-color: rgba(99,102,241,0.4);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.07);
+}
+[data-theme="dark"] #createSubFormArea .planner-field-group {
+  background: rgba(255,255,255,0.02);
+  border-color: rgba(255,255,255,0.07);
+}
+[data-theme="dark"] #createSubFormArea .planner-field-group:focus-within {
+  border-color: rgba(129,140,248,0.4);
+}
+
+/* Labels inside quick form */
+#createSubFormArea .planner-field-label {
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  color: var(--text-muted) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.6rem;
+  display: block;
+}
+
+/* Duration spinner — tighter */
+#createSubFormArea .duration-spinner-container {
+  gap: 0.6rem !important;
+}
+#createSubFormArea .spinner-btn {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  border: 1.5px solid rgba(99,102,241,0.3) !important;
+  background: rgba(99,102,241,0.07) !important;
+  color: #6366f1 !important;
+  font-size: 1.1rem !important;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.2s !important;
+}
+#createSubFormArea .spinner-btn:hover {
+  background: rgba(99,102,241,0.18) !important;
+  border-color: #6366f1 !important;
+  transform: scale(1.1);
+}
+#createSubFormArea .spinner-input {
+  width: 64px !important;
+  text-align: center;
+  font-weight: 800 !important;
+  font-size: 1.1rem !important;
+  color: #6366f1 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Quick chips — light mode clean */
+html:not([data-theme="dark"]) .quick-chip {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #475569 !important;
+}
+html:not([data-theme="dark"]) .quick-chip:hover {
+  border-color: #6366f1 !important;
+  background: rgba(99,102,241,0.07) !important;
+  color: #4f46e5 !important;
+}
+html:not([data-theme="dark"]) .quick-chip.active {
+  background: linear-gradient(135deg, #6366f1, #06b6d4) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+}
+
+/* Submit button — glow gradient */
+#btnSubmitCreateItinerary {
+  background: linear-gradient(135deg, #6366f1, #06b6d4) !important;
+  border: none !important;
+  box-shadow: 0 6px 20px rgba(99,102,241,0.3) !important;
+  transition: all 0.25s ease !important;
+}
+#btnSubmitCreateItinerary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 28px rgba(99,102,241,0.45) !important;
+  filter: brightness(1.06);
+}
+#btnSubmitCreateItinerary:active {
+  transform: translateY(0) !important;
 }

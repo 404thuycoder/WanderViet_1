@@ -62,16 +62,26 @@ const PlannerReview = require('../models/PlannerReview'); // ⭐ Đánh giá tr�
 // Lên lịch trình
 router.post('/generate', optionalAuth, async (req, res) => {
   try {
-    const { destination, days, budget, accommodation, pace, transport, interests, additionalInfo, companion, tripDate, vibe, departureTime, sessions } = req.body;
+    const { destination, days, budget, accommodation, pace, transport, interests, additionalInfo, companion, tripDate, vibe, departureTime, sessions, isShortTrip, durationHours, history } = req.body;
 
     if (!destination || !days) {
       return res.status(400).json({ success: false, message: 'Vui lòng cung cấp điểm đến và số ngày.' });
+    }
+
+    // Build chat context if history is provided
+    let chatContext = "";
+    if (history && Array.isArray(history) && history.length > 0) {
+      chatContext = "\n=== NỘI DUNG THẢO LUẬN VỚI TRỢ LÝ AI (ƯU TIÊN TUÂN THỦ CÁC CHI TIẾT NÀY) ===\n" +
+        history.map(m => `- ${m.role === 'user' ? 'Người dùng' : 'Trợ lý AI'}: ${m.content}`).join('\n');
     }
 
     // Pre-process: combine interests (chips) and additionalInfo (text)
     let combinedInterests = Array.isArray(interests) ? interests.join(', ') : (interests || '');
     if (additionalInfo) {
       combinedInterests += (combinedInterests ? '. ' : '') + additionalInfo;
+    }
+    if (chatContext) {
+      combinedInterests += (combinedInterests ? '\n' : '') + chatContext;
     }
     const interestsStr = combinedInterests;
     const interestsLower = interestsStr.toLowerCase();
@@ -215,25 +225,44 @@ QUAN TRỌNG: Khi lập lịch cho Hà Nội, BẮT BUỘC sử dụng ĐÚNG T�
       }
     }
 
+    let shortTripRules = "";
+    if (isShortTrip) {
+      const startParts = (departureTime || '08:00').split(':');
+      let startHour = parseInt(startParts[0]) || 8;
+      let startMin = parseInt(startParts[1]) || 0;
+      let endHour = startHour + (parseInt(durationHours) || 6);
+      if (endHour >= 24) endHour = endHour % 24;
+      const pad = (n) => String(n).padStart(2, '0');
+      const formattedEndTime = `${pad(endHour)}:${pad(startMin)}`;
+
+      shortTripRules = `
+=== QUY TẮC BẮT BUỘC CHO CHUYẾN ĐI NGẮN TRONG NGÀY (KHÔNG QUA ĐÊM) ===
+1. Giới hạn thời gian: Các hoạt động chỉ được diễn ra trong vòng đúng ${durationHours || 6} tiếng, bắt đầu từ ${departureTime || '08:00'} và kết thúc trước ${formattedEndTime}. Ví dụ: Nếu bắt đầu lúc 08:00 thì kết thúc lúc 14:00. Các mốc "time" của hoạt động bắt buộc phải nằm trong khoảng này.
+2. Mật độ hoạt động: Vì đi trong ngày rất ngắn, chỉ sắp xếp 2 đến 4 hoạt động chính (ví dụ: ăn trưa, cafe chill, tham quan 1-2 địa danh gần nhau). Tuyệt đối không nhồi nhét.
+3. Không qua đêm: Tuyệt đối KHÔNG đề xuất khách sạn, homestay, check-in nhận phòng hay ngủ qua đêm nào trong các hoạt động (activities) của ngày này.
+4. Cấu trúc JSON "itinerary" chỉ chứa đúng 1 ngày duy nhất (trường "day" có giá trị là 1).
+`;
+    }
+
     const prompt = `Bạn là SIÊU KIẾN TRÚC SƯ LỊCH TRÌNH của WanderViet AI. Nhiệm vụ của bạn là biến một chuyến đi thành một TÁC PHẨM NGHỆ THUẬT.
 
 === THÔNG TIN CHUYẾN ĐI ===
 - Điểm đến: ${destination}
 ${weatherInfo ? `- THỜI TIẾT THỰC TẾ NGAY LÚC NÀY: ${weatherInfo} (HÃY sử dụng thông tin thời tiết này để miêu tả các hoạt động cho chân thực hơn)` : ''}
-- Số ngày: ${numDays} ngày
-- Giờ khởi hành mỗi ngày: ${departureTime || '08:00'} (Bắt đầu các hoạt động từ khung giờ này)
+${isShortTrip ? `- Kiểu chuyến đi: Chuyến đi ngắn trong ngày (KHÔNG QUA ĐÊM)\n- Thời lượng: ${durationHours || 6} tiếng\n- Giờ khởi hành: ${departureTime || '08:00'}` : `- Số ngày: ${numDays} ngày\n- Giờ khởi hành mỗi ngày: ${departureTime || '08:00'} (Bắt đầu các hoạt động từ khung giờ này)`}
 - Buổi hoạt động mong muốn: ${Array.isArray(sessions) ? sessions.join(', ') : (sessions || 'Sáng, Chiều, Tối')}
 - Ngân sách tổng cộng: ${budget}
-- Loại lưu trú: ${accommodation || 'Khách sạn/Homestay'}
+- Loại lưu trú: ${isShortTrip ? 'Không cần qua đêm' : (accommodation || 'Khách sạn/Homestay')}
 - Phương tiện: ${transport || 'Tự do'}
 - Đi cùng: ${companion || 'Bạn bè'}
-- Nhịp độ: ${pace || 'Vừa phải'}
+- Nhịp độ: ${isShortTrip ? 'Thư thả' : (pace || 'Vừa phải')}
 - Không khí/Vibe mong muốn: ${vibe || 'Tự do/Khám phá'}
 - Yêu cầu đặc biệt: "${interestsStr || 'Không có'}"${userContext}
 ${destinationLocationContext}
+${shortTripRules}
 
 === QUY TẮC "THẾ HỆ 2.0" (PHẢI TUÂN THỦ TỐI THƯỢNG) ===
-1. MẬT ĐỘ HOẠT ĐỘNG (DENSITY): Mỗi ngày BẮT BUỘC phải có ít nhất 5-6 hoạt động bao gồm: Ăn sáng, Tham quan sáng, Ăn trưa, Nghỉ ngơi/Cafe chiều, Tham quan chiều, và Ăn tối/Chơi tối. TUYỆT ĐỐI không được để trống buổi chiều hoặc tối.
+1. MẬT ĐỘ HOẠT ĐỘNG (DENSITY): ${isShortTrip ? 'Mỗi ngày chỉ sắp xếp 2-4 hoạt động chính.' : 'Mỗi ngày BẮT BUỘC phải có ít nhất 5-6 hoạt động bao gồm: Ăn sáng, Tham quan sáng, Ăn trưa, Nghỉ ngơi/Cafe chiều, Tham quan chiều, và Ăn tối/Chơi tối. TUYỆT ĐỐI không được để trống buổi chiều hoặc tối.'}
 2. NGÔN NGỮ GIÀU HÌNH ẢNH (VISUAL-READY): Các mô tả hoạt động (task) phải đầy cảm hứng, gợi hình. Thay vì ghi "Ăn sáng", hãy ghi "Thưởng thức bún bò chuẩn vị trong làn sương sớm Đà Lạt".
 3. TỐI ƯU HÓA "GIỜ VÀNG" (GOLDEN HOURS): Tìm kiếm thời điểm ánh sáng đẹp nhất cho từng địa điểm để khách có thể chụp ảnh đẹp nhất.
 4. ĐIỂM NHẤN CẢM XÚC: Mỗi ngày phải có 1 "Điểm chạm cảm xúc" (Highlight) - một trải nghiệm đáng nhớ nhất.
@@ -334,6 +363,12 @@ Quy tắc tuyệt đối:
     let aiPlanJson;
     try {
       aiPlanJson = JSON.parse(aiPlanStr);
+      // Enrich planJson with short trip metadata
+      if (isShortTrip) {
+        aiPlanJson.isShortTrip = true;
+        aiPlanJson.durationHours = Number(durationHours) || 6;
+        aiPlanJson.departureTime = departureTime || '08:00';
+      }
     } catch (parseErr) {
       console.error('Lỗi Parse JSON:', parseErr.message, 'Data:', aiPlanStr);
       return res.status(500).json({ success: false, message: 'Lỗi biên dịch dữ liệu AI. Vui lòng thử lại.' });
@@ -549,16 +584,17 @@ CONVERSATION FLOW & ENGAGEMENT:
 RESPONSE STRUCTURE:
 You must respond with valid JSON matching this schema:
 {
-  "answer": "Your detailed response in Vietnamese. Always end with a question asking for the next missing preference unless confirmed.",
+  "answer": "Your detailed response in Vietnamese. Always end with a question asking for the next missing preference unless confirmed. Keep it concise to avoid truncated text.",
   "suggestions": ["Suggestion 1", "Suggestion 2"],
   "finalSelection": null,
-  "suggestedDays": 3,
+  "suggestedDays": 3, // For normal trips, this is number of days. If isShortTerm is true, this is the number of hours (integer, e.g. 4, 6, 8, default 6).
   "suggestedBudget": "5.000.000 VNĐ",
   "suggestedDeparture": "Hà Nội",
   "suggestedStyle": "Khám phá",
   "suggestedCompanion": "Bạn bè",
-  "suggestedNeedsHotel": true, // Default to true. Set to false ONLY if user explicitly states they don't need accommodation/hotel (e.g. "không cần khách sạn", "không ở lại", "đi trong ngày", "đã có chỗ ở", "tự túc chỗ ở")
-  "isShortTerm": false
+  "suggestedNeedsHotel": true, // Set to false if user explicitly states they don't need accommodation/hotel, OR if the trip is short-term / in-day / a few hours (isShortTerm is true).
+  "isShortTerm": false, // Set to true if the user wants a short trip of a few hours/one-day without overnight stay (e.g., "đi 5 tiếng", "trong ngày", "không qua đêm").
+  "suggestedStartTime": "08:00" // Start time string (format "HH:MM", e.g. "14:30") if isShortTerm is true, extracted from what user mentioned (default "08:00").
 }
 
 CONCRETE DIALOGUE EXAMPLES (FEW-SHOT):

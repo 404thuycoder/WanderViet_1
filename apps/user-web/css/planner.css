@@ -4908,18 +4908,59 @@ html:not([data-theme="dark"]) .btn-back-step:hover,
 
 /* --- A. AI Assistant & Discovery Chat Console --- */
 .discovery-console {
-  background: rgba(15, 23, 42, 0.45) !important;
-  backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9) !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06) !important;
   border-radius: 1.5rem !important;
   transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .discovery-console {
+  background: rgba(15, 23, 42, 0.65) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
 }
 
 .console-header {
+  background: linear-gradient(to right, #eff6ff, #f1f5f9) !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+  padding: 1.25rem 1.5rem !important;
+}
+
+[data-theme="dark"] .console-header {
   background: rgba(0, 0, 0, 0.3) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-  padding: 1.25rem 1.5rem !important;
+}
+
+.console-header h3 {
+  margin: 0;
+  font-family: 'Outfit', sans-serif !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  background: linear-gradient(135deg, #1e3a8a, #2563eb) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+[data-theme="dark"] .console-header h3 {
+  background: linear-gradient(135deg, #60a5fa, #a5f3fc) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.console-header p {
+  margin: 0.35rem 0 0 !important;
+  font-size: 0.8rem !important;
+  color: #64748b !important;
+  font-weight: 500 !important;
+}
+
+[data-theme="dark"] .console-header p {
+  color: #94a3b8 !important;
 }
 
 .console-status {
@@ -4927,30 +4968,98 @@ html:not([data-theme="dark"]) .btn-back-step:hover,
   font-weight: 800 !important;
   letter-spacing: 1.5px !important;
   text-shadow: 0 0 10px rgba(16, 185, 129, 0.3) !important;
+  margin-bottom: 0.25rem;
+  font-size: 0.72rem !important;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
 .console-messages {
-  background: rgba(10, 18, 30, 0.2) !important;
+  background: rgba(255, 255, 255, 0.5) !important;
   scrollbar-width: thin;
   padding: 1.5rem !important;
   gap: 1.25rem !important;
 }
 
+[data-theme="dark"] .console-messages {
+  background: rgba(10, 18, 30, 0.2) !important;
+}
+
+/* Custom styles for chat bubbles inside console messages */
+.console-messages .chat-bubble.ai {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 1.25rem 1.25rem 1.25rem 0.25rem !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+  padding: 1.15rem 1.25rem !important;
+}
+
+[data-theme="dark"] .console-messages .chat-bubble.ai {
+  background: rgba(30, 41, 59, 0.7) !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+.console-messages .chat-bubble.ai .chat-header {
+  border-bottom: 1px solid #cbd5e1 !important;
+}
+
+[data-theme="dark"] .console-messages .chat-bubble.ai .chat-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.console-messages .chat-bubble.ai .chat-name {
+  color: #2563eb !important;
+}
+
+[data-theme="dark"] .console-messages .chat-bubble.ai .chat-name {
+  color: #60a5fa !important;
+}
+
+.console-messages .chat-bubble.user {
+  background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 1.25rem 1.25rem 0.25rem 1.25rem !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important;
+  padding: 1rem 1.25rem !important;
+  align-self: flex-end !important;
+  margin-left: auto !important;
+}
+
 .console-input-area {
-  background: rgba(0, 0, 0, 0.3) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+  background: linear-gradient(to top, #f8fafc, #ffffff) !important;
+  border-top: 1px solid #cbd5e1 !important;
   padding: 1.25rem !important;
 }
 
+[data-theme="dark"] .console-input-area {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
 .console-form {
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
   border-radius: 1.25rem !important;
   padding: 0.5rem !important;
   transition: all 0.25s ease;
 }
 
+[data-theme="dark"] .console-form {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.08) !important;
+}
+
 .console-form:focus-within {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+[data-theme="dark"] .console-form:focus-within {
   border-color: #60a5fa !important;
   box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
   background: rgba(255, 255, 255, 0.05) !important;
@@ -4960,6 +5069,11 @@ html:not([data-theme="dark"]) .btn-back-step:hover,
   font-family: inherit;
   font-size: 0.9rem !important;
   padding: 0.6rem 0.875rem !important;
+  color: #0f172a !important;
+}
+
+[data-theme="dark"] .console-form input {
+  color: #ffffff !important;
 }
 
 .console-form button {
@@ -4968,11 +5082,29 @@ html:not([data-theme="dark"]) .btn-back-step:hover,
   transition: all 0.2s ease !important;
   border-radius: 0.85rem !important;
   padding: 0.6rem 1.5rem !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border: none !important;
 }
 
 .console-form button:hover {
   transform: translateY(-1px) scale(1.02);
   box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Premium Dark Theme Overrides for suggestion chips */
+[data-theme="dark"] .chat-chip-premium {
+  background: rgba(30, 41, 59, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+[data-theme="dark"] .chat-chip-premium:hover {
+  background: rgba(51, 65, 85, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* --- B. Step Smart Wizard (Interactive Q&A) --- */
@@ -7290,12 +7422,462 @@ html:not([data-theme="dark"]) .quick-chip.active {
 }
 
 /* Region Destinations Search Bar Premium Style */
-#regionDestSearchInput:focus {
-  border-color: #3b82f6 !important;
-  background: rgba(0, 0, 0, 0.35) !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
+.planner-search-input {
+  width: 100%;
+  padding: 0.75rem 2.4rem 0.75rem 2.4rem;
+  border-radius: var(--radius-xl, 24px);
+  border: 1.5px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
 }
 
+.planner-search-input:hover {
+  border-color: rgba(var(--primary-rgb), 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.planner-search-input:focus {
+  border-color: var(--primary) !important;
+  background: var(--bg-elevated) !important;
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15), 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Specific theme styling fallback adjustments */
+html:not([data-theme="dark"]) .planner-search-input {
+  background: #ffffff;
+  border-color: rgba(99, 102, 241, 0.15);
+}
+
+[data-theme="dark"] .planner-search-input {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+[data-theme="dark"] .planner-search-input:focus {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Icon Wrappers inside Search Input */
+.planner-search-icon-wrapper {
+  position: absolute;
+  left: 0.9rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: color 0.25s ease;
+}
+
+.planner-search-input:focus ~ .planner-search-icon-wrapper {
+  color: var(--primary);
+}
+
+.planner-search-clear-btn {
+  position: absolute;
+  right: 0.9rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.planner-search-clear-btn:hover {
+  background: rgba(var(--primary-rgb), 0.1);
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+/* Suggestions Chips Style */
 .region-suggestion-chip {
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(var(--primary-rgb), 0.04);
+  color: var(--text);
+  cursor: pointer;
   user-select: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+}
+
+html:not([data-theme="dark"]) .region-suggestion-chip {
+  background: rgba(99, 102, 241, 0.05);
+  border-color: rgba(99, 102, 241, 0.1);
+  color: #475569;
+}
+
+[data-theme="dark"] .region-suggestion-chip {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.region-suggestion-chip:hover {
+  background: rgba(var(--primary-rgb), 0.12) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(var(--primary-rgb), 0.15);
+}
+
+/* =====================================================================
+   ✨ PREMIUM SCHEDULE CREATION UI REDESIGN
+   ===================================================================== */
+
+/* --- 1. Segmented Control --- */
+.segmented-control {
+  display: flex;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 14px;
+  padding: 4px;
+  border: 1px solid var(--border, #cbd5e1);
+  margin-bottom: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] .segmented-control {
+  background: rgba(10, 18, 30, 0.4);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.segmented-btn {
+  flex: 1;
+  text-align: center;
+  padding: 0.55rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-muted, #64748b);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: inherit;
+}
+
+[data-theme="dark"] .segmented-btn {
+  color: #94a3b8;
+}
+
+.segmented-btn.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  font-weight: 700;
+}
+
+[data-theme="dark"] .segmented-btn.active {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  box-shadow: 0 4px 14px rgba(96, 165, 250, 0.25);
+}
+
+.segmented-btn:hover:not(.active) {
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .segmented-btn:hover:not(.active) {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* --- 2. Upgraded Chat Bubbles --- */
+.console-messages .chat-bubble {
+  border-radius: 20px !important;
+  padding: 1.15rem 1.35rem !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.03) !important;
+  font-size: 0.92rem !important;
+  line-height: 1.6 !important;
+  margin-bottom: 1rem !important;
+  position: relative;
+  max-width: 85%;
+  transition: all 0.3s ease;
+}
+
+.console-messages .chat-bubble.ai {
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  border-bottom-left-radius: 4px !important;
+  align-self: flex-start !important;
+  padding-left: 2.75rem !important; /* Space for avatar icon */
+}
+
+/* Pseudo element for AI Assistant Avatar */
+.console-messages .chat-bubble.ai::before {
+  content: "🤖";
+  position: absolute;
+  left: 0.85rem;
+  top: 1.1rem;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="dark"] .console-messages .chat-bubble.ai {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(15, 23, 42, 0.8)) !important;
+  color: #f1f5f9 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+}
+
+.console-messages .chat-bubble.user {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-bottom-right-radius: 4px !important;
+  align-self: flex-end !important;
+  margin-left: auto !important;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.2) !important;
+  padding-right: 2.75rem !important; /* Space for user avatar */
+}
+
+.console-messages .chat-bubble.user::after {
+  content: "👤";
+  position: absolute;
+  right: 0.85rem;
+  top: 1rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="dark"] .console-messages .chat-bubble.user {
+  background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25) !important;
+}
+
+/* --- 3. Chat Console Glassmorphism --- */
+.discovery-console {
+  background: rgba(255, 255, 255, 0.65) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.04) !important;
+  border-radius: 1.5rem !important;
+  transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .discovery-console {
+  background: rgba(12, 22, 40, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4) !important;
+}
+
+.console-header {
+  background: rgba(248, 250, 252, 0.5) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+  padding: 1.35rem 1.6rem !important;
+}
+
+[data-theme="dark"] .console-header {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.console-status {
+  font-size: 0.72rem !important;
+  font-weight: 800 !important;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981 !important;
+  padding: 4px 10px;
+  border-radius: 20px;
+  width: fit-content;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-dot {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  margin-right: 0.25rem;
+}
+
+/* --- 4. Premium Suggestion Chips & Selection Cards --- */
+.quick-chip {
+  padding: 0.6rem 1.15rem !important;
+  border-radius: 20px !important;
+  border: 1px solid var(--border, #cbd5e1) !important;
+  background: #ffffff !important;
+  color: var(--text, #1e293b) !important;
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  display: flex !important;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="dark"] .quick-chip {
+  background: rgba(30, 41, 59, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.quick-chip:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.05) !important;
+  color: #3b82f6 !important;
+  box-shadow: 0 6px 15px rgba(59, 130, 246, 0.1) !important;
+}
+
+[data-theme="dark"] .quick-chip:hover {
+  border-color: #60a5fa !important;
+  background: rgba(96, 165, 250, 0.08) !important;
+  color: #60a5fa !important;
+  box-shadow: 0 6px 15px rgba(96, 165, 250, 0.15) !important;
+}
+
+.quick-chip.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3) !important;
+  font-weight: 700 !important;
+}
+
+[data-theme="dark"] .quick-chip.active {
+  background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35) !important;
+}
+
+/* Custom styled inputs focus states */
+.planner-input {
+  border: 1.5px solid var(--border, #cbd5e1);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  background: #ffffff;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="dark"] .planner-input {
+  background: rgba(15, 23, 42, 0.4);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.planner-input:focus {
+  outline: none;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+[data-theme="dark"] .planner-input:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
+}
+
+/* --- 5. Custom Spinner Controls --- */
+.spinner-btn {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 50% !important;
+  border: 1px solid var(--border, #cbd5e1) !important;
+  background: #ffffff !important;
+  color: var(--text) !important;
+  font-size: 1.3rem !important;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="dark"] .spinner-btn {
+  background: rgba(30, 41, 59, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.spinner-btn:hover {
+  background: #f1f5f9 !important;
+  border-color: #3b82f6 !important;
+  color: #3b82f6 !important;
+  transform: translateY(-1px) scale(1.05);
+}
+
+[data-theme="dark"] .spinner-btn:hover {
+  background: rgba(51, 65, 85, 0.6) !important;
+  border-color: #60a5fa !important;
+  color: #60a5fa !important;
+}
+
+.spinner-btn:active {
+  transform: scale(0.95);
+}
+
+/* --- 6. Glowing Premium Action Button --- */
+#btnSubmitCreateItinerary {
+  width: 100%;
+  padding: 1rem 1.5rem !important;
+  border-radius: 14px !important;
+  font-family: inherit;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  color: #ffffff !important;
+  border: none !important;
+  background: linear-gradient(135deg, #4f46e5, #3b82f6, #06b6d4) !important;
+  background-size: 200% auto !important;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3) !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  animation: gradientShimmer 4s ease infinite;
+}
+
+#btnSubmitCreateItinerary:hover {
+  background-position: right center !important;
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.45), 0 0 15px rgba(6, 182, 212, 0.3) !important;
+}
+
+#btnSubmitCreateItinerary:active {
+  transform: translateY(0) scale(0.99);
+}
+
+#btnSubmitCreateItinerary svg {
+  transition: transform 0.3s ease;
+}
+
+#btnSubmitCreateItinerary:hover svg {
+  transform: translateX(4px) translateY(-2px);
+}
+
+@keyframes gradientShimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }

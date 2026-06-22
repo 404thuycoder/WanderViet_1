@@ -2026,11 +2026,21 @@
             
             <!-- THANH TÌM KIẾM & GỢI Ý TOÀN CẦU -->
             <div class="region-search-container" style="margin: 0 0 1.25rem 0; display: flex; flex-direction: column; gap: 0.6rem;">
-              <div class="planner-region-label" style="margin-bottom: 0.25rem;">🔍 Tìm kiếm điểm đến nhanh</div>
+              <div class="planner-region-label" style="margin-bottom: 0.25rem;">Tìm kiếm điểm đến nhanh</div>
               <div style="position: relative; display: flex; align-items: center; width: 100%;">
-                <input type="text" id="regionDestSearchInput" oninput="filterRegionDestinations()" placeholder="Tìm kiếm địa điểm (VD: Hà Nội, Sapa, Tràng An, Cầu Vàng...)" style="width: 100%; padding: 0.7rem 1.2rem 0.7rem 2.4rem; border-radius: 24px; border: 1.5px solid var(--border); background: rgba(0, 0, 0, 0.25); color: var(--text); font-size: 0.88rem; outline: none; transition: all 0.2s;" />
-                <span style="position: absolute; left: 0.9rem; color: var(--text-muted); font-size: 0.95rem; pointer-events: none; line-height: 1;">🔍</span>
-                <button type="button" onclick="clearRegionDestSearch()" id="btnClearRegionDestSearch" style="position: absolute; right: 0.9rem; background: none; border: none; color: var(--text-muted); font-size: 0.85rem; cursor: pointer; display: none; padding: 0;">✕</button>
+                <input type="text" id="regionDestSearchInput" oninput="filterRegionDestinations()" placeholder="Tìm kiếm địa điểm (VD: Hà Nội, Sapa, Tràng An, Cầu Vàng...)" class="planner-search-input" />
+                <span class="planner-search-icon-wrapper">
+                  <svg class="planner-search-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                  </svg>
+                </span>
+                <button type="button" onclick="clearRegionDestSearch()" id="btnClearRegionDestSearch" class="planner-search-clear-btn" style="display: none;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
               </div>
               <!-- CHIPS GỢI Ý PHỔ BIẾN -->
               <div id="regionSearchSuggestions" style="display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center;">
@@ -2588,51 +2598,35 @@
           <!-- STEP TẠO LỊCH TRÌNH THỦ CÔNG (TẠO LỊCH) -->
           <div id="stepCreate" class="form-step-content" style="display:none; flex-direction:column; gap:1.25rem;">
             
-            <!-- Sub-selector for Chatbot vs Form inside Tạo lịch tab -->
-            <div class="create-sub-selector" style="display: flex; background: rgba(0, 0, 0, 0.2); border-radius: 12px; padding: 4px; border: 1px solid var(--border);">
-              <button type="button" id="btnCreateSubChat" class="mode-toggle-btn active" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 0.5rem; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;" onclick="switchCreateSubMode('chat')">
-                <span>💬</span> Trò chuyện AI
-              </button>
-              <button type="button" id="btnCreateSubForm" class="mode-toggle-btn" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.6rem 0.5rem; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;" onclick="switchCreateSubMode('form')">
-                <span>⚡</span> Tạo lịch nhanh
-              </button>
-            </div>
+            <!-- Unified Quick Form & AI Assistant Container -->
+            <div id="createSubFormArea" style="display: block; width: 100%;">
 
-            <!-- SUB-MODE 1: CHATBOT CONTAINER -->
-            <div id="createSubChatArea" style="display: block;">
-              <div id="stepDiscovery" class="planner-path-discovery" style="display:block;">
+              <!-- AI ASSISTANT CHAT CONSOLE -->
+              <div id="stepDiscovery" class="planner-path-discovery" style="display:block; margin-bottom: 1.5rem;">
                 <div class="discovery-console">
                   <div class="console-header">
-                    <div class="console-status"><span class="status-dot"></span> AI Đang Trực Tuyến</div>
+                    <div class="console-status"><span class="status-dot"></span> AI ĐANG TRỰC TUYẾN</div>
                     <h3>WanderAI Assistant</h3>
-                    <p>Trò chuyện để tìm cảm hứng điểm đến</p>
+                    <p>Tôi ở đây để gợi ý điểm đến và giúp bạn tự động điền form tạo lịch trình nhanh chóng.</p>
                   </div>
                   
-                  <div id="discoveryMessages" class="console-messages"></div>
+                  <div id="discoveryMessages" class="console-messages" style="max-height: 260px; overflow-y: auto;"></div>
                   
                   <div class="console-input-area">
                     <div id="discoveryChips" class="console-chips"></div>
                     <form id="discoveryForm" class="console-form">
-                      <input type="text" id="discoveryInput" placeholder="VD: 5 triệu đi đâu mát mẻ?" autocomplete="off">
+                      <input type="text" id="discoveryInput" placeholder="VD: Gợi ý điểm đi từ TP.HCM tầm 5 triệu" autocomplete="off">
                       <button type="submit">Hỏi AI</button>
                     </form>
                   </div>
 
-                  <div id="discoveryActionBox" class="console-action-box" style="display:none;">
-                    <p>Bạn đã chọn được điểm đến?</p>
-                    <button id="btnAcceptDiscovery" class="btn-confirm-discovery">
-                      ✅ Đồng ý điểm đến này
+                  <div id="discoveryActionBox" class="console-action-box" style="display:none; padding: 1.25rem; background: rgba(59,130,246,0.1); border-top: 1px solid rgba(255,255,255,0.06); flex-direction: column; align-items: center; gap: 0.5rem; text-align: center; border-radius: 0 0 1.5rem 1.5rem;">
+                    <p style="margin: 0; font-weight: 600; color: var(--text);">📍 Trợ lý AI đã điền đủ thông tin cho chuyến đi: <strong id="discoveryActionDest" style="color: var(--accent);">Đà Lạt</strong></p>
+                    <button type="button" id="btnAcceptDiscovery" class="planner-btn main-action" style="padding: 0.6rem 1.25rem; font-size: 0.85rem; width: auto; margin-top: 0.25rem;">
+                      🚀 Lập lịch trình ngay với AI!
                     </button>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <!-- SUB-MODE 2: QUICK FORM CONTAINER -->
-            <div id="createSubFormArea" style="display: none;">
-              <div class="step2-header" style="margin-bottom: 1.25rem;">
-                <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--text);">Lập lịch trình nhanh</h3>
-                <p style="margin: 0.25rem 0 0; font-size: 0.8rem; color: var(--text-muted);">Nhập điểm đi, điểm đến và phong cách để AI thiết lập lịch trình nhanh chóng</p>
               </div>
 
               <form id="aiPlannerFormCreate" class="structured-form" onsubmit="event.preventDefault();">
@@ -2640,11 +2634,11 @@
                 <div class="planner-field-group" style="margin-bottom: 1.25rem;">
                   <label class="planner-field-label">📍 Vị trí khởi hành</label>
                   
-                  <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                    <button type="button" id="btnQuickCurrentLocation" onclick="getQuickDepartureGPS()" style="flex: 1; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid rgba(59,130,246,0.3); background: rgba(59,130,246,0.1); color: #60a5fa; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                  <div class="segmented-control">
+                    <button type="button" id="btnQuickCurrentLocation" class="segmented-btn active" onclick="getQuickDepartureGPS()">
                       📍 Vị trí hiện tại
                     </button>
-                    <button type="button" id="btnQuickManualLocation" onclick="toggleQuickManualLocation()" style="flex: 1; padding: 0.5rem 0.75rem; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                    <button type="button" id="btnQuickManualLocation" class="segmented-btn" onclick="toggleQuickManualLocation()">
                       ⌨️ Nhập thủ công
                     </button>
                   </div>
@@ -2673,27 +2667,47 @@
                   <div id="createDestinationSuggestions" class="autocomplete-suggestions-list" style="display: none;"></div>
                 </div>
 
-                <!-- Ngân sách dự kiến & nút Dự đoán ngân sách -->
+                <!-- Ngân sách dự kiến -->
                 <div class="planner-field-group" style="margin-bottom: 1.25rem;">
                   <label class="planner-field-label">💵 Ngân sách dự kiến (tối đa)</label>
                   <input type="text" id="createBudgetInput" class="planner-input" placeholder="VD: 5.000.000 VNĐ" oninput="formatCreateBudget(this)">
-                  <div style="margin-top: 0.4rem; display: flex; align-items: center; gap: 0.4rem;">
-                    <input type="checkbox" id="quickExcludeHotel" onchange="predictQuickBudget(true)" style="cursor: pointer; width: 15px; height: 15px; margin: 0; accent-color: var(--primary);">
-                    <label for="quickExcludeHotel" style="font-size: 0.78rem; color: var(--text-muted); cursor: pointer; user-select: none;">🏨 Không cần phòng nghỉ / khách sạn (Ví dụ: đi trong ngày, tự túc chỗ ở)</label>
-                  </div>
-                  <button type="button" id="btnPredictBudget" onclick="predictQuickBudget()" class="btn-predict-budget" style="margin-top: 0.5rem; width: 100%;">
-                    🔮 Dự đoán ngân sách đề xuất
-                  </button>
-                  <div id="quickBudgetPredictionResult" class="budget-prediction-result" style="display: none; margin-top: 0.5rem;"></div>
                 </div>
 
-                <!-- Thời gian di chuyển (Duration spinner) -->
+                <!-- Thời gian di chuyển -->
                 <div class="planner-field-group" style="margin-bottom: 1.25rem;">
-                  <label class="planner-field-label">⏱️ Thời gian di chuyển (Số ngày)</label>
-                  <div class="duration-spinner-container" style="display: flex; align-items: center; gap: 0.5rem;">
+                  <label class="planner-field-label">⏱️ Thời gian di chuyển</label>
+                  
+                  <!-- Toggle chọn kiểu chuyến đi -->
+                  <div class="segmented-control">
+                    <button type="button" id="btnDurationTypeDays" class="segmented-btn active" onclick="switchDurationType('days')">
+                      📅 Theo ngày
+                    </button>
+                    <button type="button" id="btnDurationTypeHours" class="segmented-btn" onclick="switchDurationType('hours')">
+                      ⚡ Vài tiếng (Trong ngày)
+                    </button>
+                  </div>
+
+                  <!-- Container Theo ngày -->
+                  <div id="durationDaysContainer" style="display: flex; align-items: center; gap: 0.5rem;">
                     <button type="button" class="spinner-btn" onclick="adjustQuickDuration(-1)" style="width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">−</button>
                     <input type="number" id="createDurationInput" class="planner-input spinner-input" value="3" min="1" max="14" style="text-align: center; font-weight: 700; width: 70px;" readonly>
                     <button type="button" class="spinner-btn" onclick="adjustQuickDuration(1)" style="width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">+</button>
+                    <span style="font-size: 0.85rem; color: var(--text-muted); margin-left: 0.25rem;">ngày</span>
+                  </div>
+
+                  <!-- Container Chuyến đi ngắn vài tiếng -->
+                  <div id="durationHoursContainer" style="display: none; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                      <button type="button" class="spinner-btn" onclick="adjustQuickHours(-2)" style="width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">−</button>
+                      <input type="number" id="createHoursInput" class="planner-input spinner-input" value="6" min="2" max="18" style="text-align: center; font-weight: 700; width: 70px;" readonly>
+                      <button type="button" class="spinner-btn" onclick="adjustQuickHours(2)" style="width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border); background: var(--bg-card); color: var(--text); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">+</button>
+                      <span style="font-size: 0.85rem; color: var(--text-muted); margin-left: 0.25rem;">tiếng (không qua đêm)</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem;">
+                      <label style="font-size: 0.8rem; color: var(--text-muted); min-width: 90px;">🕒 Giờ bắt đầu:</label>
+                      <input type="time" id="createStartTimeInput" class="planner-input" value="08:00" style="width: 120px; font-weight: 600;">
+                    </div>
                   </div>
                 </div>
 
@@ -2721,7 +2735,7 @@
                 </div>
 
                 <!-- NÚT TẠO LỊCH TRÌNH -->
-                <button type="button" id="btnSubmitCreateItinerary" class="planner-btn main-action" onclick="submitCreateItinerary()" style="margin-top: 1rem;">
+                <button type="button" id="btnSubmitCreateItinerary" onclick="submitCreateItinerary()">
                   <span>🚀 Lên lịch trình nhanh ngay!</span>
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
@@ -3319,27 +3333,6 @@
         const chip = document.createElement('span');
         chip.className = 'region-suggestion-chip';
         chip.textContent = name;
-        chip.style.cssText = `
-          font-size: 0.72rem;
-          padding: 3px 10px;
-          border-radius: 12px;
-          border: 1px solid var(--border);
-          background: rgba(255,255,255,0.04);
-          color: var(--text);
-          cursor: pointer;
-          transition: all 0.2s ease;
-        `;
-        
-        chip.onmouseover = () => {
-          chip.style.background = 'rgba(59,130,246,0.15)';
-          chip.style.borderColor = 'rgba(59,130,246,0.4)';
-          chip.style.color = '#60a5fa';
-        };
-        chip.onmouseout = () => {
-          chip.style.background = 'rgba(255,255,255,0.04)';
-          chip.style.borderColor = 'var(--border)';
-          chip.style.color = 'var(--text)';
-        };
         
         chip.onclick = () => {
           const searchInput = document.getElementById('regionDestSearchInput');

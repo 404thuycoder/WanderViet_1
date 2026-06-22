@@ -1856,6 +1856,7 @@ const initPlanner = function () {
   const discoveryInput = document.getElementById('discoveryInput');
   const discoveryMessages = document.getElementById('discoveryMessages');
   let discoveryHistory = [];
+  window.discoveryHistory = discoveryHistory;
 
   function parseDiscoveryMarkdown(text) {
     return text
@@ -1939,13 +1940,8 @@ const initPlanner = function () {
             stepCreate.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }, 100);
         }
-        // Always sync the view based on active tab
-        const btnFormMode = document.getElementById('btnCreateSubForm');
-        if (btnFormMode && btnFormMode.classList.contains('active')) {
-          switchCreateSubMode('form');
-        } else {
-          switchCreateSubMode('chat');
-        }
+        // Initialize the unified chat & form creation view
+        switchCreateSubMode('chat');
       } else if (targetStepId === 'stepCompare') {
         // Compare Mode
         if (stepCompare) stepCompare.style.display = 'flex';
@@ -2063,6 +2059,12 @@ const initPlanner = function () {
         if (data.success) {
           addDiscoveryBubble(data.answer, 'ai');
           discoveryHistory.push({ role: 'user', content: val }, { role: 'assistant', content: data.answer });
+          window.discoveryHistory = discoveryHistory;
+
+          // Tự động điền form ở dưới theo thông tin AI phản hồi
+          if (typeof window.autoFillPlannerForm === 'function') {
+            window.autoFillPlannerForm(data);
+          }
 
           // Cập nhật chips theo stage của AI
           const matchedCats = [];
@@ -2106,8 +2108,13 @@ const initPlanner = function () {
             const actionBox = document.getElementById('discoveryActionBox');
             actionBox.style.display = 'flex';
             // Cập nhật text động theo điểm đến
-            const actionP = actionBox.querySelector('p');
-            if (actionP) actionP.textContent = `📍 Bạn đã chọn: ${data.finalSelection}`;
+            const actionDestEl = document.getElementById('discoveryActionDest');
+            if (actionDestEl) {
+              actionDestEl.textContent = data.finalSelection;
+            } else {
+              const actionP = actionBox.querySelector('p');
+              if (actionP) actionP.textContent = `📍 Trợ lý AI đã điền đủ thông tin cho chuyến đi: ${data.finalSelection}`;
+            }
             discoveryForm.dataset.final = data.finalSelection;
             discoveryForm.dataset.budget = data.suggestedBudget || '';
             discoveryForm.dataset.days = data.suggestedDays || 3;
@@ -2115,12 +2122,138 @@ const initPlanner = function () {
             discoveryForm.dataset.style = data.suggestedStyle || '';
             discoveryForm.dataset.companion = data.suggestedCompanion || '';
             discoveryForm.dataset.needsHotel = data.suggestedNeedsHotel !== undefined ? data.suggestedNeedsHotel : true;
+            discoveryForm.dataset.isShortTerm = data.isShortTerm !== undefined ? data.isShortTerm : false;
+            discoveryForm.dataset.suggestedStartTime = data.suggestedStartTime || '08:00';
             // Scroll xuống để thấy nút
             actionBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           }
         }
       } catch (err) { console.error(err); }
     });
+  }
+
+  // ── AUTOFILL PLANNER FORM FROM AI ASSISTANT ──
+  window.autoFillPlannerForm = function(data) {
+    if (!data) return;
+
+    // ── Điền sẵn Điểm đến ──
+    const destInput = document.getElementById('createDestinationInput');
+    if (destInput && data.finalSelection) {
+      if (destInput.value !== data.finalSelection) {
+        destInput.value = data.finalSelection;
+        destInput.dispatchEvent(new Event('input'));
+        highlightInput(destInput);
+      }
+    }
+
+    // ── Điền sẵn Ngân sách ──
+    const budgetInput = document.getElementById('createBudgetInput');
+    if (budgetInput && data.suggestedBudget) {
+      const budgetVal = data.suggestedBudget;
+      const rawNum = budgetVal.replace(/[^\d]/g, '');
+      let numericBudget = parseInt(rawNum) || 0;
+      const millionMatch = budgetVal.match(/(\d+(?:[.,]\d+)?)\s*triệu/i);
+      if (millionMatch) {
+        numericBudget = Math.round(parseFloat(millionMatch[1].replace(',', '.')) * 1_000_000);
+      }
+      const formattedVal = numericBudget > 0 ? numericBudget.toLocaleString('vi-VN') + ' VNĐ' : budgetVal;
+      if (budgetInput.value !== formattedVal) {
+        budgetInput.value = formattedVal;
+        highlightInput(budgetInput);
+      }
+    }
+
+    // ── Điền sẵn Thời gian & Kiểu chuyến đi (Theo ngày / Vài tiếng) ──
+    const isShortTerm = data.isShortTerm === true || data.suggestedNeedsHotel === false;
+    if (isShortTerm) {
+      // Chuyến đi ngắn vài tiếng
+      if (typeof window.switchDurationType === 'function') {
+        window.switchDurationType('hours');
+      }
+      const hoursInput = document.getElementById('createHoursInput');
+      if (hoursInput && data.suggestedDays) {
+        const hoursVal = Math.min(18, Math.max(2, parseInt(data.suggestedDays) || 6));
+        if (parseInt(hoursInput.value) !== hoursVal) {
+          hoursInput.value = hoursVal;
+          highlightInput(hoursInput);
+        }
+      }
+      const startTimeInput = document.getElementById('createStartTimeInput');
+      if (startTimeInput && data.suggestedStartTime) {
+        if (startTimeInput.value !== data.suggestedStartTime) {
+          startTimeInput.value = data.suggestedStartTime;
+          highlightInput(startTimeInput);
+        }
+      }
+    } else {
+      // Chuyến đi theo ngày
+      if (typeof window.switchDurationType === 'function') {
+        window.switchDurationType('days');
+      }
+      const durationInput = document.getElementById('createDurationInput');
+      if (durationInput && data.suggestedDays) {
+        const daysVal = Math.min(14, Math.max(1, parseInt(data.suggestedDays) || 3));
+        if (parseInt(durationInput.value) !== daysVal) {
+          durationInput.value = daysVal;
+          highlightInput(durationInput);
+        }
+      }
+    }
+
+    // ── Điền sẵn Điểm khởi hành ──
+    const departureInput = document.getElementById('createDepartureInput');
+    if (departureInput && data.suggestedDeparture) {
+      if (departureInput.value !== data.suggestedDeparture) {
+        if (typeof toggleQuickManualLocation === 'function') toggleQuickManualLocation();
+        departureInput.value = data.suggestedDeparture;
+        highlightInput(departureInput);
+      }
+    }
+
+    // ── Loại bỏ/Giữ khách sạn ──
+    if (data.suggestedNeedsHotel !== undefined) {
+      const excludeHotelCheckbox = document.getElementById('quickExcludeHotel');
+      if (excludeHotelCheckbox) {
+        const val = !data.suggestedNeedsHotel;
+        if (excludeHotelCheckbox.checked !== val) {
+          excludeHotelCheckbox.checked = val;
+          if (typeof predictQuickBudget === 'function') predictQuickBudget(true);
+        }
+      }
+    }
+
+    // ── Chọn Phong cách chip tương ứng ──
+    if (data.suggestedStyle) {
+      const styleVal = data.suggestedStyle;
+      document.querySelectorAll('#quickStyleChips .quick-chip').forEach(chip => {
+        const ds = chip.getAttribute('data-style') || '';
+        if (ds === styleVal || styleVal.includes(ds) || ds.includes(styleVal)) {
+          selectQuickStyle(chip);
+        }
+      });
+    }
+
+    // ── Chọn Bạn đồng hành chip tương ứng ──
+    if (data.suggestedCompanion) {
+      const companionVal = data.suggestedCompanion;
+      document.querySelectorAll('#quickCompanionChips .quick-chip').forEach(chip => {
+        const dc = chip.getAttribute('data-companion') || '';
+        if (dc === companionVal || companionVal.includes(dc) || dc.includes(companionVal)) {
+          selectQuickCompanion(chip);
+        }
+      });
+    }
+  };
+
+  function highlightInput(el) {
+    if (!el) return;
+    el.style.transition = 'box-shadow 0.4s, border-color 0.4s';
+    el.style.boxShadow = '0 0 0 3px rgba(16,185,129,0.5)';
+    el.style.borderColor = '#10b981';
+    setTimeout(() => {
+      el.style.boxShadow = '';
+      el.style.borderColor = '';
+    }, 1500);
   }
 
   document.getElementById('btnAcceptDiscovery')?.addEventListener('click', () => {
@@ -2131,88 +2264,32 @@ const initPlanner = function () {
     const styleVal = discoveryForm.dataset.style || '';
     const companionVal = discoveryForm.dataset.companion || '';
     const needsHotelVal = discoveryForm.dataset.needsHotel !== 'false';
+    const isShortTermVal = discoveryForm.dataset.isShortTerm === 'true';
+    const suggestedStartTimeVal = discoveryForm.dataset.suggestedStartTime || '08:00';
 
-    const excludeHotelCheckbox = document.getElementById('quickExcludeHotel');
-    if (excludeHotelCheckbox) {
-      excludeHotelCheckbox.checked = !needsHotelVal;
-    }
+    const data = {
+      finalSelection: destVal,
+      suggestedBudget: budgetVal,
+      suggestedDays: daysVal,
+      suggestedDeparture: departureVal,
+      suggestedStyle: styleVal,
+      suggestedCompanion: companionVal,
+      suggestedNeedsHotel: needsHotelVal,
+      isShortTerm: isShortTermVal,
+      suggestedStartTime: suggestedStartTimeVal
+    };
 
-    // ── Chuyển sang tab form lập lịch nhanh ──
-    window.switchCreateSubMode('form');
-
-    // ── Điền sẵn Điểm đến ──
-    const destInput = document.getElementById('createDestinationInput');
-    if (destInput && destVal) {
-      destInput.value = destVal;
-      destInput.dispatchEvent(new Event('input'));
-    }
-
-    // ── Điền sẵn Ngân sách ──
-    const budgetInput = document.getElementById('createBudgetInput');
-    if (budgetInput && budgetVal) {
-      const rawNum = budgetVal.replace(/[^\d]/g, '');
-      let numericBudget = parseInt(rawNum) || 0;
-      const millionMatch = budgetVal.match(/(\d+(?:[.,]\d+)?)\s*triệu/i);
-      if (millionMatch) {
-        numericBudget = Math.round(parseFloat(millionMatch[1].replace(',', '.')) * 1_000_000);
-      }
-      if (numericBudget > 0) {
-        budgetInput.value = numericBudget.toLocaleString('vi-VN') + ' VNĐ';
-      } else {
-        budgetInput.value = budgetVal;
-      }
-    }
-
-    // ── Điền sẵn Số ngày ──
-    const durationInput = document.getElementById('createDurationInput');
-    if (durationInput) {
-      durationInput.value = Math.min(14, Math.max(1, daysVal));
-    }
-
-    // ── Điền sẵn Điểm khởi hành ──
-    const departureInput = document.getElementById('createDepartureInput');
-    if (departureInput && departureVal) {
-      if (typeof toggleQuickManualLocation === 'function') toggleQuickManualLocation();
-      departureInput.value = departureVal;
-    }
-
-    // ── Chọn Phong cách chip tương ứng ──
-    if (styleVal) {
-      document.querySelectorAll('#quickStyleChips .quick-chip').forEach(chip => {
-        const ds = chip.getAttribute('data-style') || '';
-        if (ds === styleVal || styleVal.includes(ds) || ds.includes(styleVal)) {
-          selectQuickStyle(chip);
-        }
-      });
-    }
-
-    // ── Chọn Bạn đồng hành chip tương ứng ──
-    if (companionVal) {
-      document.querySelectorAll('#quickCompanionChips .quick-chip').forEach(chip => {
-        const dc = chip.getAttribute('data-companion') || '';
-        if (dc === companionVal || companionVal.includes(dc) || dc.includes(companionVal)) {
-          selectQuickCompanion(chip);
-        }
-      });
-    }
-
-    // ── Hiệu ứng highlight ──
-    setTimeout(() => {
-      const form = document.getElementById('createSubFormArea');
-      if (form) {
-        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        [destInput, budgetInput, durationInput, departureInput].forEach(el => {
-          if (!el || !el.value) return;
-          el.style.transition = 'box-shadow 0.4s';
-          el.style.boxShadow = '0 0 0 3px rgba(16,185,129,0.5)';
-          setTimeout(() => { el.style.boxShadow = ''; }, 1500);
-        });
-      }
-    }, 300);
+    // Autofill form
+    window.autoFillPlannerForm(data);
 
     if (window.WanderToast) {
-      window.WanderToast.success(`✅ Đã điền sẵn thông tin cho chuyến đi ${destVal}!`);
+      window.WanderToast.success("🚀 Đang tiến hành tạo lịch trình tự động...");
     }
+    setTimeout(() => {
+      if (typeof submitCreateItinerary === 'function') {
+        submitCreateItinerary();
+      }
+    }, 500);
   });
 
   // ==========================================
@@ -2603,30 +2680,17 @@ const initPlanner = function () {
   }
 
   window.switchCreateSubMode = function(mode) {
-    const btnChat = document.getElementById('btnCreateSubChat');
-    const btnForm = document.getElementById('btnCreateSubForm');
-    const chatArea = document.getElementById('createSubChatArea');
     const formArea = document.getElementById('createSubFormArea');
     const stepDiscovery = document.getElementById('stepDiscovery');
 
-    if (mode === 'chat') {
-      btnChat?.classList.add('active');
-      btnForm?.classList.remove('active');
-      if (chatArea) chatArea.style.display = 'block';
-      if (formArea) formArea.style.display = 'none';
-      if (stepDiscovery) {
-        stepDiscovery.style.display = 'flex';
-        if (discoveryHistory.length === 0 && discoveryMessages.children.length === 0) {
-          addDiscoveryBubble("Xin chào! Tôi là WanderViet AI, trợ lý du lịch của bạn. Bạn muốn đi du lịch ở đâu hay muốn vui chơi, trải nghiệm cái gì? ✨", "ai");
-          renderDiscoverySuggestions('type');
-        }
+    // Keep both chat assistant and form area visible at all times
+    if (formArea) formArea.style.display = 'block';
+    if (stepDiscovery) {
+      stepDiscovery.style.display = 'block';
+      if (discoveryHistory.length === 0 && discoveryMessages.children.length === 0) {
+        addDiscoveryBubble("Xin chào! Tôi là WanderViet AI, trợ lý du lịch của bạn. Bạn muốn đi du lịch ở đâu hay muốn vui chơi, trải nghiệm cái gì? ✨", "ai");
+        renderDiscoverySuggestions('type');
       }
-    } else {
-      btnChat?.classList.remove('active');
-      btnForm?.classList.add('active');
-      if (chatArea) chatArea.style.display = 'none';
-      if (formArea) formArea.style.display = 'block';
-      if (stepDiscovery) stepDiscovery.style.display = 'none';
     }
   };
 
@@ -2645,14 +2709,16 @@ const initPlanner = function () {
     const btnGPS = document.getElementById('btnQuickCurrentLocation');
     const btnManual = document.getElementById('btnQuickManualLocation');
     if (btnGPS) {
-      btnGPS.style.background = 'rgba(255,255,255,0.05)';
-      btnGPS.style.borderColor = 'var(--border)';
-      btnGPS.style.color = 'var(--text-muted)';
+      btnGPS.style.background = '';
+      btnGPS.style.borderColor = '';
+      btnGPS.style.color = '';
+      btnGPS.classList.remove('active');
     }
     if (btnManual) {
-      btnManual.style.background = 'rgba(59,130,246,0.1)';
-      btnManual.style.borderColor = 'rgba(59,130,246,0.3)';
-      btnManual.style.color = '#60a5fa';
+      btnManual.style.background = '';
+      btnManual.style.borderColor = '';
+      btnManual.style.color = '';
+      btnManual.classList.add('active');
     }
 
     if (input) {
@@ -2686,14 +2752,16 @@ const initPlanner = function () {
 
           // Hiển thị active button
           if (btnGPS) {
-            btnGPS.style.background = 'rgba(59,130,246,0.1)';
-            btnGPS.style.borderColor = 'rgba(59,130,246,0.3)';
-            btnGPS.style.color = '#60a5fa';
+            btnGPS.style.background = '';
+            btnGPS.style.borderColor = '';
+            btnGPS.style.color = '';
+            btnGPS.classList.add('active');
           }
           if (btnManual) {
-            btnManual.style.background = 'rgba(255,255,255,0.05)';
-            btnManual.style.borderColor = 'var(--border)';
-            btnManual.style.color = 'var(--text-muted)';
+            btnManual.style.background = '';
+            btnManual.style.borderColor = '';
+            btnManual.style.color = '';
+            btnManual.classList.remove('active');
           }
 
           // Show map container và ẩn ô nhập thủ công
@@ -2853,6 +2921,50 @@ const initPlanner = function () {
     input.value = val;
     // Animate the spinner buttons
     const btns = document.querySelectorAll('.spinner-btn');
+    btns.forEach(b => { b.style.transform = 'scale(0.9)'; setTimeout(() => b.style.transform = '', 150); });
+  };
+
+  // ── QUICK FORM: Toggle kiểu chuyến đi ──
+  window.switchDurationType = function(type) {
+    const btnDays = document.getElementById('btnDurationTypeDays');
+    const btnHours = document.getElementById('btnDurationTypeHours');
+    const daysContainer = document.getElementById('durationDaysContainer');
+    const hoursContainer = document.getElementById('durationHoursContainer');
+
+    if (!btnDays || !btnHours) return;
+
+    if (type === 'days') {
+      btnDays.classList.add('active');
+      btnDays.style.background = '';
+      btnDays.style.color = '';
+      btnHours.classList.remove('active');
+      btnHours.style.background = '';
+      btnHours.style.color = '';
+      if (daysContainer) daysContainer.style.display = 'flex';
+      if (hoursContainer) hoursContainer.style.display = 'none';
+      btnDays.dataset.type = 'days';
+    } else {
+      btnHours.classList.add('active');
+      btnHours.style.background = '';
+      btnHours.style.color = '';
+      btnDays.classList.remove('active');
+      btnDays.style.background = '';
+      btnDays.style.color = '';
+      if (daysContainer) daysContainer.style.display = 'none';
+      if (hoursContainer) hoursContainer.style.display = 'flex';
+      btnDays.dataset.type = 'hours';
+    }
+  };
+
+  // ── QUICK FORM: Spinner tăng/giảm số giờ ──
+  window.adjustQuickHours = function(delta) {
+    const input = document.getElementById('createHoursInput');
+    if (!input) return;
+    let val = parseInt(input.value) || 6;
+    val = Math.min(18, Math.max(2, val + delta));
+    input.value = val;
+    // Animate the spinner buttons
+    const btns = document.querySelectorAll('#durationHoursContainer .spinner-btn');
     btns.forEach(b => { b.style.transform = 'scale(0.9)'; setTimeout(() => b.style.transform = '', 150); });
   };
 
@@ -3125,210 +3237,9 @@ const initPlanner = function () {
     return R * c;
   };
 
-  window.predictQuickBudget = function(silent = false) {
-    const depInput = document.getElementById('createDepartureInput');
-    const destInput = document.getElementById('createDestinationInput');
-    const depVal = (depInput?.value || '').toLowerCase().trim();
-    const dest = (destInput?.value || '').toLowerCase().trim();
-    const days = parseInt(document.getElementById('createDurationInput')?.value) || 3;
-    const styleEl = document.querySelector('#quickStyleChips .quick-chip.active');
-    const style = styleEl?.dataset?.style || 'Khám phá';
-    const companionEl = document.querySelector('#quickCompanionChips .quick-chip.active');
-    const companion = companionEl?.dataset?.companion || 'Bạn bè';
+  window.predictQuickBudget = function(silent = false) {};
 
-    const getCompanionMult = (comp) => {
-      if (comp === 'Một mình') return 1.0;
-      if (comp === 'Cặp đôi') return 1.8;
-      if (comp === 'Bạn bè') return 3.0;
-      if (comp === 'Gia đình') return 4.0;
-      return 3.0;
-    };
-
-    const getCompanionCount = (comp) => {
-      if (comp === 'Một mình') return 1;
-      if (comp === 'Cặp đôi') return 2;
-      if (comp === 'Bạn bè') return 3;
-      if (comp === 'Gia đình') return 4;
-      return 3;
-    };
-
-    const getStyleMult = (st) => {
-      if (st === 'Nghỉ dưỡng') return 1.4;
-      if (st === 'Ẩm thực') return 1.1;
-      if (st === 'Check-in') return 1.0;
-      if (st === 'Trải nghiệm') return 1.2;
-      return 1.0;
-    };
-
-    let totalMin = 0;
-    let totalMax = 0;
-    let isAiChatBased = false;
-    let hotelMin = 0;
-    let hotelMax = 0;
-    let baseMin = 0;
-    let baseMax = 0;
-
-    // 1. Kiểm tra xem có dữ liệu ngân sách gợi ý từ AI Chat không
-    const discoveryForm = document.getElementById('discoveryChatForm');
-    const aiSuggestedBudgetStr = discoveryForm?.dataset?.budget || '';
-    const rawNum = aiSuggestedBudgetStr.replace(/[^\d]/g, '');
-    let aiBudget = parseInt(rawNum) || 0;
-    const millionMatch = aiSuggestedBudgetStr.match(/(\d+(?:[.,]\d+)?)\s*triệu/i);
-    if (millionMatch) {
-      aiBudget = Math.round(parseFloat(millionMatch[1].replace(',', '.')) * 1000000);
-    }
-
-    const excludeHotel = document.getElementById('quickExcludeHotel')?.checked || false;
-
-    if (aiBudget > 0 && discoveryForm?.dataset?.final?.toLowerCase().trim() === dest) {
-      isAiChatBased = true;
-      const originalDays = parseInt(discoveryForm.dataset.days) || 3;
-      const originalStyle = discoveryForm.dataset.style || 'Khám phá';
-      const originalCompanion = discoveryForm.dataset.companion || 'Bạn bè';
-
-      const daysScale = days / originalDays;
-      const styleScale = getStyleMult(style) / getStyleMult(originalStyle);
-      const companionScale = getCompanionMult(companion) / getCompanionMult(originalCompanion);
-
-      const scaledBudget = aiBudget * daysScale * styleScale * companionScale;
-      baseMin = Math.round((scaledBudget * 0.6 * 0.85) / 50000) * 50000;
-      baseMax = Math.round((scaledBudget * 0.6 * 1.15) / 50000) * 50000;
-
-      if (!excludeHotel) {
-        hotelMin = Math.round((scaledBudget * 0.4 * 0.85) / 50000) * 50000;
-        hotelMax = Math.round((scaledBudget * 0.4 * 1.15) / 50000) * 50000;
-      }
-    } else {
-      const profile = BUDGET_PROFILES[dest] || BUDGET_PROFILES['default'];
-      const styleMult = getStyleMult(style);
-      const compMult = getCompanionMult(companion);
-
-      baseMin = Math.round((profile.base * 0.85 * styleMult * compMult * days) / 50000) * 50000;
-      baseMax = Math.round((profile.base * 1.15 * styleMult * compMult * days) / 50000) * 50000;
-
-      if (!excludeHotel) {
-        hotelMin = Math.round((profile.hotel * 0.8 * styleMult * compMult * days) / 50000) * 50000;
-        hotelMax = Math.round((profile.hotel * 1.2 * styleMult * compMult * days) / 50000) * 50000;
-      }
-    }
-
-    totalMin = baseMin + hotelMin;
-    totalMax = baseMax + hotelMax;
-
-    // 2. Tính toán chi phí di chuyển dựa trên GPS / Khoảng cách thực tế
-    let transitCost = 0;
-    let transitType = '';
-    let distanceKm = 0;
-
-    let depLat = parseFloat(depInput?.dataset?.lat) || 0;
-    let depLng = parseFloat(depInput?.dataset?.lng) || 0;
-
-    // Nếu không có GPS, tìm tọa độ tương đương qua tên thành phố nhập tay
-    if ((!depLat || !depLng) && depVal) {
-      const matchKey = Object.keys(DEST_COORDS).find(k => depVal.includes(k) || k.includes(depVal));
-      if (matchKey) {
-        depLat = DEST_COORDS[matchKey].lat;
-        depLng = DEST_COORDS[matchKey].lng;
-      }
-    }
-
-    let destLat = 0;
-    let destLng = 0;
-    if (dest) {
-      const matchKey = Object.keys(DEST_COORDS).find(k => dest.includes(k) || k.includes(dest));
-      if (matchKey) {
-        destLat = DEST_COORDS[matchKey].lat;
-        destLng = DEST_COORDS[matchKey].lng;
-      }
-    }
-
-    if (depLat && depLng && destLat && destLng) {
-      distanceKm = getDistanceFromLatLonInKm(depLat, depLng, destLat, destLng);
-      const numPeople = getCompanionCount(companion);
-
-      if (distanceKm < 50) {
-        // Taxi / Xe máy / Grab di chuyển gần
-        const costPerPerson = distanceKm * 15000 + 30000;
-        transitCost = Math.max(50000, Math.min(200000, costPerPerson)) * numPeople;
-        transitType = 'Taxi / Grab di chuyển ngắn';
-      } else if (distanceKm < 350) {
-        // Limousine, xe khách, tàu hỏa
-        const costPerPerson = distanceKm * 1000 + 100000;
-        transitCost = Math.max(150000, Math.min(450000, costPerPerson)) * numPeople;
-        transitType = 'Xe khách / Limousine';
-      } else {
-        // Máy bay khứ hồi / tàu hỏa đường dài
-        const costPerPerson = distanceKm * 800 + 800000;
-        transitCost = Math.max(1000000, Math.min(2500000, costPerPerson)) * numPeople;
-        transitType = 'Vé máy bay / Tàu hỏa khứ hồi';
-      }
-
-      // Làm tròn tiền di chuyển
-      transitCost = Math.round(transitCost / 50000) * 50000;
-
-      // Cộng chi phí di chuyển vào tổng ngân sách đề xuất
-      totalMin += transitCost;
-      totalMax += transitCost;
-    }
-
-    const fmt = n => n.toLocaleString('vi-VN');
-    const destName = dest.charAt(0).toUpperCase() + dest.slice(1) || 'điểm đến';
-
-    const resultBox = document.getElementById('quickBudgetPredictionResult');
-    if (resultBox) {
-      resultBox.style.display = 'block';
-      const labelText = isAiChatBased 
-        ? `🔮 AI gợi ý dựa trên trò chuyện (${destName} ${days} ngày — ${style} — ${companion}):`
-        : `💡 Ước tính đề xuất (${destName} ${days} ngày — ${style} — ${companion}):`;
-
-      let hotelText = `Không cần (0 VNĐ)`;
-      if (!excludeHotel) {
-        hotelText = `${fmt(hotelMin)} – ${fmt(hotelMax)} VNĐ`;
-      }
-
-      let transitBreakdownHTML = '';
-      if (transitCost > 0) {
-        transitBreakdownHTML = `
-          <div style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-top:0.2rem; border-top:1px dashed var(--border); padding-top:0.2rem;">
-            <span>🚌 Di chuyển từ nơi khởi hành (${transitType} ~ ${Math.round(distanceKm)}km):</span>
-            <span style="font-weight:700; color:#10b981;">+${fmt(transitCost)} VNĐ</span>
-          </div>
-        `;
-      }
-
-      const breakdownHTML = `
-        <div style="font-size:0.75rem; color:var(--text-muted); display:flex; flex-direction:column; gap:0.2rem; margin-top:0.4rem; border-top:1px dashed var(--border); padding-top:0.4rem;">
-          <div style="display:flex; justify-content:space-between;">
-            <span>🏨 Phòng nghỉ ${excludeHotel ? '' : `(${days} ngày)`}:</span>
-            <span style="font-weight:600; color:var(--text);">${hotelText}</span>
-          </div>
-          <div style="display:flex; justify-content:space-between;">
-            <span>🍽️ Ăn uống & Tham quan (${days} ngày):</span>
-            <span style="font-weight:600; color:var(--text);">${fmt(baseMin)} – ${fmt(baseMax)} VNĐ</span>
-          </div>
-          ${transitBreakdownHTML}
-        </div>
-      `;
-
-      resultBox.innerHTML = `
-        <div style="display:flex; flex-direction:column; gap:0.4rem;">
-          <div style="font-size:0.78rem; color:var(--text-muted);">${labelText}</div>
-          <div style="font-size:1.1rem; font-weight:800; color:#10b981;">${fmt(totalMin)} – ${fmt(totalMax)} VNĐ</div>
-          ${breakdownHTML}
-          <div style="font-size:0.7rem; color:var(--text-muted); margin-top:0.25rem;">(Tổng cộng bao gồm đầy đủ ăn chơi, chỗ ở & chi phí đi lại)</div>
-          <button type="button" onclick="applyPredictedBudget(${Math.round((totalMin + totalMax) / 2)})" style="margin-top:0.25rem; padding:0.4rem 0.75rem; background:linear-gradient(135deg,#10b981,#059669); border:none; border-radius:8px; color:#fff; font-size:0.75rem; font-weight:700; cursor:pointer; align-self:flex-start;">✅ Áp dụng mức trung bình</button>
-        </div>
-      `;
-    }
-
-    if (!silent && window.WanderToast) WanderToast.success('🔮 Đã tính xong dự đoán ngân sách!');
-  };
-
-  window.applyPredictedBudget = function(amount) {
-    const input = document.getElementById('createBudgetInput');
-    if (input) input.value = amount.toLocaleString('vi-VN') + ' VNĐ';
-    if (window.WanderToast) WanderToast.success('💵 Đã áp dụng ngân sách đề xuất!');
-  };
+  window.applyPredictedBudget = function(amount) {};
 
   // ── QUICK FORM: Hàm format tiền tệ ──
   window.formatCreateBudget = function(input) {
@@ -3348,7 +3259,6 @@ const initPlanner = function () {
     const departure = document.getElementById('createDepartureInput')?.value.trim() || '';
     const destination = document.getElementById('createDestinationInput')?.value.trim() || '';
     const budget = document.getElementById('createBudgetInput')?.value.trim() || 'Tự do';
-    const days = parseInt(document.getElementById('createDurationInput')?.value) || 3;
     const styleEl = document.querySelector('#quickStyleChips .quick-chip.active');
     const companionEl = document.querySelector('#quickCompanionChips .quick-chip.active');
     const style = styleEl?.dataset?.style || 'Khám phá';
@@ -3360,10 +3270,26 @@ const initPlanner = function () {
       return;
     }
 
+    const btnDurationTypeDays = document.getElementById('btnDurationTypeDays');
+    const isShortTrip = btnDurationTypeDays ? !btnDurationTypeDays.classList.contains('active') : false;
+    
+    let days = 3;
+    let durationHours = 0;
+    let departureTime = '08:00';
+    
+    if (isShortTrip) {
+      days = 1;
+      durationHours = parseInt(document.getElementById('createHoursInput')?.value) || 6;
+      departureTime = document.getElementById('createStartTimeInput')?.value || '08:00';
+    } else {
+      days = parseInt(document.getElementById('createDurationInput')?.value) || 3;
+    }
+
     const additionalInfoText = [
       departure ? `Xuất phát từ: ${departure}.` : '',
       `Phong cách du lịch: ${style}.`,
-      `Đi cùng: ${companion}.`
+      `Đi cùng: ${companion}.`,
+      isShortTrip ? `Chuyến đi ngắn trong ngày (KHÔNG QUA ĐÊM). Thời lượng: ${durationHours} tiếng.` : ''
     ].filter(Boolean).join(' ');
 
     const formData = {
@@ -3373,9 +3299,13 @@ const initPlanner = function () {
       additionalInfo: additionalInfoText,
       companion,
       style,
-      pace: 'Vừa phải',
+      pace: isShortTrip ? 'Thư thả' : 'Vừa phải',
       transport: 'Tự do',
-      accommodation: 'Tùy chọn',
+      accommodation: isShortTrip ? 'Không cần qua đêm' : 'Tùy chọn',
+      departureTime,
+      isShortTrip,
+      durationHours,
+      history: window.discoveryHistory || [],
       skipWizard: true
     };
 
@@ -3605,6 +3535,8 @@ const initPlanner = function () {
     if (weather) window.currentWeatherData = weather;
     window.currentDestName = typeof dest === 'object' ? (dest.name || dest.destination) : dest;
     const rawItinerary = plan.itinerary || [];
+    const isShortTrip = plan.isShortTrip === true;
+    const durationHours = plan.durationHours || 6;
 
     const itinerary = rawItinerary.map(day => ({
       ...day,
@@ -3762,9 +3694,9 @@ const initPlanner = function () {
       return `
         <div class="itinerary-tab-panel" id="itinerary-day-panel-${dayDigit}" style="display: none;">
           <div class="day-header-meta-v3">
-            <div class="day-circle-v3">D${dayDigit}</div>
+            <div class="day-circle-v3">${isShortTrip ? '⏱️' : `D${dayDigit}`}</div>
             <div style="display:flex; flex-direction:column;">
-               <h3 style="font-size: 1.5rem; font-weight: 800; color: #fff; margin: 0; font-family: 'Outfit', sans-serif;">Ngày ${dayDigit}: ${dayTitle}</h3>
+               <h3 style="font-size: 1.5rem; font-weight: 800; color: #fff; margin: 0; font-family: 'Outfit', sans-serif;">${isShortTrip ? `Lịch trình chi tiết (${durationHours} tiếng)` : `Ngày ${dayDigit}: ${dayTitle}`}</h3>
                <span style="font-size:0.78rem; color:#10b981; font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-top:2px;">✨ Trải nghiệm đặc sắc trong ngày</span>
             </div>
             <div style="flex: 1; height: 1px; background: linear-gradient(90deg, rgba(16, 185, 129, 0.4), transparent); margin-left: 1rem;"></div>
@@ -3856,8 +3788,10 @@ const initPlanner = function () {
       const dayStr = dayNum.toString();
       const dayDigitMatch = dayStr.match(/\d+/);
       const dayDigit = dayDigitMatch ? dayDigitMatch[0] : (idx + 1);
-      return `<button class="console-tab-btn" onclick="window.switchItineraryTab('day-panel-${dayDigit}', this)">📅 Ngày ${dayDigit}</button>`;
+      return `<button class="console-tab-btn" onclick="window.switchItineraryTab('day-panel-${dayDigit}', this)">📅 ${isShortTrip ? 'Lịch trình chi tiết' : `Ngày ${dayDigit}`}</button>`;
     }).join('');
+
+    const staysTabBtn = isShortTrip ? '' : `<button class="console-tab-btn" onclick="window.switchItineraryTab('stays-panel', this)">🏨 Nơi Lưu Trú</button>`;
 
     return `
       <div class="itinerary-column-wrapper">
@@ -4384,7 +4318,7 @@ const initPlanner = function () {
           <!-- Majestic Navigation Console Tab Bar -->
           <div class="console-tabs-bar-v3">
             <button class="console-tab-btn active" onclick="window.switchItineraryTab('overview-panel', this)">📊 Tổng Quan</button>
-            <button class="console-tab-btn" onclick="window.switchItineraryTab('stays-panel', this)">🏨 Nơi Lưu Trú</button>
+            ${staysTabBtn}
             ${tabHeadersHtml}
           </div>
 
@@ -4403,7 +4337,7 @@ const initPlanner = function () {
                         <span class="version-badge" style="background:rgba(16,185,129,0.15); color:#34d399; border: 1px solid rgba(16,185,129,0.3); padding:4px 12px; border-radius:20px; font-size:0.72rem; font-weight:800; display:flex; align-items:center; gap:4px; backdrop-filter:blur(4px); box-shadow: 0 0 10px rgba(52,211,153,0.15);">✨ AI OPTIMIZED</span>
                      </div>
                   </div>
-                  <h2 class="main-itinerary-title-v2" style="font-size: 1.8rem; margin-top: 1.25rem; margin-bottom: 0.75rem; font-weight: 800; background: linear-gradient(135deg, #ffffff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Outfit', sans-serif;">${plan.title || ('Hành trình ' + days + ' ngày')}</h2>
+                  <h2 class="main-itinerary-title-v2" style="font-size: 1.8rem; margin-top: 1.25rem; margin-bottom: 0.75rem; font-weight: 800; background: linear-gradient(135deg, #ffffff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'Outfit', sans-serif;">${plan.title || (isShortTrip ? `Hành trình ngắn ${durationHours} tiếng (trong ngày)` : `Hành trình ${days} ngày`)}</h2>
                   <p class="timeline-summary-v2" style="font-size: 0.95rem; line-height: 1.7; color: rgba(255,255,255,0.75); margin: 0; font-weight: 400;">${plan.tripSummary || plan.summary || 'Kế hoạch du lịch được WanderAI thiết kế riêng cho bạn.'}</p>
                   <p class="timeline-summary-v2" style="font-size: 0.88rem; line-height: 1.75; color: rgba(255,255,255,0.7); margin: 0.75rem 0 0; font-weight: 500;">${categorySummaryText ? categorySummaryText + ' • Đầy đủ ăn uống, vui chơi và nghỉ ngơi.' : 'Lịch trình được tối ưu cho trải nghiệm cân bằng, bao gồm ăn uống, vui chơi và nghỉ ngơi.'}</p>
                 </div>
@@ -4479,11 +4413,11 @@ const initPlanner = function () {
       const dayDigitMatch = dayStr.match(/\d+/);
       const dNum = dayDigitMatch ? dayDigitMatch[0] : (idx + 1);
       let dTitle = dayStr.replace(/^\d+\s*-\s*/, '').replace(/Ngày /g, '');
-      if (dTitle === dNum.toString()) dTitle = 'Khám phá điểm đến';
+      if (dTitle === dNum.toString()) dTitle = isShortTrip ? `Chuyến đi trong ngày (${durationHours} tiếng)` : 'Khám phá điểm đến';
       const acts = (day.activities || []).map(a => a.task || a.activity || a.name || '').filter(Boolean).join(' ➔ ');
       return `
                             <div style="display: flex; gap: 1rem; align-items: flex-start; padding-bottom: 1rem; border-bottom: 1px dashed rgba(255,255,255,0.1);">
-                               <div style="min-width: 65px; font-weight: 800; color: #10b981; font-size: 0.95rem; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 8px; text-align: center;">Ngày ${dNum}</div>
+                               <div style="min-width: 65px; font-weight: 800; color: #10b981; font-size: 0.95rem; background: rgba(16,185,129,0.1); padding: 4px 8px; border-radius: 8px; text-align: center;">${isShortTrip ? 'Chi tiết' : `Ngày ${dNum}`}</div>
                                <div style="flex: 1;">
                                   <div style="color: #fff; font-weight: 700; margin-bottom: 4px; font-size: 0.95rem;">${dTitle}</div>
                                   <div style="color: rgba(255,255,255,0.7); font-size: 0.85rem; line-height: 1.5;">${acts}</div>
@@ -4496,7 +4430,7 @@ const initPlanner = function () {
               </div>
             </div>
 
-            ${accommodationHtml}
+            ${isShortTrip ? '' : accommodationHtml}
             ${daysHtml}
           </div>
         </div>

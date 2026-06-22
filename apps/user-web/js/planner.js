@@ -3158,7 +3158,7 @@ const initPlanner = function () {
             box-shadow: 0 12px 30px rgba(0,0,0,0.3) !important;
           }
           .stat-box-cost:hover   { border-color: rgba(16,185,129,0.4) !important; box-shadow: 0 12px 28px rgba(16,185,129,0.12) !important; }
-          .stat-box-pace:hover   { border-color: rgba(245,158,11,0.4) !important; box-shadow: 0 12px 28px rgba(245,158,11,0.12) !important; }
+          .stat-box-duration:hover   { border-color: rgba(245,158,11,0.4) !important; box-shadow: 0 12px 28px rgba(245,158,11,0.12) !important; }
           .stat-box-vibe:hover   { border-color: rgba(56,189,248,0.4) !important; box-shadow: 0 12px 28px rgba(56,189,248,0.12) !important; }
           .stat-box-transport:hover { border-color: rgba(244,114,182,0.4) !important; box-shadow: 0 12px 28px rgba(244,114,182,0.12) !important; }
           .stat-box-weather:hover   { border-color: rgba(251,191,36,0.4) !important; box-shadow: 0 12px 28px rgba(251,191,36,0.12) !important; }
@@ -3608,12 +3608,12 @@ const initPlanner = function () {
                     </div>
                   </div>
                   
-                  <!-- Stat Box 2: pace -->
-                  <div class="stat-box-v3 stat-box-pace">
-                    <div class="stat-icon-wrap" style="background: rgba(245, 158, 11, 0.18); border: 1px solid rgba(245, 158, 11, 0.3); color: #f59e0b;">🚶</div>
+                  <!-- Stat Box 2: duration -->
+                  <div class="stat-box-v3 stat-box-duration">
+                    <div class="stat-icon-wrap" style="background: rgba(245, 158, 11, 0.18); border: 1px solid rgba(245, 158, 11, 0.3); color: #f59e0b;">📅</div>
                     <div>
-                      <span class="stat-label-v2" style="font-size: 0.7rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; display: block; font-weight: 700;">Nhịp độ di chuyển</span>
-                      <span class="stat-value-v2" style="color: #fbbf24; font-size: 0.95rem; font-weight: 800; display: block; margin-top: 1px; line-height: 1.2;">${plan.pace || 'Vừa phải - Thư thái'}</span>
+                      <span class="stat-label-v2" style="font-size: 0.7rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 0.5px; display: block; font-weight: 700;">Thời gian chuyến đi</span>
+                      <span class="stat-value-v2" style="color: #fbbf24; font-size: 0.95rem; font-weight: 800; display: block; margin-top: 1px; line-height: 1.2;">${days} Ngày ${Math.max(1, days - 1)} Đêm</span>
                     </div>
                   </div>
                   

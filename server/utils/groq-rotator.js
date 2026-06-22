@@ -21,7 +21,11 @@ const pools = {
   planner: [
     process.env.GROQ_API_KEY_PLANNER,
     process.env.GROQ_API_KEY_PLANNER_2,
-    process.env.GROQ_API_KEY_PLANNER_3
+    process.env.GROQ_API_KEY_PLANNER_3,
+    process.env.GROQ_API_KEY_PLANNER_4,
+    process.env.GROQ_API_KEY_PLANNER_5,
+    process.env.GROQ_API_KEY_PLANNER_6,
+    process.env.GROQ_API_KEY_PLANNER_7
   ],
   navigation: [
     process.env.GROQ_API_KEY_NAVIGATION

@@ -240,10 +240,7 @@ function initMap() {
     position: 'bottomleft'
   }).addTo(State.map);
 
-  // Nút zoom
-  L.control.zoom({
-    position: 'bottomright'
-  }).addTo(State.map);
+
   State.userMarker = L.divIcon({
     className: 'user-marker-wrap',
     html: '<div class="user-marker"></div>',
@@ -1716,9 +1713,24 @@ document.addEventListener('DOMContentLoaded', function () {
   // Nút Thoát dẫn đường
   if (els.exitBtn) {
     els.exitBtn.addEventListener('click', function() {
-       if (confirm("Bạn có chắc chắn muốn thoát dẫn đường?")) {
-         exitNavigation();
-       }
+      const modal = document.getElementById('exitNavModal');
+      const confirmBtn = document.getElementById('confirmExitNavBtn');
+      if (modal && confirmBtn) {
+        modal.style.display = 'flex';
+        
+        // Clone button to remove previous listeners
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        
+        newConfirmBtn.addEventListener('click', function() {
+          closeExitNavModal();
+          exitNavigation();
+        });
+      } else {
+        if (confirm("Bạn có chắc chắn muốn thoát dẫn đường?")) {
+          exitNavigation();
+        }
+      }
     });
   }
 
@@ -1930,3 +1942,41 @@ window.quickSearch = async function(category) {
     State.activeSearchCategory = null;
   }
 };
+
+window.closeExitNavModal = function() {
+  const modal = document.getElementById('exitNavModal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.showExitPageConfirm = function() {
+  const modal = document.getElementById('exitPageModal');
+  const confirmBtn = document.getElementById('confirmExitPageBtn');
+  if (modal && confirmBtn) {
+    modal.style.display = 'flex';
+    
+    // Clone button to remove previous listeners
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    
+    newConfirmBtn.addEventListener('click', function() {
+      closeExitPageModal();
+      if (window.history.length > 1 && document.referrer.includes(window.location.host)) {
+        window.history.back();
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+  }
+};
+
+window.closeExitPageModal = function() {
+  const modal = document.getElementById('exitPageModal');
+  if (modal) modal.style.display = 'none';
+};
+
+// Override WanderUI handleHeaderBack to prevent direct navigation
+if (window.WanderUI) {
+  window.WanderUI.handleHeaderBack = function() {
+    showExitPageConfirm();
+  };
+}

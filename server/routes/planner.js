@@ -961,6 +961,26 @@ router.get('/itinerary/:id', optionalAuth, async (req, res) => {
   }
 });
 
+// Đổi tên chuyến đi (rename)
+router.put('/rename/:id', auth, async (req, res) => {
+  try {
+    const { destination } = req.body;
+    if (!destination || !destination.trim()) {
+      return res.status(400).json({ success: false, message: 'Tên chuyến đi mới không hợp lệ.' });
+    }
+    const itin = await Itinerary.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      { destination: destination.trim() },
+      { returnDocument: 'after' }
+    );
+    if (!itin) return res.status(404).json({ success: false, message: 'Không tìm thấy chuyến đi.' });
+    res.json({ success: true, message: 'Đã cập nhật tên chuyến đi.', data: itin });
+  } catch (error) {
+    console.error('Rename Itinerary Error:', error.message || error);
+    res.status(500).json({ success: false, message: 'Lỗi server khi đổi tên chuyến đi.' });
+  }
+});
+
 // Cập nhật trạng thái chuyến đi (Hoàn thành, Bỏ lỡ)
 router.put('/status/:id', auth, async (req, res) => {
   try {

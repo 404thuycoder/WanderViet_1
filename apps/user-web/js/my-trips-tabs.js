@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var tabs = document.querySelectorAll('[data-trip-tab]');
   var tripsList = document.getElementById('tripsList');
   var currentTab = 'planned'; // planned, experienced, missed, deleted
+  var loadedTrips = [];
 
   // Fetch the data
   function fetchActivities() {
@@ -267,13 +268,17 @@ document.addEventListener('DOMContentLoaded', function() {
         '<div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">' +
           '<div>' +
             '<div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem; flex-wrap: wrap;">' +
-              '<h2 style="font-size: 1.5rem; color: var(--text); margin: 0; font-family: var(--font-display);">' + esc(it.destination || 'Điểm đến') + '</h2>' +
+              '<h2 style="font-size: 1.5rem; color: var(--text); margin: 0; font-family: var(--font-display); display: flex; align-items: center; gap: 0.5rem;">' +
+                '<span>' + esc(it.destination || 'Điểm đến') + '</span>' +
+                '<span class="rename-trip-btn" data-id="' + it._id + '" data-name="' + esc(it.destination || '') + '" title="Đổi tên" style="cursor: pointer; font-size: 1.1rem; opacity: 0.6; transition: opacity 0.2s;" onmouseover="this.style.opacity=\'1\'" onmouseout="this.style.opacity=\'0.6\'">✏️</span>' +
+              '</h2>' +
               tripDateBadge +
             '</div>' +
             '<p style="color: var(--text-muted); font-size: 0.95rem;">🕒 Xếp lịch: ' + (it.days || 0) + ' Ngày' + companionInfo + costInfo + hotelInfo + ' ' + tripDateLabel + ' • 📅 Lưu ngày ' + dpDateString + '</p>' +
           '</div>' +
           '<div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">' +
             actionsHtml +
+            '<button class="review-inputs-btn btn btn--outline btn--small" style="border-radius: 8px;" data-id="' + it._id + '">Xem lại</button>' +
             '<button class="view-detail-btn btn btn--outline btn--small" style="border-radius: 8px;" data-id="' + it._id + '" data-json=\'' + jsonStr.replace(/'/g, "&#39;") + '\'>Xem Lịch Trình</button>' +
           '</div>' +
         '</div>';
@@ -299,6 +304,19 @@ document.addEventListener('DOMContentLoaded', function() {
       btn.addEventListener('click', function (e) {
         var id = btn.getAttribute('data-id');
         rescheduleTrip(id);
+      });
+    });
+    document.querySelectorAll('.review-inputs-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        var id = btn.getAttribute('data-id');
+        showReviewInputs(id);
+      });
+    });
+    document.querySelectorAll('.rename-trip-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        var id = btn.getAttribute('data-id');
+        var name = btn.getAttribute('data-name');
+        renameTrip(id, name);
       });
     });
     document.querySelectorAll('.view-detail-btn').forEach(function (btn) {
@@ -331,6 +349,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     fetchTrips().then(function(tripsData) {
       var tripsArray = (tripsData && tripsData.success) ? (tripsData.data || []) : [];
+      loadedTrips = tripsArray;
       
       try {
         var activeCount = 0;
@@ -448,6 +467,124 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Modal events handled by WanderUI in SharedUI.js
+  window.showReviewInputs = function(tripId) {
+    var trip = loadedTrips.find(function(t) { return t._id === tripId; });
+    if (!trip) {
+      alert("Không tìm thấy thông tin chuyến đi.");
+      return;
+    }
+
+    var modal = document.getElementById('reviewInputsModal');
+    var contentEl = document.getElementById('reviewInputsContent');
+    if (!modal || !contentEl) return;
+
+    var destinationVal = trip.destination || 'Chưa cập nhật';
+    var daysVal = (trip.days || 0) + ' ngày';
+    var tripDateVal = trip.tripDate ? new Date(trip.tripDate).toLocaleDateString('vi-VN') : 'Chưa cập nhật';
+    var companionVal = trip.companion || 'Chưa cập nhật';
+    var budgetVal = trip.budget || 'Chưa cập nhật';
+    var interestsVal = trip.interests || 'Chưa cập nhật';
+
+    var html = 
+      '<div style="display:grid; grid-template-columns: 140px 1fr; gap: 0.75rem 0.5rem; line-height: 1.5;">' +
+        '<strong style="color:var(--text-muted,#64748b);">📍 Điểm đến:</strong>' +
+        '<span style="font-weight:600; color:var(--text,#e2e8f0);">' + esc(destinationVal) + '</span>' +
+        
+        '<strong style="color:var(--text-muted,#64748b);">🕒 Số ngày:</strong>' +
+        '<span style="color:var(--text,#e2e8f0);">' + esc(daysVal) + '</span>' +
+        
+        '<strong style="color:var(--text-muted,#64748b);">🛫 Khởi hành:</strong>' +
+        '<span style="color:var(--text,#e2e8f0);">' + esc(tripDateVal) + '</span>' +
+        
+        '<strong style="color:var(--text-muted,#64748b);">👥 Bạn đồng hành:</strong>' +
+        '<span style="color:var(--text,#e2e8f0);">' + esc(companionVal) + '</span>' +
+        
+        '<strong style="color:var(--text-muted,#64748b);">💰 Ngân sách:</strong>' +
+        '<span style="color:var(--text,#e2e8f0);">' + esc(budgetVal) + '</span>' +
+        
+        '<strong style="color:var(--text-muted,#64748b);">✨ Phong cách:</strong>' +
+        '<span style="white-space: pre-wrap; color:var(--text,#e2e8f0);">' + esc(interestsVal) + '</span>' +
+      '</div>';
+      
+    contentEl.innerHTML = html;
+    modal.style.display = 'flex';
+  };
+
+  window.closeReviewInputsModal = function() {
+    var modal = document.getElementById('reviewInputsModal');
+    if (modal) modal.style.display = 'none';
+  };
+
+  window.renameTrip = function(tripId, currentName) {
+    var modal = document.getElementById('renameTripModal');
+    var input = document.getElementById('renameTripInput');
+    var confirmBtn = document.getElementById('confirmRenameTripBtn');
+    if (!modal || !input || !confirmBtn) return;
+
+    input.value = currentName || '';
+    modal.style.display = 'flex';
+    input.focus();
+
+    // Clone button to remove previous listeners
+    var newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+    newConfirmBtn.addEventListener('click', function() {
+      var newName = input.value.trim();
+      if (!newName) {
+        if (window.WanderUI && WanderUI.showToast) {
+          WanderUI.showToast("Tên chuyến đi không được để trống!", "error");
+        } else {
+          alert("Tên chuyến đi không được để trống!");
+        }
+        return;
+      }
+
+      newConfirmBtn.disabled = true;
+      newConfirmBtn.textContent = 'Đang lưu...';
+
+      fetch('/api/planner/rename/' + tripId, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token
+        },
+        body: JSON.stringify({ destination: newName })
+      }).then(function(res) { return res.json(); })
+        .then(function(json) {
+          newConfirmBtn.disabled = false;
+          newConfirmBtn.textContent = 'Cập nhật';
+          if (json.success) {
+            if (window.WanderUI && WanderUI.showToast) {
+              WanderUI.showToast("Đã đổi tên chuyến đi thành công!", "success");
+            } else {
+              alert("Đã đổi tên chuyến đi thành công!");
+            }
+            closeRenameTripModal();
+            loadTab(currentTab);
+          } else {
+            if (window.WanderUI && WanderUI.showToast) {
+              WanderUI.showToast(json.message || "Có lỗi xảy ra khi đổi tên.", "error");
+            } else {
+              alert(json.message || "Có lỗi xảy ra khi đổi tên.");
+            }
+          }
+        }).catch(function(err) {
+          newConfirmBtn.disabled = false;
+          newConfirmBtn.textContent = 'Cập nhật';
+          if (window.WanderUI && WanderUI.showToast) {
+            WanderUI.showToast("Lỗi kết nối: " + err.message, "error");
+          } else {
+            alert("Lỗi kết nối: " + err.message);
+          }
+        });
+    });
+  };
+
+  window.closeRenameTripModal = function() {
+    var modal = document.getElementById('renameTripModal');
+    if (modal) modal.style.display = 'none';
+  };
   
   // Initial load
   if (!token) {

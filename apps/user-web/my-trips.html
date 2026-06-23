@@ -299,6 +299,36 @@
     </div>
   </div>
 
+  <!-- Review Inputs Modal -->
+  <div id="reviewInputsModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+    <div style="background:var(--bg-elevated,#1e293b);border:1px solid var(--border,rgba(255,255,255,.1));border-radius:20px;padding:2rem;max-width:500px;width:90%;color:var(--text,#e2e8f0);box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+      <h3 style="margin-top:0;margin-bottom:1.5rem;font-family:'Outfit',sans-serif;font-size:1.4rem;display:flex;align-items:center;gap:0.5rem;color:var(--primary,#6366f1);">
+        📋 Thông tin chuyến đi đã nhập
+      </h3>
+      <div id="reviewInputsContent" style="display:flex;flex-direction:column;gap:1rem;text-align:left;font-size:0.95rem;margin-bottom:1.5rem;">
+        <!-- Filled dynamically -->
+      </div>
+      <div style="display:flex;justify-content:flex-end;">
+        <button class="btn-sm btn-outline" onclick="closeReviewInputsModal()" style="border-radius:10px;padding:0.5rem 1.5rem;cursor:pointer;">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rename Trip Modal -->
+  <div id="renameTripModal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+    <div style="background:var(--bg-elevated,#1e293b);border:1px solid var(--border,rgba(255,255,255,.1));border-radius:20px;padding:2rem;max-width:400px;width:90%;color:var(--text,#e2e8f0);box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+      <h3 style="margin-top:0;margin-bottom:1rem;font-family:'Outfit',sans-serif;font-size:1.3rem;color:var(--primary,#6366f1);display:flex;align-items:center;gap:0.5rem;">
+        ✏️ Đổi tên chuyến đi
+      </h3>
+      <p style="color:var(--text-muted,#94a3b8);font-size:0.9rem;margin-bottom:1.5rem;">Vui lòng nhập tên mới cho chuyến đi của bạn:</p>
+      <input type="text" id="renameTripInput" style="width:100%;padding:0.75rem 1rem;border-radius:12px;border:1px solid var(--border,rgba(255,255,255,0.15));background:var(--bg,#0a0f1e);color:var(--text,#e2e8f0);font-size:0.95rem;outline:none;box-sizing:border-box;margin-bottom:1.5rem;" placeholder="Tên chuyến đi..." />
+      <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+        <button class="btn-sm btn-outline" onclick="closeRenameTripModal()" style="border-radius:10px;padding:0.5rem 1.25rem;cursor:pointer;">Hủy</button>
+        <button class="btn-sm btn-primary" id="confirmRenameTripBtn" style="border-radius:10px;padding:0.5rem 1.5rem;background:#6366f1;color:#fff;cursor:pointer;border:none;">Cập nhật</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/SharedUI.js?v=1778494999999"></script>
   <script src="js/my-trips-tabs.js?v=20260518_v28"></script>
   <script>

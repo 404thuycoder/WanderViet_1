@@ -559,6 +559,76 @@ router.post('/', optionalAuth, async (req, res) => {
       }
     }
 
+    // --- FAST PATH FOR DIRECT TOUR/SERVICE QUERIES ---
+    const cleanMsg = message.toLowerCase().trim().replace(/[?.,!]$/, "");
+    const tourKeywords = ['tour', 'gói tour', 'tour trọn gói', 'đặt tour', 'tìm tour', 'goi tour', 'tour tron goi', 'dat tour'];
+    const serviceKeywords = ['dịch vụ', 'khách sạn', 'nhà hàng', 'resort', 'homestay', 'chỗ nghỉ', 'quán ăn', 'dich vu', 'khach san', 'nha hang', 'cho nghi', 'quan an'];
+    const wantsTour = tourKeywords.some(k => cleanMsg.includes(k));
+    const wantsService = serviceKeywords.some(k => cleanMsg.includes(k));
+    const fastPathStrongItinKeywords = ['lên lịch', 'lập lịch', 'tạo lịch', 'lịch trình', 'kế hoạch', 'thiết kế', 'itinerary', 'lên plan', 'plan'];
+    const fastPathHasStrongItinKeyword = fastPathStrongItinKeywords.some(k => cleanMsg.includes(k));
+
+    if ((wantsTour || wantsService) && !fastPathHasStrongItinKeyword && !placeContext) {
+      // Find candidate destination
+      let searchDest = null;
+      for (const p of PROVINCES) {
+        if (cleanMsg.includes(p.toLowerCase())) {
+          searchDest = p;
+          break;
+        }
+      }
+
+      if (searchDest && message.trim().split(/\s+/).length <= 12) {
+        console.log(`⚡ [Fast Path] Direct tour/service query detected for destination: ${searchDest}`);
+        
+        // Generate metadata
+        const finalMeta = await generateResponseMetadata(message, "", "Chưa xác định rõ vị trí GPS.", false);
+        const tourCount = finalMeta.suggestedTours ? finalMeta.suggestedTours.length : 0;
+        
+        let answer = "";
+        if (wantsTour) {
+          if (tourCount > 0) {
+            answer = `Chào bạn! WanderViet AI đã tìm thấy **${tourCount}** tour du lịch hấp dẫn tại **${searchDest}** trên hệ thống.\n\nBạn hãy tham khảo danh sách chi tiết ở các **thẻ gợi ý trực quan** ngay phía dưới khung chat nhé! 👇`;
+          } else {
+            answer = `Hiện tại hệ thống WanderViet chưa có tour du lịch nào tại **${searchDest}** do đối tác đăng ký.\n\nTuy nhiên, bạn có thể tham khảo link bên dưới hoặc nếu bạn muốn, mình có thể tự động lên một **Lịch Trình (Itinerary) tự túc** chi tiết thay thế cho bạn ngay trong khung chat này nhé! 😉`;
+          }
+        } else {
+          if (tourCount > 0) {
+            answer = `Chào bạn! WanderViet AI đã tìm thấy **${tourCount}** dịch vụ lưu trú, ăn uống và trải nghiệm tại **${searchDest}** trên hệ thống.\n\nBạn hãy tham khảo các **thẻ gợi ý trực quan** ở phía dưới để xem chi tiết và đặt chỗ nhé! 👇`;
+          } else {
+            answer = `Hiện tại hệ thống WanderViet chưa có dịch vụ nào tại **${searchDest}** do đối tác đăng ký.\n\nBạn có muốn mình tự động lên một **Lịch Trình (Itinerary) du lịch tự túc** để bạn tham khảo các điểm ăn chơi tại đây không? 😉`;
+          }
+        }
+
+        if (finalMeta.suggestedLink && tourCount === 0) {
+          const linkMd = `[👉 ${finalMeta.suggestedLink.label}](${finalMeta.suggestedLink.url})`;
+          answer = answer.trim() + '\n\n' + linkMd;
+        }
+
+        // Save to DB in background
+        if (chatbotDb.readyState === 1 && !clientDisconnected) {
+          if (!currentSessionId) currentSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+          let title = message.split(' ').slice(0, 5).join(' ');
+          Promise.all([
+            new Conversation({ userId: sessionKey, sessionId: currentSessionId, title: title, role: 'user', text: message }).save(),
+            new Conversation({ userId: sessionKey, sessionId: currentSessionId, role: 'model', text: answer }).save()
+          ]).catch(err => console.error("Lỗi lưu DB Fast Path:", err.message));
+        }
+
+        return res.json({
+          success: true,
+          answer: answer,
+          sessionId: currentSessionId,
+          messageId: null,
+          proposal: finalMeta.proposal,
+          discoveryPlaces: finalMeta.discoveryPlaces,
+          suggestedTours: finalMeta.suggestedTours,
+          suggestedLink: finalMeta.suggestedLink,
+          source: 'wanderviet-ai-fastpath-tour-service'
+        });
+      }
+    }
+
     // 1. Phân tích Lịch sử hội thoại & Profile người dùng từ SERVER song song
     let chatHistory = [];
     let fullUser = null;

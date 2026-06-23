@@ -8,9 +8,9 @@
   let selectMode = false;
 
   const $ = s => document.querySelector(s);
-  const fmtVND = n => Number(n||0).toLocaleString('vi-VN') + 'đ';
+  const fmtVND = n => Number(n || 0).toLocaleString('vi-VN') + 'đ';
   const fmtD = d => d ? new Date(d).toLocaleDateString('vi-VN') : '—';
-  const fmtDT = d => d ? new Date(d).toLocaleString('vi-VN', {hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit', second:'2-digit'}) : '—';
+  const fmtDT = d => d ? new Date(d).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', second: '2-digit' }) : '—';
   const LOGO = '/assets/wanderviet-logo-cropped-rounded.png';
 
   const isServicePlace = p => {
@@ -76,20 +76,20 @@
   const isOnlinePaid = b => b.paymentStatus === 'paid' || ONLINE_METHODS.includes(b.paymentMethod);
 
   const STATUS = {
-    pending:   ['Chờ duyệt', 'warn'],
-    confirmed: ['Đã duyệt',  'info'],
-    completed: ['Hoàn thành','ok'  ],
-    cancelled: ['Đã hủy',    'err' ],
-    success:   ['Thành công','ok'  ],
-    failed:    ['Thất bại',  'err' ],
-    planning:  ['Đang lên lịch','info'],
+    pending: ['Chờ duyệt', 'warn'],
+    confirmed: ['Đã duyệt', 'info'],
+    completed: ['Hoàn thành', 'ok'],
+    cancelled: ['Đã hủy', 'err'],
+    success: ['Thành công', 'ok'],
+    failed: ['Thất bại', 'err'],
+    planning: ['Đang lên lịch', 'info'],
   };
 
   async function init() {
     if (!T) return;
     try {
       const [r1, r2] = await Promise.all([
-        fetch('/api/auth/me', { headers:{'x-auth-token':T} }),
+        fetch('/api/auth/me', { headers: { 'x-auth-token': T } }),
         fetch('/api/public/places')
       ]);
       const [me, pl] = await Promise.all([r1.json(), r2.json()]);
@@ -104,16 +104,16 @@
       $('#search-input')?.addEventListener('input', () => renderList());
 
       switchTab('wishlist');
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
   }
 
   async function loadGlobalStats() {
     try {
       const [rB, rT, rX, rA] = await Promise.all([
-        fetch('/api/bookings/my', { headers:{'x-auth-token':T} }).then(r=>r.json().catch(()=>({data:[]}))),
-        fetch('/api/planner/my-trips', { headers:{'x-auth-token':T} }).then(r=>r.json().catch(()=>({data:[]}))),
-        fetch('/api/payments/transactions', { headers:{'x-auth-token':T} }).then(r=>r.json().catch(()=>({data:[]}))),
-        fetch('/api/activities/my', { headers:{'x-auth-token':T} }).then(r=>r.json().catch(()=>({data:[]}))),
+        fetch('/api/bookings/my', { headers: { 'x-auth-token': T } }).then(r => r.json().catch(() => ({ data: [] }))),
+        fetch('/api/planner/my-trips', { headers: { 'x-auth-token': T } }).then(r => r.json().catch(() => ({ data: [] }))),
+        fetch('/api/payments/transactions', { headers: { 'x-auth-token': T } }).then(r => r.json().catch(() => ({ data: [] }))),
+        fetch('/api/activities/my', { headers: { 'x-auth-token': T } }).then(r => r.json().catch(() => ({ data: [] }))),
       ]);
 
       const trashIds = getTrashIds();
@@ -127,7 +127,7 @@
         const activeBookings = rB.data.filter(b => !trashIds.includes(b._id || b.bookingId));
         const nonRentals = activeBookings.filter(b => !isRental(b));
         const rentals = activeBookings.filter(b => isRental(b));
-        
+
         $('#count-bookings').textContent = nonRentals.length;
         $('#count-rentals').textContent = rentals.length;
         rB.data.forEach(b => { bookingMap[b.bookingId] = b; bookingMap[b._id] = b; });
@@ -150,7 +150,7 @@
         $('#count-acts').textContent = activeActs.length;
       }
 
-      const activeFavs = (user?.favorites||[]).filter(id => placeMap[id] && !trashIds.includes(id));
+      const activeFavs = (user?.favorites || []).filter(id => placeMap[id] && !trashIds.includes(id));
       $('#count-wishlist').textContent = activeFavs.length;
 
       // Count resolved trash items to avoid showing counts for missing/unapproved places or deleted records
@@ -162,14 +162,14 @@
       if (rA.success) rA.data.forEach(a => { if (a._id) resolvedIds.add(a._id); });
       const activeTrashCount = trashIds.filter(id => resolvedIds.has(id)).length;
       $('#count-trash').textContent = activeTrashCount;
-    } catch(e) {}
+    } catch (e) { }
   }
 
   function switchTab(next) {
     tab = next; fCat = 'all'; fStat = 'all'; fRegion = 'all'; fPay = 'all'; fTime = 'all';
     document.querySelectorAll('.nav-item[data-tab]').forEach(el => el.classList.toggle('is-active', el.dataset.tab === tab));
-    $('#tab-title').textContent = { wishlist:'Yêu thích', bookings:'Đặt chỗ', rentals:'Thuê xe / Đặt xe', trips:'Hành trình AI', transactions:'Giao dịch', activities:'Hoạt động', trash:'Thùng rác' }[tab];
-    
+    $('#tab-title').textContent = { wishlist: 'Yêu thích', bookings: 'Đặt chỗ', rentals: 'Thuê xe / Đặt xe', trips: 'Hành trình AI', transactions: 'Giao dịch', activities: 'Hoạt động', trash: 'Thùng rác' }[tab];
+
     const clearBtn = $('#clear-all-btn');
     if (clearBtn) {
       if (tab === 'trash') {
@@ -178,7 +178,7 @@
         clearBtn.textContent = '🗑️ Xóa tất cả';
       }
     }
-    
+
     updateDynamicSidebar();
     loadTab();
   }
@@ -186,43 +186,43 @@
   function updateDynamicSidebar() {
     const box = $('#dynamic-filters'); box.innerHTML = '';
     const addS = (lb, items, cur, type) => {
-      const d = document.createElement('div'); d.className='sb-filter-group';
-      d.innerHTML = `<p class="sb-label">${lb}</p><div class="sb-filter-list">${items.map(i=>`<div class="sb-filter-item ${cur===i.id?'active':''}" onclick="setF('${type}','${i.id}')">${i.lb}</div>`).join('')}</div>`;
+      const d = document.createElement('div'); d.className = 'sb-filter-group';
+      d.innerHTML = `<p class="sb-label">${lb}</p><div class="sb-filter-list">${items.map(i => `<div class="sb-filter-item ${cur === i.id ? 'active' : ''}" onclick="setF('${type}','${i.id}')">${i.lb}</div>`).join('')}</div>`;
       box.appendChild(d);
     };
     if (tab === 'wishlist') {
-      addS('Thể loại', [{id:'all',lb:'Tất cả'},{id:'place',lb:'Địa điểm'},{id:'service',lb:'Dịch vụ'}], fCat,'cat');
-    } else if (tab==='bookings') {
-      addS('Dịch vụ', [{id:'all',lb:'Tất cả'},{id:'Lưu trú Elite',lb:'Khách sạn'},{id:'Ẩm thực & Giải trí',lb:'Nhà hàng'},{id:'Trải nghiệm Tour',lb:'Tour'}], fCat,'cat');
-      addS('Thanh toán', [{id:'all',lb:'Tất cả'},{id:'paid',lb:'Đã thanh toán'},{id:'unpaid',lb:'Chưa thanh toán'}], fPay,'pay');
-    } else if (tab==='rentals') {
-      addS('Loại xe', [{id:'all',lb:'Tất cả'},{id:'motorbike',lb:'Xe máy'},{id:'car',lb:'Ô tô'},{id:'electric',lb:'Xe điện'}], fCat,'cat');
-      addS('Thanh toán', [{id:'all',lb:'Tất cả'},{id:'paid',lb:'Đã thanh toán'},{id:'unpaid',lb:'Chưa thanh toán'}], fPay,'pay');
-    } else if (tab==='trips') {
-      addS('Vùng miền', [{id:'all',lb:'Toàn quốc'},{id:'Bắc',lb:'Miền Bắc'},{id:'Trung',lb:'Miền Trung'},{id:'Nam',lb:'Miền Nam'}], fRegion,'region');
+      addS('Thể loại', [{ id: 'all', lb: 'Tất cả' }, { id: 'place', lb: 'Địa điểm' }, { id: 'service', lb: 'Dịch vụ' }], fCat, 'cat');
+    } else if (tab === 'bookings') {
+      addS('Dịch vụ', [{ id: 'all', lb: 'Tất cả' }, { id: 'Lưu trú Elite', lb: 'Khách sạn' }, { id: 'Ẩm thực & Giải trí', lb: 'Nhà hàng' }, { id: 'Trải nghiệm Tour', lb: 'Tour' }], fCat, 'cat');
+      addS('Thanh toán', [{ id: 'all', lb: 'Tất cả' }, { id: 'paid', lb: 'Đã thanh toán' }, { id: 'unpaid', lb: 'Chưa thanh toán' }], fPay, 'pay');
+    } else if (tab === 'rentals') {
+      addS('Loại xe', [{ id: 'all', lb: 'Tất cả' }, { id: 'motorbike', lb: 'Xe máy' }, { id: 'car', lb: 'Ô tô' }, { id: 'electric', lb: 'Xe điện' }], fCat, 'cat');
+      addS('Thanh toán', [{ id: 'all', lb: 'Tất cả' }, { id: 'paid', lb: 'Đã thanh toán' }, { id: 'unpaid', lb: 'Chưa thanh toán' }], fPay, 'pay');
+    } else if (tab === 'trips') {
+      addS('Vùng miền', [{ id: 'all', lb: 'Toàn quốc' }, { id: 'Bắc', lb: 'Miền Bắc' }, { id: 'Trung', lb: 'Miền Trung' }, { id: 'Nam', lb: 'Miền Nam' }], fRegion, 'region');
     }
   }
 
   window.setF = (t, v) => {
-    if(t==='cat') fCat=v; if(t==='stat') fStat=v; if(t==='region') fRegion=v; if(t==='pay') fPay=v;
+    if (t === 'cat') fCat = v; if (t === 'stat') fStat = v; if (t === 'region') fRegion = v; if (t === 'pay') fPay = v;
     updateDynamicSidebar(); renderList();
   };
 
   async function loadTrashItems() {
     const trashIds = getTrashIds();
     if (trashIds.length === 0) return [];
-    const EP = { bookings:'/api/bookings/my', trips:'/api/planner/my-trips', transactions:'/api/payments/transactions', activities:'/api/activities/my' };
+    const EP = { bookings: '/api/bookings/my', trips: '/api/planner/my-trips', transactions: '/api/payments/transactions', activities: '/api/activities/my' };
     try {
       const [rB, rT, rX, rA] = await Promise.all([
-        fetch(EP.bookings, { headers:{'x-auth-token':T} }).then(r=>r.json().catch(()=>({data:[]}))),
-        fetch(EP.trips, { headers:{'x-auth-token':T} }).then(r=>r.json().catch(()=>({data:[]}))),
-        fetch(EP.transactions, { headers:{'x-auth-token':T} }).then(r=>r.json().catch(()=>({data:[]}))),
-        fetch(EP.activities, { headers:{'x-auth-token':T} }).then(r=>r.json().catch(()=>({data:[]}))),
+        fetch(EP.bookings, { headers: { 'x-auth-token': T } }).then(r => r.json().catch(() => ({ data: [] }))),
+        fetch(EP.trips, { headers: { 'x-auth-token': T } }).then(r => r.json().catch(() => ({ data: [] }))),
+        fetch(EP.transactions, { headers: { 'x-auth-token': T } }).then(r => r.json().catch(() => ({ data: [] }))),
+        fetch(EP.activities, { headers: { 'x-auth-token': T } }).then(r => r.json().catch(() => ({ data: [] }))),
       ]);
 
       const allItems = [];
 
-      const favs = (user?.favorites||[]).map(id => placeMap[id]).filter(Boolean).map(item => ({ ...item, _historyType: 'wishlist' }));
+      const favs = (user?.favorites || []).map(id => placeMap[id]).filter(Boolean).map(item => ({ ...item, _historyType: 'wishlist' }));
       allItems.push(...favs);
 
       if (rB.success) {
@@ -245,7 +245,7 @@
       }
 
       return allItems.filter(item => trashIds.includes(item._id || item.id));
-    } catch(e) {
+    } catch (e) {
       console.error(e);
       return [];
     }
@@ -265,95 +265,95 @@
       const uniqueRegions = new Set(allData.map(p => p.region).filter(Boolean)).size;
       const ratings = allData.map(p => p.ratingAvg || 5);
       const avgRating = ratings.length > 0 ? (ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1) + ' ⭐' : '—';
-      
+
       sSpent.textContent = allData.length;
       if (lbSpent) lbSpent.textContent = 'Địa điểm';
-      
+
       sTrips.textContent = uniqueRegions;
       if (lbTrips) lbTrips.textContent = 'Tỉnh thành';
-      
+
       sPlaces.textContent = avgRating;
       if (lbPlaces) lbPlaces.textContent = 'Đánh giá';
-    } 
+    }
     else if (tab === 'bookings') {
       const totalSpent = allData.filter(b => b.status !== 'cancelled').reduce((sum, b) => sum + (b.totalPrice || 0), 0);
       const completed = allData.filter(b => b.status === 'completed').length;
       const pending = allData.filter(b => b.status === 'pending').length;
-      
+
       sSpent.textContent = fmtVND(totalSpent);
       if (lbSpent) lbSpent.textContent = 'Chi tiêu đặt chỗ';
-      
+
       sTrips.textContent = completed;
       if (lbTrips) lbTrips.textContent = 'Hoàn thành';
-      
+
       sPlaces.textContent = pending;
       if (lbPlaces) lbPlaces.textContent = 'Chờ duyệt';
-    } 
+    }
     else if (tab === 'rentals') {
       const totalSpent = allData.filter(b => b.status !== 'cancelled').reduce((sum, b) => sum + (b.totalPrice || 0), 0);
       const completed = allData.filter(b => b.status === 'completed').length;
       const pending = allData.filter(b => b.status === 'pending').length;
-      
+
       sSpent.textContent = fmtVND(totalSpent);
       if (lbSpent) lbSpent.textContent = 'Chi tiêu thuê xe';
-      
+
       sTrips.textContent = completed;
       if (lbTrips) lbTrips.textContent = 'Hoàn thành';
-      
+
       sPlaces.textContent = pending;
       if (lbPlaces) lbPlaces.textContent = 'Chờ duyệt';
-    } 
+    }
     else if (tab === 'trips') {
       const totalDays = allData.reduce((sum, t) => sum + (parseInt(t.days) || 1), 0);
       const uniqueDest = new Set(allData.map(t => t.destination).filter(Boolean)).size;
-      
+
       sSpent.textContent = allData.length;
       if (lbSpent) lbSpent.textContent = 'Chuyến đi';
-      
+
       sTrips.textContent = totalDays + ' ngày';
       if (lbTrips) lbTrips.textContent = 'Tổng số ngày';
-      
+
       sPlaces.textContent = uniqueDest;
       if (lbPlaces) lbPlaces.textContent = 'Điểm đến';
-    } 
+    }
     else if (tab === 'transactions') {
       const totalSuccess = allData.filter(t => t.status === 'success' && t.type !== 'refund').reduce((sum, t) => sum + t.amount, 0);
       const totalRefund = allData.filter(t => t.status === 'success' && t.type === 'refund').reduce((sum, t) => sum + t.amount, 0);
       const successCount = allData.filter(t => t.status === 'success').length;
-      
+
       sSpent.textContent = fmtVND(totalSuccess);
       if (lbSpent) lbSpent.textContent = 'Tổng chi tiêu';
-      
+
       sTrips.textContent = fmtVND(totalRefund);
       if (lbTrips) lbTrips.textContent = 'Tổng hoàn tiền';
-      
+
       sPlaces.textContent = successCount;
       if (lbPlaces) lbPlaces.textContent = 'Thành công';
-    } 
+    }
     else if (tab === 'activities') {
       const uniqueDays = new Set(allData.map(a => a.timestamp ? new Date(a.timestamp).toDateString() : '').filter(Boolean)).size;
       const timestamps = allData.map(a => a.timestamp ? new Date(a.timestamp).getTime() : 0).filter(Boolean);
       const lastActive = timestamps.length > 0 ? new Date(Math.max(...timestamps)).toLocaleDateString('vi-VN') : '—';
-      
+
       sSpent.textContent = allData.length;
       if (lbSpent) lbSpent.textContent = 'Hoạt động';
-      
+
       sTrips.textContent = uniqueDays;
       if (lbTrips) lbTrips.textContent = 'Số ngày';
-      
+
       sPlaces.textContent = lastActive;
       if (lbPlaces) lbPlaces.textContent = 'Gần nhất';
-    } 
+    }
     else if (tab === 'trash') {
       const bookingsCount = allData.filter(item => item._historyType === 'bookings' || item._historyType === 'rentals').length;
       const othersCount = allData.filter(item => item._historyType !== 'bookings' && item._historyType !== 'rentals').length;
-      
+
       sSpent.textContent = allData.length;
       if (lbSpent) lbSpent.textContent = 'Mục đã xóa';
-      
+
       sTrips.textContent = bookingsCount;
       if (lbTrips) lbTrips.textContent = 'Đặt & Thuê';
-      
+
       sPlaces.textContent = othersCount;
       if (lbPlaces) lbPlaces.textContent = 'Mục khác';
     }
@@ -361,7 +361,7 @@
 
   async function loadTab() {
     $('#list-area').innerHTML = '<div class="empty-box">Đang kiểm tra dữ liệu...</div>';
-    
+
     selectMode = false;
     const selectBtn = $('#toggle-select-mode-btn');
     if (selectBtn) {
@@ -383,11 +383,11 @@
       return;
     }
 
-    const EP = { bookings:'/api/bookings/my', rentals:'/api/bookings/my', trips:'/api/planner/my-trips', transactions:'/api/payments/transactions', activities:'/api/activities/my' };
+    const EP = { bookings: '/api/bookings/my', rentals: '/api/bookings/my', trips: '/api/planner/my-trips', transactions: '/api/payments/transactions', activities: '/api/activities/my' };
     try {
-      if (tab === 'wishlist') allData = (user?.favorites||[]).map(id => placeMap[id]).filter(Boolean);
+      if (tab === 'wishlist') allData = (user?.favorites || []).map(id => placeMap[id]).filter(Boolean);
       else {
-        const r = await fetch(EP[tab] || EP['bookings'], { headers:{'x-auth-token':T} });
+        const r = await fetch(EP[tab] || EP['bookings'], { headers: { 'x-auth-token': T } });
         const j = await r.json();
         if (tab === 'rentals') {
           allData = j.success ? j.data.filter(b => {
@@ -405,7 +405,7 @@
           allData = j.success ? j.data : [];
         }
       }
-    } catch(e) {}
+    } catch (e) { }
 
     const trashIds = getTrashIds();
     allData = allData.filter(item => !trashIds.includes(item._id || item.id));
@@ -416,7 +416,7 @@
   function renderList() {
     const qVal = $('#search-input')?.value.toLowerCase() || '';
     let data = [...allData];
-    if (fCat!=='all') {
+    if (fCat !== 'all') {
       if (tab === 'wishlist') {
         if (fCat === 'place') {
           data = data.filter(p => !isServicePlace(p));
@@ -424,32 +424,32 @@
           data = data.filter(p => isServicePlace(p));
         }
       } else {
-        data = data.filter(i => (placeMap[i.placeId]?.category===fCat || i.category===fCat));
+        data = data.filter(i => (placeMap[i.placeId]?.category === fCat || i.category === fCat));
       }
     }
-    if (fPay!=='all') data = data.filter(i => i.paymentStatus === fPay);
-    if (qVal) data = data.filter(i => (i.name||i.placeName||i.destination||'').toLowerCase().includes(qVal));
+    if (fPay !== 'all') data = data.filter(i => i.paymentStatus === fPay);
+    if (qVal) data = data.filter(i => (i.name || i.placeName || i.destination || '').toLowerCase().includes(qVal));
 
     $('#result-count-val').textContent = data.length;
-    if(!data.length) { 
-      $('#list-area').innerHTML = '<div class="empty-box">Chưa tìm thấy bản ghi nào khớp.</div>'; 
+    if (!data.length) {
+      $('#list-area').innerHTML = '<div class="empty-box">Chưa tìm thấy bản ghi nào khớp.</div>';
       $('#selection-bar').style.display = 'none';
-      return; 
+      return;
     }
 
-    $('#list-area').innerHTML = (tab==='activities' || (tab==='trash' && data.every(i => i._historyType === 'activities')) ? '<div class="timeline">' : '<div class="card-grid">') + 
+    $('#list-area').innerHTML = (tab === 'activities' || (tab === 'trash' && data.every(i => i._historyType === 'activities')) ? '<div class="timeline">' : '<div class="card-grid">') +
       data.map(item => {
         const itemTab = tab === 'trash' ? item._historyType : tab;
-        if(itemTab==='wishlist') return cardV(item);
-        if(itemTab==='bookings') return cardB(item);
-        if(itemTab==='rentals') return cardR(item);
-        if(itemTab==='trips')    return cardT(item);
-        if(itemTab==='transactions') return cardX(item);
-        if(itemTab==='activities') return cardA(item);
+        if (itemTab === 'wishlist') return cardV(item);
+        if (itemTab === 'bookings') return cardB(item);
+        if (itemTab === 'rentals') return cardR(item);
+        if (itemTab === 'trips') return cardT(item);
+        if (itemTab === 'transactions') return cardX(item);
+        if (itemTab === 'activities') return cardA(item);
         return '';
       }).join('') + '</div>';
-      
-      window.updateSelectedCount();
+
+    window.updateSelectedCount();
   }
 
   window.doAction = (action, id) => {
@@ -552,7 +552,7 @@
       if (type === 'wishlist' && user && user.favorites) {
         user.favorites = user.favorites.filter(x => x !== id);
       }
-    } catch(e) { console.error(e); }
+    } catch (e) { console.error(e); }
 
     const trashIds = getTrashIds();
     setTrashIds(trashIds.filter(x => x !== id));
@@ -646,7 +646,7 @@
           if (type === 'wishlist' && user && user.favorites) {
             user.favorites = user.favorites.filter(x => x !== id);
           }
-        } catch(e) {}
+        } catch (e) { }
       }
       const trashIds = getTrashIds();
       let updated = [...trashIds];
@@ -692,7 +692,7 @@
             const method = type === 'wishlist' ? 'POST' : 'DELETE';
             await fetch(url, { method, headers: { 'x-auth-token': T } });
           }
-        } catch(e) {}
+        } catch (e) { }
       }
       setTrashIds([]);
       WanderUI.showToast('Đã dọn sạch thùng rác', 'success');
@@ -709,12 +709,12 @@
     loadGlobalStats();
   };
 
-  function cardV(p) { 
+  function cardV(p) {
     const id = p._id || p.id;
     const type = tab === 'trash' ? p._historyType : tab;
     const imgUrl = p.image || p.coverImage || (p.images && p.images[0]) || `/api/public/place-photo?name=${encodeURIComponent(p.name || '')}`;
     const checkboxHtml = selectMode ? `<div class="item-checkbox-wrap"><input type="checkbox" class="item-checkbox" data-id="${id}" data-type="${type}" onchange="updateSelectedCount()"></div>` : '';
-    
+
     let footerHtml = '';
     if (tab === 'trash') {
       footerHtml = `
@@ -734,7 +734,7 @@
         <div class="v-img-wrap">
           ${checkboxHtml}
           <img src="${imgUrl}" onerror="this.onerror=null;this.src='/assets/wanderviet-logo-cropped-rounded.png';">
-          <div class="v-badge-top">⭐ ${p.ratingAvg||5}</div>
+          <div class="v-badge-top">⭐ ${p.ratingAvg || 5}</div>
         </div>
         <div class="v-body">
           <p class="v-cat">${p.category || (isServicePlace(p) ? 'Dịch vụ' : 'Địa điểm')}</p>
@@ -744,13 +744,13 @@
         <div class="v-footer">
           ${footerHtml}
         </div>
-      </div>`; 
+      </div>`;
   }
 
-  function cardB(b) { 
+  function cardB(b) {
     const id = b._id || b.bookingId;
     const type = tab === 'trash' ? b._historyType : tab;
-    const pl=placeMap[b.placeId]||{}; const [l,c]=STATUS[b.status]||[b.status,'info'];
+    const pl = placeMap[b.placeId] || {}; const [l, c] = STATUS[b.status] || [b.status, 'info'];
     const isUnpaid = !isOnlinePaid(b) && b.status !== 'cancelled';
     const isDone = b.status === 'completed';
     const imgUrl = pl.image || pl.coverImage || (pl.images && pl.images[0]) || `/api/public/place-photo?name=${encodeURIComponent(b.placeName || 'Dịch vụ')}`;
@@ -777,9 +777,9 @@
           <div class="v-status-tag tag-${c}">${l}</div>
         </div>
         <div class="v-body">
-          <p class="v-cat">${pl.category||'Dịch vụ'}</p>
+          <p class="v-cat">${pl.category || 'Dịch vụ'}</p>
           <h4 class="v-title">${b.placeName}</h4>
-          <div class="v-meta"><span>📅 ${fmtD(b.useDate)}</span><span style="color:${isUnpaid?'#ef4444':'#10b981'}">${isOnlinePaid(b)?'Đã thanh toán':'Chưa thanh toán'}</span></div>
+          <div class="v-meta"><span>📅 ${fmtD(b.useDate)}</span><span style="color:${isUnpaid ? '#ef4444' : '#10b981'}">${isOnlinePaid(b) ? 'Đã thanh toán' : 'Chưa thanh toán'}</span></div>
         </div>
         <div class="v-footer">
           ${footerHtml}
@@ -787,12 +787,12 @@
       </div>`;
   }
 
-  function cardT(t) { 
+  function cardT(t) {
     const id = t._id;
     const type = tab === 'trash' ? t._historyType : tab;
-    const [l,c] = STATUS[t.status] || ['Đang lên lịch', 'info'];
+    const [l, c] = STATUS[t.status] || ['Đang lên lịch', 'info'];
     const checkboxHtml = selectMode ? `<div class="item-checkbox-wrap"><input type="checkbox" class="item-checkbox" data-id="${id}" data-type="${type}" onchange="updateSelectedCount()"></div>` : '';
-    
+
     let footerHtml = '';
     if (tab === 'trash') {
       footerHtml = `
@@ -820,7 +820,7 @@
           </div>
           ${footerHtml}
         </div>
-      </div>`; 
+      </div>`;
   }
 
   function cardR(b) {
@@ -870,10 +870,10 @@
       </div>`;
   }
 
-  function cardX(t) { 
+  function cardX(t) {
     const id = t._id;
     const type = tab === 'trash' ? t._historyType : tab;
-    const b = bookingMap[t.bookingId]; 
+    const b = bookingMap[t.bookingId];
     const pl = b ? (placeMap[b.placeId] || {}) : {};
     let imgUrl = LOGO;
     if (t.type !== 'upgrade') {
@@ -899,17 +899,17 @@
           <div class="v-badge-top">${fmtVND(t.amount)}</div>
         </div>
         <div class="v-body">
-          <p class="v-cat" style="color:${t.type==='refund'?'#10b981':'var(--accent)'}">${t.type.toUpperCase()}</p>
+          <p class="v-cat" style="color:${t.type === 'refund' ? '#10b981' : 'var(--accent)'}">${t.type.toUpperCase()}</p>
           <h4 class="v-title">${t.description}</h4>
           <div class="v-meta">🕒 ${fmtD(t.createdAt)}</div>
         </div>
         <div class="v-footer">
           ${footerHtml}
         </div>
-      </div>`; 
+      </div>`;
   }
 
-  function cardA(a) { 
+  function cardA(a) {
     const id = a._id;
     const type = tab === 'trash' ? a._historyType : tab;
     const checkboxHtml = selectMode ? `<div class="item-checkbox-wrap" style="top: 12px; left: 12px; width: 22px; height: 22px;"><input type="checkbox" class="item-checkbox" data-id="${id}" data-type="${type}" onchange="updateSelectedCount()"></div>` : '';
@@ -935,7 +935,7 @@
             ${actionsHtml}
           </div>
         </div>
-      </div>`; 
+      </div>`;
   }
 
   init();

@@ -1,7 +1,7 @@
 /* ===================== PLANNER.JS ===================== */
 window.WanderPlanner = window.WanderPlanner || {};
 
-window.getRatingStarsHtml = function(rating, fontSize = '0.85rem') {
+window.getRatingStarsHtml = function (rating, fontSize = '0.85rem') {
   const r = parseFloat(rating) || 0;
   const percent = Math.min(100, Math.max(0, (r / 5) * 100));
   return '<span style="position:relative;display:inline-block;font-size:' + fontSize + ';color:rgba(156,163,175,0.35);white-space:nowrap;letter-spacing:1.5px;line-height:1;vertical-align:middle;">★★★★★<span style="position:absolute;top:0;left:0;width:' + percent + '%;overflow:hidden;color:#fbbf24;white-space:nowrap;letter-spacing:1.5px;line-height:1;">★★★★★</span></span>';
@@ -28,6 +28,11 @@ const VN_DESTINATION_PHOTOS = {
   "hoàng thành thăng long": ["https://media.baocaobang.vn/upload/image/201307/thumbnail/16974_Hoangthanh01.jpg"],
   "nhà tù hỏa lò": ["https://tuotz.com/wp-content/uploads/2025/07/nha-tu-hoa-lo-1-1.png"],
   "chùa trấn quốc": ["https://nhn.1cdn.vn/thumbs/1200x630/2023/09/13/chua-tran-quoc-th.jpg"],
+  "bảo tàng lịch sử quân sự việt nam": [
+    "https://mediafile.qdnd.vn//images/2024/10/4/btlsqsvn_11.jpg",
+    "https://i.ytimg.com/vi/aT7hwfvpzDY/maxresdefault.jpg",
+    "https://hnm.1cdn.vn/2025/04/10/baotang-banve.jpg"
+  ],
   "hồ tây": ["https://phuotvivu.com/blog/wp-content/uploads/2021/06/H%E1%BB%93-T%C3%A2y-1024x597.jpg"],
   "cầu long biên": ["https://statics.vinpearl.com/cau-long-bien-6_1678872759.jpg"],
   "phố cổ hà nội": ["https://thoitiet24h.vn/images/pho-co-ha-noi-xua.jpg"],
@@ -42,18 +47,39 @@ const VN_DESTINATION_PHOTOS = {
   "nhà thờ lớn": ["https://hnm.1cdn.vn/2020/12/18/nhipsonghanoi.hanoimoi.com.vn-uploads-images-phananh-2020-12-17-_nha-tho-lon.jpg"],
   "bún chả hương liên": ["https://mms.img.susercontent.com/vn-11134513-7r98o-lstxf7m02f2c77@resize_ss1242x600!@crop_w1242_h600_cT"],
   "phở thìn bờ hồ": ["https://cafebiz.cafebizcdn.vn/zoom/700_438/162123310254002176/2023/2/23/avatar1677154808691-1677154809528736470105.jpg"],
-  "phở bát đàn": ["https://mms.img.susercontent.com/vn-11134513-7r98o-lsu7jkcdbfkpd3@resize_ss1242x600!@crop_w1242_h600_cT"],
+  "phở bát đàn": [
+    "https://mia.vn/media/uploads/blog-du-lich/pho-bat-dan-pho-gia-truyen-100-nam-tuoi-tai-ha-noi-1730101627.jpg",
+    "https://danielfooddiary.com/wp-content/uploads/2025/12/Pho-Gia-Truyen-Bat-Dan-HANOI--The-Authentic-Pho-Experience-Visitors-Seek.jpg",
+    "https://i.ytimg.com/vi/6dnPv6zTvuM/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBM70ayQgDKDSk5aiCK23AfJ7ekHw"
+  ],
   "phở 10 lý quốc sư": ["https://danielfooddiary.com/wp-content/uploads/2025/12/pho101.JPG"],
-  "chả cá lã vọng": ["https://statics.vinpearl.com/cha-ca-la-vong-ha-noi-0_1681057662.jpg"],
+  "chả cá lã vọng": [
+    "https://cdn.xanhsm.com/2025/01/20fafb8e-cha-ca-la-vong-hcm-1.jpg",
+    "https://nuocmamlegia.com/wp-content/uploads/2021/09/cha-ca-la-vong-tai-nha.jpg",
+    "https://afamilycdn.com/150157425591193600/2023/4/28/quan-cha-ca-la-vong-ha-noi-cha-ca-gia-nguyen-tran-khat-chan-23253848-1682669226278-168266922633517786913.jpg"
+  ],
   "bún thang giảng": ["https://luxuo.vn/wp-content/uploads/2024/11/cover-bun-thang.jpg"],
   "bún ốc hình lăng": ["https://cdn.tgdd.vn/2021/10/CookDish/tong-hop-8-cach-nau-bun-oc-ngon-hap-dan-chuan-vi-tai-nha-avt-1200x676.jpg"],
   "bún đậu mắm tôm cầu gỗ": ["https://lofita.vn/wp-content/uploads/2026/04/bun-dau-mam-tom-go-vap-9f18ca.webp"],
-  "bánh mì 25": ["https://www.vibrantlyvietnam.com/wp-content/uploads/2019/08/banh-mi-25-hanoi-vietnam-restaurant-review.jpg"],
+  "bánh mì 25": [
+    "https://www.vibrantlyvietnam.com/wp-content/uploads/2019/08/banh-mi-25-restaurant-review-hanoi-vietnam.jpg",
+    "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/30/72/d8/c0/caption.jpg?w=1200&h=1200&s=1",
+    "https://down-vn.img.susercontent.com/vn-11134259-7r98o-lw8blzy9e86361@resize_ss800x450"
+  ],
   "bánh cuốn gia an": ["https://meetup.vn/wp-content/uploads/2025/06/351520-banh-cuon-gia-an-body-2.jpg"],
   "cơm gà hàng bè": ["https://cdn-i.vtcnews.vn/resize/th/upload/2024/04/23/comgathuonghaingonnhuthongxuong-1-23434087.png"],
   "kem tràng tiền": ["https://nhn.1cdn.vn/2021/09/27/nhipsonghanoi-hanoimoi-com-vn-kem-ttien.jpg"],
   "cà phê giảng": ["https://coffee.org.vn/wp-content/uploads/2022/04/ca-phe-trung-16.jpg"],
-  "cà phê đường tàu": ["https://cdn.cand.vn/images/6295294336b43409ef7c00e9eb4350a94f3ddb88ffb7afcf0284/Ca_phe_duong_tau-1741410653170.jpg.avif"],
+  "cà phê đường tàu": [
+    "https://vcdn1-dulich.vnecdn.net/2024/11/27/1-5472-1732715875.jpg?w=680&h=0&q=100&dpr=2&fit=crop&s=Jbax3Yr8WunO177PpBSEDQ",
+    "https://tauvinhhalong.com/wp-content/uploads/2026/04/cafe-duong-tau.jpg",
+    "https://images2.thanhnien.vn/528068263637045248/2026/1/6/anh-4-1677982298200679889817-1767697162891248443079.jpg"
+  ],
+  "cà phê đường tàu phố cổ": [
+    "https://vcdn1-dulich.vnecdn.net/2024/11/27/1-5472-1732715875.jpg?w=680&h=0&q=100&dpr=2&fit=crop&s=Jbax3Yr8WunO177PpBSEDQ",
+    "https://tauvinhhalong.com/wp-content/uploads/2026/04/cafe-duong-tau.jpg",
+    "https://images2.thanhnien.vn/528068263637045248/2026/1/6/anh-4-1677982298200679889817-1767697162891248443079.jpg"
+  ],
   "trà chanh tạ hiện": ["https://1phutsaigon.vn/wp-content/uploads/2023/11/dia-chi-tra-chanh-gia-tay-o-sai-gon-2.jpg"],
   "quán bia tạ hiện": ["https://greenfuture.tech/_next/image?url=https%3A%2F%2Fupload-static.fgf.vn%2Fcms%2Fpho-ta-hien-4.jpg&w=3840&q=100"],
   "nhà hàng ngon": ["https://mia.vn/media/uploads/blog-du-lich/nha-hang-quan-an-ngon-ha-noi-noi-gin-giu-gia-tri-am-thuc-viet-13-1640631736.jpg"],
@@ -77,8 +103,16 @@ const VN_DESTINATION_PHOTOS = {
   "maison d'orient hotel": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/fe/77/42/maison-d-orient.jpg?w=900&h=500&s=1"],
   "the oriental jade hotel": ["https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/2b/1d/1f/swimming-pool.jpg?w=900&h=500&s=1"],
   "meliá hanoi": ["https://cdn2.vietnambooking.com/wp-content/uploads/hotel_pro/hotel_343476/ff30dfd6b244d3357f6c8392a8d1b033.jpg"],
-  "xem múa rối nước thăng long": ["https://luhanhvietnam.com.vn/du-lich-land-tour/vnt_upload/tour/08_2019/thumbs/780_crop_72f718faa37747e6a5f724eb2481cc2f.png"],
-  "múa rối nước thăng long": ["https://luhanhvietnam.com.vn/du-lich-land-tour/vnt_upload/tour/08_2019/thumbs/780_crop_72f718faa37747e6a5f724eb2481cc2f.png"],
+  "xem múa rối nước thăng long": [
+    "https://dulichnewtour.vn/ckfinder/images/Tours/nhahatmuaroithanglong/nha-hat-mua-roi-thang-long%20(4).jpg",
+    "https://i.ytimg.com/vi/8p3uR8LrZSk/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLASYXT9Pq8K7RJ3T8lRBlmGTHOp-A",
+    "https://sovhtt.hanoi.gov.vn/wp-content/uploads/2016/03/roi-nuoc.jpg"
+  ],
+  "múa rối nước thăng long": [
+    "https://dulichnewtour.vn/ckfinder/images/Tours/nhahatmuaroithanglong/nha-hat-mua-roi-thang-long%20(4).jpg",
+    "https://i.ytimg.com/vi/8p3uR8LrZSk/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLASYXT9Pq8K7RJ3T8lRBlmGTHOp-A",
+    "https://sovhtt.hanoi.gov.vn/wp-content/uploads/2016/03/roi-nuoc.jpg"
+  ],
   "đi xích lô quanh phố cổ": ["https://statics.vinpearl.com/gia-xich-lo-ha-noi-banner_1682253976.jpg"],
   "xích lô phố cổ": ["https://statics.vinpearl.com/gia-xich-lo-ha-noi-banner_1682253976.jpg"],
   "dạo chợ đêm phố cổ": ["https://static.vinwonders.com/production/cho-dem-pho-co-ha-noi-1.jpg"],
@@ -89,6 +123,31 @@ const VN_DESTINATION_PHOTOS = {
   "café sách & góc chill phố cổ": ["https://hotelroyalhoian.vn/wp-content/uploads/2025/05/dac-san-hoi-an-1-2-4.jpg"],
   "nhà hàng rooftop ở west lake": ["https://topgo.vn/wp-content/uploads/2017/07/rooftop-bar-12-1.jpg"],
   "nhà hàng buffet lẩu / nướng nổi tiếng": ["https://melamine.vn/wp-content/uploads/2023/07/Seoul-Garden-Chuoi-nha-hang-buffet-lau-nuong-TPHCM.jpg"],
+  "tour xe máy vespa phố cổ đêm": [
+    "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/8f/d9/39/hanoi-backstreet-tours.jpg?w=500&h=500&s=1",
+    "https://hanoibackstreettours.com/wp-content/uploads/2016/10/Hanoi-Motorbike-Tours-1.jpg",
+    "https://hanoibackstreettours.com/wp-content/uploads/2020/03/Hanoi-Vesp-Tours.jpg"
+  ],
+  "aeon mall long biên": [
+    "https://aeonmall-long-bien.com.vn/wp-content/uploads/2025/03/sanh-tay-hyundai-1-1.jpg",
+    "https://aeonmall-long-bien.com.vn/wp-content/uploads/2021/11/843aed8e0ae2c1bc98f3.jpg",
+    "https://aeonmall-vietnam.com/wp-content/uploads/2017/04/NY_0542-1.jpg"
+  ],
+  "rạp chiếu phim quốc gia": [
+    "https://api.chieuphimquocgia.com.vn/Content/Images/Master/0017151.jpg",
+    "https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2022/2/10/1013003/Z3171610536964_66669.jpg",
+    "https://apiv2.chieuphimquocgia.com.vn/Content/Images/Master/0017724.png"
+  ],
+  "tổ hợp hanoi creative city": [
+    "https://vov2.vov.vn/sites/default/files/images/hncrt.jpg",
+    "https://storage.googleapis.com/mytourcdn/resources/pictures/locations/sbb1441333879.jpg",
+    "https://nhn.1cdn.vn/thumbs/720x480/2023/03/12/khu-to-hop-giai-tri.jpg"
+  ],
+  "công viên nước hồ tây": [
+    "https://statics.vinpearl.com/cong-vien-nuoc-ho-tay-4_1683899934.jpg",
+    "https://bizweb.dktcdn.net/100/101/075/articles/cv-871e5153-3882-428d-8f2f-b7606147cebb.jpg?v=1555754159673",
+    "https://tlavn.com/wp-content/uploads/2025/07/AVA.jpg"
+  ],
   "hạ long": [
     "https://dulichviet.com.vn/images/bandidau/%E1%BA%A2nh%20tour/tour%20du%20l%E1%BB%8Bch%20H%E1%BA%A1%20Long/gioi-thieu-ve-vinh-ha-long.webp",
     "https://cdn.xanhsm.com/2025/02/7393eefb-vinh-ha-long-thumb.jpg",
@@ -468,10 +527,20 @@ const initPlanner = function () {
     const destInput = document.getElementById('dest');
     if (destInput) {
       destInput.addEventListener('input', () => {
-        setTimeout(() => updateBudgetEstimate(), 200);
+        setTimeout(() => {
+          if (typeof populateBudgetBreakdownSuggestions === 'function') {
+            populateBudgetBreakdownSuggestions();
+          } else {
+            updateBudgetEstimate();
+          }
+        }, 200);
       });
       destInput.addEventListener('change', () => {
-        updateBudgetEstimate();
+        if (typeof populateBudgetBreakdownSuggestions === 'function') {
+          populateBudgetBreakdownSuggestions();
+        } else {
+          updateBudgetEstimate();
+        }
       });
     }
 
@@ -559,8 +628,12 @@ const initPlanner = function () {
     // Update date/time hints
     updateDateTimeHints();
 
-    // Initialize budget estimate
-    updateBudgetEstimate();
+    // Initialize budget estimate suggestions
+    if (typeof populateBudgetBreakdownSuggestions === 'function') {
+      populateBudgetBreakdownSuggestions();
+    } else {
+      updateBudgetEstimate();
+    }
 
     // Update total members
     updateTotalMembers();
@@ -876,6 +949,436 @@ const initPlanner = function () {
     }
   };
 
+
+  // ================================================
+  // DATABASE DỰ ĐOÁN ĐỀ XUẤT AI CHO KHOẢN CHI CHƯA CHỌN
+  // ================================================
+  const AI_PREDICTIONS_DB = {
+    "Hà Nội": {
+      budget: {
+        hotel: { name: "Hanoi Old Quarter Homestay", price: 350000, room: "Phòng Standard", location: "Quận Hoàn Kiếm" },
+        transport: { name: "Thuê xe máy Wave Alpha (tự lái, tự đổ xăng)", price: 120000 },
+        foodPool: {
+          breakfast: [
+            { name: "Phở Bò Lâm Hàng Vải + Trà đá", price: 55000, desc: "Phở bò truyền thống chuẩn vị cổ kính Hà Nội kèm ly trà đá thanh mát.", ingredients: "Bánh phở (tinh bột), thịt bò (đạm), hành hoa (vitamin), nước trà xanh." },
+            { name: "Bánh mì sốt vang nóng hổi + Sữa đậu nành", price: 45000, desc: "Bánh mì giòn chấm sốt vang gân bò đậm đà cùng cốc sữa đậu nành.", ingredients: "Tinh bột năng lượng cao, đạm béo từ gân bò hầm, đạm thực vật từ sữa đậu." },
+            { name: "Xôi xéo Hàng Hòm + Nước ngô ngọt", price: 30000, desc: "Xôi nếp dẻo bùi đậu xanh mỡ hành giòn thơm đi kèm sữa ngô ngọt.", ingredients: "Tinh bột hấp thu chậm, đạm thực vật từ đậu xanh, vitamin từ ngô ngọt." }
+          ],
+          lunch: [
+            { name: "Cơm sườn nướng Đào Duy Từ + Nước sấu đá", price: 65000, desc: "Đĩa cơm sườn cốt lết nướng đậm đà dưa góp kèm nước sấu đá chua ngọt đặc sản.", ingredients: "Cơm tám dẻo thơm (tinh bột), sườn heo nướng (đạm béo), nước sấu đá." },
+            { name: "Cơm rang thập cẩm + Canh cải ngọt + Nước sấu đá", price: 60000, desc: "Cơm rang dẻo tơi đầy đủ trứng thịt xá xíu kết hợp canh rau và nước sấu.", ingredients: "Tinh bột rang vàng giòn, đạm trứng & xá xíu, xơ từ canh cải ngọt." },
+            { name: "Bún Chả Đắc Kim Hàng Mành + Trà đá", price: 65000, desc: "Bún chả nướng than hoa thơm lừng và cốc trà đá Hà Nội.", ingredients: "Thịt heo nướng sém (đạm), bún tươi (tinh bột), chất xơ từ đu đủ xanh." }
+          ],
+          dinner: [
+            { name: "Cơm rang dưa bò Hàng Bông + Canh cải + Trà quất", price: 70000, desc: "Cơm rang giòn giòn cùng thịt bò xào dưa chua thơm lừng kèm trà quất.", ingredients: "Protein & sắt dồi dào từ thịt bò ta, tinh bột từ cơm rang dưa chua, trà quất." },
+            { name: "Cơm tấm sườn bì chả Hà Nội + Nước vối ấm", price: 55000, desc: "Cơm tấm nướng sườn ngon ngậy chan mỡ hành nóng hổi cùng ly nước vối tốt tiêu hóa.", ingredients: "Gạo tấm dẻo, sườn heo cốt lết (đạm), bì thính dẻo bùi, nước vối." },
+            { name: "Bún cá cay Hàng Đậu + Sữa đậu nành", price: 50000, desc: "Bún cá chiên giòn rụm nước dùng chua cay và cốc sữa đậu nành thơm mát.", ingredients: "Đạm từ cá chiên, bún tươi, vitamin C từ dọc mùng, sữa đậu nành." }
+          ]
+        },
+        tickets: [
+          { name: "Vé Đền Ngọc Sơn", price: 30000, desc: "Vé tham quan cầu Thê Húc, Đền Ngọc Sơn và tháp Bút." },
+          { name: "Vé Văn Miếu - Quốc Tử Giám", price: 30000, desc: "Vé vào cổng di tích trường đại học đầu tiên của Việt Nam." },
+          { name: "Bảo tàng Lịch sử Quân sự Việt Nam", price: 40000, desc: "Không gian trưng bày lịch sử quân sự quy mô lớn với nhiều hiện vật quý hiếm quốc gia." }
+        ],
+        entertain: [
+          { name: "Cà phê trứng tại Cafe Giảng", price: 40000, desc: "Thưởng thức món đặc sản cà phê trứng ngậy béo lâu đời." },
+          { name: "Trà chanh Chợ Gạo ngắm phố", price: 20000, desc: "Ngồi ghế nhựa uống trà chanh cắn hướng dương ngắm phố đêm." },
+          { name: "Cà phê Đường Tàu Phố Cổ", price: 40000, desc: "Ngồi nhâm nhi cà phê trứng bên đường ray tàu hỏa chạy sát qua các ngôi nhà cổ kính." }
+        ]
+      },
+      normal: {
+        hotel: { name: "Hanoi Boutique Hotel 3 sao", price: 750000, room: "Phòng Deluxe City View", location: "Quận Hoàn Kiếm" },
+        transport: { name: "Grab Car & Grab Bike nội thành", price: 250000 },
+        foodPool: {
+          breakfast: [
+            { name: "Phở Gia Truyền Bát Đàn + Quẩy + Trà đá", price: 65000, desc: "Bát phở bò lõi chín/tái mềm ngọt lịm kèm đĩa quẩy giòn và trà đá.", ingredients: "Bánh phở (tinh bột), đạm sắt từ thịt bò tươi, nước dùng xương giàu canxi, trà đá." },
+            { name: "Bún thang Bà Đức Cầu Gỗ + Sữa đậu nành", price: 65000, desc: "Món bún tinh tế với nước dùng gà thanh tao kết hợp sữa đậu nành ngon miệng.", ingredients: "Đạm từ gà xé, giò lụa, trứng tráng, nước dùng tôm khô bùi, sữa đậu." },
+            { name: "Bánh mì 25 kẹp patê xá xíu + Nước quất mật ong", price: 45000, desc: "Ổ bánh mì pate gan nóng hổi đi kèm ly nước quất mật ong giải nhiệt.", ingredients: "Giàu sắt & béo từ pate gan, tinh bột, vitamin A, C từ quất mật ong." }
+          ],
+          lunch: [
+            { name: "Cơm niêu đất xá xíu Phố Cổ + Nước sâm dứa", price: 75000, desc: "Cơm niêu cháy cạnh giòn rụm với thịt xá xíu xốt mật ong cùng nước sâm dứa mát lạnh.", ingredients: "Tinh bột dồi dào từ cơm niêu, đạm từ xá xíu mật ong, vitamin khoáng chất từ nước sâm." },
+            { name: "Bún Chả Hương Liên (Obama) + Nem cua bể + Bia Hà Nội", price: 95000, desc: "Mẹt bún chả trứ danh kèm nem cua bể giòn tan và chai bia Hà Nội.", ingredients: "Chả viên & chả miếng nướng than (đạm), bún tươi, nem cua bể giàu kẽm, bia." },
+            { name: "Bún đậu mắm tôm Hàng Khay + Nước quất đá", price: 70000, desc: "Mẹt bún đậu mắm tôm đầy đủ nem rán, chả cốm và ly nước quất đá chua mát.", ingredients: "Bún, đậu rán giòn, chả cốm (đạm), nem, thịt chân giò luộc, vitamin từ quất." }
+          ],
+          dinner: [
+            { name: "Cơm rang dưa bò giòn sần sật + Canh thịt băm + Trà chanh", price: 80000, desc: "Cơm rang vàng óng xào bắp bò chín mềm và dưa chua giòn ngọt kèm trà chanh.", ingredients: "Đạm & sắt từ thịt bò ta, cơm rang dưa chua thanh nhiệt, canh rau thịt băm, trà chanh." },
+            { name: "Lẩu riêu cua sườn sụn Phố Cổ + Nước ngọt lon", price: 190000, desc: "Nồi lẩu cua đồng giã tay sườn non giòn sần sật ăn kèm nước ngọt có ga.", ingredients: "Canxi từ gạch cua giã tay, đạm từ bắp bò ta, vitamin từ rau xanh muống, xà lách." },
+            { name: "Chả cá Lã Vọng + Nước sấu đá mát lạnh", price: 210000, desc: "Cá lăng nướng nghệ vàng ruộm ăn kèm bún, hành hoa tươi và cốc nước sấu thơm lừng.", ingredients: "Đạm & omega-3 từ cá lăng sông Đà, vitamin khoáng chất từ rau thì là, hành lá." }
+          ]
+        },
+        tickets: [
+          { name: "Vé di tích Nhà tù Hỏa Lò", price: 30000, desc: "Tham quan di tích lịch sử khét tiếng thời Pháp thuộc." },
+          { name: "Vé Hoàng Thành Thăng Long", price: 30000, desc: "Khám phá di sản văn hóa thế giới UNESCO nghìn năm tuổi." },
+          { name: "Bảo tàng Lịch sử Quân sự Việt Nam", price: 40000, desc: "Không gian trưng bày lịch sử quân sự quy mô lớn với nhiều hiện vật quý hiếm quốc gia." }
+        ],
+        entertain: [
+          { name: "Vé Xem Múa Rối Nước Thăng Long", price: 100000, desc: "Show nghệ thuật múa rối nước dân gian độc đáo bên Hồ Gươm." },
+          { name: "Rạp chiếu phim Quốc gia", price: 80000, desc: "Xem phim bom tấn tại rạp chiếu phim quốc gia chất lượng cao." },
+          { name: "Cà phê Đường Tàu Phố Cổ", price: 45000, desc: "Nhâm nhi ly nước và trải nghiệm tàu chạy sát bên cạnh độc lạ." },
+          { name: "Tổ hợp Hanoi Creative City", price: 50000, desc: "Khu nghệ thuật sáng tạo kết hợp ăn uống, triển lãm và khu vui chơi cực chất của giới trẻ." },
+          { name: "Aeon Mall Long Biên", price: 0, desc: "Trung tâm thương mại mua sắm ẩm thực và giải trí sầm uất hàng đầu Hà Nội." }
+        ]
+      },
+      luxury: {
+        hotel: { name: "Sofitel Legend Metropole Hanoi", price: 4500000, room: "Phòng Premium Grand Luxury", location: "Quận Hoàn Kiếm" },
+        transport: { name: "Thuê xe ô tô Camry 4 chỗ riêng có tài xế", price: 1200000 },
+        foodPool: {
+          breakfast: [
+            { name: "Buffet sáng tại Sofitel Metropole + Nước ép trái cây tươi", price: 650000, desc: "Trải nghiệm buffet sáng đẳng cấp 5 sao quốc tế và các loại nước ép organic thượng hạng.", ingredients: "Đầy đủ dinh dưỡng cao cấp với trứng cá caviar, cá hồi xông khói, nước ép tươi." },
+            { name: "Phở bò Wagyu Landmark Sky72 + Trà sâm thượng hạng", price: 450000, desc: "Phở bò Wagyu nhập khẩu ngắm mây thành phố từ trên cao cùng trà sâm bồi bổ sức khỏe.", ingredients: "Thịt bò Wagyu vân mỡ đều (đạm béo), nước dùng nhân sâm giàu đề kháng." }
+          ],
+          lunch: [
+            { name: "Set cơm Việt Cung Đình tại Gia Restaurant (Michelin) + Vang trắng Ý", price: 1600000, desc: "Nhà hàng Michelin tinh tế kết hợp hương vị truyền thống & hiện đại cùng ly vang trắng.", ingredients: "Nguyên liệu theo mùa chọn lọc, giàu dinh dưỡng, cân bằng tốt tinh bột & đạm." },
+            { name: "Buffet trưa hải sản thượng hạng Metropole + Champagne", price: 1300000, desc: "Buffet đẳng cấp quốc tế với các món Á-Âu và hải sản thượng hạng cùng ly Champagne Pháp.", ingredients: "Tôm hùm, cua huỳnh đế (đạm cao), gan ngỗng, các loại bánh ngọt Pháp." }
+          ],
+          dinner: [
+            { name: "Bữa tối ẩm thực tại Press Club Hanoi + Vang đỏ Bordeaux", price: 1100000, desc: "Trải nghiệm ẩm thực Pháp - Việt cao cấp do đầu bếp gắn sao Michelin tư vấn cùng ly vang đỏ thượng hạng.", ingredients: "Sườn cừu nướng sốt vang đỏ dồi dào kẽm sắt, nấm truffle tươi giàu khoáng chất." },
+            { name: "Set lẩu hải sản bào ngư Sen Tây Hồ VIP + Nước yến sào", price: 750000, desc: "Lẩu hải sản bào ngư nhân sâm bồi bổ sức khỏe đi kèm hũ yến sào chưng đường phèn.", ingredients: "Bào ngư tươi hầm nhân sâm (tăng đề kháng), tôm mũ ni, mực tươi, yến sào." }
+          ]
+        },
+        tickets: [
+          { name: "Tour Đêm Hoàng Thành Thăng Long", price: 300000, desc: "Trải nghiệm tham quan Hoàng Thành lung linh về đêm với các nghi lễ cổ truyền." },
+          { name: "Tour Đêm di tích Hỏa Lò", price: 299000, desc: "Chương trình tham quan trải nghiệm đêm vô cùng xúc động và chân thực." }
+        ],
+        entertain: [
+          { name: "Vé xem show Ionah tại Nhà hát Lớn", price: 650000, desc: "Show diễn nghệ thuật xiếc, múa và âm thanh ánh sáng hiện đại." },
+          { name: "Trải nghiệm Sky Lounge tầng 65 Lotte Center", price: 250000, desc: "Ngắm trọn vẹn Hà Nội từ đài quan sát kính trong suốt và thưởng thức cocktail." },
+          { name: "Tour Xe Máy Vespa Phố Cổ Đêm", price: 350000, desc: "Tour xe Vespa cổ khám phá ngóc ngách Hà Nội về đêm đầy thú vị." },
+          { name: "Công viên nước Hồ Tây", price: 180000, desc: "Tổ hợp công viên giải trí và các trò chơi dưới nước sôi động hàng đầu Thủ đô." }
+        ]
+      }
+    },
+    "TP. Hồ Chí Minh": {
+      budget: {
+        hotel: { name: "Saigon Backpackers Homestay", price: 300000, room: "Phòng Dorm/Standard", location: "Quận 1" },
+        transport: { name: "Thuê xe máy Wave Alpha (tự đổ xăng)", price: 120000 },
+        foodPool: {
+          breakfast: [
+            { name: "Hủ Tiếu Gõ Sài Gòn + Trà đá", price: 30000, desc: "Tô hủ tiếu bình dân quen thuộc của người Sài Gòn ăn kèm ly trà đá mát lạnh.", ingredients: "Hủ tiếu (tinh bột), thịt heo thái mỏng (đạm), tóp mỡ béo ngậy, nước trà đá." },
+            { name: "Bánh mì thịt chả vỉa hè + Nước sâm lạnh", price: 25000, desc: "Bánh mì kẹp đầy đặn dăm bông, chả lụa đi kèm cốc nước sâm mía lau mát mẻ.", ingredients: "Tinh bột dồi dào, đạm từ giò lụa, vitamin từ ngò dưa chua, nước sâm thanh lọc." }
+          ],
+          lunch: [
+            { name: "Cơm Tấm Bụi Sài Gòn + Trà đá", price: 55000, desc: "Sườn nướng thơm ngon chuẩn vị cơm tấm Sài Gòn ăn cùng nước mắm chua ngọt và trà đá dứa.", ingredients: "Gạo tấm thơm ngon (tinh bột), sườn heo cốt lết (đạm), mỡ hành (chất béo), trà đá." },
+            { name: "Bún thịt nướng bình dân Quận 1 + Nước mía", price: 45000, desc: "Tô bún thịt nướng giòn rụm nước mắm chua ngọt cùng ly nước mía mát lạnh.", ingredients: "Bún tươi, thịt heo nướng nạc (đạm), rau sống dồi dào chất xơ, nước mía ngọt thanh." }
+          ],
+          dinner: [
+            { name: "Cơm chiên Dương Châu hè phố + Nước ngọt lon", price: 40000, desc: "Cơm chiên hạt tơi đều đầy đủ trứng, lạp sườn xá xíu ăn kèm lon coca mát lạnh.", ingredients: "Tinh bột dồi dào từ cơm, đạm từ trứng gà, lạp xưởng, đậu hà lan chất xơ." },
+            { name: "Bột chiên Đạt Thành Quận 3 + Nước rau má", price: 35000, desc: "Đĩa bột chiên giòn giòn trứng gà béo ngậy cùng ly nước rau má đậu xanh thanh lọc.", ingredients: "Bột gạo chiên giòn, trứng gà (đạm), đu đủ xanh bào sợi giải ngấy, nước rau má." }
+          ]
+        },
+        tickets: [
+          { name: "Vé Dinh Độc Lập", price: 40000, desc: "Tham quan di tích lịch sử quốc gia đặc biệt." }
+        ],
+        entertain: [
+          { name: "Cà phê bệt Nhà thờ Đức Bà", price: 25000, desc: "Trải nghiệm văn hóa cà phê bệt độc đáo của giới trẻ Sài Thành." }
+        ]
+      },
+      normal: {
+        hotel: { name: "Liberty Central Saigon Riverside 3 sao", price: 800000, room: "Phòng Deluxe City View", location: "Quận 1" },
+        transport: { name: "Grab Car & Grab Bike nội thành", price: 260000 },
+        foodPool: {
+          breakfast: [
+            { name: "Hủ Tiếu Thanh Xuân + Nước sâm rong biển", price: 65000, desc: "Hủ tiếu Mỹ Tho gia truyền lâu đời nêm nếm cực ngon kèm nước sâm mát lạnh.", ingredients: "Sợi hủ tiếu dai, tôm thịt băm (đạm), gan heo giàu sắt, sốt đặc biệt, sâm rong biển." },
+            { name: "Bánh mì Huỳnh Hoa + Cà phê sữa đá Sài Gòn", price: 85000, desc: "Ổ bánh mì nổi tiếng đầy ắp thịt nguội cùng ly cà phê sữa đá đậm đà chuẩn vị.", ingredients: "Bánh mì giòn rụm, pate gan béo ngậy, giò chả, bơ tươi, cà phê sữa đá tỉnh táo." }
+          ],
+          lunch: [
+            { name: "Cơm Tấm Nguyễn Văn Cừ + Nước mía sầu riêng", price: 85000, desc: "Cơm tấm sườn nướng mật ong ngon nức tiếng Sài Gòn kèm cốc nước mía sầu riêng ngậy béo.", ingredients: "Sườn heo nướng bản lớn thơm ngậy, bì thính heo dẻo thơm, chả chưng trứng, nước mía sầu riêng." },
+            { name: "Cơm niêu Thiên Lý thơm ngon + Trà đào sả", price: 80000, desc: "Cơm niêu cháy xém giòn thơm ăn cùng các món kho tộ chuẩn cơm mẹ nấu đi kèm trà đào sả ngọt nhẹ.", ingredients: "Gạo tám thơm dẻo (tinh bột), thịt ba chỉ kho tộ (đạm béo), rau luộc, trà đào." },
+            { name: "Bánh xèo Ăn Là Ghiền + Nước dừa xiêm", price: 90000, desc: "Bánh xèo khổng lồ miền Tây nhân tôm thịt cùng trái dừa xiêm mát lịm.", ingredients: "Vỏ bánh giòn từ bột nghệ, tôm sông, thịt heo (đạm), giá đỗ, rau xà lách, nước dừa xiêm." }
+          ],
+          dinner: [
+            { name: "Cơm gà xối mỡ Nha Trang + Canh súp + Nước sâm lạnh", price: 75000, desc: "Cơm chiên hạt dẻo thơm ăn cùng đùi gà góc tư chiên xối mỡ giòn tan kết hợp canh rau và nước sâm.", ingredients: "Tinh bột từ gạo chiên, đạm protein lớn từ đùi gà rán, vitamin từ dưa leo xà lách." },
+            { name: "Lẩu cua Đất Mũi ngon ngậy + Nước ngọt lon", price: 210000, desc: "Nồi lẩu cua biển Cà Mau tươi ngon ngọt nước ăn cùng bún tươi và nước ngọt mát lạnh.", ingredients: "Cua biển gạch/thịt cực giàu đạm và canxi, nước dùng bầu chua thanh mát, bún, rau xanh." }
+          ]
+        },
+        tickets: [
+          { name: "Vé Bảo Tàng Chứng Tích Chiến Tranh", price: 40000, desc: "Bảo tàng lưu giữ lịch sử chiến tranh Việt Nam ý nghĩa." }
+        ],
+        entertain: [
+          { name: "Vé Du Thuyền Sông Sài Gòn", price: 350000, desc: "Ăn tối ngắm thành phố lung linh ánh đèn từ du thuyền sông Sài Gòn." },
+          { name: "Vé Bóng Nước Kịch Nói Sân Khấu", price: 200000, desc: "Xem kịch nói đầy cảm xúc tại sân khấu kịch lớn." }
+        ]
+      },
+      luxury: {
+        hotel: { name: "The Reverie Saigon 5 sao cao cấp", price: 5500000, room: "Phòng Grand Deluxe Riverside", location: "Quận 1" },
+        transport: { name: "Thuê xe ô tô Mercedes E300 riêng có tài xế", price: 1800000 },
+        foodPool: {
+          breakfast: [
+            { name: "Buffet Caravelle Saigon + Nước ép cam/táo hữu cơ", price: 600000, desc: "Bữa sáng 5 sao đẳng cấp giữa trung tâm Quận 1 ăn kèm các loại nước ép cao cấp.", ingredients: "Hải sản tươi sống, bánh ngọt thủ công Pháp, nước ép hữu cơ giàu vitamin." }
+          ],
+          lunch: [
+            { name: "Set cơm Việt Cung Đình tại SH Garden + Nước ép dứa mật ong", price: 550000, desc: "Nhà hàng sân thượng ngắm phố đi bộ Nguyễn Huệ, phục vụ cơm niêu và món kho hoàng gia kèm nước ép dứa.", ingredients: "Món ăn truyền thống Việt Nam cao cấp trình bày nghệ thuật, cân bằng tốt đạm và chất xơ." }
+          ],
+          dinner: [
+            { name: "Bữa tối Luxury tại Landmark 81 + Vang đỏ Chianti", price: 1300000, desc: "Bữa tối sang trọng tại nhà hàng cao nhất Việt Nam ngắm toàn cảnh kết hợp ly rượu vang Chianti hảo hạng.", ingredients: "Beefsteak thịt bò Wagyu (đạm béo cao cấp), gan ngỗng Pháp, rượu vang đỏ." }
+          ]
+        },
+        tickets: [
+          { name: "Vé đài quan sát Landmark 81 SkyView", price: 420000, desc: "Vé lên đài quan sát tầng cao nhất Landmark 81 ngắm trọn Sài Gòn." }
+        ],
+        entertain: [
+          { name: "Thưởng thức trà chiều tại Park Hyatt Saigon", price: 650000, desc: "Set trà chiều quý tộc Pháp trong không gian sảnh khách sạn đẳng cấp." },
+          { name: "Chill Bar sân thượng Chill Skybar Quận 1", price: 350000, desc: "Thưởng thức ly cocktail ngắm toàn cảnh trung tâm Sài Gòn về đêm." }
+        ]
+      }
+    },
+    "Đà Nẵng": {
+      budget: {
+        hotel: { name: "Danang Beach Hostel", price: 300000, room: "Phòng Standard", location: "Quận Ngũ Hành Sơn" },
+        transport: { name: "Thuê xe máy Wave Alpha tại Đà Nẵng", price: 120000 },
+        foodPool: {
+          breakfast: [
+            { name: "Bánh mì chả bò Đà Nẵng + Trà đá", price: 25000, desc: "Bánh mì giòn kẹp chả bò đậm đà gia vị kèm ly trà đá xanh mát.", ingredients: "Chả bò giòn dai (đạm), tinh bột bánh mì, đu đủ chua giải ngấy." }
+          ],
+          lunch: [
+            { name: "Cơm gà xé Đà Nẵng bình dân + Canh cải + Trà đá", price: 45000, desc: "Cơm rang gà xé phay bóp rau răm ăn kèm nước canh cải nóng hổi và trà đá.", ingredients: "Cơm rang thơm, đạm từ thịt gà xé, vitamin từ hành tây rau răm, trà đá." },
+            { name: "Mì Quảng Bà Mua + Nước mía", price: 55000, desc: "Bát mì Quảng thơm ngon đậm đà hương vị miền Trung cùng ly nước mía giòn ngọt.", ingredients: "Mì, tôm, thịt, trứng cút, bánh tráng, rau sống, nước mía ngọt lịm." }
+          ],
+          dinner: [
+            { name: "Cơm tấm sườn nướng miền Trung + Trà đá", price: 45000, desc: "Đĩa cơm tấm sườn nướng mỡ hành đậm đà đưa cơm ăn cùng trà đá mát lạnh.", ingredients: "Cơm tấm dẻo, sườn nướng đạm béo, nước mắm tỏi ớt đặc trưng, trà đá." },
+            { name: "Bún chả cá Ông Tạ bình dân + Nước rau má", price: 45000, desc: "Tô bún chả cá nước dùng ngọt thanh nóng hổi và ly nước rau má tươi ngon ngọt dịm.", ingredients: "Chả cá thác lác chiên hấp (đạm thơm ngon), bún, măng chua, nước rau má mát gan." }
+          ]
+        },
+        tickets: [
+          { name: "Vé Ngũ Hành Sơn", price: 40000, desc: "Vé tham quan ngọn núi Ngũ Hành nổi tiếng linh thiêng." }
+        ],
+        entertain: [
+          { name: "Dạo chơi Quảng trường 29 Tháng 3", price: 20000, desc: "Vui chơi ăn vặt ngắm cảnh đêm Đà Nẵng." }
+        ]
+      },
+      normal: {
+        hotel: { name: "Khách sạn Sala Danang Beach 3 sao", price: 800000, room: "Phòng Superior Ocean View", location: "Quận Sơn Trà" },
+        transport: { name: "Grab Car & Grab Bike nội thành Đà Nẵng", price: 220000 },
+        foodPool: {
+          breakfast: [
+            { name: "Bún bò bà Thương + Nước quất đá", price: 55000, desc: "Tô bún bò huế đậm đà nổi danh Đà Nẵng kèm ly nước quất ngọt mát.", ingredients: "Thịt bắp bò (đạm sắt), huyết heo (sắt), nước dùng xương ngọt lịm, nước quất đá." },
+            { name: "Bánh mì chảo cô Sinh + Sữa đậu nành", price: 50000, desc: "Chảo bánh mì đầy ắp pate xá xíu trứng ốp la cùng sữa đậu nành mát lành.", ingredients: "Tinh bột từ bánh mì, đạm béo từ trứng gà, pate heo, sữa đậu nành dồi dào dưỡng chất." }
+          ],
+          lunch: [
+            { name: "Cơm niêu Nhà Đỏ thơm dẻo + Trà bí đao", price: 90000, desc: "Cơm niêu đập giòn rụm ăn kèm cá kho tộ đậm đà miền Trung và trà bí đao ngọt thanh.", ingredients: "Tinh bột từ gạo tám niêu, đạm từ cá bống kho tộ, rau kho quẹt xơ khoáng, trà bí đao." },
+            { name: "Bánh Tráng Cuốn Thịt Heo Trần + Nước ép dứa", price: 115000, desc: "Món ăn đặc sản thịt heo hai đầu da cuốn kèm ly nước ép dứa tươi mát.", ingredients: "Thịt ba chỉ hai đầu da luộc ngọt ngậy, xà lách tía tô dồi dào chất xơ, nước dứa ép." },
+            { name: "Bún chả cá Nguyễn Chí Thanh + Nước sâm dứa", price: 55000, desc: "Bún chả cá lâu năm gia truyền nước dùng ngọt tự nhiên kèm ly sâm dứa Đà Nẵng.", ingredients: "Chả cá chiên, chả cá thu hấp, su hào, bí đỏ (vitamin), sâm dứa thanh mát." }
+          ],
+          dinner: [
+            { name: "Cơm rang hải sản đặc biệt + Canh chua + Trà chanh", price: 75000, desc: "Cơm chiên giòn rụm cùng mực xào, tôm tươi thơm ngọt ăn kèm canh chua tôm và trà chanh mát lạnh.", ingredients: "Đạm tôm mực biển, tinh bột cơm chiên dẻo, chất xơ & vitamin từ canh chua dứa cà chua, trà chanh." },
+            { name: "Lẩu hải sản Năm Đảnh tươi sống + Nước ngọt lon", price: 160000, desc: "Quán hải sản bình dân ngon nổi tiếng luôn đông đúc ăn kèm bún tươi và nước ngọt lon.", ingredients: "Nghêu hấp sả, tôm mực nướng muối ớt đầy dinh dưỡng giàu kẽm đạm béo." }
+          ]
+        },
+        tickets: [
+          { name: "Vé Cáp Treo Bà Nà Hills", price: 750000, desc: "Vé cáp treo lên đỉnh Bà Nà ngắm Cầu Vàng." }
+        ],
+        entertain: [
+          { name: "Vé Du Thuyền Sông Hàn Ngắm Cầu Rồng", price: 150000, desc: "Du thuyền ngắm cảnh sông Hàn và Cầu Rồng phun lửa phun nước đêm cuối tuần." }
+        ]
+      },
+      luxury: {
+        hotel: { name: "InterContinental Danang Sun Peninsula Resort", price: 6500000, room: "Classic Terrace Suite Ocean View", location: "Bán đảo Sơn Trà" },
+        transport: { name: "Thuê xe ô tô Mercedes C-Class có tài xế", price: 1800000 },
+        foodPool: {
+          breakfast: [
+            { name: "Buffet sáng tại InterContinental Danang + Nước ép trái cây tươi", price: 700000, desc: "Bữa sáng đẳng cấp quốc tế ngắm vịnh biển Sơn Trà thơ mộng cùng nước ép cao cấp.", ingredients: "Hải sản tươi sống giàu đạm kẽm, bánh ngọt nướng nóng hổi, nước trái cây ép tươi dồi dào vitamin." }
+          ],
+          lunch: [
+            { name: "Set cơm Niêu Cao Cấp & Mì Quảng ếch bếp Trang VIP + Nước dừa xiêm", price: 1500000, desc: "Cơm niêu ngự tiến và set mì Quảng ếch sang trọng trong mẹt tre cùng quả dừa xiêm lịm mát.", ingredients: "Thịt ếch đồng um nghệ đạm cao lành tính, gạo tám thơm dẻo, rau rừng tươi, nước dừa tươi." }
+          ],
+          dinner: [
+            { name: "Bữa tối hải sản tại Nhà hàng La Maison 1888 + Rượu vang cao cấp Pháp", price: 1600000, desc: "Nhà hàng ẩm thực Pháp cao cấp hàng đầu Việt Nam tại resort kết hợp rượu vang Pháp.", ingredients: "Thực đơn hải sản cao cấp chế biến bởi đầu bếp 3 sao Michelin đầy đủ đạm kẽm, rượu vang Pháp hảo hạng." }
+          ]
+        },
+        tickets: [
+          { name: "Vé Bà Nà Hills Hạng VIP", price: 1200000, desc: "Vé trải nghiệm Bà Nà Hills trọn gói kèm lối đi ưu tiên." }
+        ],
+        entertain: [
+          { name: "Dù Lượn Trên Bán Đảo Sơn Trà", price: 450000, desc: "Trải nghiệm bay dù lượn từ đỉnh Sơn Trà ngắm biển Đà Nẵng cực đỉnh." }
+        ]
+      }
+    },
+    "Đà Lạt": {
+      budget: {
+        hotel: { name: "Dalat Valley Homestay", price: 300000, room: "Phòng Standard ấm cúng", location: "Phường 10, Đà Lạt" },
+        transport: { name: "Thuê xe máy Sirius vượt đèo Đà Lạt", price: 120000 },
+        foodPool: {
+          breakfast: [
+            { name: "Bánh mì xíu mại Hoàng Diệu + Sữa đậu nành nóng", price: 35000, desc: "Món ăn sáng quốc dân ấm nóng giữa sương sớm Đà Lạt cùng sữa đậu nành nóng ấm lòng.", ingredients: "Xíu mại thịt heo (đạm), da heo giòn béo, bánh mì giòn nóng (tinh bột), sữa đậu nành nóng hổi." }
+          ],
+          lunch: [
+            { name: "Bánh căn Lệ trứng cút + Sữa đậu xanh nóng", price: 40000, desc: "Bánh căn nướng lò đất giòn rụm nhân trứng cút và cốc sữa đậu xanh nóng.", ingredients: "Trứng cút thơm bùi (đạm), vỏ bánh bột gạo (tinh bột), nước xíu mại chấm, sữa đậu xanh dồi dào vitamin." },
+            { name: "Cơm bình dân dốc nhà ga + Canh chua + Trà atisô đá", price: 35000, desc: "Đĩa cơm sườn luộc/kho bình dân nóng hổi cùng bát canh chua thanh mát và trà atisô mát.", ingredients: "Tinh bột từ gạo tẻ, đạm thịt ba chỉ, canh rau xanh mát, trà atisô thải độc gan." }
+          ],
+          dinner: [
+            { name: "Cơm chiên tỏi đùi gà rán + Canh súp + Trà atisô nóng", price: 50000, desc: "Cơm chiên tỏi hạt vàng giòn ăn cùng đùi gà rán thơm phức kết hợp trà atisô nóng.", ingredients: "Tinh bột cơm chiên tỏi thơm, đạm từ đùi gà góc tư rán giòn, trà atisô giữ ấm cơ thể." },
+            { name: "Lẩu gà lá é Tao Ngộ bình dân + Nước ngọt lon", price: 90000, desc: "Món lẩu nóng hổi trứ danh giữa cái lạnh Đà Lạt ăn cùng lon nước ngọt sảng khoái.", ingredients: "Gà ta thả vườn (đạm), lá é thơm nồng giàu vitamin chống cảm cúm, bún tươi tinh bột." }
+          ]
+        },
+        tickets: [
+          { name: "Vé vườn hoa cẩm tú cầu", price: 30000, desc: "Vườn hoa rực rỡ sắc màu check-in tuyệt đẹp." }
+        ],
+        entertain: [
+          { name: "Trà sữa ngắm Hồ Xuân Hương", price: 35000, desc: "Uống trà ngắm cảnh hồ lãng mạn se lạnh." }
+        ]
+      },
+      normal: {
+        hotel: { name: "Colline Hotel Dalat 3 sao", price: 850000, room: "Phòng Deluxe City View", location: "Trung tâm Đà Lạt" },
+        transport: { name: "Grab & Taxi nội thành Đà Lạt", price: 230000 },
+        foodPool: {
+          breakfast: [
+            { name: "Bánh mì chảo 27 + Ly Atisô nóng hổi", price: 60000, desc: "Chảo bánh mì đầy ắp pate xá xíu trứng ốp la cùng ly trà atisô nóng giữ ấm cơ thể.", ingredients: "Trứng gà ta, pate heo, phô mai lát bò cười thơm ngậy giàu canxi, trà atisô nóng hổi tốt gan." },
+            { name: "Bánh căn Nhà Chung + Sữa đậu nành nóng", price: 60000, desc: "Bánh căn nhân tôm thịt đổ khuôn đất nung giòn ngậy kèm ly sữa đậu nành nóng hổi.", ingredients: "Đạm tôm thịt, tinh bột gạo tẻ dẻo, sữa đậu nành cung cấp đạm thực vật chất lượng cao." }
+          ],
+          lunch: [
+            { name: "Cơm niêu Hương Trà + Canh atisô sườn non + Trà đá", price: 95000, desc: "Cơm niêu đất cơm dẻo cháy sém ngon ngọt chấm kho quẹt, bát canh hoa atisô sườn hầm thơm bùi kèm trà đá.", ingredients: "Gạo tám thơm cơm niêu, đạm & khoáng chất từ sườn heo hầm hoa atisô rừng tốt tiêu hóa, trà đá." },
+            { name: "Lẩu Bò Ba Toa Nhà Gỗ + Nước ngọt lon", price: 130000, desc: "Nồi lẩu bò thơm nức nước dùng ngọt xương hầm lâu năm cùng lon nước ngọt có ga mát mẻ.", ingredients: "Thịt nạm bò gân bò dồi dào đạm collagen béo, cải xanh xơ khoáng, mì trứng tinh bột." },
+            { name: "Nem Nướng Bà Hùng + Trà đào sả", price: 70000, desc: "Nem nướng giòn ngọt cuộn bánh tráng và tương chấm đặc biệt kết hợp ly trà đào sả thơm lừng.", ingredients: "Nem thịt heo nướng than ngọt đạm, ram chiên giòn rụm, xà lách rau thơm Đà Lạt dồi dào chất xơ." }
+          ],
+          dinner: [
+            { name: "Cơm đùi gà nướng lu muối ớt + Xà lách trộn + Trà atisô nóng", price: 85000, desc: "Cơm chiên hạt dẻo kèm đùi gà nướng mật ong muối ớt cay cay dĩa salad rau Đà Lạt và trà atisô nóng.", ingredients: "Gạo chiên vàng, protein từ đùi gà nướng chín lu ngọt thịt, vitamin dồi dào từ xà lách dưa leo." },
+            { name: "Lẩu gà lá é Tao Ngộ chính gốc + Nước ngọt lon", price: 160000, desc: "Món lẩu gà đặc sản nóng hổi sảng khoái với bún tươi nước lẩu ngọt lịm đi kèm nước ngọt mát mẻ.", ingredients: "Gà ta dai chắc thịt dồi dào đạm béo, lá é cay ấm chống lạnh sâu, bún tươi, nấm tươi." }
+          ]
+        },
+        tickets: [
+          { name: "Vé Thung Lũng Tình Yêu", price: 250000, desc: "Vé tham quan trọn gói thung lũng lãng mạn biểu tượng của Đà Lạt." }
+        ],
+        entertain: [
+          { name: "Cà phê tại Lululola Show", price: 150000, desc: "Thưởng thức nước uống ngắm hoàng hôn Đà Lạt cực chill." }
+        ]
+      },
+      luxury: {
+        hotel: { name: "Ana Mandara Villas Dalat Resort", price: 2800000, room: "Villa Room phong cách Pháp cổ", location: "Phường 5, Đà Lạt" },
+        transport: { name: "Thuê xe Limousine 9 chỗ trọn gói nội thành", price: 1500000 },
+        foodPool: {
+          breakfast: [
+            { name: "Buffet sáng tại Dalat Palace + Trà Atisô thượng hạng", price: 500000, desc: "Bữa sáng trong dinh thự cổ phong cách hoàng gia Pháp cùng bình trà Atisô đặc sản cao cấp.", ingredients: "Cà phê Arabica Cầu Đất nguyên chất, bánh ngọt Pháp nướng bơ ngậy béo, nước ép trái cây hữu cơ." }
+          ],
+          lunch: [
+            { name: "Set cơm đồi thông Le Chalet Dalat + Nước ép dâu tây Đà Lạt", price: 450000, desc: "Cơm thố đất nung cùng các món ăn thuần Việt tinh tế nấu niêu kèm ly nước ép dâu tây tươi mát sạch.", ingredients: "Salad rau củ hữu cơ Đà Lạt giàu xơ vitamin, phi lê cá hồi áp chảo sốt chanh dây đạm Omega-3 tốt lành." }
+          ],
+          dinner: [
+            { name: "Bữa tối lãng mạn tại Ana Mandara Villas + Rượu vang đỏ Đà Lạt Premium", price: 850000, desc: "Thưởng thức món Âu trong không gian biệt thự Pháp lãng mạn kết hợp cùng ly rượu vang đỏ Đà Lạt hảo hạng.", ingredients: "Sườn cừu Úc nướng đá nóng dồi dào kẽm protein béo ngọt, salad bơ dưa hữu cơ, vang đỏ Đà Lạt." }
+          ]
+        },
+        tickets: [
+          { name: "Vé Đường Hầm Điêu Khắc & Hồ Vô Cực", price: 90000, desc: "Check-in công trình điêu khắc đất sét độc đáo bậc nhất." }
+        ],
+        entertain: [
+          { name: "Show ca nhạc Mây Lang Thang", price: 500000, desc: "Nghe các ca sĩ nổi tiếng hát giữa đồi thông thơ mộng trong sương khói." }
+        ]
+      }
+    }
+  };
+
+
+  function getCityAIPredictions(cityName, tierName, days, nights) {
+    const defaultCity = "Hà Nội";
+    const dbCity = AI_PREDICTIONS_DB[cityName] || AI_PREDICTIONS_DB[defaultCity];
+    const tier = dbCity[tierName] || dbCity.normal;
+
+    // Deep clone predicted items
+    const result = {
+      hotel: { ...tier.hotel },
+      transport: { ...tier.transport },
+      food: [],
+      tickets: tier.tickets ? tier.tickets.map(t => ({ ...t, fromAI: true })) : [],
+      entertain: tier.entertain ? tier.entertain.map(e => ({ ...e, fromAI: true })) : []
+    };
+
+    // Build Food Day-by-Day nutrition meal plan
+    const pool = tier.foodPool || {
+      breakfast: tier.food || [],
+      lunch: tier.food || [],
+      dinner: tier.food || []
+    };
+
+    for (let d = 1; d <= days; d++) {
+      // Breakfast
+      if (pool.breakfast && pool.breakfast.length > 0) {
+        const item = pool.breakfast[(d - 1) % pool.breakfast.length];
+        result.food.push({
+          ...item,
+          day: d,
+          mealLabel: "Bữa sáng",
+          fromAI: true
+        });
+      }
+      // Lunch
+      if (pool.lunch && pool.lunch.length > 0) {
+        const item = pool.lunch[(d - 1) % pool.lunch.length];
+        result.food.push({
+          ...item,
+          day: d,
+          mealLabel: "Bữa trưa",
+          fromAI: true
+        });
+      }
+      // Dinner
+      if (pool.dinner && pool.dinner.length > 0) {
+        const item = pool.dinner[(d - 1) % pool.dinner.length];
+        result.food.push({
+          ...item,
+          day: d,
+          mealLabel: "Bữa tối",
+          fromAI: true
+        });
+      }
+    }
+
+    // If fallback is used, dynamically localize names
+    if (!AI_PREDICTIONS_DB[cityName]) {
+      result.hotel.name = `Khách sạn đề xuất tại ${cityName}`;
+      result.hotel.location = cityName;
+
+      if (tierName === 'budget') {
+        result.transport.name = `Thuê xe máy tự lái tại ${cityName} (Wave/Sirius)`;
+      } else if (tierName === 'luxury') {
+        result.transport.name = `Thuê xe ô tô riêng tự lái / Grab Car trọn gói tại ${cityName}`;
+      } else {
+        result.transport.name = `Grab & Taxi di chuyển nội thành tại ${cityName}`;
+      }
+
+      // Generate generic food plan
+      result.food = [];
+      for (let d = 1; d <= days; d++) {
+        result.food.push({
+          name: `Bữa sáng dinh dưỡng tại ${cityName}`,
+          price: tierName === 'budget' ? 25000 : tierName === 'luxury' ? 200000 : 45000,
+          desc: "Bữa sáng nhẹ nhàng nạp năng lượng bắt đầu ngày mới.",
+          ingredients: "Tinh bột, chất xơ & đạm nhẹ nhàng dễ tiêu hóa.",
+          day: d,
+          mealLabel: "Bữa sáng",
+          fromAI: true
+        });
+        result.food.push({
+          name: `Bữa trưa đặc sản ${cityName}`,
+          price: tierName === 'budget' ? 45000 : tierName === 'luxury' ? 400000 : 70000,
+          desc: "Thưởng thức ẩm thực truyền thống đậm đà bản sắc địa phương.",
+          ingredients: "Cân bằng các nhóm chất đạm, tinh bột & chất xơ.",
+          day: d,
+          mealLabel: "Bữa trưa",
+          fromAI: true
+        });
+        result.food.push({
+          name: `Bữa tối ẩm thực ${cityName}`,
+          price: tierName === 'budget' ? 45000 : tierName === 'luxury' ? 450000 : 80000,
+          desc: "Bữa tối ngon miệng ấm cúng cùng gia đình hoặc bạn bè.",
+          ingredients: "Bổ sung đầy đủ chất đạm, vitamin & khoáng chất.",
+          day: d,
+          mealLabel: "Bữa tối",
+          fromAI: true
+        });
+      }
+
+      result.tickets = [
+        { name: `Vé điểm tham quan biểu tượng ${cityName}`, price: tierName === 'budget' ? 20000 : tierName === 'luxury' ? 180000 : 50000, desc: `Danh lam thắng cảnh văn hóa lịch sử tiêu biểu tại ${cityName}.`, fromAI: true }
+      ];
+
+      result.entertain = [
+        { name: `Hoạt động giải trí văn hóa tại ${cityName}`, price: tierName === 'budget' ? 40000 : tierName === 'luxury' ? 300000 : 90000, desc: `Trải nghiệm các hoạt động nghệ thuật, giải trí thú vị.`, fromAI: true }
+      ];
+    }
+
+    return result;
+  }
+
+
   // ================================================
   // DATABASE CHI PHÍ ĐỊA ĐIỂM NỔI BẬT
   // ================================================
@@ -883,6 +1386,8 @@ const initPlanner = function () {
     // ===== HÀ NỘI =====
     "Lăng Chủ tịch Hồ Chí Minh": { ticket: 0, food: 0, type: "attraction" },
     "Chùa Một Cột": { ticket: 0, food: 0, type: "attraction" },
+    "Bảo tàng Lịch sử Quân sự Việt Nam": { ticket: 40000, food: 0, type: "attraction" },
+    "Bảo Tàng Lịch Sự Quân Sự Việt Nam": { ticket: 40000, food: 0, type: "attraction" },
     "Hồ Hoàn Kiếm": { ticket: 0, food: 0, type: "attraction" },
     "Đền Ngọc Sơn": { ticket: 0, food: 0, type: "attraction" },
     // Removed some specific local eateries/experiences from default spot costs (managed in UI lists now)
@@ -891,6 +1396,18 @@ const initPlanner = function () {
     "Chả cá Lã Vọng": { ticket: 0, food: 200000, type: "restaurant" },
     "Trà Hạt Long An": { ticket: 0, food: 80000, type: "cafe" },
     "Phủ Tây Hồ": { ticket: 0, food: 0, type: "attraction" },
+    "Phở Gia Truyền Bát Đàn": { ticket: 0, food: 60000, type: "restaurant" },
+    "Bún Chả Hương Liên": { ticket: 0, food: 60000, type: "restaurant" },
+    "Bánh Mì 25": { ticket: 0, food: 35000, type: "restaurant" },
+    "Xem Múa Rối Nước Thăng Long": { ticket: 100000, food: 0, type: "experience" },
+    "Cà phê Đường Tàu Phố Cổ": { ticket: 0, food: 40000, type: "experience" },
+    "Tour Xe Máy Vespa Phố Cổ Đêm": { ticket: 350000, food: 0, type: "experience" },
+    "Aeon Mall Long Biên": { ticket: 0, food: 0, type: "entertainment" },
+    "Rạp chiếu phim Quốc gia": { ticket: 80000, food: 0, type: "entertainment" },
+    "Tổ hợp Hanoi Creative City": { ticket: 50000, food: 0, type: "entertainment" },
+    "Công viên nước Hồ Tây": { ticket: 180000, food: 0, type: "entertainment" },
+
+
 
     // ===== TP.HCM =====
     "Dinh Độc Lập": { ticket: 75000, food: 0, type: "attraction" },
@@ -1351,7 +1868,11 @@ const initPlanner = function () {
       }
     }
 
-    updateBudgetEstimate();
+    if (typeof populateBudgetBreakdownSuggestions === 'function') {
+      populateBudgetBreakdownSuggestions();
+    } else {
+      updateBudgetEstimate();
+    }
   };
 
   // Update budget estimate - chi tiết theo từng khoản
@@ -1365,37 +1886,79 @@ const initPlanner = function () {
 
     // Lấy chi phí theo tier đã chọn
     const tier = tierCosts[currentTravelTier];
+    const totalPeople = adults + children + toddlers + seniors;
+    const cityName = getCurrentDestinationName() || "Hà Nội";
+    const predictions = getCityAIPredictions(cityName, currentTravelTier, days, nights);
 
     // ===== 1. TÍNH TIỀN PHÒNG KHÁCH SẠN =====
     // Tính số người cần tính phòng (trẻ dưới 5 tuổi ngủ chung miễn phí)
     const payablePeople = adults + children + seniors; // Trẻ 6-11 + NL + NC tuổi
     // Tính số phòng cần thiết (mỗi phòng tối đa 2 người)
     const roomsNeeded = Math.ceil(payablePeople / tier.hotel.maxPerRoom);
-    const hotelTotal = tier.hotel.perRoom * roomsNeeded * nights;
+
+    const hotelPred = predictions.hotel;
+    const hotelTotal = hotelPred.price * roomsNeeded * nights;
 
     // Chi tiết phòng
     const hotelDetail = document.getElementById('hotelDetail');
     if (hotelDetail) {
-      hotelDetail.textContent = `${roomsNeeded} phòng × ${formatCurrency(tier.hotel.perRoom)} × ${nights} đêm`;
+      hotelDetail.innerHTML = `
+        <div style="font-weight: 600; color: var(--text); margin-bottom: 2px;">
+          <span style="font-size:0.65rem;color:#10b981;background:rgba(16,185,129,0.1);padding:2px 6px;border-radius:4px;margin-right:6px;font-weight:700;display:inline-block;white-space:nowrap;vertical-align:middle;">✨ AI Dự đoán</span>
+          ${hotelPred.name} (${hotelPred.room})
+        </div>
+        <div style="font-size: 0.72rem; color: var(--text-muted);">
+          Vị trí: ${hotelPred.location} | ${roomsNeeded} phòng × ${formatCurrency(hotelPred.price)} × ${nights} đêm
+        </div>
+      `;
     }
+
 
     // ===== 2. TÍNH TIỀN ĂN UỐNG =====
     // Người lớn & trẻ 6-11 & người cao tuổi: ăn đầy đủ
     // Trẻ dưới 5 tuổi: miễn phí ăn
     const mealPeople = adults + children + seniors;
-    const foodTotal = tier.food.perAdult * mealPeople * days;
+
+    // Calculate food cost based on selected suggestions
+    const foodCheckboxes = document.querySelectorAll('#foodSuggestionList input[type="checkbox"]');
+    let foodTotal = 0;
+    let selectedFoodDesc = '';
+
+    if (foodCheckboxes.length > 0) {
+      let selectedSum = 0;
+      let selectedCount = 0;
+      foodCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          selectedSum += parseFloat(cb.dataset.price) || 0;
+          selectedCount++;
+        }
+      });
+
+      // Each checkbox is a specific meal on a specific day, so total is selectedSum * mealPeople
+      foodTotal = selectedSum * mealPeople;
+
+      if (selectedCount > 0) {
+        selectedFoodDesc = `${mealPeople} người × ${selectedCount} bữa ăn (${formatCurrency(selectedSum)}/người)`;
+      } else {
+        selectedFoodDesc = `Không chọn món ăn nào (0 VNĐ)`;
+      }
+      if (toddlers > 0) selectedFoodDesc += ` + ${toddlers} trẻ <5t miễn phí`;
+    } else {
+      // Fallback
+      foodTotal = tier.food.perAdult * mealPeople * days;
+      selectedFoodDesc = `${mealPeople} người × ${formatCurrency(tier.food.perAdult)} × ${days} ngày`;
+      if (toddlers > 0) selectedFoodDesc += ` + ${toddlers} trẻ <5tuổi miễn phí`;
+    }
 
     // Chi tiết ăn uống
     const foodDetail = document.getElementById('foodDetail');
     if (foodDetail) {
-      let foodDesc = `${mealPeople} người × ${formatCurrency(tier.food.perAdult)} × ${days} ngày`;
-      if (toddlers > 0) foodDesc += ` + ${toddlers} trẻ <5tuổi miễn phí`;
-      foodDetail.textContent = foodDesc;
+      foodDetail.textContent = selectedFoodDesc;
     }
 
     // ===== 3. TÍNH TIỀN DI CHUYỂN (DỰA TRÊN GPS HOẶC NHẬP THỦ CÔNG) =====
     const formStep2 = document.getElementById('aiPlannerFormStep2');
-    
+
     // Lấy tên điểm khởi hành từ ô nhập thủ công hoặc GPS
     const departureInput = document.getElementById('departureLocation')?.value?.trim();
     let depLat = 21.0285; // Mặc định Hà Nội
@@ -1431,7 +1994,87 @@ const initPlanner = function () {
 
     // Tính khoảng cách
     const distanceKm = calculateDistance(depLat, depLng, destLat, destLng);
-    const transportTotal = calculateTransportCost(distanceKm, currentTravelTier);
+
+    // Transport vehicle calculations
+    // Options: Xe máy tự lái, Grab (Bike/Car), Ô tô tự lái, Xe khách / Tàu hỏa, Máy bay khứ hồi
+    if (!window.selectedVehicleType) {
+      if (currentTravelTier === 'budget') window.selectedVehicleType = 'bike';
+      else if (currentTravelTier === 'luxury') window.selectedVehicleType = 'car';
+      else window.selectedVehicleType = 'grab';
+    }
+
+    const vehicleOptions = [
+      {
+        id: 'bike',
+        name: 'Xe máy tự lái',
+        icon: '🛵',
+        calculate: (dist, d, p) => (120000 * d) + (dist > 30 ? dist * 1500 : 0),
+        detail: (dist, d, p) => `Thuê Wave/Sirius tự lái | Xăng tự đổ`
+      },
+      {
+        id: 'grab',
+        name: 'Grab (Bike/Car)',
+        icon: '🚗',
+        calculate: (dist, d, p) => (180000 * d) + (dist > 30 ? dist * 15000 : 0),
+        detail: (dist, d, p) => `Grab di chuyển linh hoạt nội đô`
+      },
+      {
+        id: 'car',
+        name: 'Ô tô tự lái',
+        icon: '🚘',
+        calculate: (dist, d, p) => (800000 * d) + (dist > 30 ? dist * 2500 : 0),
+        detail: (dist, d, p) => `Thuê xe tự lái | Xăng tự đổ`
+      },
+      {
+        id: 'public',
+        name: 'Xe khách / Tàu hỏa',
+        icon: '🚌',
+        calculate: (dist, d, p) => {
+          if (dist <= 30) return 50000 * p;
+          return (200000 * p * 2) + (120000 * d); // khứ hồi + local travel
+        },
+        detail: (dist, d, p) => dist <= 30 ? `Cự ly ngắn` : `Vé khứ hồi ${formatCurrency(200000)}/ng + di chuyển local`
+      },
+      {
+        id: 'flight',
+        name: 'Máy bay khứ hồi',
+        icon: '✈️',
+        calculate: (dist, d, p) => {
+          if (dist <= 30) return 0; // Not applicable
+          return (1800000 * p) + 500000 + (150000 * d); // vé khứ hồi/ng + taxi sân bay + di chuyển local
+        },
+        detail: (dist, d, p) => dist <= 30 ? `Không áp dụng cự ly gần` : `Vé khứ hồi ${formatCurrency(900000)}/lượt/ng + taxi`
+      }
+    ];
+
+    const activeOpt = vehicleOptions.find(o => o.id === window.selectedVehicleType) || vehicleOptions[0];
+    const transportTotal = activeOpt.calculate(distanceKm, days, totalPeople);
+
+    // Render vehicles list
+    const vehicleListEl = document.getElementById('transportVehicleList');
+    if (vehicleListEl) {
+      vehicleListEl.innerHTML = vehicleOptions.map(opt => {
+        const cost = opt.calculate(distanceKm, days, totalPeople);
+        const costLabel = cost > 0 ? formatCurrency(cost) : 'Không áp dụng';
+        const isSelected = window.selectedVehicleType === opt.id;
+        const borderStyle = isSelected ? 'border: 2px solid var(--primary); background: rgba(22, 163, 74, 0.1);' : 'border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02);';
+        const cursorStyle = cost > 0 ? 'cursor: pointer;' : 'cursor: not-allowed; opacity: 0.5;';
+        const clickHandler = cost > 0 ? `onclick="window.changeVehicleType('${opt.id}')"` : '';
+
+        return `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; border-radius: 6px; margin-bottom: 0.25rem; ${borderStyle} ${cursorStyle}" ${clickHandler}>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.2rem;">${opt.icon}</span>
+              <div style="display: flex; flex-direction: column; text-align: left;">
+                <span style="font-weight: 600; font-size: 0.8rem; color: var(--text);">${opt.name}</span>
+                <span style="font-size: 0.65rem; color: var(--text-muted);">${opt.detail(distanceKm, days, totalPeople)}</span>
+              </div>
+            </div>
+            <span style="font-weight: 700; font-size: 0.8rem; color: var(--primary);">${costLabel}</span>
+          </div>
+        `;
+      }).join('');
+    }
 
     const transportDetail = document.getElementById('transportDetail');
     const transportIcon = document.getElementById('transportIcon');
@@ -1455,88 +2098,135 @@ const initPlanner = function () {
     }
 
     // Hiển thị chi tiết và icon
+    if (transportIcon) transportIcon.textContent = activeOpt.icon;
     if (transportDetail) {
-      if (distanceKm <= 5) {
-        transportDetail.textContent = '📍 Cùng khu vực - Di chuyển nội bộ (Grab, xe máy)';
-      } else if (distanceKm > 300) {
-        transportDetail.textContent = `✈️ Khoảng ${Math.round(distanceKm)}km - Máy bay khứ hồi`;
-      } else if (distanceKm > 100) {
-        transportDetail.textContent = `🚗 Khoảng ${Math.round(distanceKm)}km - Ô tô cao tốc (khứ hồi)`;
-      } else {
-        transportDetail.textContent = `🛵 Khoảng ${Math.round(distanceKm)}km - Xe máy/Grab (khứ hồi)`;
-      }
+      transportDetail.innerHTML = `
+        <div style="font-weight: 600; color: var(--text); margin-bottom: 2px;">
+          Đã chọn: ${activeOpt.name}
+        </div>
+        <div style="font-size: 0.72rem; color: var(--text-muted);">
+          Tổng cộng: ${formatCurrency(transportTotal)} (Khoảng cách GPS: ${distanceKm.toFixed(1)} km)
+        </div>
+      `;
     }
-    if (transportIcon) {
-      if (distanceKm <= 5) transportIcon.textContent = '🏠';
-      else if (distanceKm > 300) transportIcon.textContent = '✈️';
-      else if (distanceKm > 100) transportIcon.textContent = '🚗';
-      else transportIcon.textContent = '🛵';
-    }
+
 
     // ===== 4. TÍNH TIỀN VÉ THAM QUAN =====
     // Người lớn: 100%, Trẻ 6-11: giảm 30%, Trẻ <5: miễn phí, Người cao tuổi: giảm 20%
-    const ticketAdults = tier.ticket * adults * days;
-    const ticketChildren = tier.ticket * (1 - CHILD_6_11_DISCOUNT) * children * days;
-    const ticketSeniors = tier.ticket * (1 - SENIOR_DISCOUNT) * seniors * days;
-    const ticketToddlers = 0; // Miễn phí
-    const ticketTotal = ticketAdults + ticketChildren + ticketSeniors + ticketToddlers;
+    const ticketCheckboxes = document.querySelectorAll('#ticketSuggestionList input[type="checkbox"]');
+    let ticketTotal = 0;
+    let selectedTicketDesc = '';
+
+    if (ticketCheckboxes.length > 0) {
+      let selectedSum = 0;
+      let selectedCount = 0;
+      ticketCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          selectedSum += parseFloat(cb.dataset.price) || 0;
+          selectedCount++;
+        }
+      });
+
+      const ticketAdults = selectedSum * adults;
+      const ticketChildren = selectedSum * (1 - CHILD_6_11_DISCOUNT) * children;
+      const ticketSeniors = selectedSum * (1 - SENIOR_DISCOUNT) * seniors;
+      const ticketToddlers = 0;
+
+      ticketTotal = ticketAdults + ticketChildren + ticketSeniors + ticketToddlers;
+      selectedTicketDesc = `${selectedCount} điểm | Tổng vé/NL: ${formatCurrency(selectedSum)}`;
+
+      let discountParts = [];
+      if (children > 0) discountParts.push(`TE: -30%`);
+      if (seniors > 0) discountParts.push(`NC: -20%`);
+      if (toddlers > 0) discountParts.push(`TN: miễn phí`);
+      if (discountParts.length > 0) {
+        selectedTicketDesc += ` (${discountParts.join(', ')})`;
+      }
+    } else {
+      // Fallback
+      const ticketAdults = tier.ticket * adults * days;
+      const ticketChildren = tier.ticket * (1 - CHILD_6_11_DISCOUNT) * children * days;
+      const ticketSeniors = tier.ticket * (1 - SENIOR_DISCOUNT) * seniors * days;
+      const ticketToddlers = 0;
+
+      ticketTotal = ticketAdults + ticketChildren + ticketSeniors + ticketToddlers;
+      selectedTicketDesc = `NL: ${formatCurrency(tier.ticket)} × ${adults}ng × ${days}ngày`;
+    }
 
     const ticketDetail = document.getElementById('ticketDetail');
     if (ticketDetail) {
-      let parts = [];
-      if (adults > 0) parts.push(`NL: ${formatCurrency(tier.ticket)}×${adults}×${days}`);
-      if (children > 0) parts.push(`6-11t: -30%`);
-      if (seniors > 0) parts.push(`NC: -20%`);
-      if (toddlers > 0) parts.push(`<5t: miễn phí`);
-      ticketDetail.textContent = parts.join(' | ');
+      ticketDetail.textContent = selectedTicketDesc;
     }
 
-    // ===== 5. TÍNH TIỀN GIẢI TRÍ & ĐỒ UỐNG =====
+    // ===== 5. TÍNH TIỀN GIẢI TRÍ =====
     // Tất cả mọi người đều tính (trẻ dưới 5 giảm 50%)
-    const totalPeople = adults + children + toddlers + seniors;
+    const entertainCheckboxes = document.querySelectorAll('#entertainSuggestionList input[type="checkbox"]');
+    let entertainTotal = 0;
+    let selectedEntertainDesc = '';
 
-    const entertainAdults = tier.entertain * (adults + seniors + children) * days;
-    const entertainToddlers = tier.entertain * 0.5 * toddlers * days;
-    const entertainTotal = entertainAdults + entertainToddlers;
+    if (entertainCheckboxes.length > 0) {
+      let selectedSum = 0;
+      let selectedCount = 0;
+      entertainCheckboxes.forEach(cb => {
+        if (cb.checked) {
+          selectedSum += parseFloat(cb.dataset.price) || 0;
+          selectedCount++;
+        }
+      });
+
+      const entertainAdults = selectedSum * (adults + seniors + children);
+      const entertainToddlers = selectedSum * 0.5 * toddlers;
+      entertainTotal = (entertainAdults + entertainToddlers) * days;
+
+      selectedEntertainDesc = `Tổng phí ngày/NL: ${formatCurrency(selectedSum)} (${selectedCount} khoản)`;
+      if (toddlers > 0) selectedEntertainDesc += ` (trẻ nhỏ -50%)`;
+    } else {
+      // Fallback
+      const entertainAdults = tier.entertain * (adults + seniors + children) * days;
+      const entertainToddlers = tier.entertain * 0.5 * toddlers * days;
+      entertainTotal = entertainAdults + entertainToddlers;
+      selectedEntertainDesc = `Người lớn: ${formatCurrency(tier.entertain)} × ${days} ngày`;
+      if (toddlers > 0) selectedEntertainDesc += ` + Trẻ nhỏ -50%`;
+    }
 
     const entertainDetail = document.getElementById('entertainDetail');
     if (entertainDetail) {
-      let entertainDesc = `Người lớn: ${formatCurrency(tier.entertain)} × ${days} ngày`;
-      if (toddlers > 0) entertainDesc += ` + Trẻ nhỏ -50%`;
-      entertainDetail.textContent = entertainDesc;
+      entertainDetail.textContent = selectedEntertainDesc;
     }
 
     // ===== TÍNH CHI PHÍ ĐỊA ĐIỂM ĐÃ CHỌN =====
-    const spotsCost = calculateSelectedSpotsCost();
+    // If the suggestion checkboxes are loaded, they already include these costs.
+    // So we avoid double counting.
     let spotsGrandTotal = 0;
     const spotsCostSection = document.getElementById('selectedSpotsCostSection');
-    const spotsTotalEl = document.getElementById('spotsTotal');
-    const spotsDetailEl = document.getElementById('spotsDetail');
-    const spotsListEl = document.getElementById('spotsList');
+    if (spotsCostSection) {
+      spotsCostSection.style.display = 'none'; // Hide since detailed in category sub-panels
+    }
 
-    if (spotsCost.spotCount > 0) {
-      if (spotsCostSection) spotsCostSection.style.display = 'block';
+    if (foodCheckboxes.length === 0 && ticketCheckboxes.length === 0) {
+      const spotsCost = calculateSelectedSpotsCost();
+      if (spotsCost.spotCount > 0) {
+        if (spotsCostSection) spotsCostSection.style.display = 'block';
+        const spotsPerPerson = spotsCost.totalTicket + spotsCost.totalFood;
+        spotsGrandTotal = spotsPerPerson * totalPeople;
 
-      // Chi phí địa điểm cho tất cả mọi người
-      const spotsPerPerson = spotsCost.totalTicket + spotsCost.totalFood;
-      spotsGrandTotal = spotsPerPerson * totalPeople;
+        const spotsTotalEl = document.getElementById('spotsTotal');
+        if (spotsTotalEl) spotsTotalEl.textContent = formatCurrency(spotsGrandTotal);
 
-      // Hiển thị
-      if (spotsTotalEl) {
-        spotsTotalEl.textContent = formatCurrency(spotsGrandTotal);
+        const spotsDetailEl = document.getElementById('spotsDetail');
+        if (spotsDetailEl) {
+          let detail = `${spotsCost.spotCount} địa điểm × ${totalPeople} người`;
+          if (spotsCost.totalTicket > 0) detail += ` | Vé: ${formatCurrency(spotsCost.totalTicket)}/ng`;
+          if (spotsCost.totalFood > 0) detail += ` | Ăn: ${formatCurrency(spotsCost.totalFood)}/ng`;
+          spotsDetailEl.textContent = detail;
+        }
+
+        const spotsListEl = document.getElementById('spotsList');
+        if (spotsListEl) {
+          const spotNames = (window.selectedAttractionData || []).map(s => s.name).join(', ');
+          spotsListEl.textContent = spotNames.substring(0, 100) + (spotNames.length > 100 ? '...' : '');
+        }
       }
-      if (spotsDetailEl) {
-        let detail = `${spotsCost.spotCount} địa điểm × ${totalPeople} người`;
-        if (spotsCost.totalTicket > 0) detail += ` | Vé: ${formatCurrency(spotsCost.totalTicket)}/ng`;
-        if (spotsCost.totalFood > 0) detail += ` | Ăn: ${formatCurrency(spotsCost.totalFood)}/ng`;
-        spotsDetailEl.textContent = detail;
-      }
-      if (spotsListEl) {
-        const spotNames = (window.selectedAttractionData || []).map(s => s.name).join(', ');
-        spotsListEl.textContent = spotNames.substring(0, 100) + (spotNames.length > 100 ? '...' : '');
-      }
-    } else {
-      if (spotsCostSection) spotsCostSection.style.display = 'none';
     }
 
     // ===== TỔNG HỢP =====
@@ -1570,7 +2260,13 @@ const initPlanner = function () {
       if (seniors > 0) parts.push(`${seniors} NCT`);
       membersSummary.textContent = `${parts.join(' + ')} = ${totalPeople} người`;
     }
+    window.updateBudgetEstimate = updateBudgetEstimate;
+    window.changeVehicleType = function (vehicleType) {
+      window.selectedVehicleType = vehicleType;
+      updateBudgetEstimate();
+    };
   }
+
 
   // Format currency
   function formatCurrency(amount) {
@@ -2133,7 +2829,7 @@ const initPlanner = function () {
   }
 
   // ── AUTOFILL PLANNER FORM FROM AI ASSISTANT ──
-  window.autoFillPlannerForm = function(data) {
+  window.autoFillPlannerForm = function (data) {
     if (!data) return;
 
     // ── Điền sẵn Điểm đến ──
@@ -2679,7 +3375,7 @@ const initPlanner = function () {
     });
   }
 
-  window.switchCreateSubMode = function(mode) {
+  window.switchCreateSubMode = function (mode) {
     const formArea = document.getElementById('createSubFormArea');
     const stepDiscovery = document.getElementById('stepDiscovery');
 
@@ -2695,16 +3391,16 @@ const initPlanner = function () {
   };
 
   // ── QUICK FORM: Toggle nhập thủ công ──
-  window.toggleQuickManualLocation = function() {
+  window.toggleQuickManualLocation = function () {
     const mapContainer = document.getElementById('quickLocationMapContainer');
     const displayBlock = document.getElementById('quickSelectedLocationDisplay');
     const manualInput = document.getElementById('quickManualLocationInput');
     const input = document.getElementById('createDepartureInput');
-    
+
     if (mapContainer) mapContainer.style.display = 'none';
     if (displayBlock) displayBlock.style.display = 'none';
     if (manualInput) manualInput.style.display = 'block';
-    
+
     // Đánh dấu active button
     const btnGPS = document.getElementById('btnQuickCurrentLocation');
     const btnManual = document.getElementById('btnQuickManualLocation');
@@ -2729,11 +3425,11 @@ const initPlanner = function () {
   };
 
   // ── QUICK FORM: GPS Lấy vị trí hiện tại ──
-  window.getQuickDepartureGPS = function() {
+  window.getQuickDepartureGPS = function () {
     const btnGPS = document.getElementById('btnQuickCurrentLocation');
     const btnManual = document.getElementById('btnQuickManualLocation');
     const input = document.getElementById('createDepartureInput');
-    
+
     if (!navigator.geolocation) {
       if (window.WanderToast) WanderToast.warning('Trình duyệt của bạn không hỗ trợ định vị.');
       return;
@@ -2905,7 +3601,7 @@ const initPlanner = function () {
     } else {
       quickLocationMarker = L.marker([lat, lon]).addTo(quickLocationMap);
     }
-    
+
     // Invalidate size to avoid rendering glitch in hidden container
     setTimeout(() => {
       if (quickLocationMap) quickLocationMap.invalidateSize();
@@ -2913,7 +3609,7 @@ const initPlanner = function () {
   }
 
   // ── QUICK FORM: Spinner tăng/giảm số ngày ──
-  window.adjustQuickDuration = function(delta) {
+  window.adjustQuickDuration = function (delta) {
     const input = document.getElementById('createDurationInput');
     if (!input) return;
     let val = parseInt(input.value) || 3;
@@ -2925,7 +3621,7 @@ const initPlanner = function () {
   };
 
   // ── QUICK FORM: Toggle kiểu chuyến đi ──
-  window.switchDurationType = function(type) {
+  window.switchDurationType = function (type) {
     const btnDays = document.getElementById('btnDurationTypeDays');
     const btnHours = document.getElementById('btnDurationTypeHours');
     const daysContainer = document.getElementById('durationDaysContainer');
@@ -2957,7 +3653,7 @@ const initPlanner = function () {
   };
 
   // ── QUICK FORM: Spinner tăng/giảm số giờ ──
-  window.adjustQuickHours = function(delta) {
+  window.adjustQuickHours = function (delta) {
     const input = document.getElementById('createHoursInput');
     if (!input) return;
     let val = parseInt(input.value) || 6;
@@ -2969,7 +3665,7 @@ const initPlanner = function () {
   };
 
   // ── QUICK FORM: Chọn phong cách du lịch (single select) ──
-  window.selectQuickStyle = function(chip) {
+  window.selectQuickStyle = function (chip) {
     document.querySelectorAll('#quickStyleChips .quick-chip').forEach(c => {
       c.classList.remove('active');
       c.style.background = 'rgba(255,255,255,0.05)';
@@ -2983,7 +3679,7 @@ const initPlanner = function () {
   };
 
   // ── QUICK FORM: Chọn thành viên đi cùng (single select) ──
-  window.selectQuickCompanion = function(chip) {
+  window.selectQuickCompanion = function (chip) {
     document.querySelectorAll('#quickCompanionChips .quick-chip').forEach(c => {
       c.classList.remove('active');
       c.style.background = 'rgba(255,255,255,0.05)';
@@ -3040,7 +3736,7 @@ const initPlanner = function () {
         depInput.dataset.lat = lat;
         depInput.dataset.lng = lon;
       }
-      
+
       suggestionsBox.style.display = 'none';
       setTimeout(() => predictQuickBudget(true), 100);
     }
@@ -3127,7 +3823,7 @@ const initPlanner = function () {
     // Lấy danh sách tên điểm đến từ VN_DESTINATION_PHOTOS
     const allDestinations = typeof VN_DESTINATION_PHOTOS !== 'undefined'
       ? Object.keys(VN_DESTINATION_PHOTOS).filter(k => k.length > 3 && !k.includes('/') && !k.includes('.'))
-      : ['Hà Nội','Sapa','Đà Lạt','Nha Trang','Hội An','Đà Nẵng','Phú Quốc','Huế','Ninh Bình','Hạ Long','Mũi Né','Quy Nhơn','Cần Thơ','Vũng Tàu','Cô Tô','Côn Đảo','Mộc Châu','Hà Giang','Cao Bằng','Mai Châu'];
+      : ['Hà Nội', 'Sapa', 'Đà Lạt', 'Nha Trang', 'Hội An', 'Đà Nẵng', 'Phú Quốc', 'Huế', 'Ninh Bình', 'Hạ Long', 'Mũi Né', 'Quy Nhơn', 'Cần Thơ', 'Vũng Tàu', 'Cô Tô', 'Côn Đảo', 'Mộc Châu', 'Hà Giang', 'Cao Bằng', 'Mai Châu'];
 
     // Bộ gợi ý phổ biến để hiện ngay khi focus (chưa gõ gì)
     const popularSuggestions = [
@@ -3166,7 +3862,7 @@ const initPlanner = function () {
     });
   })();
 
-  window.selectQuickDestination = function(name) {
+  window.selectQuickDestination = function (name) {
     const input = document.getElementById('createDestinationInput');
     const box = document.getElementById('createDestinationSuggestions');
     if (input) input.value = name;
@@ -3177,26 +3873,26 @@ const initPlanner = function () {
 
   // ── QUICK FORM: Dự đoán ngân sách ──
   const BUDGET_PROFILES = {
-    'hà nội':       { base: 800000, hotel: 600000 },
-    'sapa':         { base: 600000, hotel: 550000 },
-    'hạ long':      { base: 900000, hotel: 800000 },
-    'đà nẵng':      { base: 850000, hotel: 700000 },
-    'hội an':       { base: 750000, hotel: 750000 },
-    'huế':          { base: 650000, hotel: 550000 },
-    'nha trang':    { base: 950000, hotel: 800000 },
-    'đà lạt':       { base: 700000, hotel: 600000 },
-    'phú quốc':     { base: 1200000, hotel: 1100000 },
-    'mũi né':       { base: 800000, hotel: 700000 },
-    'phan thiết':   { base: 800000, hotel: 700000 },
-    'vũng tàu':     { base: 700000, hotel: 600000 },
-    'côn đảo':      { base: 1100000, hotel: 1000000 },
-    'quy nhơn':     { base: 680000, hotel: 600000 },
-    'ninh bình':    { base: 600000, hotel: 500000 },
-    'hà giang':     { base: 700000, hotel: 400000 },
-    'cần thơ':      { base: 650000, hotel: 500000 },
-    'mộc châu':     { base: 600000, hotel: 400000 },
-    'cao bằng':     { base: 600000, hotel: 350000 },
-    'default':      { base: 750000, hotel: 600000 }
+    'hà nội': { base: 800000, hotel: 600000 },
+    'sapa': { base: 600000, hotel: 550000 },
+    'hạ long': { base: 900000, hotel: 800000 },
+    'đà nẵng': { base: 850000, hotel: 700000 },
+    'hội an': { base: 750000, hotel: 750000 },
+    'huế': { base: 650000, hotel: 550000 },
+    'nha trang': { base: 950000, hotel: 800000 },
+    'đà lạt': { base: 700000, hotel: 600000 },
+    'phú quốc': { base: 1200000, hotel: 1100000 },
+    'mũi né': { base: 800000, hotel: 700000 },
+    'phan thiết': { base: 800000, hotel: 700000 },
+    'vũng tàu': { base: 700000, hotel: 600000 },
+    'côn đảo': { base: 1100000, hotel: 1000000 },
+    'quy nhơn': { base: 680000, hotel: 600000 },
+    'ninh bình': { base: 600000, hotel: 500000 },
+    'hà giang': { base: 700000, hotel: 400000 },
+    'cần thơ': { base: 650000, hotel: 500000 },
+    'mộc châu': { base: 600000, hotel: 400000 },
+    'cao bằng': { base: 600000, hotel: 350000 },
+    'default': { base: 750000, hotel: 600000 }
   };
 
   const DEST_COORDS = {
@@ -3237,12 +3933,12 @@ const initPlanner = function () {
     return R * c;
   };
 
-  window.predictQuickBudget = function(silent = false) {};
+  window.predictQuickBudget = function (silent = false) { };
 
-  window.applyPredictedBudget = function(amount) {};
+  window.applyPredictedBudget = function (amount) { };
 
   // ── QUICK FORM: Hàm format tiền tệ ──
-  window.formatCreateBudget = function(input) {
+  window.formatCreateBudget = function (input) {
     let val = input.value.replace(/\D/g, '');
     if (!val) { input.value = ''; return; }
     let formatted = parseInt(val, 10).toLocaleString('vi-VN');
@@ -3255,7 +3951,7 @@ const initPlanner = function () {
   };
 
   // ── QUICK FORM: Submit lập lịch nhanh ──
-  window.submitCreateItinerary = function() {
+  window.submitCreateItinerary = function () {
     const departure = document.getElementById('createDepartureInput')?.value.trim() || '';
     const destination = document.getElementById('createDestinationInput')?.value.trim() || '';
     const budget = document.getElementById('createBudgetInput')?.value.trim() || 'Tự do';
@@ -3272,11 +3968,11 @@ const initPlanner = function () {
 
     const btnDurationTypeDays = document.getElementById('btnDurationTypeDays');
     const isShortTrip = btnDurationTypeDays ? !btnDurationTypeDays.classList.contains('active') : false;
-    
+
     let days = 3;
     let durationHours = 0;
     let departureTime = '08:00';
-    
+
     if (isShortTrip) {
       days = 1;
       durationHours = parseInt(document.getElementById('createHoursInput')?.value) || 6;
@@ -3350,7 +4046,7 @@ const initPlanner = function () {
         try {
           const errJson = await res.json();
           if (errJson && errJson.message) errMsg = errJson.message;
-        } catch (e) {}
+        } catch (e) { }
         throw new Error(errMsg);
       }
 
@@ -3397,7 +4093,7 @@ const initPlanner = function () {
 
         resultContainer.style.display = 'block';
         refineBox.style.display = 'block';
-        
+
         const btnSaveTrip = document.getElementById('btnSaveTrip');
         if (btnSaveTrip) btnSaveTrip.style.display = 'inline-flex';
 
@@ -4851,11 +5547,11 @@ const initPlanner = function () {
     try {
       let payload = { itineraryId: currentItineraryId };
       if (!currentItineraryId || currentItineraryId === 'undefined' || currentItineraryId === 'null' || currentItineraryId === 'new') {
-         payload = { 
-           planJson: planHistory[currentPlanIndex], 
-           destination: window._currentDest || "Điểm đến của tôi", 
-           days: window._currentDays || 3 
-         };
+        payload = {
+          planJson: planHistory[currentPlanIndex],
+          destination: window._currentDest || "Điểm đến của tôi",
+          days: window._currentDays || 3
+        };
       }
       const res = await fetch('/api/planner/save', {
         method: 'POST',
@@ -4963,7 +5659,7 @@ const initPlanner = function () {
         // Kích hoạt show-result để CSS hiển thị timelineResult và tự động ẩn formCard
         document.querySelector('.planner-container')?.classList.add('show-result');
         const plannerFormCard = document.getElementById('plannerFormCard');
-        
+
         const btnSaveTrip = document.getElementById('btnSaveTrip');
         if (btnSaveTrip) btnSaveTrip.style.display = 'inline-flex';
 
@@ -5022,6 +5718,286 @@ const initPlanner = function () {
       console.error("Lỗi hiển thị lịch trình đã lưu:", e);
     }
   }
+  // ================================================================
+  // STATIC LOCAL VIETNAMESE DISHES SUGGESTIONS
+  // ================================================================
+  const STATIC_DISHES = [
+    { name: "Phở Bò Gia Truyền Hà Nội", city: "Hà Nội", price: 55000, desc: "Món ăn quốc hồn quốc túy...", ingredients: "Sợi phở mềm dai, thịt bò tươi ngon, nước dùng ninh từ xương bò, quế, hồi, thảo quả." },
+    { name: "Bún Chả Hà Nội", city: "Hà Nội", price: 60000, desc: "Thịt nướng thơm lừng than hồng...", ingredients: "Thịt ba chỉ nướng, chả viên nướng, nước chấm chua ngọt kèm đu đủ xanh, bún, rau sống." },
+    { name: "Chả Cá Lã Vọng", city: "Hà Nội", price: 180000, desc: "Cá lăng nướng nghệ thơm phức...", ingredients: "Cá lăng thái miếng nướng nghệ, hành lá, thì là, lạc rang, mắm tôm pha chanh ớt đường." },
+    { name: "Mì Quảng Ếch Đà Nẵng", city: "Đà Nẵng", price: 50000, desc: "Sợi mì Quảng dày mướt...", ingredients: "Mì Quảng vàng từ nghệ, thịt ếch om sả nghệ, nước dùng xâm xấp, bánh tráng nướng." },
+    { name: "Cao Lầu Hội An", city: "Hội An", price: 45000, desc: "Món mì độc đáo trứ danh...", ingredients: "Sợi mì làm từ nước tro giếng cổ Bá Lễ, thịt xá xíu rim mặn ngọt, tóp mỡ, rau đắng." },
+    { name: "Bánh Mì Phượng Hội An", city: "Hội An", price: 35000, desc: "Ổ bánh mì kẹp nhân đầy đặn...", ingredients: "Pate gan béo mịn, sốt mayonnaise tự làm, thịt xá xíu, chả lụa, dưa leo, rau răm." },
+    { name: "Lẩu Gà Lá É Đà Lạt", city: "Đà Lạt", price: 250000, desc: "Lẩu gà ấm nóng đặc sản...", ingredients: "Thịt gà đồi giòn dai, lá é trắng tươi cay nồng, măng chua, nấm sò, bún tươi." },
+    { name: "Bánh Tráng Nướng Đà Lạt", city: "Đà Lạt", price: 25000, desc: "Pizza Đà Lạt nóng hổi...", ingredients: "Bánh tráng nướng giòn phết bơ, trứng cút, hành phi, sả, bò khô, xúc xích, phô mai." },
+    { name: "Lẩu Bò Ba Toa Đà Lạt", city: "Đà Lạt", price: 300000, desc: "Nồi lẩu bò nghi ngút khói...", ingredients: "Thịt bò nạm, gân, đuôi hầm mềm, đậu phụ, cải xanh, mì trứng, chấm chao sa tế." },
+    { name: "Cơm Tấm Sườn Bì Chả Sài Gòn", city: "TP.HCM", price: 55000, desc: "Cơm tấm sườn nướng mỡ hành...", ingredients: "Gạo tấm thơm dẻo, sườn heo nướng mật ong, bì heo thính, chả trứng hấp, nước mắm ngọt." },
+    { name: "Hủ Tiếu Nam Vang Sài Gòn", city: "TP.HCM", price: 65000, desc: "Tô hủ tiếu tôm thịt trứng cút...", ingredients: "Sợi hủ tiếu dai mướt, tôm tươi, thịt băm, gan heo, hẹ lá, tỏi phi thơm lừng." },
+    { name: "Bánh Tráng Trộn Sài Gòn", city: "TP.HCM", price: 25000, desc: "Món ăn vặt đường phố nổi tiếng...", ingredients: "Bánh tráng sợi, muối Tây Ninh, quất, sa tế, rau răm, trứng cút, khô bò, lạc rang." }
+  ];
+
+  function getCurrentDestinationName() {
+    const destInput = document.getElementById('dest');
+    if (destInput && destInput.value && destInput.value.trim()) {
+      return destInput.value.trim().split(',')[0].trim();
+    }
+    let selectedDests = window.selectedDestinations || [];
+    if (selectedDests.length === 0) {
+      selectedDests = window.selectedDestNames || [];
+    }
+    if (selectedDests.length === 0) {
+      return '';
+    }
+    if (typeof selectedDests[0] === 'object') {
+      return selectedDests[0].name || selectedDests[0].destination || '';
+    }
+    return selectedDests[0] || '';
+  }
+
+  window.updateBudgetItemUIVisibility = function (checkbox) {
+    const row = checkbox.closest('.budget-item-row');
+    if (!row) return;
+    const moreBtn = row.querySelector('.budget-item-more-btn');
+    const container = row.parentElement;
+    const detailsBox = container ? container.querySelector('.budget-item-details-box') : null;
+
+    const isFromStep1 = checkbox.getAttribute('data-from-step1') === 'true';
+
+    if (checkbox.checked && isFromStep1) {
+      if (moreBtn) moreBtn.style.display = 'inline-block';
+    } else {
+      if (moreBtn) moreBtn.style.display = 'none';
+      if (detailsBox) detailsBox.style.display = 'none';
+    }
+  };
+
+  window.toggleBudgetFood = function (name, checkbox) {
+    const isChecked = checkbox.checked;
+    const item = (window.selectedAttractionData || []).find(a => a.name === name);
+
+    if (item && !isChecked) {
+      const card = document.querySelector(`[data-spot-name="${name}"]`);
+      window.toggleSpotSelection(card, name, item.category, item.cityName);
+    } else if (!item && isChecked) {
+      const card = document.querySelector(`[data-spot-name="${name}"]`);
+      window.toggleSpotSelection(card, name, 'restaurant', getCurrentDestinationName());
+    } else {
+      updateBudgetEstimate();
+    }
+  };
+
+  window.toggleBudgetTicket = function (name, checkbox) {
+    const isChecked = checkbox.checked;
+    const item = (window.selectedAttractionData || []).find(a => a.name === name);
+
+    if (item && !isChecked) {
+      const card = document.querySelector(`[data-spot-name="${name}"]`);
+      window.toggleSpotSelection(card, name, item.category, item.cityName);
+    } else if (!item && isChecked) {
+      const card = document.querySelector(`[data-spot-name="${name}"]`);
+      window.toggleSpotSelection(card, name, 'attraction', getCurrentDestinationName());
+    } else {
+      updateBudgetEstimate();
+    }
+  };
+
+  window.toggleBudgetEntertain = function (name, checkbox) {
+    const isChecked = checkbox.checked;
+    const item = (window.selectedAttractionData || []).find(a => a.name === name);
+
+    if (item && !isChecked) {
+      const card = document.querySelector(`[data-spot-name="${name}"]`);
+      window.toggleSpotSelection(card, name, item.category, item.cityName);
+    } else if (!item && isChecked) {
+      const card = document.querySelector(`[data-spot-name="${name}"]`);
+      window.toggleSpotSelection(card, name, 'experience', getCurrentDestinationName());
+    } else {
+      updateBudgetEstimate();
+    }
+  };
+
+  async function populateBudgetBreakdownSuggestions() {
+    const cityName = getCurrentDestinationName() || "Hà Nội";
+    const tier = currentTravelTier;
+    const days = parseInt(document.getElementById('days')?.value) || 1;
+    const nights = parseInt(document.getElementById('nights')?.value) || (days - 1);
+
+    const predictions = getCityAIPredictions(cityName, tier, days, nights);
+
+    // 1. POPULATE FOOD
+    const foodListEl = document.getElementById('foodSuggestionList');
+    if (foodListEl) {
+      const selectedFood = (window.selectedAttractionData || [])
+        .filter(a => a.category === 'restaurant')
+        .map(a => {
+          const cost = getSpotCost(a.name);
+          return {
+            name: a.name,
+            price: cost ? (cost.food || cost.ticket || 60000) : 60000,
+            desc: a.description || "Quán ăn bạn đã chọn trong danh sách địa điểm.",
+            ingredients: "Quán ăn chọn từ danh sách hoặc bản đồ.",
+            fromStep1: true
+          };
+        });
+
+      // Keep a queue of selected restaurants to distribute into Lunch/Dinner slots
+      let userFoodQueue = [...selectedFood];
+      const aiMeals = predictions.food.map(f => ({ ...f, fromStep1: false }));
+
+      const finalDishes = aiMeals.map(meal => {
+        if ((meal.mealLabel === "Bữa trưa" || meal.mealLabel === "Bữa tối") && userFoodQueue.length > 0) {
+          const userItem = userFoodQueue.shift();
+          return {
+            ...userItem,
+            day: meal.day,
+            mealLabel: meal.mealLabel
+          };
+        }
+        return meal;
+      });
+
+      // Render food grouped by day
+      let foodHtml = '';
+      let currentDay = 0;
+
+      finalDishes.forEach((dish, idx) => {
+        const safeName = dish.name.replace(/'/g, "\\'");
+        const isChecked = "checked";
+        const changeHandler = `window.updateBudgetItemUIVisibility(this); window.toggleBudgetFood('${safeName}', this)`;
+        const badge = dish.fromStep1 ? '' : `<span style="font-size:0.62rem;color:#10b981;background:rgba(16,185,129,0.1);padding:1px 5px;border-radius:4px;margin-right:5px;font-weight:700;display:inline-block;white-space:nowrap;vertical-align:middle;">✨ AI Dự đoán</span>`;
+        const showMoreBtnStyle = dish.fromStep1 ? 'inline-block' : 'none';
+
+        if (dish.day !== currentDay) {
+          currentDay = dish.day;
+          foodHtml += `<div style="font-weight: 700; color: var(--primary); margin: 0.8rem 0 0.4rem 0; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2px;">📅 Ngày ${currentDay}</div>`;
+        }
+
+        foodHtml += `
+          <div style="display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.4rem; padding-left: 0.4rem;">
+            <div class="budget-item-row">
+              <div class="budget-item-left">
+                <input type="checkbox" class="budget-item-checkbox" data-type="food" data-name="${dish.name}" data-price="${dish.price}" data-from-step1="${dish.fromStep1 || false}" ${isChecked} onchange="${changeHandler}" />
+                <span style="font-weight: 600; color: var(--text);"><span style="color: var(--primary-light); font-size: 0.72rem; margin-right: 6px; font-weight: bold;">[${dish.mealLabel || "Bữa ăn"}]</span>${badge}${dish.name}</span>
+              </div>
+              <div class="budget-item-right">
+                <span class="budget-item-price">${formatCurrency(dish.price)}</span>
+                <button type="button" class="budget-item-more-btn" style="display: ${showMoreBtnStyle};" onclick="window.toggleBudgetItemDetails('food-details-${idx}', event)">Xem thêm</button>
+              </div>
+            </div>
+            <div id="food-details-${idx}" class="budget-item-details-box" style="display: none;">
+              <strong>Mô tả:</strong> ${dish.desc}<br/>
+              <strong>Thành phần dinh dưỡng:</strong> ${dish.ingredients}
+            </div>
+          </div>
+        `;
+      });
+
+      foodListEl.innerHTML = foodHtml;
+    }
+
+    // 2. POPULATE TICKETS
+    const ticketListEl = document.getElementById('ticketSuggestionList');
+    if (ticketListEl) {
+      const selectedTickets = (window.selectedAttractionData || [])
+        .filter(a => a.category === 'attraction')
+        .map(a => {
+          const cost = getSpotCost(a.name);
+          return {
+            name: a.name,
+            price: cost ? cost.ticket : 0,
+            desc: a.description || "Điểm tham quan hấp dẫn trong lịch trình.",
+            cityName: a.cityName || cityName,
+            fromStep1: true
+          };
+        });
+
+      let finalTickets = selectedTickets.length > 0 ? [...selectedTickets] : predictions.tickets.map(t => ({ ...t, fromStep1: false }));
+
+      ticketListEl.innerHTML = finalTickets.map((spot, idx) => {
+        let price = spot.price;
+        if (price === undefined) {
+          const cost = getSpotCost(spot.name);
+          price = cost ? cost.ticket : (DEFAULT_COSTS[spot.category] || DEFAULT_COSTS.attraction).ticket;
+        }
+
+        const priceLabel = price > 0 ? formatCurrency(price) : "Miễn phí";
+        const safeName = spot.name.replace(/'/g, "\\'");
+        const isChecked = "checked";
+        const changeHandler = `window.updateBudgetItemUIVisibility(this); window.toggleBudgetTicket('${safeName}', this)`;
+        const badge = spot.fromStep1 ? '' : `<span style="font-size:0.62rem;color:#3b82f6;background:rgba(59,130,246,0.1);padding:1px 5px;border-radius:4px;margin-right:5px;font-weight:700;display:inline-block;white-space:nowrap;vertical-align:middle;">✨ AI Dự đoán</span>`;
+        const showMoreBtnStyle = spot.fromStep1 ? 'inline-block' : 'none';
+
+        return `
+          <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+            <div class="budget-item-row">
+              <div class="budget-item-left">
+                <input type="checkbox" class="budget-item-checkbox" data-type="ticket" data-name="${spot.name}" data-price="${price}" data-from-step1="${spot.fromStep1 || false}" ${isChecked} onchange="${changeHandler}" />
+                <span style="font-weight: 600; color: var(--text);">${badge}${spot.name}</span>
+              </div>
+              <div class="budget-item-right">
+                <span class="budget-item-price">${priceLabel}</span>
+                <button type="button" class="budget-item-more-btn" style="display: ${showMoreBtnStyle};" onclick="window.toggleBudgetItemDetails('ticket-details-${idx}', event)">Xem thêm</button>
+              </div>
+            </div>
+            <div id="ticket-details-${idx}" class="budget-item-details-box" style="display: none;">
+              <strong>Mô tả:</strong> ${spot.desc || "Điểm tham quan hấp dẫn trong lịch trình."}<br/>
+              <strong>Vị trí:</strong> ${spot.cityName || cityName}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 3. POPULATE ENTERTAINMENT
+    const entertainListEl = document.getElementById('entertainSuggestionList');
+    if (entertainListEl) {
+      const selectedExperiences = (window.selectedAttractionData || [])
+        .filter(a => a.category === 'experience' || a.category === 'entertainment')
+        .map(a => {
+          const cost = getSpotCost(a.name);
+          return {
+            name: a.name,
+            price: cost ? (cost.ticket || cost.food || 100000) : 100000,
+            desc: a.description || "Hoạt động trải nghiệm, giải trí độc đáo.",
+            fromStep1: true
+          };
+        });
+
+      let finalEntertain = selectedExperiences.length > 0 ? [...selectedExperiences] : predictions.entertain.map(e => ({ ...e, fromStep1: false }));
+
+      entertainListEl.innerHTML = finalEntertain.map((item, idx) => {
+        const safeName = item.name.replace(/'/g, "\\'");
+        const isChecked = "checked";
+        const changeHandler = `window.updateBudgetItemUIVisibility(this); window.toggleBudgetEntertain('${safeName}', this)`;
+        const badge = item.fromStep1 ? '' : `<span style="font-size:0.62rem;color:#a855f7;background:rgba(168,85,247,0.1);padding:1px 5px;border-radius:4px;margin-right:5px;font-weight:700;display:inline-block;white-space:nowrap;vertical-align:middle;">✨ AI Dự đoán</span>`;
+        const showMoreBtnStyle = item.fromStep1 ? 'inline-block' : 'none';
+
+        return `
+          <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+            <div class="budget-item-row">
+              <div class="budget-item-left">
+                <input type="checkbox" class="budget-item-checkbox" data-type="entertain" data-name="${item.name}" data-price="${item.price}" data-from-step1="${item.fromStep1 || false}" ${isChecked} onchange="${changeHandler}" />
+                <span style="font-weight: 600; color: var(--text);">${badge}${item.name}</span>
+              </div>
+              <div class="budget-item-right">
+                <span class="budget-item-price">${formatCurrency(item.price)}</span>
+                <button type="button" class="budget-item-more-btn" style="display: ${showMoreBtnStyle};" onclick="window.toggleBudgetItemDetails('entertain-details-${idx}', event)">Xem thêm</button>
+              </div>
+            </div>
+            <div id="entertain-details-${idx}" class="budget-item-details-box" style="display: none;">
+              <strong>Chi tiết:</strong> ${item.desc}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    updateBudgetEstimate();
+  }
+
+
+  window.populateBudgetBreakdownSuggestions = populateBudgetBreakdownSuggestions;
+
   // Initialize Quick Form Location Selection to Manual by default
   if (typeof toggleQuickManualLocation === 'function') {
     toggleQuickManualLocation();

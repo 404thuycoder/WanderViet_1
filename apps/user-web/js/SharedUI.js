@@ -2664,7 +2664,38 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
         box-shadow: 0 12px 40px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
         display: flex; align-items: center; justify-content: space-between; gap: 1rem;
         animation: wander-toast-in 0.4s cubic-bezier(0.18,0.89,0.32,1.28);
+        border-left: 6px solid #3b82f6;
+        transition: opacity 0.4s ease, transform 0.4s ease, background 0.3s ease;
       }
+      .wander-toast--success {
+        border-left-color: #10b981;
+        background: rgba(16, 185, 129, 0.15);
+        border-color: rgba(16, 185, 129, 0.3);
+      }
+      .wander-toast--error {
+        border-left-color: #ef4444;
+        background: rgba(239, 68, 68, 0.15);
+        border-color: rgba(239, 68, 68, 0.3);
+      }
+      .wander-toast--warning {
+        border-left-color: #f59e0b;
+        background: rgba(245, 158, 11, 0.15);
+        border-color: rgba(245, 158, 11, 0.3);
+      }
+      .wander-toast--info {
+        border-left-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.15);
+        border-color: rgba(59, 130, 246, 0.3);
+      }
+      .wander-toast--fade-out {
+        opacity: 0 !important;
+        transform: translateY(-20px) !important;
+      }
+      .wander-toast__close {
+        background: none; border: none; color: rgba(255,255,255,0.5); font-size: 1.25rem;
+        cursor: pointer; padding: 0; line-height: 1; transition: color 0.2s;
+      }
+      .wander-toast__close:hover { color: #fff; }
       @keyframes wander-toast-in { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
       .wander-notif-drawer {
         position: fixed; top: 0; right: 0; width: 380px; height: 100vh;
@@ -9042,4 +9073,71 @@ window.WanderUI = Object.assign(window.WanderUI, (function () {
 
   return { setTheme, toggleTheme, showToast, setButtonLoading, toggleNotificationDrawer, updateNotificationBadge, markAsRead, markAllAsRead, syncAuthUI, forceLogout, toggleUserMenu, openAuthModal, confirm, openPlaceDetail, openBookingDetail, openItineraryDetail, openNotificationDetailModal, getRankBadgeHTML, getRankIcon, getStoreKey, initSettingsHandlers, trackQuestActivity, getQuestActivity, startTopLoader, finishTopLoader, openModal, closeModal, copyToClipboard, viewImage, recordActivity };
 })());
+
+function showAlertModal(title, message, type = 'warning') {
+  return new Promise((resolve) => {
+    const modalId = 'temp-alert-modal-' + Date.now();
+    const borderColors = {
+      warning: '#f59e0b',
+      error: '#ef4444',
+      success: '#10b981',
+      info: '#3b82f6'
+    };
+    const accentColor = borderColors[type] || '#f59e0b';
+    
+    const icons = {
+      warning: `<svg style="width: 48px; height: 48px; color: #f59e0b;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>`,
+      error: `<svg style="width: 48px; height: 48px; color: #ef4444;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+      success: `<svg style="width: 48px; height: 48px; color: #10b981;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
+      info: `<svg style="width: 48px; height: 48px; color: #3b82f6;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`
+    };
+    const icon = icons[type] || icons.warning;
+
+    const modalHtml = `
+      <div id="${modalId}" style="z-index: 2147483647; position: fixed; inset: 0; background: rgba(10, 18, 28, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; padding: 16px; animation: modal-fade-in 0.25s ease-out; font-family: 'Outfit', sans-serif;">
+        <div style="max-width: 400px; width: 100%; background: #1e293b; border: 1px solid rgba(255, 255, 255, 0.1); border-top: 5px solid ${accentColor}; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); padding: 28px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px; animation: modal-slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);">
+          <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.05);">
+            ${icon}
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <h3 style="margin: 0; font-size: 1.35rem; font-weight: 700; color: #fff; font-family: 'Outfit', sans-serif;">${title}</h3>
+            <p style="color: #94a3b8; line-height: 1.6; font-size: 0.95rem; margin: 0; font-family: 'Inter', sans-serif;">${message}</p>
+          </div>
+          <button id="${modalId}-ok" style="cursor: pointer; padding: 12px 24px; border-radius: 14px; background: ${accentColor}; color: #fff; border: none; font-weight: 600; width: 100%; transition: all 0.2s; font-family: 'Outfit', sans-serif; font-size: 1rem;">Đóng</button>
+        </div>
+      </div>
+    `;
+    
+    if (!document.getElementById('wv-alert-keyframes')) {
+      const style = document.createElement('style');
+      style.id = 'wv-alert-keyframes';
+      style.innerHTML = `
+        @keyframes modal-fade-in { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modal-slide-up { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = modalHtml;
+    const modalElement = wrapper.firstElementChild;
+    document.body.appendChild(modalElement);
+    
+    const btn = document.getElementById(`${modalId}-ok`);
+    btn.onmouseover = () => { btn.style.opacity = '0.9'; btn.style.transform = 'translateY(-1px)'; };
+    btn.onmouseout = () => { btn.style.opacity = '1'; btn.style.transform = 'translateY(0)'; };
+    btn.onclick = () => {
+      modalElement.remove();
+      resolve();
+    };
+  });
+}
+
+window.WanderToast = {
+  success: (msg) => window.WanderUI.showToast(msg, 'success'),
+  error: (msg) => showAlertModal("Lỗi", msg, 'error'),
+  warning: (msg) => showAlertModal("Cảnh báo", msg, 'warning'),
+  info: (msg) => window.WanderUI.showToast(msg, 'info'),
+  warn: (msg) => showAlertModal("Cảnh báo", msg, 'warning')
+};
 

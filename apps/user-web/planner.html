@@ -1660,6 +1660,84 @@
       background: rgba(0, 0, 0, 0.1);
     }
 
+    /* Budget Breakdown Sub-Panels and Suggestion Lists */
+    .budget-sub-panel {
+      animation: slideDown 0.25s ease-out;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      padding: 0.6rem;
+      margin-top: 0.5rem;
+    }
+    [data-theme="light"] .budget-sub-panel {
+      background: rgba(0, 0, 0, 0.03);
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .budget-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.5rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+    [data-theme="light"] .budget-item-row {
+      background: #fff;
+    }
+    .budget-item-row:hover {
+      border-color: rgba(59, 130, 246, 0.4);
+      transform: translateX(2px);
+    }
+    .budget-item-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text);
+    }
+    .budget-item-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .budget-item-price {
+      font-weight: 700;
+      color: var(--text);
+    }
+    .budget-item-checkbox {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: #10b981;
+    }
+    .budget-item-more-btn {
+      font-size: 0.68rem;
+      color: #3b82f6;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+    .budget-item-details-box {
+      background: rgba(0, 0, 0, 0.2);
+      border-left: 3px solid #3b82f6;
+      padding: 0.5rem 0.75rem;
+      margin-top: 0.25rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-radius: 0 6px 6px 0;
+      line-height: 1.4;
+      animation: fadeIn 0.2s ease;
+    }
+    [data-theme="light"] .budget-item-details-box {
+      background: rgba(0, 0, 0, 0.02);
+    }
   </style>
 </head>
 
@@ -2163,9 +2241,10 @@
                   <div id="tab-spots" class="v2-tab-panel" style="padding:0.85rem;">
                     <!-- Filter chips -->
                     <div style="display:flex; gap:0.4rem; margin-bottom:0.75rem; flex-wrap:wrap;">
-                      <label class="v2-chip-filter active" id="chip-attraction" onclick="toggleChipFilter(this,'attraction')">🏛️ Điểm chơi</label>
+                      <label class="v2-chip-filter active" id="chip-attraction" onclick="toggleChipFilter(this,'attraction')">🏛️ Tham quan</label>
                       <label class="v2-chip-filter active" id="chip-restaurant" onclick="toggleChipFilter(this,'restaurant')">🍜 Quán ăn</label>
                       <label class="v2-chip-filter active" id="chip-experience" onclick="toggleChipFilter(this,'experience')">✨ Trải nghiệm</label>
+                      <label class="v2-chip-filter active" id="chip-entertainment" onclick="toggleChipFilter(this,'entertainment')">🎪 Giải trí</label>
                     </div>
                     <!-- Spots grid 2-col -->
                     <div id="reviewPanelSpots" style="display:grid; grid-template-columns:1fr 1fr; gap:0.85rem;">
@@ -2467,30 +2546,42 @@
                   
                   <!-- 🍜 Tiền ăn uống -->
                   <div class="bb-item">
-                    <div class="bb-header">
-                      <div class="bb-title"><span class="bb-icon">🍜</span> Ăn uống</div>
+                    <div class="bb-header" onclick="window.toggleBudgetSubPanel('foodSubPanel', event)" style="cursor: pointer;">
+                      <div class="bb-title"><span class="bb-icon">🍜</span> Ăn uống <span style="font-size:0.65rem;color:#10b981;margin-left:0.5rem;padding:2px 6px;border-radius:4px;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.05);font-weight:normal;">Chi tiết ▼</span></div>
                       <span class="bb-total" id="foodTotal">0 VNĐ</span>
                     </div>
                     <div id="foodDetail" class="bb-detail"></div>
+                    <div id="foodSubPanel" class="budget-sub-panel" style="display: none;">
+                      <div style="font-size: 0.72rem; font-weight: bold; margin-bottom: 0.4rem; color: var(--text);">Gợi ý món ăn ngon (click chọn để tính chi phí):</div>
+                      <div id="foodSuggestionList" style="display: grid; gap: 0.4rem;"></div>
+                    </div>
                   </div>
                   
-                  <!-- 🚌 Tiền di chuyển -->
-                  <div class="bb-item">
-                    <div class="bb-header">
-                      <div class="bb-title"><span class="bb-icon" id="transportIcon">🛵</span> Di chuyển</div>
-                      <span class="bb-total" id="transportTotal">0 VNĐ</span>
-                    </div>
-                    <div id="transportRoute" class="bb-detail" style="font-weight: 600; margin-bottom: 2px;"></div>
-                    <div id="transportDetail" class="bb-detail"></div>
-                  </div>
+                   <!-- 🚌 Tiền di chuyển -->
+                   <div class="bb-item">
+                     <div class="bb-header" onclick="window.toggleBudgetSubPanel('transportSubPanel', event)" style="cursor: pointer;">
+                       <div class="bb-title"><span class="bb-icon" id="transportIcon">🛵</span> Di chuyển <span style="font-size:0.65rem;color:#10b981;margin-left:0.5rem;padding:2px 6px;border-radius:4px;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.05);font-weight:normal;">Phương tiện ▼</span></div>
+                       <span class="bb-total" id="transportTotal">0 VNĐ</span>
+                     </div>
+                     <div id="transportRoute" class="bb-detail" style="font-weight: 600; margin-bottom: 2px;"></div>
+                     <div id="transportDetail" class="bb-detail"></div>
+                     <div id="transportSubPanel" class="budget-sub-panel" style="display: none; padding-top: 0.4rem; border-top: 1px dashed rgba(255,255,255,0.1); margin-top: 0.4rem;">
+                       <div style="font-size: 0.72rem; font-weight: bold; margin-bottom: 0.4rem; color: var(--text);">Chọn phương tiện di chuyển (tính toán dựa trên khoảng cách GPS):</div>
+                       <div id="transportVehicleList" style="display: grid; gap: 0.4rem;"></div>
+                     </div>
+                   </div>
                   
                   <!-- 🎫 Tiền vé tham quan -->
                   <div class="bb-item">
-                    <div class="bb-header">
-                      <div class="bb-title"><span class="bb-icon">🎫</span> Vé tham quan</div>
+                    <div class="bb-header" onclick="window.toggleBudgetSubPanel('ticketSubPanel', event)" style="cursor: pointer;">
+                      <div class="bb-title"><span class="bb-icon">🎫</span> Vé tham quan <span style="font-size:0.65rem;color:#3b82f6;margin-left:0.5rem;padding:2px 6px;border-radius:4px;border:1px solid rgba(59,130,246,0.3);background:rgba(59,130,246,0.05);font-weight:normal;">Chi tiết ▼</span></div>
                       <span class="bb-total" id="ticketTotal">0 VNĐ</span>
                     </div>
                     <div id="ticketDetail" class="bb-detail"></div>
+                    <div id="ticketSubPanel" class="budget-sub-panel" style="display: none;">
+                      <div style="font-size: 0.72rem; font-weight: bold; margin-bottom: 0.4rem; color: var(--text);">Chi tiết vé theo địa điểm (click chọn/bỏ gợi ý):</div>
+                      <div id="ticketSuggestionList" style="display: grid; gap: 0.4rem;"></div>
+                    </div>
                   </div>
                   
                   <!-- 📍 Chi phí địa điểm đã chọn -->
@@ -2505,11 +2596,15 @@
                   
                   <!-- ☕ Tiền giải trí & đồ uống -->
                   <div class="bb-item">
-                    <div class="bb-header">
-                      <div class="bb-title"><span class="bb-icon">☕</span> Giải trí & Đồ uống</div>
+                    <div class="bb-header" onclick="window.toggleBudgetSubPanel('entertainSubPanel', event)" style="cursor: pointer;">
+                      <div class="bb-title"><span class="bb-icon">🔮</span> Giải trí <span style="font-size:0.65rem;color:#a855f7;margin-left:0.5rem;padding:2px 6px;border-radius:4px;border:1px solid rgba(168,85,247,0.3);background:rgba(168,85,247,0.05);font-weight:normal;">Chi tiết ▼</span></div>
                       <span class="bb-total" id="entertainTotal">0 VNĐ</span>
                     </div>
                     <div id="entertainDetail" class="bb-detail"></div>
+                    <div id="entertainSubPanel" class="budget-sub-panel" style="display: none;">
+                      <div style="font-size: 0.72rem; font-weight: bold; margin-bottom: 0.4rem; color: var(--text);">Chi tiết khoản chi giải trí (bỏ chọn nếu không đi):</div>
+                      <div id="entertainSuggestionList" style="display: grid; gap: 0.4rem;"></div>
+                    </div>
                   </div>
                 </div>
                 
@@ -3677,6 +3772,11 @@
         spots: [
           { name: "Lăng Chủ tịch Hồ Chí Minh", category: "attraction", desc: "Khu di tích lịch sử văn hóa thiêng liêng quốc gia.", reviews: 234, rating: 4.9, photos: ["https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg"] },
           { name: "Chùa Một Cột", category: "attraction", desc: "Ngôi chùa độc đáo với kiến trúc trên một cột giữa hồ nhỏ.", reviews: 198, rating: 4.8, photos: ["https://hoidisanvanhoa.vn/wp-content/uploads/2024/12/39.jpg"] },
+          { name: "Bảo tàng Lịch sử Quân sự Việt Nam", category: "attraction", desc: "Không gian trưng bày lịch sử quân sự quy mô lớn với nhiều hiện vật quý hiếm quốc gia.", reviews: 520, rating: 4.9, photos: [
+            "https://mediafile.qdnd.vn//images/2024/10/4/btlsqsvn_11.jpg",
+            "https://i.ytimg.com/vi/aT7hwfvpzDY/maxresdefault.jpg",
+            "https://hnm.1cdn.vn/2025/04/10/baotang-banve.jpg"
+          ] },
           { name: "Hồ Hoàn Kiếm", category: "attraction", desc: "Biểu tượng lịch sử, trái tim của thủ đô Hà Nội.", reviews: 567, rating: 4.8, photos: ["https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg"] },
           { name: "Đền Ngọc Sơn", category: "attraction", desc: "Di tích văn hóa nằm trên đảo trong Hồ Hoàn Kiếm.", reviews: 412, rating: 4.7, photos: ["https://vov2.vov.vn/sites/default/files/styles/large/public/2025-10/den-ngoc-son-ben-ho-hoan-kiem-anh-pham-hung-1.jpg"] },
           { name: "Nhà tù Hỏa Lò", category: "experience", desc: "Di tích lịch sử với nhiều câu chuyện về thời kỳ đấu tranh.", reviews: 278, rating: 4.6, photos: ["https://tuotz.com/wp-content/uploads/2025/07/nha-tu-hoa-lo-1-1.png"] },
@@ -3686,7 +3786,58 @@
           { name: "Chùa Trấn Quốc", category: "attraction", desc: "Ngôi chùa cổ nhất Hà Nội tọa lạc trên bán đảo Hồ Tây.", reviews: 345, rating: 4.8, photos: ["https://nhn.1cdn.vn/thumbs/1200x630/2023/09/13/chua-tran-quoc-th.jpg"] },
           { name: "Hồ Tây", category: "attraction", desc: "Hồ nước ngọt lớn nhất Hà Nội, thơ mộng và yên bình.", reviews: 412, rating: 4.7, photos: ["https://phuotvivu.com/blog/wp-content/uploads/2021/06/H%E1%BB%93-T%C3%A2y-1024x597.jpg"] },
           { name: "Phố Cổ Hà Nội", category: "attraction", desc: "36 phố phường cổ kính, linh hồn của Hà Nội nghìn năm.", reviews: 512, rating: 4.8, photos: ["https://thoitiet24h.vn/images/pho-co-ha-noi-xua.jpg"] },
-          { name: "Cầu Long Biên", category: "attraction", desc: "Cây cầu thép biểu tượng, nhân chứng lịch sử của Hà Nội.", reviews: 267, rating: 4.6, photos: ["https://statics.vinpearl.com/cau-long-bien-6_1678872759.jpg"] }
+          { name: "Cầu Long Biên", category: "attraction", desc: "Cây cầu thép biểu tượng, nhân chứng lịch sử của Hà Nội.", reviews: 267, rating: 4.6, photos: ["https://statics.vinpearl.com/cau-long-bien-6_1678872759.jpg"] },
+          { name: "Chả cá Lã Vọng", category: "restaurant", desc: "Món chả cá lăng nướng nghệ danh tiếng ăn kèm bún, rau thơm, hành hoa và mắm tôm ngon tuyệt.", reviews: 290, rating: 4.8, photos: [
+            "https://cdn.xanhsm.com/2025/01/20fafb8e-cha-ca-la-vong-hcm-1.jpg",
+            "https://nuocmamlegia.com/wp-content/uploads/2021/09/cha-ca-la-vong-tai-nha.jpg",
+            "https://afamilycdn.com/150157425591193600/2023/4/28/quan-cha-ca-la-vong-ha-noi-cha-ca-gia-nguyen-tran-khat-chan-23253848-1682669226278-168266922633517786913.jpg"
+          ] },
+          { name: "Phở Gia Truyền Bát Đàn", category: "restaurant", desc: "Quán phở bò gia truyền nổi tiếng với nước dùng bò ngọt thanh, thịt bò tái chín mềm thơm phức.", reviews: 310, rating: 4.9, photos: [
+            "https://mia.vn/media/uploads/blog-du-lich/pho-bat-dan-pho-gia-truyen-100-nam-tuoi-tai-ha-noi-1730101627.jpg",
+            "https://danielfooddiary.com/wp-content/uploads/2025/12/Pho-Gia-Truyen-Bat-Dan-HANOI--The-Authentic-Pho-Experience-Visitors-Seek.jpg",
+            "https://i.ytimg.com/vi/6dnPv6zTvuM/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBM70ayQgDKDSk5aiCK23AfJ7ekHw"
+          ] },
+          { name: "Bún Chả Hương Liên", category: "restaurant", desc: "Quán bún chả nổi tiếng từng đón tiếp Tổng thống Obama, chả nướng thơm lừng đậm đà.", reviews: 450, rating: 4.8, photos: ["https://mms.img.susercontent.com/vn-11134513-7r98o-lstxf7m02f2c77@resize_ss1242x600!@crop_w1242_h600_cT"] },
+          { name: "Bánh Mì 25", category: "restaurant", desc: "Thương hiệu bánh mì kẹp patê xá xíu nổi tiếng với du khách nước ngoài, vỏ bánh giòn rụm nhân đầy đặn.", reviews: 380, rating: 4.7, photos: [
+            "https://www.vibrantlyvietnam.com/wp-content/uploads/2019/08/banh-mi-25-restaurant-review-hanoi-vietnam.jpg",
+            "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/30/72/d8/c0/caption.jpg?w=1200&h=1200&s=1",
+            "https://down-vn.img.susercontent.com/vn-11134259-7r98o-lw8blzy9e86361@resize_ss800x450"
+          ] },
+          { name: "Xem Múa Rối Nước Thăng Long", category: "experience", desc: "Trải nghiệm nghệ thuật sân khấu rối nước dân gian độc đáo có từ thế kỷ 11 của Việt Nam.", reviews: 480, rating: 4.9, photos: [
+            "https://dulichnewtour.vn/ckfinder/images/Tours/nhahatmuaroithanglong/nha-hat-mua-roi-thang-long%20(4).jpg",
+            "https://i.ytimg.com/vi/8p3uR8LrZSk/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLASYXT9Pq8K7RJ3T8lRBlmGTHOp-A",
+            "https://sovhtt.hanoi.gov.vn/wp-content/uploads/2016/03/roi-nuoc.jpg"
+          ] },
+          { name: "Cà phê Đường Tàu Phố Cổ", category: "experience", desc: "Ngồi nhâm nhi tách cà phê trứng bên đường ray tàu hỏa chạy sát qua các ngôi nhà cổ kính.", reviews: 340, rating: 4.7, photos: [
+            "https://vcdn1-dulich.vnecdn.net/2024/11/27/1-5472-1732715875.jpg?w=680&h=0&q=100&dpr=2&fit=crop&s=Jbax3Yr8WunO177PpBSEDQ",
+            "https://tauvinhhalong.com/wp-content/uploads/2026/04/cafe-duong-tau.jpg",
+            "https://images2.thanhnien.vn/528068263637045248/2026/1/6/anh-4-1677982298200679889817-1767697162891248443079.jpg"
+          ] },
+          { name: "Tour Xe Máy Vespa Phố Cổ Đêm", category: "experience", desc: "Trải nghiệm khám phá ngóc ngách Hà Nội về đêm trên những chiếc xe Vespa cổ kính đầy thú vị.", reviews: 180, rating: 4.8, photos: [
+            "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/8f/d9/39/hanoi-backstreet-tours.jpg?w=500&h=500&s=1",
+            "https://hanoibackstreettours.com/wp-content/uploads/2016/10/Hanoi-Motorbike-Tours-1.jpg",
+            "https://hanoibackstreettours.com/wp-content/uploads/2020/03/Hanoi-Vesp-Tours.jpg"
+          ] },
+          { name: "Aeon Mall Long Biên", category: "entertainment", desc: "Khu trung tâm thương mại mua sắm, ẩm thực và vui chơi giải trí sầm uất bậc nhất Hà Nội.", reviews: 412, rating: 4.8, photos: [
+            "https://aeonmall-long-bien.com.vn/wp-content/uploads/2025/03/sanh-tay-hyundai-1-1.jpg",
+            "https://aeonmall-long-bien.com.vn/wp-content/uploads/2021/11/843aed8e0ae2c1bc98f3.jpg",
+            "https://aeonmall-vietnam.com/wp-content/uploads/2017/04/NY_0542-1.jpg"
+          ] },
+          { name: "Rạp chiếu phim Quốc gia", category: "entertainment", desc: "Trung tâm chiếu phim quốc gia hiện đại hàng đầu với các phòng chiếu chất lượng cao.", reviews: 298, rating: 4.7, photos: [
+            "https://api.chieuphimquocgia.com.vn/Content/Images/Master/0017151.jpg",
+            "https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2022/2/10/1013003/Z3171610536964_66669.jpg",
+            "https://apiv2.chieuphimquocgia.com.vn/Content/Images/Master/0017724.png"
+          ] },
+          { name: "Tổ hợp Hanoi Creative City", category: "entertainment", desc: "Khu nghệ thuật sáng tạo kết hợp ăn uống, triển lãm và khu vui chơi cực chất của giới trẻ.", reviews: 189, rating: 4.6, photos: [
+            "https://vov2.vov.vn/sites/default/files/images/hncrt.jpg",
+            "https://storage.googleapis.com/mytourcdn/resources/pictures/locations/sbb1441333879.jpg",
+            "https://nhn.1cdn.vn/thumbs/720x480/2023/03/12/khu-to-hop-giai-tri.jpg"
+          ] },
+          { name: "Công viên nước Hồ Tây", category: "entertainment", desc: "Tổ hợp công viên giải trí và các trò chơi dưới nước sôi động hàng đầu Thủ đô vào mùa hè.", reviews: 320, rating: 4.7, photos: [
+            "https://statics.vinpearl.com/cong-vien-nuoc-ho-tay-4_1683899934.jpg",
+            "https://bizweb.dktcdn.net/100/101/075/articles/cv-871e5153-3882-428d-8f2f-b7606147cebb.jpg?v=1555754159673",
+            "https://tlavn.com/wp-content/uploads/2025/07/AVA.jpg"
+          ] }
         ]
       },
       "TP. Hồ Chí Minh": {
@@ -4672,6 +4823,44 @@
       }
     })();
 
+    // Global collapse helper functions for budget details
+    window.toggleBudgetSubPanel = function(panelId, event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const panel = document.getElementById(panelId);
+      if (!panel) return;
+      
+      const isHidden = panel.style.display === 'none';
+      panel.style.display = isHidden ? 'block' : 'none';
+      
+      // Update badge text
+      const header = panel.parentNode.querySelector('.bb-header');
+      const badge = header ? header.querySelector('span[style*="font-weight:normal"]') : null;
+      if (badge) {
+        badge.textContent = isHidden ? 
+          (panelId === 'transportSubPanel' ? 'Phương tiện ▲' : 'Chi tiết ▲') : 
+          (panelId === 'transportSubPanel' ? 'Phương tiện ▼' : 'Chi tiết ▼');
+      }
+    };
+    
+    window.toggleBudgetItemDetails = function(detailsId, event) {
+      if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      }
+      const details = document.getElementById(detailsId);
+      if (!details) return;
+      
+      const isHidden = details.style.display === 'none';
+      details.style.display = isHidden ? 'block' : 'none';
+      
+      if (event && event.target) {
+        event.target.textContent = isHidden ? 'Thu gọn' : 'Xem thêm';
+      }
+    };
+
     // Selected attractions with full info
     window.selectedAttractionData = []; // Array of { name, category, cityName, image, description }
     window.selectedAttractionCards = {}; // Map by spot name
@@ -4800,7 +4989,7 @@
       if (panel) { panel.style.setProperty('display', 'block', 'important'); }
     };
 
-    window._activeChipFilters = { attraction: true, restaurant: true, experience: true };
+    window._activeChipFilters = { attraction: true, restaurant: true, experience: true, entertainment: true };
     window.toggleChipFilter = function(chipEl, category) {
       window._activeChipFilters[category] = !window._activeChipFilters[category];
       chipEl.classList.toggle('active', window._activeChipFilters[category]);
@@ -4822,8 +5011,9 @@
       document.querySelectorAll('.v2-tab').forEach((b,i) => b.classList.toggle('active', i===0));
       document.querySelectorAll('.v2-tab-panel').forEach((p,i) => { p.style.display = i===0 ? 'block' : 'none'; });
       // Reset chip filters
-      window._activeChipFilters = { attraction: true, restaurant: true, experience: true };
-      ['chip-attraction','chip-restaurant','chip-experience'].forEach(id => { const el=document.getElementById(id); if(el) el.classList.add('active'); });
+      window._activeChipFilters = { attraction: true, restaurant: true, experience: true, entertainment: true };
+      ['chip-attraction','chip-restaurant','chip-experience','chip-entertainment'].forEach(id => { const el=document.getElementById(id); if(el) el.classList.add('active'); });
+
 
 
       const panel = document.getElementById('v2DestReviewPanel');
@@ -5044,10 +5234,12 @@
       }
 
       const categories = {
-        attraction: { label: "Điểm chơi", icon: "🏛️", color: "#3b82f6", rgb: "59, 130, 246" },
+        attraction: { label: "Tham quan", icon: "🏛️", color: "#3b82f6", rgb: "59, 130, 246" },
         restaurant: { label: "Quán ăn", icon: "🍜", color: "#10b981", rgb: "16, 185, 129" },
-        experience: { label: "Trải nghiệm", icon: "✨", color: "#f59e0b", rgb: "245, 158, 11" }
+        experience: { label: "Trải nghiệm", icon: "✨", color: "#f59e0b", rgb: "245, 158, 11" },
+        entertainment: { label: "Giải trí", icon: "🎪", color: "#a855f7", rgb: "168, 85, 247" }
       };
+
 
       cityData.spots.forEach((spot, spotIdx) => {
         const catInfo = categories[spot.category] || { label: "Khác", icon: "📍", color: "#6b7280", rgb: "107, 114, 128" };
@@ -5150,10 +5342,12 @@
       document.getElementById('spotDetailReviews').textContent = `${spot.reviews || 0} đánh giá`;
       
       const categories = {
-        attraction: { label: "Điểm chơi", color: "#3b82f6" },
+        attraction: { label: "Tham quan", color: "#3b82f6" },
         restaurant: { label: "Quán ăn", color: "#10b981" },
-        experience: { label: "Trải nghiệm", color: "#f59e0b" }
+        experience: { label: "Trải nghiệm", color: "#f59e0b" },
+        entertainment: { label: "Giải trí", color: "#a855f7" }
       };
+
       const catInfo = categories[spot.category] || { label: "Khác", color: "#6b7280" };
       document.getElementById('spotDetailCategory').textContent = catInfo.label;
       document.getElementById('spotDetailCategory').style.background = catInfo.color;
@@ -5562,6 +5756,16 @@
       // ===================== HÀ NỘI — ĐIỂM THAM QUAN =====================
       "Hồ Hoàn Kiếm": ["https://sakos.vn/wp-content/uploads/2024/01/THUMB-SAKOS-20.jpg"],
       "Chùa Một Cột": ["https://hoidisanvanhoa.vn/wp-content/uploads/2024/12/39.jpg"],
+      "Bảo tàng Lịch sử Quân sự Việt Nam": [
+        "https://mediafile.qdnd.vn//images/2024/10/4/btlsqsvn_11.jpg",
+        "https://i.ytimg.com/vi/aT7hwfvpzDY/maxresdefault.jpg",
+        "https://hnm.1cdn.vn/2025/04/10/baotang-banve.jpg"
+      ],
+      "Bảo Tàng Lịch Sử Quân Sự Việt Nam": [
+        "https://mediafile.qdnd.vn//images/2024/10/4/btlsqsvn_11.jpg",
+        "https://i.ytimg.com/vi/aT7hwfvpzDY/maxresdefault.jpg",
+        "https://hnm.1cdn.vn/2025/04/10/baotang-banve.jpg"
+      ],
       "Lăng Bác": ["https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg"],
       "Lăng Chủ tịch Hồ Chí Minh": ["https://ik.imagekit.io/tvlk/blog/2023/10/lang-chu-tich%E2%80%93ho-chi-minh-15.jpg"],
       "Đền Ngọc Sơn": ["https://vov2.vov.vn/sites/default/files/styles/large/public/2025-10/den-ngoc-son-ben-ho-hoan-kiem-anh-pham-hung-1.jpg"],
@@ -5586,13 +5790,25 @@
       // ===================== HÀ NỘI — ẨM THỰC =====================
       "Bún Chả Hương Liên": ["https://mms.img.susercontent.com/vn-11134513-7r98o-lstxf7m02f2c77@resize_ss1242x600!@crop_w1242_h600_cT"],
       "Phở Thìn Bờ Hồ": ["https://cafebiz.cafebizcdn.vn/zoom/700_438/162123310254002176/2023/2/23/avatar1677154808691-1677154809528736470105.jpg"],
-      "Phở Bát Đàn": ["https://mms.img.susercontent.com/vn-11134513-7r98o-lsu7jkcdbfkpd3@resize_ss1242x600!@crop_w1242_h600_cT"],
+      "Phở Bát Đàn": [
+        "https://mia.vn/media/uploads/blog-du-lich/pho-bat-dan-pho-gia-truyen-100-nam-tuoi-tai-ha-noi-1730101627.jpg",
+        "https://danielfooddiary.com/wp-content/uploads/2025/12/Pho-Gia-Truyen-Bat-Dan-HANOI--The-Authentic-Pho-Experience-Visitors-Seek.jpg",
+        "https://i.ytimg.com/vi/6dnPv6zTvuM/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBM70ayQgDKDSk5aiCK23AfJ7ekHw"
+      ],
       "Phở 10 Lý Quốc Sư": ["https://danielfooddiary.com/wp-content/uploads/2025/12/pho101.JPG"],
-      "Chả Cá Lã Vọng": ["https://statics.vinpearl.com/cha-ca-la-vong-ha-noi-0_1681057662.jpg"],
+      "Chả Cá Lã Vọng": [
+        "https://cdn.xanhsm.com/2025/01/20fafb8e-cha-ca-la-vong-hcm-1.jpg",
+        "https://nuocmamlegia.com/wp-content/uploads/2021/09/cha-ca-la-vong-tai-nha.jpg",
+        "https://afamilycdn.com/150157425591193600/2023/4/28/quan-cha-ca-la-vong-ha-noi-cha-ca-gia-nguyen-tran-khat-chan-23253848-1682669226278-168266922633517786913.jpg"
+      ],
       "Bún Thang Giảng": ["https://luxuo.vn/wp-content/uploads/2024/11/cover-bun-thang.jpg"],
       "Bún Ốc Hình Lăng": ["https://cdn.tgdd.vn/2021/10/CookDish/tong-hop-8-cach-nau-bun-oc-ngon-hap-dan-chuan-vi-tai-nha-avt-1200x676.jpg"],
       "Bún Đậu Mắm Tôm Cầu Gỗ": ["https://lofita.vn/wp-content/uploads/2026/04/bun-dau-mam-tom-go-vap-9f18ca.webp"],
-      "Bánh Mì 25": ["https://www.vibrantlyvietnam.com/wp-content/uploads/2019/08/banh-mi-25-hanoi-vietnam-restaurant-review.jpg"],
+      "Bánh Mì 25": [
+        "https://www.vibrantlyvietnam.com/wp-content/uploads/2019/08/banh-mi-25-restaurant-review-hanoi-vietnam.jpg",
+        "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/30/72/d8/c0/caption.jpg?w=1200&h=1200&s=1",
+        "https://down-vn.img.susercontent.com/vn-11134259-7r98o-lw8blzy9e86361@resize_ss800x450"
+      ],
       "Bánh Cuốn Gia An": ["https://meetup.vn/wp-content/uploads/2025/06/351520-banh-cuon-gia-an-body-2.jpg"],
       "Cơm Gà Hàng Bè": ["https://cdn-i.vtcnews.vn/resize/th/upload/2024/04/23/comgathuonghaingonnhuthongxuong-1-23434087.png"],
       "Kem Tràng Tiền": ["https://nhn.1cdn.vn/2021/09/27/nhipsonghanoi-hanoimoi-com-vn-kem-ttien.jpg"],
@@ -5626,8 +5842,16 @@
       "Meliá Hanoi": ["https://cdn2.vietnambooking.com/wp-content/uploads/hotel_pro/hotel_343476/ff30dfd6b244d3357f6c8392a8d1b033.jpg"],
 
       // ===================== HÀ NỘI — TRẢI NGHIỆM ĐẶC SẮC =====================
-      "Xem Múa Rối Nước Thăng Long": ["https://luhanhvietnam.com.vn/du-lich-land-tour/vnt_upload/tour/08_2019/thumbs/780_crop_72f718faa37747e6a5f724eb2481cc2f.png"],
-      "Múa Rối Nước Thăng Long": ["https://luhanhvietnam.com.vn/du-lich-land-tour/vnt_upload/tour/08_2019/thumbs/780_crop_72f718faa37747e6a5f724eb2481cc2f.png"],
+      "Xem Múa Rối Nước Thăng Long": [
+        "https://dulichnewtour.vn/ckfinder/images/Tours/nhahatmuaroithanglong/nha-hat-mua-roi-thang-long%20(4).jpg",
+        "https://i.ytimg.com/vi/8p3uR8LrZSk/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLASYXT9Pq8K7RJ3T8lRBlmGTHOp-A",
+        "https://sovhtt.hanoi.gov.vn/wp-content/uploads/2016/03/roi-nuoc.jpg"
+      ],
+      "Múa Rối Nước Thăng Long": [
+        "https://dulichnewtour.vn/ckfinder/images/Tours/nhahatmuaroithanglong/nha-hat-mua-roi-thang-long%20(4).jpg",
+        "https://i.ytimg.com/vi/8p3uR8LrZSk/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLASYXT9Pq8K7RJ3T8lRBlmGTHOp-A",
+        "https://sovhtt.hanoi.gov.vn/wp-content/uploads/2016/03/roi-nuoc.jpg"
+      ],
       "Đi Xích Lô Quanh Phố Cổ": ["https://statics.vinpearl.com/gia-xich-lo-ha-noi-banner_1682253976.jpg"],
       "Dạo Chợ Đêm Phố Cổ": ["https://static.vinwonders.com/production/cho-dem-pho-co-ha-noi-1.jpg"],
       "Thuê Xe Đạp / Chạy Bộ Quanh Hồ Tây": ["https://cdnphoto.dantri.com.vn/fZAnyQDTNSmcjWgAxzwf3l6y-bw=/2024/04/06/2-1712371163261.jpg?watermark=true"],
@@ -5635,6 +5859,56 @@
       "Café Sách & Góc Chill Phố Cổ": ["https://hotelroyalhoian.vn/wp-content/uploads/2025/05/dac-san-hoi-an-1-2-4.jpg"],
       "Nhà Hàng Rooftop Ở West Lake": ["https://topgo.vn/wp-content/uploads/2017/07/rooftop-bar-12-1.jpg"],
       "Nhà Hàng Buffet Lẩu / Nướng Nổi Tiếng": ["https://melamine.vn/wp-content/uploads/2023/07/Seoul-Garden-Chuoi-nha-hang-buffet-lau-nuong-TPHCM.jpg"],
+      "Cà Phê Đường Tàu": [
+        "https://vcdn1-dulich.vnecdn.net/2024/11/27/1-5472-1732715875.jpg?w=680&h=0&q=100&dpr=2&fit=crop&s=Jbax3Yr8WunO177PpBSEDQ",
+        "https://tauvinhhalong.com/wp-content/uploads/2026/04/cafe-duong-tau.jpg",
+        "https://images2.thanhnien.vn/528068263637045248/2026/1/6/anh-4-1677982298200679889817-1767697162891248443079.jpg"
+      ],
+      "Cà Phê Đường Tàu Phố Cổ": [
+        "https://vcdn1-dulich.vnecdn.net/2024/11/27/1-5472-1732715875.jpg?w=680&h=0&q=100&dpr=2&fit=crop&s=Jbax3Yr8WunO177PpBSEDQ",
+        "https://tauvinhhalong.com/wp-content/uploads/2026/04/cafe-duong-tau.jpg",
+        "https://images2.thanhnien.vn/528068263637045248/2026/1/6/anh-4-1677982298200679889817-1767697162891248443079.jpg"
+      ],
+      "Tour Xe Máy Vespa Phố Cổ Đêm": [
+        "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/8f/d9/39/hanoi-backstreet-tours.jpg?w=500&h=500&s=1",
+        "https://hanoibackstreettours.com/wp-content/uploads/2016/10/Hanoi-Motorbike-Tours-1.jpg",
+        "https://hanoibackstreettours.com/wp-content/uploads/2020/03/Hanoi-Vesp-Tours.jpg"
+      ],
+      "Aeon Mall Long Biên": [
+        "https://aeonmall-long-bien.com.vn/wp-content/uploads/2025/03/sanh-tay-hyundai-1-1.jpg",
+        "https://aeonmall-long-bien.com.vn/wp-content/uploads/2021/11/843aed8e0ae2c1bc98f3.jpg",
+        "https://aeonmall-vietnam.com/wp-content/uploads/2017/04/NY_0542-1.jpg"
+      ],
+      "Rạp Chiếu Phim Quốc Gia": [
+        "https://api.chieuphimquocgia.com.vn/Content/Images/Master/0017151.jpg",
+        "https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2022/2/10/1013003/Z3171610536964_66669.jpg",
+        "https://apiv2.chieuphimquocgia.com.vn/Content/Images/Master/0017724.png"
+      ],
+      "Rạp chiếu phim Quốc gia": [
+        "https://api.chieuphimquocgia.com.vn/Content/Images/Master/0017151.jpg",
+        "https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2022/2/10/1013003/Z3171610536964_66669.jpg",
+        "https://apiv2.chieuphimquocgia.com.vn/Content/Images/Master/0017724.png"
+      ],
+      "Tổ Hợp Hanoi Creative City": [
+        "https://vov2.vov.vn/sites/default/files/images/hncrt.jpg",
+        "https://storage.googleapis.com/mytourcdn/resources/pictures/locations/sbb1441333879.jpg",
+        "https://nhn.1cdn.vn/thumbs/720x480/2023/03/12/khu-to-hop-giai-tri.jpg"
+      ],
+      "Tổ hợp Hanoi Creative City": [
+        "https://vov2.vov.vn/sites/default/files/images/hncrt.jpg",
+        "https://storage.googleapis.com/mytourcdn/resources/pictures/locations/sbb1441333879.jpg",
+        "https://nhn.1cdn.vn/thumbs/720x480/2023/03/12/khu-to-hop-giai-tri.jpg"
+      ],
+      "Công Viên Nước Hồ Tây": [
+        "https://statics.vinpearl.com/cong-vien-nuoc-ho-tay-4_1683899934.jpg",
+        "https://bizweb.dktcdn.net/100/101/075/articles/cv-871e5153-3882-428d-8f2f-b7606147cebb.jpg?v=1555754159673",
+        "https://tlavn.com/wp-content/uploads/2025/07/AVA.jpg"
+      ],
+      "Công viên nước Hồ Tây": [
+        "https://statics.vinpearl.com/cong-vien-nuoc-ho-tay-4_1683899934.jpg",
+        "https://bizweb.dktcdn.net/100/101/075/articles/cv-871e5153-3882-428d-8f2f-b7606147cebb.jpg?v=1555754159673",
+        "https://tlavn.com/wp-content/uploads/2025/07/AVA.jpg"
+      ],
 
       // ===================== ĐÀ NẴNG =====================
       "Cầu Vàng Bà Nà Hills": [
@@ -5677,7 +5951,7 @@
       tab.classList.add('active');
 
       const categoryMap = {
-        attraction: { label: 'Điểm chơi', icon: '🏛️', tag: 'Khám phá địa điểm nổi bật' },
+        attraction: { label: 'Tham quan', icon: '🏛️', tag: 'Khám phá địa điểm nổi bật' },
         restaurant: { label: 'Quán ăn', icon: '🍜', tag: 'Trải nghiệm ẩm thực đặc sắc' },
         experience: { label: 'Trải nghiệm', icon: '✨', tag: 'Hoạt động giải trí & trải nghiệm' }
       };
@@ -6719,7 +6993,7 @@
 (function() {
 
   var CATEGORY_META = {
-    attraction:  { label: 'Điểm chơi', icon: '🏛️', color: 'rgba(59,130,246,0.9)' },
+    attraction:  { label: 'Tham quan', icon: '🏛️', color: 'rgba(59,130,246,0.9)' },
     restaurant:  { label: 'Quán ăn',   icon: '🍜', color: 'rgba(16,185,129,0.9)' },
     experience:  { label: 'Trải nghiệm', icon: '✨', color: 'rgba(245,158,11,0.9)' },
     cafe:        { label: 'Cà phê',    icon: '☕', color: 'rgba(168,85,247,0.9)' },

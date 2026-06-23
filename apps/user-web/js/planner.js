@@ -479,11 +479,23 @@ const initPlanner = function () {
         const days = parseInt(daysInput.value) || 1;
         if (nightsInput) nightsInput.value = Math.max(0, days - 1);
         updateBudgetEstimate();
+        // Re-render danh sách bữa ăn theo số ngày mới
+        setTimeout(() => {
+          if (typeof populateBudgetBreakdownSuggestions === 'function') {
+            populateBudgetBreakdownSuggestions();
+          }
+        }, 50);
       });
       daysInput.addEventListener('change', () => {
         const days = parseInt(daysInput.value) || 1;
         if (nightsInput) nightsInput.value = Math.max(0, days - 1);
         updateBudgetEstimate();
+        // Re-render danh sách bữa ăn theo số ngày mới
+        setTimeout(() => {
+          if (typeof populateBudgetBreakdownSuggestions === 'function') {
+            populateBudgetBreakdownSuggestions();
+          }
+        }, 50);
       });
     }
     if (nightsInput) {
@@ -491,11 +503,23 @@ const initPlanner = function () {
         const nights = parseInt(nightsInput.value) || 0;
         if (daysInput) daysInput.value = nights + 1;
         updateBudgetEstimate();
+        // Re-render danh sách bữa ăn theo số ngày mới
+        setTimeout(() => {
+          if (typeof populateBudgetBreakdownSuggestions === 'function') {
+            populateBudgetBreakdownSuggestions();
+          }
+        }, 50);
       });
       nightsInput.addEventListener('change', () => {
         const nights = parseInt(nightsInput.value) || 0;
         if (daysInput) daysInput.value = nights + 1;
         updateBudgetEstimate();
+        // Re-render danh sách bữa ăn theo số ngày mới
+        setTimeout(() => {
+          if (typeof populateBudgetBreakdownSuggestions === 'function') {
+            populateBudgetBreakdownSuggestions();
+          }
+        }, 50);
       });
     }
 
@@ -862,6 +886,12 @@ const initPlanner = function () {
     nightsInput.value = nights;
 
     updateBudgetEstimate();
+    // Re-render danh sách bữa ăn theo số ngày mới
+    setTimeout(() => {
+      if (typeof populateBudgetBreakdownSuggestions === 'function') {
+        populateBudgetBreakdownSuggestions();
+      }
+    }, 50);
   };
 
   window.adjustNights = function (delta) {
@@ -878,6 +908,12 @@ const initPlanner = function () {
     daysInput.value = days;
 
     updateBudgetEstimate();
+    // Re-render danh sách bữa ăn theo số ngày mới
+    setTimeout(() => {
+      if (typeof populateBudgetBreakdownSuggestions === 'function') {
+        populateBudgetBreakdownSuggestions();
+      }
+    }, 50);
   };
 
   // Member count adjustment

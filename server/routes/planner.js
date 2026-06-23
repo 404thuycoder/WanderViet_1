@@ -315,6 +315,9 @@ LƯU Ý QUAN TRỌNG:
 - "cost" phải ghi rõ số tiền cụ thể, không ghi chung chung.`;
 
 
+    // Tính max_tokens dựa trên số ngày: ~700 tokens/ngày cho lịch chi tiết (tối thiểu 3000, tối đa 8000)
+    const dynamicMaxTokens = Math.min(8000, Math.max(3000, numDays * 750));
+
     let response;
     const maxRetries = 3;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -328,7 +331,7 @@ LƯU Ý QUAN TRỌNG:
 Quy tắc tuyệt đối:
 - BẮT BUỘC ĐI QUA ĐỊA ĐIỂM CHỈ ĐỊNH: Nếu trong 'Yêu cầu đặc biệt' có chứa danh sách địa điểm (ví dụ: 'Ưu tiên đi qua các địa điểm du lịch: ...'), bạn PHẢI BẮT BUỘC sắp xếp lịch trình đi qua TOÀN BỘ các địa điểm này một cách hợp lý và thực tế. Tuyệt đối không được bỏ sót bất kỳ điểm nào!
 - "Săn mây / bình minh" → hoạt động lúc 04:30–06:30 SÁNG SỚM, KHÔNG được xếp chiều tối.
-- Số ngày trong itinerary PHẢI BẰNG số ngày được yêu cầu.
+- Số ngày trong itinerary PHẢI BẰNG ${numDays} ngày. KHÔNG được thiếu ngày.
 - Ngày 1 PHẢI tính thời gian di chuyển đến điểm đến.
 - ĐỘ CHÍNH XÁC: Bạn PHẢI cung cấp địa chỉ (location) thực tế, chính xác tại Việt Nam. Không được bịa đặt tên quán hay địa chỉ sai lệch.
 - CHẾ ĐỘ "KHÔNG QUAN TÂM HẠN MỨC": Nếu budget là "Không quan tâm hạn mức", hãy mặc định chọn những dịch vụ CAO CẤP nhất, quán ăn NỔI TIẾNG nhất và KHÔNG cần lo lắng về giá.
@@ -337,7 +340,7 @@ Quy tắc tuyệt đối:
             { role: 'user', content: prompt }
           ],
           response_format: { type: 'json_object' },
-          max_tokens: 4000
+          max_tokens: dynamicMaxTokens
         });
         break; // Thành công, thoát vòng lặp
       } catch (err) {
@@ -368,6 +371,55 @@ Quy tắc tuyệt đối:
         aiPlanJson.isShortTrip = true;
         aiPlanJson.durationHours = Number(durationHours) || 6;
         aiPlanJson.departureTime = departureTime || '08:00';
+      }
+
+      // ===== POST-PROCESSING: Bổ sung ngày còn thiếu nếu AI trả về ít hơn numDays =====
+      if (!isShortTrip && aiPlanJson.itinerary && Array.isArray(aiPlanJson.itinerary)) {
+        const existingDays = aiPlanJson.itinerary.length;
+        if (existingDays < numDays) {
+          console.warn(`⚠️ [Planner] AI chỉ trả về ${existingDays}/${numDays} ngày. Tự động bổ sung ${numDays - existingDays} ngày còn thiếu.`);
+          const destName = typeof destination === 'string' ? destination.split(',')[0].trim() : destination;
+          for (let d = existingDays + 1; d <= numDays; d++) {
+            // Tìm ngày cuối để tham khảo cấu trúc
+            const refDay = aiPlanJson.itinerary[existingDays - 1] || {};
+            aiPlanJson.itinerary.push({
+              day: d,
+              highlight: `Khám phá thêm ${destName} - Ngày ${d}`,
+              activities: [
+                {
+                  time: departureTime || '08:00',
+                  session: 'Sáng',
+                  task: `Ăn sáng và khám phá ${destName} buổi sáng Ngày ${d}`,
+                  location: destName,
+                  cost: 'Linh hoạt',
+                  transport: '🚗 Di chuyển tự do',
+                  rating: 4.2,
+                  description: `Ngày ${d} tại ${destName}: tiếp tục khám phá các điểm thú vị còn lại.`
+                },
+                {
+                  time: '12:00',
+                  session: 'Chiều',
+                  task: `Ăn trưa đặc sản ${destName} và tham quan buổi chiều`,
+                  location: destName,
+                  cost: 'Linh hoạt',
+                  transport: '🚶 Đi bộ hoặc Grab',
+                  rating: 4.0,
+                  description: `Thưởng thức ẩm thực địa phương và tham quan điểm nổi bật buổi chiều.`
+                },
+                {
+                  time: '18:00',
+                  session: 'Tối',
+                  task: `Ăn tối và trải nghiệm ${destName} về đêm`,
+                  location: destName,
+                  cost: 'Linh hoạt',
+                  transport: '🚗 Grab về khách sạn',
+                  rating: 4.3,
+                  description: `Bữa tối ấm cúng và tận hưởng không khí ${destName} về đêm.`
+                }
+              ]
+            });
+          }
+        }
       }
     } catch (parseErr) {
       console.error('Lỗi Parse JSON:', parseErr.message, 'Data:', aiPlanStr);
